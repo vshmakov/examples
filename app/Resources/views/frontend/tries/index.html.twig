@@ -1,0 +1,28 @@
+{%extends 'frontend/division.html.twig'%}
+
+{%block main%}
+<form>
+<h1>Пример №<span id="exampleNum">*</span></h1>
+<div>
+<span>
+<span id="example">* + *</span> =
+<input type="text" name="" id="">
+</span>
+</div>
+
+<button type="submit">Ответить</button>
+</form>
+
+<h1>Статистика</h1>
+<ul>
+<li>Ошибок: <span id="errorsCount">*</span></li>
+	<li>Осталось времени: <span id="timer">*</span></li>
+	<li>Осталось примеров: <span id="remainedExamples">*</span></li>
+	</ul>
+{%endblock%}
+
+{%block javaScript%}
+{{parent()}}
+<script type="text/javascript" src="/assets/helper.js"></script>
+<script type="text/javascript" src="/assets/frontend/tries.js"></script>
+{%endblock%}

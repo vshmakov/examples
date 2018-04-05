@@ -1,0 +1,10 @@
+{%extends 'frontend/division.html.twig'%}
+
+{%block main%}
+{{form(form)}}
+{%endblock%}
+
+{%block javaScript%}
+{{parent()}}
+<script type="text/javascript" src="/assets/frontend/profiles_edit.js"></script>
+{%endblock%}

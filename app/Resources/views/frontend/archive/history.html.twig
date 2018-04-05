@@ -1,0 +1,36 @@
+{%extends 'frontend/division.html.twig'%}
+
+{%block main%}
+<h1>Статистика</h1>
+<ul>
+	<li>Начало попытки: {{try.getStartTime()}}</li>
+	<li>Конец попытки: {{try.getFinishTime()}}</li>
+	<li>Примеров в попытке: {{try.getExamplesCount()}}</li>
+	<li>Решено примеров: {{try.getSolvedExamplesCount()}}</li>
+<li>Ошибок: {{try.getErrorsCount()}}</li>
+	<li>Оценка: {{try.getRating()}}</li>
+</ul>
+
+<h1>Примеры</h1>
+<table>
+	<thead>
+		<th>№</th>
+		<th>Пример</th>
+		<th>Ответ</th>
+	</thead>
+	{%for example in examples|reverse%}
+{%if not example.isRight()%}
+<tr>
+<td colspan="3">
+<h6>{{(example.getAnswer() is not null) ? "Ошибка №"~example.getErrorNum() : "Пример не решен"}}</h6>
+</td>
+</tr>
+{%endif%}
+	<tr>
+		<td>{{example.getNumber()}}</td>
+		<td>{{example}}</td>
+		<td>{{example.getAnswer() ?? '-'}}</td>
+	</tr>
+	{%endfor%}
+</table>
+{%endblock%}

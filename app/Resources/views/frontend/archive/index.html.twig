@@ -1,0 +1,32 @@
+{%extends 'frontend/division.html.twig'%}
+
+{%block main%}
+<h1>Архив попыток</h1>
+{%if tries%}
+<table>
+<thead>
+	<th>№</th>
+	<th>Начало попытки</th>
+	<th>Конец попытки</th>
+	<th>Примеров в попытке</th>
+	<th>Решено примеров</th>
+	<th>Ошибок</th>
+	<th>Оценка</th>
+</thead>
+
+{%for try in tries|reverse%}
+<tr>
+	<td><a href="{{path('history', {'id':try.getId()})}}">Попытка №{{try.getId()}}</a></td>
+	<td>{{try.getStartTime()}}</td>
+	<td>{{try.getFinishTime()}}</td>
+	<td>{{try.getExamplesCount()}}</td>
+	<td>{{try.getSolvedExamplesCount()}}</td>
+	<td>{{try.getErrorsCount()}}</td>
+	<td>{{try.getRating()}}</td>
+</tr>
+{%endfor%}
+<table>
+{%else%}
+Нет начатых попыток
+{%endif%}
+{%endblock%}

@@ -1,5 +1,41 @@
 <?php
 
+namespace App\Controller;
+
+use App\Entity\Attempt;
+use App\Repository\AttemptRepository;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Routing\Annotation\Route;
+
+ /**
+*@Route("/attempt")
+*/
+class AttemptController extends Controller {
+/**
+*@Route("/", name="attempt_index")
+*/
+public function index(AttemptRepository $r) {
+return $this->render('attempt/index.html.twig', [
+"attempts"=>$r->findAllByCurrentUser()
+]);
+}
+
+/**
+*@Route("/{id}/show", name="attempt_show", requirements={"id": "\d+"})
+*/
+public function show(Attempt $a) {
+$try=er('t')->getCurrentUserTryByIdOrNull($id) ?? throwNotFoundExseption();
+$examples=er('e')->findByTry($try);
+
+return $this->render('frontend/archive/history.html.twig', [
+'title'=>"Попытка №{$try->getId()}",
+'try'=>$try,
+'examples'=>$examples
+]);
+}
+
+}
 namespace AppBundle\Controller\Frontend;
 
 use AppBundle\Controller\MainController;

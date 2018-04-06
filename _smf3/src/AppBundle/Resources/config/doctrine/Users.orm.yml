@@ -1,0 +1,40 @@
+AppBundle\Entity\Users:
+    type: entity
+    table: users
+    repositoryClass: AppBundle\Repository\UsersRepository
+    indexes:
+        profile_id:
+            columns:
+                - profile_id
+    uniqueConstraints:
+        UNIQ_1483A5E992FC23A8:
+            columns:
+                - username_canonical
+        UNIQ_1483A5E9A0D96FBF:
+            columns:
+                - email_canonical
+        UNIQ_1483A5E9C05FB297:
+            columns:
+                - confirmation_token
+    id:
+        id:
+            type: integer
+            nullable: false
+            options:
+                unsigned: false
+            id: true
+            generator:
+                strategy: IDENTITY
+    fields:
+    manyToOne:
+        profile:
+            targetEntity: Profiles
+            cascade: {  }
+            fetch: LAZY
+            mappedBy: null
+            inversedBy: null
+            joinColumns:
+                profile_id:
+                    referencedColumnName: id
+            orphanRemoval: false
+    lifecycleCallbacks: {  }

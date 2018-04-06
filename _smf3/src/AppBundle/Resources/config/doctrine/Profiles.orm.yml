@@ -1,0 +1,140 @@
+AppBundle\Entity\Profiles:
+    type: entity
+    table: profiles
+    repositoryClass: AppBundle\Repository\ProfilesRepository
+    indexes:
+        IDX_8B308530A76ED395:
+            columns:
+                - user_id
+    id:
+        id:
+            type: integer
+            nullable: false
+            options:
+                unsigned: false
+            id: true
+            generator:
+                strategy: IDENTITY
+    fields:
+        createTime:
+            type: datetime
+            nullable: false
+            column: create_time
+        tryDuration:
+            type: integer
+            nullable: false
+            options:
+                unsigned: false
+            column: try_duration
+        examplesCount:
+            type: integer
+            nullable: false
+            options:
+                unsigned: false
+            column: examples_count
+        addMin:
+            type: integer
+            nullable: true
+            options:
+                unsigned: false
+            column: add_min
+        addMax:
+            type: integer
+            nullable: true
+            options:
+                unsigned: false
+            column: add_max
+        subMin:
+            type: integer
+            nullable: true
+            options:
+                unsigned: false
+            column: sub_min
+        subMax:
+            type: integer
+            nullable: true
+            options:
+                unsigned: false
+            column: sub_max
+        minSub:
+            type: integer
+            nullable: true
+            options:
+                unsigned: false
+            column: min_sub
+        multMin:
+            type: integer
+            nullable: true
+            options:
+                unsigned: false
+            column: mult_min
+        multMax:
+            type: integer
+            nullable: true
+            options:
+                unsigned: false
+            column: mult_max
+        divMin:
+            type: integer
+            nullable: true
+            options:
+                unsigned: false
+            column: div_min
+        divMax:
+            type: integer
+            nullable: true
+            options:
+                unsigned: false
+            column: div_max
+        minDiv:
+            type: integer
+            nullable: true
+            options:
+                unsigned: false
+            column: min_div
+        addPerc:
+            type: integer
+            nullable: true
+            options:
+                unsigned: false
+            column: add_perc
+        subPerc:
+            type: integer
+            nullable: true
+            options:
+                unsigned: false
+            column: sub_perc
+        multPerc:
+            type: integer
+            nullable: true
+            options:
+                unsigned: false
+            column: mult_perc
+        divPerc:
+            type: integer
+            nullable: true
+            options:
+                unsigned: false
+            column: div_perc
+        description:
+            type: string
+            nullable: false
+            length: 63
+            options:
+                fixed: false
+        isPublic:
+            type: boolean
+            nullable: false
+            column: is_public
+    manyToOne:
+        user:
+            targetEntity: Users
+            cascade: {  }
+            fetch: LAZY
+            mappedBy: null
+            inversedBy: null
+            joinColumns:
+                user_id:
+                    referencedColumnName: id
+            orphanRemoval: false
+    lifecycleCallbacks: {  }

@@ -35,23 +35,10 @@ return $this->render('frontend/archive/history.html.twig', [
 ]);
 }
 
-}
-namespace AppBundle\Controller\Frontend;
-
-use AppBundle\Controller\MainController;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use AppBundle\Entity\Tries;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-
- /**
-*@Route("/tries")
-*/
-class TriesController extends MainController {
-
 /**
-*@Route("/{id}", name="tryById", requirements={"id": "\d+"})
+*@Route("/{id}", name="attempt_solve", requirements={"id": "\d+"})
 */
-public function indexAction ($id, \Symfony\Component\HttpFoundation\Session\Session $s) {
+public function solve(Attempt $att, \Symfony\Component\HttpFoundation\Session\Session $s) {
 $try=er('t')->getCurrentUserTryByIdOrNull($id) ?? throwNotFoundExseption();
     if (!$try->isActual()) return $this->redirectToRoute('history', ['id'=>$try->getId()]);
 var_dump(er('s')->getCurrentUserSessionOrNull()->getSid());

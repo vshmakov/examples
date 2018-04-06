@@ -24,7 +24,7 @@ return $this->render('attempt/index.html.twig', [
 *@Route("/{id}/show", name="attempt_show", requirements={"id": "\d+"})
 */
 public function show(Attempt $att) {
-$this->canOrAcc('VIEW', $att);
+$this->can('view', $att);
 $try=er('t')->getCurrentUserTryByIdOrNull($id) ?? throwNotFoundExseption();
 $examples=er('e')->findByTry($try);
 

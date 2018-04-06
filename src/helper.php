@@ -1,5 +1,7 @@
 <?php
-
+namespace App;
+class helper{}
+/*
 function stop($var='', $key=0, $times=1) {
 static $doneTimes=0;
 
@@ -183,3 +185,4 @@ throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
 function throwAccessDeniedException($message=null) {
 throw new \Symfony\Component\Security\Core\Exception\AccessDeniedException($message);
 }
+*/

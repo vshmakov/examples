@@ -24,7 +24,7 @@ return $this->render('attempt/index.html.twig', [
 *@Route("/{id}/show", name="attempt_show", requirements={"id": "\d+"})
 */
 public function show(Attempt $att) {
-$this->canOrAcc('VIEW', $att);
+$this->can('view', $att);
 $try=er('t')->getCurrentUserTryByIdOrNull($id) ?? throwNotFoundExseption();
 $examples=er('e')->findByTry($try);
 
@@ -35,10 +35,23 @@ return $this->render('frontend/archive/history.html.twig', [
 ]);
 }
 
-/**
-*@Route("/{id}", name="attempt_solve", requirements={"id": "\d+"})
+}
+namespace AppBundle\Controller\Frontend;
+
+use AppBundle\Controller\MainController;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use AppBundle\Entity\Tries;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+
+ /**
+*@Route("/tries")
 */
-public function solve(Attempt $att, \Symfony\Component\HttpFoundation\Session\Session $s) {
+class TriesController extends MainController {
+
+/**
+*@Route("/{id}", name="tryById", requirements={"id": "\d+"})
+*/
+public function indexAction ($id, \Symfony\Component\HttpFoundation\Session\Session $s) {
 $try=er('t')->getCurrentUserTryByIdOrNull($id) ?? throwNotFoundExseption();
     if (!$try->isActual()) return $this->redirectToRoute('history', ['id'=>$try->getId()]);
 var_dump(er('s')->getCurrentUserSessionOrNull()->getSid());

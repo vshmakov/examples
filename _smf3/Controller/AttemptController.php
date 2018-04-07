@@ -2,19 +2,28 @@
 
 namespace App\Controller;
 
+use Doctrine\ORM\EntityManagerInterface as EM;
+use Symfony\Component\HttpFoundation\Session\SessionInterface
+use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Attempt;
-use App\Repository\AttemptRepository;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use App\Repository\AttemptRepository as AttR;
+use App\Repository\ExampleRepository as ExR;
 use Symfony\Component\Routing\Annotation\Route;
 
  /**
 *@Route("/attempts")
 */
 class AttemptController extends MainController {
+private $attR;
+
+public function __construct($AttR $attR) {
+$this->attR=$attR;
+}
+
 /**
 *@Route("/", name="attempt_index")
 */
-public function index(AttemptRepository $r) {
+public function index(AttR $r) {
 return $this->render('attempt/index.html.twig', [
 "attempts"=>$r->findAllByCurrentUser()
 ]);
@@ -23,61 +32,69 @@ return $this->render('attempt/index.html.twig', [
 /**
 *@Route("/{id}/show", name="attempt_show", requirements={"id": "\d+"})
 */
-public function show(Attempt $att) {
-$this->can('view', $att);
-$try=er('t')->getCurrentUserTryByIdOrNull($id) ?? throwNotFoundExseption();
-$examples=er('e')->findByTry($try);
-
-return $this->render('frontend/archive/history.html.twig', [
-'title'=>"Попытка №{$try->getId()}",
-'try'=>$try,
-'examples'=>$examples
+public function show(Attempt $att, ExR $exR, AttR $attR) {
+$this->denyAccessUnlessGranted('VIEW', $att);
+return $this->render('attempt/show.html.twig', [
+"attempt"=>$att,
+"examples"=>$exR->findByAttempt($att),
 ]);
 }
 
-}
-namespace AppBundle\Controller\Frontend;
-
-use AppBundle\Controller\MainController;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use AppBundle\Entity\Tries;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-
- /**
-*@Route("/tries")
-*/
-class TriesController extends MainController {
-
 /**
-*@Route("/{id}", name="tryById", requirements={"id": "\d+"})
+*@Route("/{id}", name="attempt_solve", requirements={"id": "\d+"})
 */
-public function indexAction ($id, \Symfony\Component\HttpFoundation\Session\Session $s) {
-$try=er('t')->getCurrentUserTryByIdOrNull($id) ?? throwNotFoundExseption();
-    if (!$try->isActual()) return $this->redirectToRoute('history', ['id'=>$try->getId()]);
-var_dump(er('s')->getCurrentUserSessionOrNull()->getSid());
-return $this->render('frontend/tries/index.html.twig', [
-'title'=>'Решение',
-'JSParams'=>[
-'tryData'=>$try->getCurrentData(),
-'answerRoute'=>$this->generateUrl('answerExample', ['id'=>$try->getId()])
+public function solve(Attempt $att, ExR $exR, AttR $attR, \Symfony\Component\HttpFoundation\Session\Session $s) {
+    if (!$this->isGranted("SOLVE", $att)) {
+if ($this->isGranted("VIEW", $att)) return $this->redirectToRoute('attempt_show', ['id'=>$att->getId()]);
+else return $this->redirectToRoute("attempt_last");
+}
+return $this->render('attempt/solve.html.twig', [
+"jsParams"=>[
+"attData"=>$this->getDataByAtt($att),
+'answerRoute'=>$this->generateUrl('attempt_answer', ['id'=>$try->getId()])
 ]
 ]);//
 }
 
 /**
-*@Route("/last", name="lastTry")
+*@Route("/last", name="attempt_last")
 */
-public function lastAction() {
-$try=(($t=er('t')->getCurrentUserLastTryOrNull()) && $t->isActual()) ? $t : er('t')->getNewTry();
-return $this->redirectToRoute('tryById', 
-['id'=>$try->getId()]);
+public function last(AttR $attR) {
+$att=$attR->findLastByCurrentUserOrNull();
+if (!$this->isGranted("SOLVE", $att)) return $this->redirectToRoute("attempt_new");
+return $this->redirectToRoute('attempt_solve', ['id'=>$att->getId()]);
 }
 
 /**
-*@Route("/new", name="newTry")
+*@Route("/new", name="attempt_new")
 */
-public function newAction() {
-return $this->redirectToRoute('tryById', ['id'=>er('t')->getNewTry()->getId()]);
+public function new(AttR $attR) {
+return $this->redirectToRoute('attempt_solve', ['id'=>$attR->getNewByCurrentUser()->getId()]);
 }
 
+/**
+*@Route("/{id}/answer", name="attempt_answer")
+*@Method("POST")
+*/
+public function answer(Attempt $att, Request $request, MathMNG $mm, ExR $exR, EM $em) {
+if (!$this->isGranted("ANSWER", $att)) return $this->json(['finish'=>true]);
+
+$ex=$exR->findLastByAttemptOrNull($att);
+$an=(float) $request->request->get('answer');
+$isR=$an === (float) $mm->solveExample($x->getFirst(), $ex->getSecond(), $ex->getSign());
+$ex->setAnswer($an)->setIsRight($isR);
+$em->flush();
+
+$finish=!$this->isGranted("ANSWER", $att);
+if (!$finish) $exR->getNewByAttempt($att);
+return $this->json([
+'isRight'=>$isR, 
+'finish'=>$finish,
+'attData'=>$this->getDataByAtt($att),
+]);//
+}
+
+private function getDataByAtt($att) {
+return [];
+}
 }

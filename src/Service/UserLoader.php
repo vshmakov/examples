@@ -11,7 +11,7 @@ const GUEST_LOGIN="__guest";
 private $user;
 private $ur;
 
-public function __construct(UserRepository $ur, TokenInterface $token) {
+public function __construct(UserRepository $ur, TokenInterface $token=null) {
 $this->ur=$ur;
         $this->user = $token->getUser();
 }

@@ -2,8 +2,9 @@
 
 namespace App\Controller;
 
+use App\Service\MathMng;
 use Doctrine\ORM\EntityManagerInterface as EM;
-use Symfony\Component\HttpFoundation\Session\SessionInterface
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Attempt;
 use App\Repository\AttemptRepository as AttR;
@@ -16,7 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class AttemptController extends MainController {
 private $attR;
 
-public function __construct($AttR $attR) {
+public function __construct(AttR $attR) {
 $this->attR=$attR;
 }
 
@@ -97,4 +98,5 @@ return $this->json([
 private function getDataByAtt($att) {
 return [];
 }
+
 }

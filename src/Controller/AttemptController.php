@@ -12,7 +12,7 @@ use App\Repository\ExampleRepository as ExR;
 use Symfony\Component\Routing\Annotation\Route;
 
  /**
-*@Route("/attempts")
+* @Route("/attempts")
 */
 class AttemptController extends MainController {
 private $attR;
@@ -22,7 +22,7 @@ $this->attR=$attR;
 }
 
 /**
-*@Route("/", name="attempt_index")
+* @Route("/", name="attempt_index")
 */
 public function index(AttR $r) {
 return $this->render('attempt/index.html.twig', [
@@ -75,7 +75,6 @@ return $this->redirectToRoute('attempt_solve', ['id'=>$attR->getNewByCurrentUser
 
 /**
 *@Route("/{id}/answer", name="attempt_answer")
-*@Method("POST")
 */
 public function answer(Attempt $att, Request $request, MathMNG $mm, ExR $exR, EM $em) {
 if (!$this->isGranted("ANSWER", $att)) return $this->json(['finish'=>true]);

@@ -13,7 +13,7 @@ private $ur;
 
 public function __construct(UserRepository $ur, TokenInterface $token=null) {
 $this->ur=$ur;
-        $this->user = $token->getUser();
+//        $this->user = $token->getUser();
 }
 
 public function getUser() {

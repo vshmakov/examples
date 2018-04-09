@@ -28,10 +28,16 @@ class User
      */
     private $sessions;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Profile", mappedBy="author", orphanRemoval=true)
+     */
+    private $profiles;
+
     public function __construct()
     {
         $this->attempts = new ArrayCollection();
         $this->sessions = new ArrayCollection();
+        $this->profiles = new ArrayCollection();
     }
 
     public function getId()
@@ -95,6 +101,37 @@ class User
             // set the owning side to null (unless already changed)
             if ($session->getUser() === $this) {
                 $session->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Profile[]
+     */
+    public function getProfiles(): Collection
+    {
+        return $this->profiles;
+    }
+
+    public function addProfile(Profile $profile): self
+    {
+        if (!$this->profiles->contains($profile)) {
+            $this->profiles[] = $profile;
+            $profile->setAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProfile(Profile $profile): self
+    {
+        if ($this->profiles->contains($profile)) {
+            $this->profiles->removeElement($profile);
+            // set the owning side to null (unless already changed)
+            if ($profile->getAuthor() === $this) {
+                $profile->setAuthor(null);
             }
         }
 

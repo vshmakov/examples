@@ -1,0 +1,94 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block body %}
+    <h1>Profile</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ profile.id }}</td>
+            </tr>
+            <tr>
+                <th>AddTime</th>
+                <td>{{ profile.addTime ? profile.addTime|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>IsPublic</th>
+                <td>{{ profile.isPublic ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>Duration</th>
+                <td>{{ profile.duration }}</td>
+            </tr>
+            <tr>
+                <th>ExamplesCount</th>
+                <td>{{ profile.examplesCount }}</td>
+            </tr>
+            <tr>
+                <th>AddMin</th>
+                <td>{{ profile.addMin }}</td>
+            </tr>
+            <tr>
+                <th>AddMax</th>
+                <td>{{ profile.addMax }}</td>
+            </tr>
+            <tr>
+                <th>SubMin</th>
+                <td>{{ profile.subMin }}</td>
+            </tr>
+            <tr>
+                <th>SubMax</th>
+                <td>{{ profile.subMax }}</td>
+            </tr>
+            <tr>
+                <th>MinSub</th>
+                <td>{{ profile.minSub }}</td>
+            </tr>
+            <tr>
+                <th>MultMin</th>
+                <td>{{ profile.multMin }}</td>
+            </tr>
+            <tr>
+                <th>MultMax</th>
+                <td>{{ profile.multMax }}</td>
+            </tr>
+            <tr>
+                <th>DivMin</th>
+                <td>{{ profile.divMin }}</td>
+            </tr>
+            <tr>
+                <th>DivMax</th>
+                <td>{{ profile.divMax }}</td>
+            </tr>
+            <tr>
+                <th>MinDiv</th>
+                <td>{{ profile.minDiv }}</td>
+            </tr>
+            <tr>
+                <th>AddPerc</th>
+                <td>{{ profile.addPerc }}</td>
+            </tr>
+            <tr>
+                <th>SubPerc</th>
+                <td>{{ profile.subPerc }}</td>
+            </tr>
+            <tr>
+                <th>MultPerc</th>
+                <td>{{ profile.multPerc }}</td>
+            </tr>
+            <tr>
+                <th>DivPerc</th>
+                <td>{{ profile.divPerc }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('profile_index') }}">back to list</a>
+
+    <a href="{{ path('profile_edit', {'id': profile.id}) }}">edit</a>
+
+    {{ include('profile/_delete_form.html.twig') }}
+{% endblock %}

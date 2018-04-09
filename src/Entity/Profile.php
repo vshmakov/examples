@@ -92,6 +92,26 @@ class Profile
      */
     private $minDiv;
 
+    /**
+     * @ORM\Column(type="smallint")
+     */
+    private $addPerc;
+
+   /**
+     * @ORM\Column(type="smallint")
+     */
+    private $subPerc;
+
+    /**
+     * @ORM\Column(type="smallint")
+     */
+    private $multPerc;
+
+    /**
+     * @ORM\Column(type="smallint")
+     */
+    private $divPerc;
+
     public function getId()
     {
         return $this->id;
@@ -273,6 +293,54 @@ class Profile
     public function setMinDiv(int $minDiv): self
     {
         $this->minDiv = $minDiv;
+
+        return $this;
+    }
+
+    public function getAddPerc(): ?int
+    {
+        return $this->addPerc;
+    }
+
+    public function setAddPerc(int $addPerc): self
+    {
+        $this->addPerc = $addPerc;
+
+        return $this;
+    }
+
+    public function getSubPerc(): ?int
+    {
+        return $this->subPerc;
+    }
+
+    public function setSubPerc(int $subPerc): self
+    {
+        $this->subPerc = $subPerc;
+
+        return $this;
+    }
+
+    public function getMultPerc(): ?int
+    {
+        return $this->multPerc;
+    }
+
+    public function setMultPerc(int $multPerc): self
+    {
+        $this->multPerc = $multPerc;
+
+        return $this;
+    }
+
+    public function getDivPerc(): ?int
+    {
+        return $this->divPerc;
+    }
+
+    public function setDivPerc(int $divPerc): self
+    {
+        $this->divPerc = $divPerc;
 
         return $this;
     }

@@ -29,7 +29,7 @@ class Example
     private $first;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="smallint")
      */
     private $sign;
 

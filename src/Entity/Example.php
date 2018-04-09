@@ -58,10 +58,6 @@ class Example
      */
     private $answerTime;
 
-public function __construct() {
-$this->addTime=new DT();
-}
-
     public function getId()
     {
         return $this->id;

@@ -9,6 +9,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Profile
 {
+use DTTrait;
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -131,7 +133,7 @@ class Profile
 
     public function getAddTime(): ?\DateTimeInterface
     {
-        return $this->addTime;
+        return $this->dt($this->addTime);
     }
 
     public function setAddTime(\DateTimeInterface $addTime): self

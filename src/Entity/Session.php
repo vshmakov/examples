@@ -9,6 +9,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Session
 {
+use DTTrait;
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -39,7 +41,7 @@ class Session
 
     public function getAddTime(): ?\DateTimeInterface
     {
-        return $this->addTime;
+        return $this->dt($this->addTime);
     }
 
     public function setAddTime(\DateTimeInterface $addTime): self

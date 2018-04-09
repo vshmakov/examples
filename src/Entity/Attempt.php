@@ -11,6 +11,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Attempt
 {
+use DTTrait;
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()

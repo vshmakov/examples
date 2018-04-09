@@ -10,6 +10,8 @@ use App\DT;
  */
 class Example
 {
+use DTTrait;
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()

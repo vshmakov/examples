@@ -13,7 +13,8 @@ private function initAddTime($var="addTime") {
 $this->$var=new DT();
 }
 
-protected function dt($dt) {
+private function dt($dt) {
 return DT::createFromDT($dt);
 }
+
 }

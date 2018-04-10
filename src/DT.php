@@ -3,7 +3,7 @@
 namespace App;
 
 class DT extends \DateTime {
-public static function createFromFormat($f, $s) {
+public static function createFromFormat($f, $s, $o=null) {
 $dt=DateTime::createFromFormat($f, $s);
 return ($dt && $dt->getTimestamp() > 0) ? self::createFromDT($dt) : false;
 }

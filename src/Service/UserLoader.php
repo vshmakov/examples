@@ -25,7 +25,7 @@ return (!$this->isGuest()) ? $this->user : $this->getGuest();
 }
 
 public function isGuest() {
-return $this->user instanceof UserInterface;
+return !($this->user instanceof UserInterface);
 }
 
 private function getGuest() {

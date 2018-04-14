@@ -6,45 +6,42 @@ use App\Entity\Attempt;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-/**
- * @method Attempt|null find($id, $lockMode = null, $lockVersion = null)
- * @method Attempt|null findOneBy(array $criteria, array $orderBy = null)
- * @method Attempt[]    findAll()
- * @method Attempt[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- */
 class AttemptRepository extends ServiceEntityRepository
 {
-    public function __construct(RegistryInterface $registry)
+use BaseTrait;
+
+private $exR;
+
+    public function __construct(RegistryInterface $registry, ExampleRepository $exR)
     {
         parent::__construct($registry, Attempt::class);
+$this->exR=$exR;
     }
 
-//    /**
-//     * @return Attempt[] Returns an array of Attempt objects
-//     */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('a')
-            ->andWhere('a.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('a.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+public function getTitleByAttempt($att) {
+return "Попытка №".$this->getNumberByAttempt($att);
+}
 
-    /*
-    public function findOneBySomeField($value): ?Attempt
-    {
-        return $this->createQueryBuilder('a')
-            ->andWhere('a.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
+public function getNumberByAttempt($att) {
+
+}
+
+public function getFinishTimeByAttempt($att) {
+
+}
+
+public function getSolvedExamplesCountByAttempt($att) {
+$this->v("")
+}
+
+public function getErrorsCountByAttempt($att) {
+return $this->exR->count([
+"attempt"=>$att,
+"isRight"=>false,
+]);
+}
+
+public function getRatingByAttempt($att) {
+
+}
 }

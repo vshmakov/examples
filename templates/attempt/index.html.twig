@@ -1,0 +1,32 @@
+{%extends 'base.html.twig'%}
+
+{%block main%}
+<h1>Архив попыток</h1>
+{%if attempts%}
+<table>
+<thead>
+	<th>№</th>
+	<th>Начало попытки</th>
+	<th>Конец попытки</th>
+	<th>Примеров в попытке</th>
+	<th>Решено примеров</th>
+	<th>Ошибок</th>
+	<th>Оценка</th>
+</thead>
+
+{%for att in attempts%}
+<tr>
+	<td><a href="{{path("attempt_show", {'id': att.id})}}">{{attR.getTitleByAttempt(att)}}</a></td>
+	<td>{{att.addTime}}</td>
+	<td>{{attR.getFinishTimeByAttempt(att)}}</td>
+	<td>{{att.examples.count()}}</td>
+	<td>{{attR.getSolvedExamplesCountByAttempt(att)}}</td>
+	<td>{{attR.getErrorsCountByAttempt(att)}}</td>
+	<td>{{attR.getRatingByAttempt(att)}}</td>
+</tr>
+{%endfor%}
+<table>
+{%else%}
+Нет начатых попыток
+{%endif%}
+{%endblock%}

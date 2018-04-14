@@ -12,7 +12,7 @@ use App\Repository\ExampleRepository as ExR;
 use Symfony\Component\Routing\Annotation\Route;
 
  /**
-* @Route("/attempts")
+* @Route("/attempt")
 */
 class AttemptController extends MainController {
 private $attR;

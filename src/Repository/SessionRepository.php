@@ -5,46 +5,37 @@ namespace App\Repository;
 use App\Entity\Session;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\HttpFoundation\RequestStack as Req;
+use Symfony\Component\HttpFoundation\Session\Session as Sess;
 
-/**
- * @method Session|null find($id, $lockMode = null, $lockVersion = null)
- * @method Session|null findOneBy(array $criteria, array $orderBy = null)
- * @method Session[]    findAll()
- * @method Session[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- */
 class SessionRepository extends ServiceEntityRepository
 {
-    public function __construct(RegistryInterface $registry)
+use BaseTrait;
+private $r;
+
+    public function __construct(RegistryInterface $registry, Req $r
+)
     {
         parent::__construct($registry, Session::class);
+$this->r=$r->getCurrentRequest();
     }
 
-//    /**
-//     * @return Session[] Returns an array of Session objects
-//     */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('s')
-            ->andWhere('s.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('s.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+public function findByUserOrGetNew($u) {
+$r=$this->r;
+if (!$r->hasPreviousSession()) {
+$sess=(new Sess());
+$sess->start();
+$r->setSession($sess);
+}
+$sid=$r->getSession()->getId();
+if ($s=$this->findOneBySid($sid)) return $s;
 
-    /*
-    public function findOneBySomeField($value): ?Session
-    {
-        return $this->createQueryBuilder('s')
-            ->andWhere('s.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
+$s=(new Session())
+->setUser($u)
+->setSid($sid);
+$em=$this->em();
+$em->persist($s);
+$em->flush();
+return $s;
+}
 }

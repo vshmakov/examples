@@ -44,6 +44,7 @@ use DTTrait;
     public function __construct()
     {
         $this->attempts = new ArrayCollection();
+$this->initAddTime();
     }
 
     public function getId()

@@ -26,7 +26,8 @@ $this->attR=$attR;
 */
 public function index(AttR $r) {
 return $this->render('attempt/index.html.twig', [
-"attempts"=>$r->findAllByCurrentUser()
+"attempts"=>$r->findAllByCurrentUser(),
+"attR"=>$r,
 ]);
 }
 

@@ -12,12 +12,14 @@ class AttemptRepository extends ServiceEntityRepository
 use BaseTrait;
 private $exR;
 private $ul;
+private $sR;
 
-    public function __construct(RegistryInterface $registry, ExampleRepository $exR, UserLoader $ul)
+    public function __construct(RegistryInterface $registry, ExampleRepository $exR, UserLoader $ul, SessionRepository $sR)
     {
         parent::__construct($registry, Attempt::class);
 $this->exR=$exR;
 $this->ul=$ul;
+$this->sR=$sR;
     }
 
 public function getTitleByAttempt($att) {
@@ -33,6 +35,13 @@ public function getFinishTimeByAttempt($att) {
 }
 
 public function getSolvedExamplesCountByAttempt($att) {
+return $this->v(
+$this->q("select count(e) from App:Attempt a
+join a.examples e
+where e.answer != false and e.answer is not null and a = :a
+
+")->setParameter("a", $att)
+);
 }
 
 public function getErrorsCountByAttempt($att) {
@@ -53,5 +62,14 @@ join s.user u
 where u = :u")
 ->setParameter("u", $this->ul->getUser())
 ->getResult();
+}
+
+public function getNewByCurrentUser() {
+$att=(new Attempt())
+->setSession($this->sR->findByUserOrGetNew($this->ul->getUser()));
+$em=$this->em();
+$em->persist($att);
+$em->flush();
+return $att;
 }
 }

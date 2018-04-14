@@ -21,7 +21,7 @@ return $this->em()->createQuery($dql);
 }
 
 private function v($q) {
-return $q->getSingleResult()[0];
+return $q->getSingleResult()[1];
 }
 
 private function qb() {

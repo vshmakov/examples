@@ -44,6 +44,7 @@ use DTTrait;
     public function __construct()
     {
         $this->examples = new ArrayCollection();
+$this->initAddTime();
     }
 
     public function getId()

@@ -31,15 +31,15 @@ use DTTrait;
     private $addTime;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="attempts")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $user;
-
-    /**
      * @ORM\Column(type="object")
      */
     private $settings;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Session", inversedBy="attempts")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $session;
 
     public function __construct()
     {
@@ -94,18 +94,6 @@ use DTTrait;
         return $this;
     }
 
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(?User $user): self
-    {
-        $this->user = $user;
-
-        return $this;
-    }
-
     public function getSettings()
     {
         return $this->settings;
@@ -114,6 +102,18 @@ use DTTrait;
     public function setSettings($settings): self
     {
         $this->settings = $settings;
+
+        return $this;
+    }
+
+    public function getSession(): ?Session
+    {
+        return $this->session;
+    }
+
+    public function setSession(?Session $session): self
+    {
+        $this->session = $session;
 
         return $this;
     }

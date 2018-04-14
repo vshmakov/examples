@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -33,6 +35,16 @@ use DTTrait;
      * @ORM\JoinColumn(nullable=false)
      */
     private $user;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Attempt", mappedBy="session", orphanRemoval=true)
+     */
+    private $attempts;
+
+    public function __construct()
+    {
+        $this->attempts = new ArrayCollection();
+    }
 
     public function getId()
     {
@@ -71,6 +83,37 @@ use DTTrait;
     public function setUser(?User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Attempt[]
+     */
+    public function getAttempts(): Collection
+    {
+        return $this->attempts;
+    }
+
+    public function addAttempt(Attempt $attempt): self
+    {
+        if (!$this->attempts->contains($attempt)) {
+            $this->attempts[] = $attempt;
+            $attempt->setSession($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAttempt(Attempt $attempt): self
+    {
+        if ($this->attempts->contains($attempt)) {
+            $this->attempts->removeElement($attempt);
+            // set the owning side to null (unless already changed)
+            if ($attempt->getSession() === $this) {
+                $attempt->setSession(null);
+            }
+        }
 
         return $this;
     }

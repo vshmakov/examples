@@ -20,11 +20,6 @@ class User extends BaseUser
     protected $id;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Attempt", mappedBy="user", orphanRemoval=true)
-     */
-    private $attempts;
-
-    /**
      * @ORM\OneToMany(targetEntity="App\Entity\Session", mappedBy="user", orphanRemoval=true)
      */
     private $sessions;
@@ -36,7 +31,6 @@ class User extends BaseUser
 
     public function __construct()
     {
-        $this->attempts = new ArrayCollection();
         $this->sessions = new ArrayCollection();
         $this->profiles = new ArrayCollection();
     }
@@ -44,37 +38,6 @@ class User extends BaseUser
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * @return Collection|Attempt[]
-     */
-    public function getAttempts(): Collection
-    {
-        return $this->attempts;
-    }
-
-    public function addAttempt(Attempt $attempt): self
-    {
-        if (!$this->attempts->contains($attempt)) {
-            $this->attempts[] = $attempt;
-            $attempt->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeAttempt(Attempt $attempt): self
-    {
-        if ($this->attempts->contains($attempt)) {
-            $this->attempts->removeElement($attempt);
-            // set the owning side to null (unless already changed)
-            if ($attempt->getUser() === $this) {
-                $attempt->setUser(null);
-            }
-        }
-
-        return $this;
     }
 
     /**

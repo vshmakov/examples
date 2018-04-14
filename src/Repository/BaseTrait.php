@@ -20,8 +20,8 @@ private function q($dql) {
 return $this->em()->createQuery($dql);
 }
 
-private function v($dql) {
-return $this->q($dql)->getSingleResult()[0];
+private function v($q) {
+return $q->getSingleResult()[0];
 }
 
 private function qb() {

@@ -31,7 +31,7 @@ return !($this->user instanceof UserInterface);
 private function getGuest() {
 static $u=false;
 $gl=self::GUEST_LOGIN;
-if (!$u===false) $u=$this->uR->findOneByUsername($gl);
+if ($u===false) $u=$this->uR->findOneByUsername($gl);
 if (!$u) {
 $u=new User();
 $u->setUsername($gl)

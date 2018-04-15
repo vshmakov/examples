@@ -37,8 +37,10 @@ return $this->render('attempt/index.html.twig', [
 public function show(Attempt $att, ExR $exR, AttR $attR) {
 $this->denyAccessUnlessGranted('VIEW', $att);
 return $this->render('attempt/show.html.twig', [
-"attempt"=>$att,
+"att"=>$att,
 "examples"=>$exR->findByAttempt($att),
+"exR"=>$exR,
+"attR"=>$attR,
 ]);
 }
 
@@ -62,7 +64,7 @@ return $this->render('attempt/solve.html.twig', [
 *@Route("/last", name="attempt_last")
 */
 public function last(AttR $attR) {
-$att=$attR->findLastByCurrentUserOrNull();
+$att=$attR->findLastByCurrentUser();
 if (!$this->isGranted("SOLVE", $att)) return $this->redirectToRoute("attempt_new");
 return $this->redirectToRoute('attempt_solve', ['id'=>$att->getId()]);
 }

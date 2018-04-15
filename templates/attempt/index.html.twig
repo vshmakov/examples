@@ -16,13 +16,13 @@
 
 {%for att in attempts%}
 <tr>
-	<td><a href="{{path("attempt_show", {'id': att.id})}}">{{attR.getTitleByAttempt(att)}}</a></td>
+	<td><a href="{{path("attempt_show", {'id': att.id})}}">{{attR.getTitle(att)}}</a></td>
 	<td>{{att.addTime}}</td>
-	<td>{{attR.getFinishTimeByAttempt(att)}}</td>
+	<td>{{attR.getFinishTime(att)}}</td>
 	<td>{{att.examples.count()}}</td>
-	<td>{{attR.getSolvedExamplesCountByAttempt(att)}}</td>
-	<td>{{attR.getErrorsCountByAttempt(att)}}</td>
-	<td>{{attR.getRatingByAttempt(att)}}</td>
+	<td>{{attR.getSolvedExamplesCount(att)}}</td>
+	<td>{{attR.getErrorsCount(att)}}</td>
+	<td>{{attR.getRating(att)}}</td>
 </tr>
 {%endfor%}
 <table>

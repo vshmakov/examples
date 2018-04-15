@@ -1,14 +1,14 @@
-{%extends 'frontend/division.html.twig'%}
+{%extends 'base.html.twig'%}
 
 {%block main%}
 <h1>Статистика</h1>
 <ul>
-	<li>Начало попытки: {{try.getStartTime()}}</li>
-	<li>Конец попытки: {{try.getFinishTime()}}</li>
-	<li>Примеров в попытке: {{try.getExamplesCount()}}</li>
-	<li>Решено примеров: {{try.getSolvedExamplesCount()}}</li>
-<li>Ошибок: {{try.getErrorsCount()}}</li>
-	<li>Оценка: {{try.getRating()}}</li>
+	<li>Начало попытки: {{att.addTime}}</li>
+	<li>Конец попытки: {{attR.getFinishTime(att)}}</li>
+{#	<li>Примеров в попытке: {{att.settings.examplesCount}}</li>#}
+	<li>Решено примеров: {{attR.getSolvedExamplesCount(att)}}</li>
+<li>Ошибок: {{attR.getErrorsCount(att)}}</li>
+	<li>Оценка: {{attR.getRating(att)}}</li>
 </ul>
 
 <h1>Примеры</h1>
@@ -18,19 +18,23 @@
 		<th>Пример</th>
 		<th>Ответ</th>
 	</thead>
-	{%for example in examples|reverse%}
-{%if not example.isRight()%}
+	{%for ex in examples|reverse%}
+{%if not ex.isRight%}
 <tr>
 <td colspan="3">
-<h6>{{(example.getAnswer() is not null) ? "Ошибка №"~example.getErrorNum() : "Пример не решен"}}</h6>
+<h6>{{(ex.answer is not null) ? "Ошибка №"~exR.getErrorNum(ex) : "Пример не решен"}}</h6>
 </td>
 </tr>
 {%endif%}
 	<tr>
-		<td>{{example.getNumber()}}</td>
-		<td>{{example}}</td>
-		<td>{{example.getAnswer() ?? '-'}}</td>
+		<td>{{exR.getNumber(ex)}}</td>
+		<td>{{ex}}</td>
+		<td>{{ex.answer ?? '-'}}</td>
 	</tr>
+{%else%}
+<tr>
+<td colspan="3">Нет Примеров в попытке</td>
+</tr>
 	{%endfor%}
 </table>
 {%endblock%}

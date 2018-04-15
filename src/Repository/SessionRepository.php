@@ -15,23 +15,40 @@ class SessionRepository extends ServiceEntityRepository
 {
 use BaseTrait;
 private $ul;
+private $curUser;
 private $sm;
 
     public function __construct(RegistryInterface $registry, UserLoader $ul, SessionMarker $sm)
     {
         parent::__construct($registry, Session::class);
 $this->ul=$ul;
+$this->curUser=$ul->getUser();
 $this->sm=$sm;
     }
 
-public function findByCurrentUserOrGetNew() {
-return $this->findByUserOrGetNew($this->ul->getUser());
+public function findOneByCurrentUser() {
+return $this->findOneByUser($this->curUser);
 }
 
-public function findByUserOrGetNew($u) {
+public function findOneByUser($u) {
 $sid=$this->sm->getKey();
-if ($s=$this->findOneBySid($sid)) return $s;
+return $this->findOneByUserAndSid($u, $sid);
+}
 
+public function findOneByCurrentUserOrGetNew() {
+return $this->findOneByUserOrGetNew($this->curUser);
+}
+
+public function findOneByUserOrGetNew($u) {
+return  $this->findOneByUser($u) ?? $this->getNewByUserAndSid($u, $this->sm->getSid());
+}
+
+public function findOneByUserAndSid($u, $sid) {
+return $this->findOneBy(["sid"=>$sid, "user"=>$u]);
+}
+
+private function getNewByUserAndSid($u, $sid) { 
+if ($s=$this->findOneByUserAndSid($u, $sid)) return $s;
 $s=(new Session())
 ->setUser($u)
 ->setSid($sid);
@@ -40,4 +57,5 @@ $em->persist($s);
 $em->flush();
 return $s;
 }
+
 }

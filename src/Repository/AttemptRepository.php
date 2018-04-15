@@ -66,7 +66,7 @@ where u = :u")
 
 public function getNewByCurrentUser() {
 $att=(new Attempt())
-->setSession($this->sR->findByUserOrGetNew($this->ul->getUser()));
+->setSession($this->sR->findOneByCurrentUserOrGetNew());
 $em=$this->em();
 $em->persist($att);
 $em->flush();

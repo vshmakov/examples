@@ -1,4 +1,4 @@
-{%extends 'frontend/division.html.twig'%}
+{%extends 'base.html.twig'%}
 
 {%block main%}
 <form>
@@ -19,10 +19,4 @@
 	<li>Осталось времени: <span id="timer">*</span></li>
 	<li>Осталось примеров: <span id="remainedExamples">*</span></li>
 	</ul>
-{%endblock%}
-
-{%block javaScript%}
-{{parent()}}
-<script type="text/javascript" src="/assets/helper.js"></script>
-<script type="text/javascript" src="/assets/frontend/tries.js"></script>
 {%endblock%}

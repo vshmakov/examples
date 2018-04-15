@@ -53,7 +53,7 @@ else return $this->redirectToRoute("attempt_last");
 return $this->render('attempt/solve.html.twig', [
 "jsParams"=>[
 "attData"=>$this->getDataByAtt($att),
-'answerRoute'=>$this->generateUrl('attempt_answer', ['id'=>$try->getId()])
+'answerRoute'=>$this->generateUrl('attempt_answer', ['id'=>$att->getId()])
 ]
 ]);//
 }

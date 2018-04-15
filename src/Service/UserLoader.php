@@ -17,7 +17,7 @@ private $em;
 public function __construct(UserRepository $uR, EM $em, TokenStorageInterface $ts) {
 $this->uR=$uR;
 $this->em=$em;
-        $this->user = $ts->getToken()->getUser();
+if ($tk=$ts->getToken())         $this->user = $tk->getUser();
 }
 
 public function getUser() {

@@ -7,14 +7,17 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use App\Entity\Attempt;
 use App\Entity\User;
 use App\Service\UserLoader;
+use App\Repository\SessionRepository;
 
 class AttemptVoter extends Voter
 {
 private $ul;
 private $att;
+private $sR;
 
-public function __construct(UserLoader $ul) {
+public function __construct(UserLoader $ul, SessionRepository $sR) {
 $this->ul=$ul;
+$this->sR=$sR;
 }
 
     protected function supports($attribute, $subject)
@@ -45,6 +48,22 @@ return true;
     }
 
 private function canSolve() {
+if (!$this->canView()) return false;
+$att=$this->att;
+$ul=$this->ul;
+$u=$ul->getUser();
+
+if ($ul->isGuest() && $att->getSession() !== $this->sR->findOneByCurrentUser()) return false;
+
+return true;
+}
+
+private function canView() {
+$att=$this->att;
+$ul=$this->ul;
+$u=$ul->getUser();
+if ($u !== $att->getSession()->getUser()) return false;
+return true;
 
 }
 

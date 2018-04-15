@@ -44,7 +44,9 @@ return  $this->findOneByUser($u) ?? $this->getNewByUserAndSid($u, $this->sm->get
 }
 
 public function findOneByUserAndSid($u, $sid) {
-return $this->findOneBy(["sid"=>$sid, "user"=>$u]);
+$p=["user"=>$u];
+if ($u === $this->ul->getGuest()) $p+=["sid"=>$sid];
+return $this->findOneBy($p);
 }
 
 private function getNewByUserAndSid($u, $sid) { 

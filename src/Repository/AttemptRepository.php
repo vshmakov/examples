@@ -54,7 +54,7 @@ join a.examples e
 where a = :att and e.answerTime is not null
 order by e.answerTime desc
 ")->setParameter("att", $att)
-)) ?? $att->getAddTime();
+)) ?: $att->getAddTime();
 }
 
 public function getSolvedExamplesCount($att) {

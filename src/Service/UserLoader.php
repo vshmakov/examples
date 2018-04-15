@@ -28,7 +28,7 @@ public function isGuest() {
 return !($this->user instanceof UserInterface);
 }
 
-private function getGuest() {
+public function getGuest() {
 static $u=false;
 $gl=self::GUEST_LOGIN;
 if ($u===false) $u=$this->uR->findOneByUsername($gl);

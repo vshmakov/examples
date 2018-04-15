@@ -9,7 +9,7 @@ return ($dt && $dt->getTimestamp() > 0) ? self::createFromDT($dt) : false;
 }
 
 public static function createFromDT($dt) {
-return ($dt instanceof \DateTimeInterface) ? self::createFromTimestamp($dt->getTimestamp()) : $dt;
+return ($dt instanceof \DateTimeInterface) ? self::createFromTimestamp($dt->getTimestamp()) : false;
 }
 
 public static function createFromTimestamp($time) {

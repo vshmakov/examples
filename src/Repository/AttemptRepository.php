@@ -39,11 +39,22 @@ return "Попытка №".$this->getNumber($att);
 }
 
 public function getNumber($att) {
-
+return $this->v(
+$this->q("select count(a) from App:Attempt a
+join a.session s
+where s.user = :u and a.addTime <= :dt
+")->setParameters(["u"=>$this->ul->getUser(), "dt"=>$att->getAddTime()])
+);
 }
 
 public function getFinishTime($att) {
-
+return $this->v(
+$this->q("select e.answerTime from App:Attempt a
+join a.examples e
+where a = :att and e.answerTime is not null
+order by e.answerTime desc
+")->setParameter("att", $att)
+) ?? $att->getAddTime();
 }
 
 public function getSolvedExamplesCount($att) {
@@ -64,7 +75,7 @@ return $this->exR->count([
 }
 
 public function getRating($att) {
-
+return 5;
 }
 
 public function findAllByCurrentUser() {
@@ -84,4 +95,5 @@ $em->persist($att);
 $em->flush();
 return $att;
 }
+
 }

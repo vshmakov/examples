@@ -5,6 +5,8 @@ namespace App\Entity;
 Use App\DT;
 
 trait DTTrait {
+use BaseTrait;
+
 public function __construct() {
 $this->initAddTime();
 }

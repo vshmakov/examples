@@ -15,14 +15,15 @@
 </thead>
 
 {%for att in attempts%}
+{%set att=att.setER(attR)%}
 <tr>
-	<td><a href="{{path("attempt_show", {'id': att.id})}}">{{attR.getTitle(att)}}</a></td>
+	<td><a href="{{path("attempt_show", {'id': att.id})}}">{{att.title}}</a></td>
 	<td>{{att.addTime}}</td>
-	<td>{{attR.getFinishTime(att)}}</td>
-	<td>{{att.examples.count()}}</td>
-	<td>{{attR.getSolvedExamplesCount(att)}}</td>
-	<td>{{attR.getErrorsCount(att)}}</td>
-	<td>{{attR.getRating(att)}}</td>
+	<td>{{att.finishTime}}</td>
+	<td>{{att.examplesCount}}</td>
+	<td>{{att.solvedExamplesCount}}</td>
+	<td>{{att.errorsCount}}</td>
+	<td>{{att.rating}}</td>
 </tr>
 {%endfor%}
 <table>

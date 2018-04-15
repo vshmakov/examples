@@ -119,4 +119,7 @@ $this->initAddTime();
         return $this;
     }
 
+public function getExamplesCount() {
+return 0;
+}
 }

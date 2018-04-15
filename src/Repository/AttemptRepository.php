@@ -48,13 +48,13 @@ where s.user = :u and a.addTime <= :dt
 }
 
 public function getFinishTime($att) {
-return $this->v(
+return $this->dt($this->v(
 $this->q("select e.answerTime from App:Attempt a
 join a.examples e
 where a = :att and e.answerTime is not null
 order by e.answerTime desc
 ")->setParameter("att", $att)
-) ?? $att->getAddTime();
+)) ?? $att->getAddTime();
 }
 
 public function getSolvedExamplesCount($att) {
@@ -62,7 +62,6 @@ return $this->v(
 $this->q("select count(e) from App:Attempt a
 join a.examples e
 where e.answer != false and e.answer is not null and a = :a
-
 ")->setParameter("a", $att)
 );
 }

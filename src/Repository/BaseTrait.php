@@ -8,12 +8,10 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 trait BaseTrait {
+use \App\BaseTrait;
+
 private function em() {
 return $this->getEntityManager();
-}
-
-private function dt($dt) {
-return DT::createFromDT($dt);
 }
 
 private function q($dql) {

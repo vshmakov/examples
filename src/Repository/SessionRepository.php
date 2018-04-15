@@ -40,7 +40,7 @@ return $this->findOneByUserOrGetNew($this->curUser);
 }
 
 public function findOneByUserOrGetNew($u) {
-return  $this->findOneByUser($u) ?? $this->getNewByUserAndSid($u, $this->sm->getSid());
+return  $this->findOneByUser($u) ?? $this->getNewByUserAndSid($u, $this->sm->getKey());
 }
 
 public function findOneByUserAndSid($u, $sid) {

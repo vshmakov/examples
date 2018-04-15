@@ -40,7 +40,7 @@ break;
 return true;
                 break;
             case 'VIEW':
-return true;
+return $this->canView();
                 break;
         }
 

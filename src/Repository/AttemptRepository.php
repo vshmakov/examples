@@ -26,6 +26,7 @@ public function findLastByCurrentUser() {
 $ul=$this->ul;
 $w=(!$ul->isGuest()) ? "s.user = :u" : "a.session = :s";
 $q=$this->q("select a from App:Attempt a
+join a.session s
 where $w
 order by a.addTime desc")
 ->setMaxResults(1);

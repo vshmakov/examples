@@ -1,5 +1,11 @@
 <?php
 
+use App\DT;
+
+function dt($dt) {
+return DT::createFromDT($dt);
+}
+
 call_user_func(function () {
 $min=60;
 $hour=60*$min;
@@ -17,3 +23,25 @@ define($key, $val);
 }
 });
 
+function normPerc($p) {
+$all1=0;
+foreach ($p as $k=>$v) {
+$all1+=abs($v);
+}
+
+if (!$all1) $all1=1;
+$all2=0;
+foreach ($p as $key=>$val) {
+$all2+=$p[$key]=round($val/$all1*100);
+}
+
+foreach (array_reverse($p) as $k=>$v) {
+if ($v) {
+$p[$k]+=100-$all2;
+return $p;
+}
+}
+
+$p[$k]+=100-$all2;
+return $p;
+}

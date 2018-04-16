@@ -34,87 +34,87 @@ use DTTrait;
     /**
      * @ORM\Column(type="boolean")
      */
-    private $isPublic;
+    private $isPublic=false;
 
     /**
      * @ORM\Column(type="smallint")
      */
-    private $duration;
+    private $duration=5;
 
     /**
      * @ORM\Column(type="smallint")
      */
-    private $examplesCount;
+    private $examplesCount=10;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $addMin;
+    private $addMin=1;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $addMax;
+    private $addMax=10;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $subMin;
+    private $subMin=1;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $subMax;
+    private $subMax=20;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $minSub;
+    private $minSub=1;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $multMin;
+    private $multMin=0;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $multMax;
+    private $multMax=4;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $divMin;
+    private $divMin=1;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $divMax;
+    private $divMax=20;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $minDiv;
+    private $minDiv=2;
 
     /**
      * @ORM\Column(type="smallint")
      */
-    private $addPerc;
+    private $addPerc=25;
 
    /**
      * @ORM\Column(type="smallint")
      */
-    private $subPerc;
+    private $subPerc=25;
 
     /**
      * @ORM\Column(type="smallint")
      */
-    private $multPerc;
+    private $multPerc=25;
 
     /**
      * @ORM\Column(type="smallint")
      */
-    private $divPerc;
+    private $divPerc=25;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\User", mappedBy="profile")
@@ -124,6 +124,7 @@ use DTTrait;
     public function __construct()
     {
         $this->users = new ArrayCollection();
+$this->initAddTime();
     }
 
     public function getId()
@@ -389,4 +390,17 @@ use DTTrait;
 
         return $this;
     }
+
+public function normPerc() {
+$pKeies=['addPerc', 'subPerc', 'multPerc', 'divPerc'];
+$p=[];
+foreach ($pKeies as $k) {
+$p[$k]=$this->$k;
+}
+
+foreach (normPerc($p) as $k=>$v) {
+$this->$k=$v;
+}
+}
+
 }

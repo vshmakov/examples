@@ -39,7 +39,7 @@ use DTTrait;
     /**
      * @ORM\Column(type="smallint")
      */
-    private $duration=5;
+    private $duration=300;
 
     /**
      * @ORM\Column(type="smallint")
@@ -401,6 +401,8 @@ $p[$k]=$this->$k;
 foreach (normPerc($p) as $k=>$v) {
 $this->$k=$v;
 }
+
+return $this;
 }
 
 }

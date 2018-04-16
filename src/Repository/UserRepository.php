@@ -10,14 +10,14 @@ class UserRepository extends ServiceEntityRepository
 {
 use BaseTrait;
 
-    public function __construct(RegistryInterface $registry, ProfileRepository $pR)
+    public function __construct(RegistryInterface $registry)
     {
         parent::__construct($registry, User::class);
-$this->pR=$pR;
     }
 
 public function getSelfOrPublicProfile($u) {
-$p=$u->getProfile() ?? $this->pR->findOneByUser($u) ?? $this->pR->findOnePublic();
+$pR=$this->er(ProfileRepository::class);
+$p=$u->getProfile() ?? $pR->findOneByAuthor($u) ?? $pR->findOnePublic();
 if (!$p) throw new \Exception("Принадлежащие данному пользователю и общие профили отсутствуют");
 return $p;
 }

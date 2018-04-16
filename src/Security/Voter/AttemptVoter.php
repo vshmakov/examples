@@ -2,6 +2,7 @@
 
 namespace App\Security\Voter;
 
+use App\Repository\AttemptRepository;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use App\Entity\Attempt;
@@ -14,10 +15,12 @@ class AttemptVoter extends Voter
 private $ul;
 private $att;
 private $sR;
+private $attR;
 
-public function __construct(UserLoader $ul, SessionRepository $sR) {
+public function __construct(UserLoader $ul, SessionRepository $sR, AttemptRepository $attR) {
 $this->ul=$ul;
 $this->sR=$sR;
+$this->attR=$attR;
 }
 
     protected function supports($attribute, $subject)
@@ -27,7 +30,7 @@ $this->sR=$sR;
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
     {
-$this->att=$subject;
+$this->att=$subject->setER($this->attR);
 
         switch ($attribute) {
 case "SOLVE":
@@ -52,9 +55,11 @@ if (!$this->canView()) return false;
 $att=$this->att;
 $ul=$this->ul;
 $u=$ul->getUser();
-
-if ($ul->isGuest() && $att->getSession() !== $this->sR->findOneByCurrentUser()) return false;
-
+$set=$att->getSettings();
+dump($set);
+if (($ul->isGuest() && $att->getSession() !== $this->sR->findOneByCurrentUser())
+or ($att->getSolvedExamplesCount() >= $set->getExamplesCount()
+or ($att->getAddTime()->getTimestamp() + $set->getDuration() < time())) ) return false;
 return true;
 }
 

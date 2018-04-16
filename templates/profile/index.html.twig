@@ -1,69 +1,48 @@
-{% extends 'base.html.twig' %}
+{%extends 'base.html.twig'%}
 
-{% block title %}Profile index{% endblock %}
+{%block main%}
+<h1>Общие профили</h1>
+{%if public%}
+<table>
+<thead>
+	<th>Выбрать</th>
+	<th>Описание</th>
+<th>Время создания</th>
+<th>Удалить</th>
+</thead>
+{%for profile in public%}
+<tr>
+<td><button class="choose-profile-button" value="{{profile.id}}" alt="V"></button></td>
+	<td><a href="{{path('profile_edit', {'id':profile.id})}}">{{profile.id}}</a></td>
+<td>{{profile.addTime}}</td>
+<td><button class="delete-profile-button" value="{{profile.id}}" data-href="{{path("profile_delete", {'id': profile.id})}}" alt="Удалить"></button></td>
+</tr>
+{%endfor%}
+<table>
+{%else%}
+Нет профилей
+{%endif%}
 
-{% block body %}
-    <h1>Profile index</h1>
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>AddTime</th>
-                <th>IsPublic</th>
-                <th>Duration</th>
-                <th>ExamplesCount</th>
-                <th>AddMin</th>
-                <th>AddMax</th>
-                <th>SubMin</th>
-                <th>SubMax</th>
-                <th>MinSub</th>
-                <th>MultMin</th>
-                <th>MultMax</th>
-                <th>DivMin</th>
-                <th>DivMax</th>
-                <th>MinDiv</th>
-                <th>AddPerc</th>
-                <th>SubPerc</th>
-                <th>MultPerc</th>
-                <th>DivPerc</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for profile in profiles %}
-            <tr>
-                <td>{{ profile.id }}</td>
-                <td>{{ profile.addTime ? profile.addTime|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ profile.isPublic ? 'Yes' : 'No' }}</td>
-                <td>{{ profile.duration }}</td>
-                <td>{{ profile.examplesCount }}</td>
-                <td>{{ profile.addMin }}</td>
-                <td>{{ profile.addMax }}</td>
-                <td>{{ profile.subMin }}</td>
-                <td>{{ profile.subMax }}</td>
-                <td>{{ profile.minSub }}</td>
-                <td>{{ profile.multMin }}</td>
-                <td>{{ profile.multMax }}</td>
-                <td>{{ profile.divMin }}</td>
-                <td>{{ profile.divMax }}</td>
-                <td>{{ profile.minDiv }}</td>
-                <td>{{ profile.addPerc }}</td>
-                <td>{{ profile.subPerc }}</td>
-                <td>{{ profile.multPerc }}</td>
-                <td>{{ profile.divPerc }}</td>
-                <td>
-                    <a href="{{ path('profile_show', {'id': profile.id}) }}">show</a>
-                    <a href="{{ path('profile_edit', {'id': profile.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="20">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
-    <a href="{{ path('profile_new') }}">Create new</a>
-{% endblock %}
+<h1>Личные профили</h1>
+{%if public%}
+<table>
+<thead>
+	<th>Выбрать</th>
+	<th>Описание</th>
+<th>Время создания</th>
+<th>Удалить</th>
+</thead>
+{%for profile in public%}
+<tr>
+<td><button class="choose-profile-button" value="{{profile.id}}" alt="V"></button></td>
+	<td><a href="{{path('profile_edit', {'id':profile.id})}}">{{profile.id}}</a></td>
+<td>{{profile.addTime}}</td>
+<td><button class="delete-profile-button" value="{{profile.id}}" data-href="{{path("profile_delete", {'id': profile.id})}}" alt="Удалить"></button></td>
+</tr>
+{%endfor%}
+<table>
+{%else%}
+Нет профилей
+{%endif%}
+<a href="{{path("profile_new")}}">Создать профиль</a>
+{%endblock%}

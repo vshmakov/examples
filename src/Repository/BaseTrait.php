@@ -26,4 +26,8 @@ return (is_array($r)) ? $r[1] : $r;
 private function qb() {
 return $this->createQueryBuilder();
 }
+
+private function er($cl) {
+return $this->em()->getRepository($cl);
+}
 }

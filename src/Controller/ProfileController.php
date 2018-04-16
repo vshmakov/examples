@@ -18,9 +18,12 @@ class ProfileController extends Controller
     /**
      * @Route("/", name="profile_index", methods="GET")
      */
-    public function index(ProfileRepository $profileRepository): Response
+    public function index(ProfileRepository $pR): Response
     {
-        return $this->render('profile/index.html.twig', ['profiles' => $profileRepository->findAll()]);
+        return $this->render('profile/index.html.twig', [
+'public'=>$pR->findByIsPublic(true),
+'profiles' => $pR->findByCurrentAuthor()
+]);
     }
 
     /**
@@ -32,9 +35,9 @@ class ProfileController extends Controller
         $form = $this->createForm(ProfileType::class, $profile);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid() && $this->isGranted("CREATE", $profile)) {
             $em = $this->getDoctrine()->getManager();
-            $em->persist($profile);
+            $em->persist($profile->normPerc());
             $em->flush();
 
             return $this->redirectToRoute('profile_index');
@@ -59,10 +62,12 @@ class ProfileController extends Controller
      */
     public function edit(Request $request, Profile $profile): Response
     {
+$this->denyAccessUnlessGranted("EDIT", $profile);
         $form = $this->createForm(ProfileType::class, $profile);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+$profile->normPerc();
             $this->getDoctrine()->getManager()->flush();
 
             return $this->redirectToRoute('profile_edit', ['id' => $profile->getId()]);

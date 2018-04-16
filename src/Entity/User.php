@@ -12,6 +12,8 @@ use FOS\UserBundle\Model\User as BaseUser;
  */
 class User extends BaseUser
 {
+use BaseTrait;
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -28,6 +30,11 @@ class User extends BaseUser
      * @ORM\OneToMany(targetEntity="App\Entity\Profile", mappedBy="author", orphanRemoval=true)
      */
     private $profiles;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Profile", inversedBy="users")
+     */
+    private $profile;
 
     public function __construct()
     {
@@ -98,6 +105,18 @@ class User extends BaseUser
                 $profile->setAuthor(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getProfile(): ?Profile
+    {
+        return $this->profile;
+    }
+
+    public function setProfile(?Profile $profile): self
+    {
+        $this->profile = $profile;
 
         return $this;
     }

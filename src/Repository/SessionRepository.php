@@ -53,7 +53,7 @@ private function getNewByUserAndSid($u, $sid) {
 if ($s=$this->findOneByUserAndSid($u, $sid)) return $s;
 $s=(new Session())
 ->setUser($u)
-->setSid($sid);
+->setSid(($this->ul->isGuest()) ? $sid : "");
 $em=$this->em();
 $em->persist($s);
 $em->flush();

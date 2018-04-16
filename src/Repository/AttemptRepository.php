@@ -13,13 +13,15 @@ use BaseTrait;
 private $exR;
 private $ul;
 private $sR;
+private $uR;
 
-    public function __construct(RegistryInterface $registry, ExampleRepository $exR, UserLoader $ul, SessionRepository $sR)
+    public function __construct(RegistryInterface $registry, ExampleRepository $exR, UserLoader $ul, SessionRepository $sR, UserRepository $uR)
     {
         parent::__construct($registry, Attempt::class);
 $this->exR=$exR;
 $this->ul=$ul;
 $this->sR=$sR;
+$this->uR=$uR;
     }
 
 public function findLastByCurrentUser() {
@@ -87,8 +89,10 @@ where u = :u")
 }
 
 public function getNewByCurrentUser() {
+$u=$this->ul->getUser()->setER($this->uR);
 $att=(new Attempt())
-->setSession($this->sR->findOneByCurrentUserOrGetNew());
+->setSession($this->sR->findOneByCurrentUserOrGetNew())
+->setSettings($u->getSelfOrPublicProfile());
 $em=$this->em();
 $em->persist($att);
 $em->flush();

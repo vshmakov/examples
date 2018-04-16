@@ -19,7 +19,8 @@ return $this->em()->createQuery($dql);
 }
 
 private function v($q) {
-return ($q->setMaxResults(1)->getOneOrNullResult())[1]; //getSingleResult()[1];
+$r=($q->setMaxResults(1)->getOneOrNullResult());
+return (is_array($r)) ? $r[1] : $r;
 }
 
 private function qb() {

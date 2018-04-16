@@ -13,7 +13,7 @@ return $this;
 }
 
 public function __call($v, $p=[]) {
-$m="get".ucfirst($v);
+$m=(preg_match("#^get[A-Z]#", $v)) ? $v : "get".ucfirst($v);
 return $this->er->$m($this);
 }
 }

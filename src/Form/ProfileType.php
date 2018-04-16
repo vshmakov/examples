@@ -14,7 +14,8 @@ class ProfileType extends AbstractType
         $builder
             ->add('addTime')
             ->add('isPublic')
-            ->add('duration')
+            ->add('minutes')
+            ->add('seconds')
             ->add('examplesCount')
             ->add('addMin')
             ->add('addMax')

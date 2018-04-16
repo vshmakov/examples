@@ -405,4 +405,22 @@ $this->$k=$v;
 return $this;
 }
 
+public function getMinutes():int {
+return ($this->duration/MIN);
+}
+
+public function setMinutes(int $min) {
+$this->duration=$min*MIN+$this->getSeconds();
+return $this;
+}
+
+public function getSeconds():int {
+return $this->duration%MIN;
+}
+
+public function setSeconds(int $sec) {
+$sec=$sec%MIN;
+$this->duration=$this->getMinutes()*MIN+$sec;
+return $this;
+}
 }

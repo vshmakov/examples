@@ -440,4 +440,8 @@ public function setDescription(string $description): self
     $__EXTRA__LINE;
     return $this;
 }
+
+public function __toString() {
+return $this->getDescription();
+}
 }

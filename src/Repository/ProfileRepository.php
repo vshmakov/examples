@@ -43,4 +43,19 @@ where p.isPublic = true
 public function findByCurrentAuthor() {
 return $this->findByAuthor($this->ul->getUser());
 }
+
+public function getTitle($p) {
+return $p->getDescription() ?: "Профиль №".$this->getNumber($p);
+}
+
+public function countByCurrentAuthor() {
+return $this->count(["author"=>$this->ul->getUser()]);
+}
+
+public function getNumber($p) {
+return ($p->getId()) ? $this->v($this->q("select count(p) from App:Profile p
+where p.author =:a and p.id <= :id")
+->setParameters(["a"=>$p->getAuthor(), "id"=>$p->getId()])
+) : $this->countByCurrentAuthor()+1;
+}
 }

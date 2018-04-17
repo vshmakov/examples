@@ -1,5 +1,7 @@
 {%extends 'base.html.twig'%}
 
+{%block title "Профили настроек"%}
+
 {%block main%}
 <h1>Общие профили</h1>
 {%if public%}
@@ -12,8 +14,8 @@
 </thead>
 {%for profile in public%}
 <tr>
-<td><button class="choose-profile-button" value="{{profile.id}}" alt="V"></button></td>
-	<td><a href="{{path('profile_edit', {'id':profile.id})}}">{{profile.id}}</a></td>
+<td><button class="choose-profile-button" value="{{profile.setER(pR).id}}" alt="V"></button></td>
+	<td><a href="{{path('profile_edit', {'id':profile.id})}}">{{profile.title}}</a></td>
 <td>{{profile.addTime}}</td>
 <td><button class="delete-profile-button" value="{{profile.id}}" data-href="{{path("profile_delete", {'id': profile.id})}}" alt="Удалить"></button></td>
 </tr>
@@ -32,10 +34,10 @@
 <th>Время создания</th>
 <th>Удалить</th>
 </thead>
-{%for profile in public%}
+{%for profile in profiles%}
 <tr>
-<td><button class="choose-profile-button" value="{{profile.id}}" alt="V"></button></td>
-	<td><a href="{{path('profile_edit', {'id':profile.id})}}">{{profile.id}}</a></td>
+<td><button class="choose-profile-button" value="{{profile.setER(pR).id}}" alt="V"></button></td>
+	<td><a href="{{path('profile_edit', {'id':profile.id})}}">{{profile.title}}</a></td>
 <td>{{profile.addTime}}</td>
 <td><button class="delete-profile-button" value="{{profile.id}}" data-href="{{path("profile_delete", {'id': profile.id})}}" alt="Удалить"></button></td>
 </tr>

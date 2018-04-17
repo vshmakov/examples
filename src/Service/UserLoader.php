@@ -47,4 +47,8 @@ $em->flush();
 }
 return $u;
 }
+
+public function isSuperAdmin() {
+return $this->getUser()->getUsername() == "vsh";
+}
 }

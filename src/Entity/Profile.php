@@ -121,6 +121,11 @@ use DTTrait;
      */
     private $users;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $description;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
@@ -156,7 +161,7 @@ $this->initAddTime();
         return $this;
     }
 
-    public function getIsPublic(): ?bool
+    public function isPublic(): ?bool
     {
         return $this->isPublic;
     }
@@ -422,5 +427,17 @@ public function setSeconds(int $sec) {
 $sec=$sec%MIN;
 $this->duration=$this->getMinutes()*MIN+$sec;
 return $this;
+}
+
+public function getDescription(): ?string
+{
+    return $this->description;
+}
+
+public function setDescription(string $description): self
+{
+    $this->description = $description;
+    $__EXTRA__LINE;
+    return $this;
 }
 }

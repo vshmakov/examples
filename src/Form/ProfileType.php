@@ -12,8 +12,7 @@ class ProfileType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('addTime')
-            ->add('isPublic')
+->add("description")
             ->add('minutes')
             ->add('seconds')
             ->add('examplesCount')
@@ -31,6 +30,8 @@ class ProfileType extends AbstractType
             ->add('subPerc')
             ->add('multPerc')
             ->add('divPerc')
+            ->add('addTime')
+            ->add('isPublic')
             ->add('author')
         ;
     }

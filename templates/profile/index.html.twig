@@ -2,31 +2,8 @@
 
 {%block title "Профили настроек"%}
 
-{%block main%}
-<h1>Общие профили</h1>
-{%if public%}
-<table>
-<thead>
-	<th>Выбрать</th>
-	<th>Описание</th>
-<th>Время создания</th>
-<th>Удалить</th>
-</thead>
-{%for profile in public%}
-<tr>
-<td><button class="choose-profile-button" value="{{profile.setER(pR).id}}" alt="V"></button></td>
-	<td><a href="{{path('profile_edit', {'id':profile.id})}}">{{profile.title}}</a></td>
-<td>{{profile.addTime}}</td>
-<td><button class="delete-profile-button" value="{{profile.id}}" data-href="{{path("profile_delete", {'id': profile.id})}}" alt="Удалить"></button></td>
-</tr>
-{%endfor%}
-<table>
-{%else%}
-Нет профилей
-{%endif%}
-
-<h1>Личные профили</h1>
-{%if public%}
+{%macro prTable(profiles, pR)%}
+{%if profiles%}
 <table>
 <thead>
 	<th>Выбрать</th>
@@ -45,6 +22,20 @@
 <table>
 {%else%}
 Нет профилей
+{%endif%}
+{%endmacro%}
+
+{%block main%}
+{%import _self as s%}
+<h1>Общие профили</h1>
+{{s.prTable(public, pR)}}
+
+<h1>Личные профили</h1>
+{{s.prTable(profiles, pR)}}
+
+{%if is_granted("ROLE_ADMIN")%}
+<h1>Все профили</h1>
+{{s.prTable(all, pR)}}
 {%endif%}
 <a href="{{path("profile_new")}}">Создать профиль</a>
 {%endblock%}

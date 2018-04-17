@@ -24,6 +24,7 @@ class ProfileController extends MainController
         return $this->render('profile/index.html.twig', [
 'public'=>$pR->findByIsPublic(true),
 'profiles' => $pR->findByCurrentAuthor(),
+"all"=>($this->isGranted("ROLE_SUPER_ADMIN")) ? $pR->findAll() : [],
 "pR"=>$pR,
 ]);
     }

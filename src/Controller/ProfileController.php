@@ -74,10 +74,11 @@ $this->denyAccessUnlessGranted("VIEW", $profile);
     {
 $this->denyAccessUnlessGranted("VIEW", $profile);
 $profile->SetDescription($pR->getTitle($profile));
+$canEdit=$this->isGranted("EDIT", $profile);
         $form = $this->createForm(ProfileType::class, $profile);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid() && $this->isGranted("EDIT", $profile)) {
+        if ($form->isSubmitted() && $form->isValid() && $canEdit) {
 $profile->normPerc();
             $this->getDoctrine()->getManager()->flush();
 
@@ -85,6 +86,9 @@ $profile->normPerc();
         }
 
         return $this->render('profile/edit.html.twig', [
+"jsParams"=>[
+"canEdit"=>$canEdit,
+],
             'profile' => $profile,
             'form' => $form->createView(),
         ]);

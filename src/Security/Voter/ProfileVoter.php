@@ -61,7 +61,7 @@ return $p->isPublic() or $this->ul->getUser() === $p->getAuthor();
 }
 
 private function canEdit() {
-return $this->canCreate() && $this->ul->getUser() === $this->p->getAuthor();
+return $this->canCreate() && $this->ul->getUser() === $this->p->getAuthor() && !$this->p->isPublic();
 }
 
 private function canDelete() {

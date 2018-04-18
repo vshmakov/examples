@@ -12,7 +12,9 @@ var P={{(jsParams ?? {})|json_encode|raw}};
 <ul>
 <li><a href="{{path("homepage")}}">На главную</a></li>
 <li><a href="{{path("attempt_index")}}">Архив</a></li>
+{%if hasPreviousAttempt%}
 <li><a href="{{path("attempt_last")}}">Последняя попытка</a></li>
+{%endif%}
 <li><a href="{{path("attempt_new")}}">Новая попытка</a></li>
 <li><a href="{{path("profile_index")}}">Профили настроек</a></li>
 {%if is_granted("IS_AUTHENTICATED_REMEMBERED")%}

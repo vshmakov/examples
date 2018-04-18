@@ -6,6 +6,7 @@ use App\Service\UserLoader;
 use App\Entity\Attempt;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class AttemptRepository extends ServiceEntityRepository
 {
@@ -14,14 +15,16 @@ private $exR;
 private $ul;
 private $sR;
 private $uR;
+private $ch;
 
-    public function __construct(RegistryInterface $registry, ExampleRepository $exR, UserLoader $ul, SessionRepository $sR, UserRepository $uR)
+    public function __construct(RegistryInterface $registry, ExampleRepository $exR, UserLoader $ul, SessionRepository $sR, UserRepository $uR, AuthorizationCheckerInterface $ch)
     {
         parent::__construct($registry, Attempt::class);
 $this->exR=$exR;
 $this->ul=$ul;
 $this->sR=$sR;
 $this->uR=$uR;
+$this->ch=$ch;
     }
 
 public function findLastByCurrentUser() {
@@ -30,10 +33,10 @@ $w=(!$ul->isGuest()) ? "s.user = :u" : "a.session = :s";
 $q=$this->q("select a from App:Attempt a
 join a.session s
 where $w
-order by a.addTime desc")
-->setMaxResults(1);
-(!$ul->isGuest()) ? $q->setParameter("u", $ul->getUser()) : $q->setParameter("s", $this->sR->findOneByCurrentUserOrGetNew());
-return $q->getOneOrNullResult();
+order by a.addTime desc");
+!$ul->isGuest() ? $q->setParameter("u", $ul->getUser()) : $q->setParameter("s", $this->sR->findOneByCurrentUserOrGetNew());
+$att=$this->v($q);
+return ($this->ch->isGranted("SOLVE", $att)) ? $att : null;
 }
 
 public function getTitle($att) {
@@ -99,4 +102,7 @@ $em->flush();
 return $att;
 }
 
+public function getData($att) {
+return [];
+}
 }

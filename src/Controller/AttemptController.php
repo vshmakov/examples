@@ -1,5 +1,6 @@
 <?php
 
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 namespace App\Controller;
 
 use App\Service\MathMng;
@@ -50,13 +51,14 @@ return $this->render('attempt/show.html.twig', [
 public function solve(Attempt $att, ExR $exR, AttR $attR, \Symfony\Component\HttpFoundation\Session\Session $s) {
     if (!$this->isGranted("SOLVE", $att)) {
 if ($this->isGranted("VIEW", $att)) return $this->redirectToRoute('attempt_show', ['id'=>$att->getId()]);
-else return $this->redirectToRoute("attempt_last");
+else throw new AccessDeniedException();
 }
 return $this->render('attempt/solve.html.twig', [
 "jsParams"=>[
-"attData"=>$this->getDataByAtt($att),
+"attData"=>$att->setER($attR)->getData(),
 'answerRoute'=>$this->generateUrl('attempt_answer', ['id'=>$att->getId()])
-]
+],
+"att"=>$att,
 ]);//
 }
 
@@ -64,9 +66,8 @@ return $this->render('attempt/solve.html.twig', [
 *@Route("/last", name="attempt_last")
 */
 public function last(AttR $attR) {
-$att=$attR->findLastByCurrentUser();
-if (!$this->isGranted("SOLVE", $att)) return $this->redirectToRoute("attempt_new");
-return $this->redirectToRoute('attempt_solve', ['id'=>$att->getId()]);
+if ($att=$attR->findLastByCurrentUser()) return $this->redirectToRoute('attempt_solve', ['id'=>$att->getId()]);
+return $this->render("attempt/last.html.twig");
 }
 
 /**

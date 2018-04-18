@@ -1,0 +1,8 @@
+{%block title "Последняя начатая попытка не найдена"%}
+
+{%extends 'content.html.twig'%}
+
+{%block content%}
+<p>В вашем аккаунте пока не начато ни одной попытки.</p>
+<div><a href="{{path("attempt_new")}}">Начать сейчас</a></div>
+{%endblock%}

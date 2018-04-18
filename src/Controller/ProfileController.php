@@ -108,8 +108,9 @@ $this->denyAccessUnlessGranted("DELETE", $profile);
 public function appoint(Profile $profile, UserLoader $ul) {
 $this->denyAccessUnlessGranted("APPOINT", $profile);
 $u=$ul->getUser();
-$ul->setProfile($profile);
+$u->setProfile($profile);
 $this->em()->flush();
+return $this->json(true);
 }
 
 /**

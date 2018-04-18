@@ -19,7 +19,7 @@ createButtons: $('.create-profile-button'),
 
 onClickButton: function (event) {
 event.preventDefault();
-$.post($(this).data("href"), {}, this.mark.bind(this));
+$.post($(event.target).data("href"), {}, this.setState.bind(this));
 },
 
 setState: function () {
@@ -43,6 +43,7 @@ btns.removeClass(self.curCl).removeClass(self.cannotCl);
 
 for (var id in st) {
 var d=st[id];
+console.log(id, d);
 var b=btns.filter("[value = "+id+"]");
 if (d.cur) b.addClass(self.curCl);
 if (!d.can) b.addClass(self.cannotCl);
@@ -63,7 +64,7 @@ disabled: false,
 
 this.allButtons.each(function () {
 var b=$(this);
-if (b.hasClass(self.curCl)) b.attr("alt", "X");
+if (b.hasClass(self.curCl)) b.attr({"alt": "X", disabled: true});
 if (b.hasClass(self.cannotCl)) b.attr("disabled", true);
 });
 

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Psr\Log\LoggerInterface as Log;
 use App\Entity\Profile;
 use App\Form\ProfileType;
 use App\Repository\ProfileRepository;
@@ -10,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\UserLoader;
+use App\Repository\UserRepository;
 
 /**
  * @Route("/attempt-profile")
@@ -22,6 +24,9 @@ class ProfileController extends MainController
     public function index(ProfileRepository $pR): Response
     {
         return $this->render('profile/index.html.twig', [
+"jsParams"=>[
+"profile_stage"=>$this->generateUrl("profile_stage"),
+],
 'public'=>$pR->findByIsPublic(true),
 'profiles' => $pR->findByCurrentAuthor(),
 "all"=>($this->isGranted("ROLE_SUPER_ADMIN")) ? $pR->findAll() : [],
@@ -105,5 +110,24 @@ $this->denyAccessUnlessGranted("APPOINT", $profile);
 $u=$ul->getUser();
 $ul->setProfile($profile);
 $this->em()->flush();
+}
+
+/**
+     * @Route("/stage", name="profile_stage", methods="POST")
+*/
+public function stage(Request $r, ProfileRepository $pR, UserRepository $uR, UserLoader $ul, Log $l) {
+$pr=$r->request->get("profiles", []);
+dump($r->request);
+$l->debug(json_encode($pr));
+$an=["app"=>[], "del"=>[]];
+
+foreach ($pr as $id) {
+$p=$pR->find($id);
+$up=$uR->getSelfOrPublicProfile($ul->getUser());
+$an["app"][$id]=["can"=>$this->isGranted("APPOINT", $p), "cur"=>$up===$p];
+$an["del"][$id]=["can"=>$this->isGranted("DELETE", $p), "cur"=>$up===$p];
+}
+
+return $this->json($an);
 }
 }

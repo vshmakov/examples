@@ -2,7 +2,7 @@
 
 {%block title "Профили настроек"%}
 
-{%macro prTable(profiles, pR)%}
+{%macro prTable(profiles, pR, curPr)%}
 {%if profiles%}
 <table>
 <thead>
@@ -13,10 +13,10 @@
 </thead>
 {%for profile in profiles%}
 <tr>
-<td><button class="choose-profile-button" value="{{profile.setER(pR).id}}" alt="V"></button></td>
+<td><button class="appoint-profile-button" data-href="{{path("profile_appoint", {"id": profile.id})}}" data-can="{{is_granted("APPOINT", profile)}}" data-is-current="{{profile == curPr}}" value="{{profile.setER(pR).id}}" alt="V"></button></td>
 	<td><a href="{{path('profile_edit', {'id':profile.id})}}">{{profile.title}}</a></td>
 <td>{{profile.addTime}}</td>
-<td><button class="delete-profile-button" value="{{profile.id}}" data-href="{{path("profile_delete", {'id': profile.id})}}" alt="Удалить"></button></td>
+<td><button class="delete-profile-button" data-href="{{path("profile_delete", {"id": profile.id})}}" data-can="{{is_granted("DELETE", profile)}}" data-is-current="{{profile == curPr}}" value="{{profile.setER(pR).id}}" alt="V"></button></td>
 </tr>
 {%endfor%}
 <table>
@@ -35,7 +35,33 @@
 
 {%if is_granted("ROLE_ADMIN")%}
 <h1>Все профили</h1>
-{{s.prTable(all, pR)}}
+{%if all%}
+<table>
+<thead>
+	<th>Выбрать</th>
+	<th>Описание</th>
+<th>Пользователь</th>
+<th>Время создания</th>
+<th>Удалить</th>
+</thead>
+{%for profile in all%}
+<tr>
+<td><button class="choose-profile-button" value="{{profile.setER(pR).id}}" alt="V"></button></td>
+	<td><a href="{{path('profile_edit', {'id':profile.id})}}">{{profile.title}}</a></td>
+<td>{{profile.author.username}}</td>
+<td>{{profile.addTime}}</td>
+<td><button class="delete-profile-button" value="{{profile.id}}" data-href="{{path("profile_delete", {'id': profile.id})}}" alt="Удалить"></button></td>
+</tr>
+{%endfor%}
+<table>
+{%else%}
+Нет профилей
+{%endif%}
 {%endif%}
 <a href="{{path("profile_new")}}">Создать профиль</a>
+{%endblock%}
+
+{%block javascripts%}
+{{parent()}}
+<script src="{{asset("assets/profile/index.js")}}"></script>
 {%endblock%}

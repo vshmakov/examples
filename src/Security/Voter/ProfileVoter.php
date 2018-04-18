@@ -2,6 +2,7 @@
 
 namespace App\Security\Voter;
 
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -12,9 +13,11 @@ class ProfileVoter extends Voter
 {
 private $p;
 private $ul;
+private $ch;
 
-public function __construct(UserLoader $ul) {
+public function __construct(UserLoader $ul, AuthorizationCheckerInterface $ch) {
 $this->ul=$ul;
+$this->ch=$ch;
 }
 
     protected function supports($attribute, $subject)
@@ -24,6 +27,7 @@ $this->ul=$ul;
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
     {
+if ($this->ch->isGranted("ROLE_SUPER_ADMIN")) return true;
 $this->p=$subject;
 
         switch ($attribute) {

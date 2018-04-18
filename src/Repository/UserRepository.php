@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\User;
+use App\Entity\Profile;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -16,7 +17,7 @@ use BaseTrait;
     }
 
 public function getSelfOrPublicProfile($u) {
-$pR=$this->er(ProfileRepository::class);
+$pR=$this->er(Profile::class);
 $p=$u->getProfile() ?? $pR->findOneByAuthor($u) ?? $pR->findOnePublic();
 if (!$p) throw new \Exception("Принадлежащие данному пользователю и общие профили отсутствуют");
 return $p;

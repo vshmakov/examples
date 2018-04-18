@@ -83,18 +83,18 @@ return $this->redirectToRoute('attempt_solve', ['id'=>$attR->getNewByCurrentUser
 public function answer(Attempt $att, Request $request, MathMNG $mm, ExR $exR, EM $em) {
 if (!$this->isGranted("ANSWER", $att)) return $this->json(['finish'=>true]);
 
-$ex=$exR->findLastByAttemptOrNull($att);
+$ex=$exR->findLastByAttempt($att);
 $an=(float) $request->request->get('answer');
 $isR=$an === (float) $mm->solveExample($x->getFirst(), $ex->getSecond(), $ex->getSign());
 $ex->setAnswer($an)->setIsRight($isR);
 $em->flush();
 
-$finish=!$this->isGranted("ANSWER", $att);
+$finish=!$this->isGranted("SOLVE", $att);
 if (!$finish) $exR->getNewByAttempt($att);
 return $this->json([
 'isRight'=>$isR, 
 'finish'=>$finish,
-'attData'=>$this->getDataByAtt($att),
+'attData'=>$$att->setER($attR)->getData(),
 ]);//
 }
 

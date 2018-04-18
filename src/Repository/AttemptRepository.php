@@ -102,7 +102,32 @@ $em->flush();
 return $att;
 }
 
+public function hasPreviousExample($att) {
+return !!$this->exR->findLastByAttempt($att);
+}
+
 public function getData($att) {
-return [];
+$exR=$this->exR;
+if (!$ex=$exR->findLastByAttempt($att)) return false;
+$ex->setER($exR);
+$att->setEr($this);
+
+return [
+"ex"=>[
+"num"=>$ex->getNumber(),
+"str"=>"$ex",
+],
+"errors"=>$att->getErrorsCount(),
+"exRem"=>$att->getRemainedExamplesCount(),
+"timeRem=>$att->getRemainedTime(),
+];
+}
+
+public function getRemainedExamplesCount($att) {
+return 0;
+}
+
+public function getRemainedTime($att) {
+return 0;
 }
 }

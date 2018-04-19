@@ -45,3 +45,17 @@ return $p;
 $p[$k]+=100-$all2;
 return $p;
 }
+
+function getArrByKeies($arr, $ka) {
+$res=[];
+
+foreach ($ka as $k) {
+if (isset($arr[$k])) $res[$k]=$arr[$k];
+}
+
+return $res;
+}
+
+function getArrByStr($s) {
+return explode(" ", $s);
+}

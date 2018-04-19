@@ -444,4 +444,9 @@ public function setDescription(string $description): self
 public function __toString() {
 return $this->getDescription();
 }
+
+public function getData() {
+return getArrByKeies((array) $this, 
+getArrByStr("duration examplesCount addMin addMax subMin subMax minSub multMin multMax divMin divMax minDiv addPerc subPerc multPerc divPerc"));;
+}
 }

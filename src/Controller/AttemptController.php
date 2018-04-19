@@ -53,6 +53,8 @@ public function solve(Attempt $att, ExR $exR, AttR $attR, \Symfony\Component\Htt
 if ($this->isGranted("VIEW", $att)) return $this->redirectToRoute('attempt_show', ['id'=>$att->getId()]);
 else throw new AccessDeniedException();
 }
+
+$exR->findLastByAttemptOrGetNew($att);
 return $this->render('attempt/solve.html.twig', [
 "jsParams"=>[
 "attData"=>$att->setER($attR)->getData(),
@@ -80,21 +82,20 @@ return $this->redirectToRoute('attempt_solve', ['id'=>$attR->getNewByCurrentUser
 /**
 *@Route("/{id}/answer", name="attempt_answer")
 */
-public function answer(Attempt $att, Request $request, MathMNG $mm, ExR $exR, EM $em) {
+public function answer(Attempt $att, Request $request, ExR $exR, EM $em) {
 if (!$this->isGranted("ANSWER", $att)) return $this->json(['finish'=>true]);
 
 $ex=$exR->findLastByAttempt($att);
 $an=(float) $request->request->get('answer');
-$isR=$an === (float) $mm->solveExample($x->getFirst(), $ex->getSecond(), $ex->getSign());
-$ex->setAnswer($an)->setIsRight($isR);
+$ex->setAnswer($an);
 $em->flush();
 
 $finish=!$this->isGranted("SOLVE", $att);
-if (!$finish) $exR->getNewByAttempt($att);
+if (!$finish) $exR->getNew($att);
 return $this->json([
-'isRight'=>$isR, 
+'isRight'=>$ex->isRight(), 
 'finish'=>$finish,
-'attData'=>$$att->setER($attR)->getData(),
+'attData'=>$att->setER($attR)->getData(),
 ]);//
 }
 

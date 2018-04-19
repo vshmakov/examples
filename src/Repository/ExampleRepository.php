@@ -5,46 +5,43 @@ namespace App\Repository;
 use App\Entity\Example;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use App\Service\ExampleManager as ExMNG;
 
-/**
- * @method Example|null find($id, $lockMode = null, $lockVersion = null)
- * @method Example|null findOneBy(array $criteria, array $orderBy = null)
- * @method Example[]    findAll()
- * @method Example[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- */
 class ExampleRepository extends ServiceEntityRepository
 {
+use BaseTrait;
+private $exMng;
+
+public function __construct(ExMng $m) {
+$this->exMng=$m;
+}
+
     public function __construct(RegistryInterface $registry)
     {
         parent::__construct($registry, Example::class);
     }
 
-//    /**
-//     * @return Example[] Returns an array of Example objects
-//     */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('e')
-            ->andWhere('e.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('e.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+public function findLastByAttempt($att) {
 
-    /*
-    public function findOneBySomeField($value): ?Example
-    {
-        return $this->createQueryBuilder('e')
-            ->andWhere('e.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
+}
+
+public function getNumber($ex) {
+
+}
+
+public function findLastByAttemptOrGetNew($att) {
+return $this->findLastByAttempt($att) ?? $this->getNew($att);
+}
+
+public function getNew($att) {
+$ex=new Example();
+$ex->setAttempt($att);
+$d=$this->ExMng->getRandEx($att->getSettings()->getData());
+$ex->setFirst($d->first)->setSecond($d->second)->setSign($d->sign);
+$em=$this->em();
+$em->persist($ex);
+$em->flush();
+return $ex;
+}
+
 }

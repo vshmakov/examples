@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\DT;
+use App\Service\ExampleManager as ExMNG;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ExampleRepository")
@@ -121,7 +122,8 @@ use DTTrait;
     public function setAnswer(?float $answer): self
     {
         $this->answer = $answer;
-
+$this->setIsRight($answer === ExMng::solve(($this->first, $this->second, $this->sign));
+$this->setAnswerTime(new \DateTime());
         return $this;
     }
 
@@ -160,4 +162,9 @@ use DTTrait;
 
         return $this;
     }
+
+public function __toString() {
+return sprintf("%s %s %s", $this->first, [1=>"+", "-", "*", ":"][$this->sign], $this->second);
+}
+
 }

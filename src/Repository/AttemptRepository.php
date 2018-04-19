@@ -119,7 +119,7 @@ return [
 ],
 "errors"=>$att->getErrorsCount(),
 "exRem"=>$att->getRemainedExamplesCount(),
-"timeRem=>$att->getRemainedTime(),
+"timeRem"=>$att->getRemainedTime(),
 ];
 }
 

@@ -56,7 +56,6 @@ $att=$this->att;
 $ul=$this->ul;
 $u=$ul->getUser();
 $set=$att->getSettings();
-dump($set);
 if (($ul->isGuest() && $att->getSession() !== $this->sR->findOneByCurrentUser())
 or ($att->getSolvedExamplesCount() >= $set->getExamplesCount()
 or ($att->getAddTime()->getTimestamp() + $set->getDuration() < time())) ) return false;

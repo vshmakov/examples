@@ -2,6 +2,7 @@
 
 namespace App\Security\Voter;
 
+use App\Repository\ExampleRepository as ExR;
 use App\Repository\AttemptRepository;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
@@ -12,15 +13,18 @@ use App\Repository\SessionRepository;
 
 class AttemptVoter extends Voter
 {
+use BaseTrait;
 private $ul;
 private $att;
 private $sR;
 private $attR;
+private $exR;
 
-public function __construct(UserLoader $ul, SessionRepository $sR, AttemptRepository $attR) {
+public function __construct(UserLoader $ul, SessionRepository $sR, AttemptRepository $attR, ExR $exR) {
 $this->ul=$ul;
 $this->sR=$sR;
 $this->attR=$attR;
+$this->exR=$exR;
 }
 
     protected function supports($attribute, $subject)
@@ -31,23 +35,7 @@ $this->attR=$attR;
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
     {
 $this->att=$subject->setER($this->attR);
-
-        switch ($attribute) {
-case "SOLVE":
-return $this->canSolve();
-break;
-case "ANSWER":
-return $this->canAnswer();
-break;
-            case "EDIT":
-return true;
-                break;
-            case 'VIEW':
-return $this->canView();
-                break;
-        }
-
-        return false;
+return $this->checkRight($attribute, $subject, $token);
     }
 
 private function canSolve() {
@@ -62,17 +50,17 @@ or ($att->getAddTime()->getTimestamp() + $set->getDuration() < time())) ) return
 return true;
 }
 
+private function canAnswer() {
+$ex=$this->exR->findLastByAttempt($this->att);
+return $this->canSolve() && $ex && $ex->getAnswer() === null;
+}
+
 private function canView() {
 $att=$this->att;
 $ul=$this->ul;
 $u=$ul->getUser();
 if ($u !== $att->getSession()->getUser()) return false;
 return true;
-
-}
-
-private function canAnswer() {
-
 }
 
 }

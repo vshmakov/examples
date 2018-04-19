@@ -59,3 +59,7 @@ return $res;
 function getArrByStr($s) {
 return explode(" ", $s);
 }
+
+function getMethodName($s, $p="") {
+return $p.ucfirst($s);
+}

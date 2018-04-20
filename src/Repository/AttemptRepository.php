@@ -113,13 +113,11 @@ $ex->setER($exR);
 $att->setEr($this);
 
 return [
-"ex"=>[
 "num"=>$ex->getNumber(),
 "str"=>"$ex",
-],
 "errors"=>$att->getErrorsCount(),
 "exRem"=>$att->getRemainedExamplesCount(),
-"timeRem"=>$att->getRemainedTime(),
+"limTime"=>$att->getLimitTime()->getTimestamp(),
 ];
 }
 
@@ -129,7 +127,7 @@ return $c > 0 ? $c : 0;
 }
 
 public function getRemainedTime($att) {
-$t=$att->getAddTime()->getTimestamp()+$att->getSettings()->getDuration() - time();
+$t=$att->getLimitTime()->getTimestamp() - time();
 return $t > 0 ? $t : 0;
 }
 }

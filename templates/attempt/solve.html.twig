@@ -4,10 +4,10 @@
 
 {%block main%}
 <form>
-<h1>Пример №<span id="exampleNum">*</span></h1>
+<h1>Пример №<span id="num">*</span></h1>
 <div>
 <span>
-<span id="example">* + *</span> =
+<span id="str">* + *</span> =
 <input type="text" name="" id="">
 </span>
 </div>
@@ -17,8 +17,13 @@
 
 <h1>Статистика</h1>
 <ul>
-<li>Ошибок: <span id="errorsCount">*</span></li>
-	<li>Осталось времени: <span id="timer">*</span></li>
-	<li>Осталось примеров: <span id="remainedExamples">*</span></li>
+<li>Ошибок: <span id="errors">*</span></li>
+	<li>Осталось времени: <span id="timeRem">*</span></li>
+	<li>Осталось примеров: <span id="exRem">*</span></li>
 	</ul>
+{%endblock%}
+
+{%block javascripts%}
+{{parent()}}
+<script src="{{asset("/assets/attempt/solve.js")}}"></script>
 {%endblock%}

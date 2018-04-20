@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\DT;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\AttemptRepository")
@@ -120,6 +121,10 @@ $this->initAddTime();
     }
 
 public function getExamplesCount() {
-return 0;
+return $this->getSettings()->getExamplesCount();
+}
+
+public function getLimitTime() {
+return DT::createFromTimestamp($this->getAddTime()->getTimestamp()+$this->getSettings()->getDuration());
 }
 }

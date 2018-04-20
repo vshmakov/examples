@@ -1,16 +1,16 @@
 {%extends 'base.html.twig'%}
 
-{%block title att.setER(attR).title%}
+{%block title att.title%}
 
 {%block main%}
 <h1>Статистика</h1>
 <ul>
 	<li>Начало попытки: {{att.addTime}}</li>
-	<li>Конец попытки: {{attR.getFinishTime(att)}}</li>
-{#	<li>Примеров в попытке: {{att.settings.examplesCount}}</li>#}
-	<li>Решено примеров: {{attR.getSolvedExamplesCount(att)}}</li>
-<li>Ошибок: {{attR.getErrorsCount(att)}}</li>
-	<li>Оценка: {{attR.getRating(att)}}</li>
+	<li>Конец попытки: {{att.finishTime}}</li>
+	<li>Примеров в попытке: {{att.examplesCount}}</li>
+	<li>Решено примеров: {{att.solvedExamplesCount}}</li>
+<li>Ошибок: {{att.errorsCount}}</li>
+	<li>Оценка: {{att.rating}}</li>
 </ul>
 
 <h1>Примеры</h1>

@@ -20,7 +20,10 @@ return $this->em()->createQuery($dql);
 
 private function v($q) {
 $r=($q->setMaxResults(1)->getOneOrNullResult());
-return (is_array($r)) ? $r[1] : $r;
+if (!is_array($r)) return $r;
+foreach ($r as $v) {
+return $v;
+}
 }
 
 private function qb() {

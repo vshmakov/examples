@@ -1,9 +1,8 @@
 <?php
 
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 namespace App\Controller;
 
-use App\Service\MathMng;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Doctrine\ORM\EntityManagerInterface as EM;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -38,10 +37,9 @@ return $this->render('attempt/index.html.twig', [
 public function show(Attempt $att, ExR $exR, AttR $attR) {
 $this->denyAccessUnlessGranted('VIEW', $att);
 return $this->render('attempt/show.html.twig', [
-"att"=>$att,
+"att"=>$att->setER($attR),
 "examples"=>$exR->findByAttempt($att),
 "exR"=>$exR,
-"attR"=>$attR,
 ]);
 }
 
@@ -58,7 +56,7 @@ $exR->findLastUnansweredByAttemptOrGetNew($att);
 return $this->render('attempt/solve.html.twig', [
 "jsParams"=>[
 "attData"=>$att->setER($attR)->getData(),
-'answerRoute'=>$this->generateUrl('attempt_answer', ['id'=>$att->getId()])
+'attempt_answer'=>$this->generateUrl('attempt_answer', ['id'=>$att->getId()])
 ],
 "att"=>$att,
 ]);//
@@ -82,7 +80,7 @@ return $this->redirectToRoute('attempt_solve', ['id'=>$attR->getNewByCurrentUser
 /**
 *@Route("/{id}/answer", name="attempt_answer")
 */
-public function answer(Attempt $att, Request $request, ExR $exR, EM $em) {
+public function answer(Attempt $att, Request $request, ExR $exR, EM $em, AttR $attR) {
 if (!$this->isGranted("ANSWER", $att)) return $this->json(['finish'=>true]);
 
 $ex=$exR->findLastUnansweredByAttempt($att);

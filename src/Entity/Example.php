@@ -127,7 +127,7 @@ $this->setAnswerTime(new \DateTime());
         return $this;
     }
 
-    public function getIsRight(): ?bool
+    public function isRight(): ?bool
     {
         return $this->isRight;
     }

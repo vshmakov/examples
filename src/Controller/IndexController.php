@@ -14,7 +14,6 @@ class IndexController extends Controller
      */
     public function index(\App\Service\UserLoader $ul, \App\Repository\UserRepository $uR)
     {
-dump($ul->getUser()->setER($uR)->getSelfOrPublicProfile()->getData());
         return $this->render('index/index.html.twig', [
             'controller_name' => 'IndexController',
         ]);

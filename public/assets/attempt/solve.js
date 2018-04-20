@@ -4,7 +4,7 @@ h.createObj({
 constructor: function () {
 var self=this;
 $.each(["num", "exRem", "str", "errors"], function () {
-self[k]=$("#"+this);
+self[this]=$("#"+this);
 });
 this.setData(P.attData);
 this.form.submit(this.answer.bind(this));

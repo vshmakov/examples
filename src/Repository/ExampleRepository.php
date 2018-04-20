@@ -25,6 +25,13 @@ order by e.addTime desc")
 ->setParameter("a", $att));
 }
 
+public function getErrorNum($ex) {
+if ($ex->isRight() !== false) return;
+return $this->v($this->q("select count(e) from App:Example e
+where e.attempt = :a and e.isRight = false and e.addTime <= :dt")
+->setParameters(["a"=>$ex->getAttempt(), "dt"=>$ex->getAddTime()]));
+}
+
 public function getNumber($ex) {
 return $this->v($this->q("select count(e) from App:Example e
 where e.attempt = :a and e.addTime <= :dt")

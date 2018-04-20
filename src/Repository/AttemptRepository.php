@@ -113,8 +113,10 @@ $ex->setER($exR);
 $att->setEr($this);
 
 return [
+"ex"=>[
 "num"=>$ex->getNumber(),
 "str"=>"$ex",
+],
 "errors"=>$att->getErrorsCount(),
 "exRem"=>$att->getRemainedExamplesCount(),
 "limTime"=>$att->getLimitTime()->getTimestamp(),

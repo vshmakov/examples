@@ -11,7 +11,7 @@ use App\Service\UserLoader;
 
 class ProfileVoter extends Voter
 {
-private $p;
+use BaseTrait;
 private $ul;
 private $ch;
 
@@ -28,47 +28,26 @@ $this->ch=$ch;
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
     {
 if ($this->ch->isGranted("ROLE_SUPER_ADMIN")) return true;
-$this->p=$subject;
-
-        switch ($attribute) {
-case "DELETE":
-return $this->canDelete();
-break;
-case "CREATE":
-return $this->canCreate();
-break;
-            case 'EDIT':
-return $this->canEdit();
-                break;
-case"APPOINT":
-return $this->canAppoint();
-break;
-            case 'VIEW':
-return $this->canView();
-                break;
-        }
-
-        return false;
+return $this->checkRight($attribute, $subject, $token);
     }
 
 private function canCreate() {
 return !$this->ul->isGuest();
 }
 
-private function canView() {
-$p=$this->p;
+private function canView($p) {
 return $p->isPublic() or $this->ul->getUser() === $p->getAuthor();
 }
 
-private function canEdit() {
-return $this->canCreate() && $this->ul->getUser() === $this->p->getAuthor() && !$this->p->isPublic();
+private function canEdit($p) {
+return $this->canCreate() && $this->ul->getUser() === $p->getAuthor() && !$p->isPublic();
 }
 
-private function canDelete() {
+private function canDelete($p) {
 return $this->canEdit();
 } 
 
-private function canAppoint() {
+private function canAppoint($p) {
 return $this->canCreate() && $this->canView();
 } 
 }

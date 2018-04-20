@@ -27,7 +27,7 @@ $this->uR=$uR;
 $this->ch=$ch;
     }
 
-public function findLastByCurrentUser() {
+public function findLastActualByCurrentUser() {
 $ul=$this->ul;
 $w=(!$ul->isGuest()) ? "s.user = :u" : "a.session = :s";
 $q=$this->q("select a from App:Attempt a
@@ -124,10 +124,12 @@ return [
 }
 
 public function getRemainedExamplesCount($att) {
-return 0;
+$c=$att->getSettings()->getExamplesCount() - $this->getSolvedExamplesCount($att);
+return $c > 0 ? $c : 0;
 }
 
 public function getRemainedTime($att) {
-return 0;
+$t=$att->getAddTime()->getTimestamp()+$att->getSettings()->getDuration() - time();
+return $t > 0 ? $t : 0;
 }
 }

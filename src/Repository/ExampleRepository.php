@@ -21,16 +21,21 @@ $this->exMng=$m;
         parent::__construct($registry, Example::class);
     }
 
-public function findLastByAttempt($att) {
-
+public function findLastUnansweredByAttempt($att) {
+return $this->v($this->q("select e from App:Example e
+where e.attempt = :a and e.answer is null
+order by e.addTime desc")
+->setParameter("a", $att));
 }
 
 public function getNumber($ex) {
-
+return $this->v($this->q("select count(e) from App:Example e
+where e.attempt = :a and e.addTime <= :dt")
+->setParameters(["a"=>$ex->getAttempt(), "dt"=>$ex->getAddTime()]));
 }
 
-public function findLastByAttemptOrGetNew($att) {
-return $this->findLastByAttempt($att) ?? $this->getNew($att);
+public function findLastUnansweredByAttemptOrGetNew($att) {
+return $this->findLastUnansweredByAttempt($att) ?? $this->getNew($att);
 }
 
 public function getNew($att) {

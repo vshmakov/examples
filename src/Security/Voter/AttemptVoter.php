@@ -15,7 +15,6 @@ class AttemptVoter extends Voter
 {
 use BaseTrait;
 private $ul;
-private $att;
 private $sR;
 private $attR;
 private $exR;
@@ -34,31 +33,29 @@ $this->exR=$exR;
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
     {
-$this->att=$subject->setER($this->attR);
-return $this->checkRight($attribute, $subject, $token);
+return $this->checkRight($attribute, $subject->setER($this->attR), $token);
     }
 
-private function canSolve() {
+private function canSolve($att) {
 if (!$this->canView()) return false;
-$att=$this->att;
 $ul=$this->ul;
 $u=$ul->getUser();
-$set=$att->getSettings();
+
 if (($ul->isGuest() && $att->getSession() !== $this->sR->findOneByCurrentUser())
-or ($att->getSolvedExamplesCount() >= $set->getExamplesCount()
-or ($att->getAddTime()->getTimestamp() + $set->getDuration() < time())) ) return false;
+or ($att->getRemainedExamplesCount() == 0)
+or ($att->getRemainedTime() == 0)) ) return false;
 return true;
 }
 
-private function canAnswer() {
-$ex=$this->exR->findLastByAttempt($this->att);
-return $this->canSolve() && $ex && $ex->getAnswer() === null;
+private function canAnswer($att) {
+$ex=$this->exR->findLastUnansweredByAttempt($att);
+return $this->canSolve() && $ex;
 }
 
-private function canView() {
-$att=$this->att;
+private function canView($att) {
 $ul=$this->ul;
 $u=$ul->getUser();
+
 if ($u !== $att->getSession()->getUser()) return false;
 return true;
 }

@@ -17,7 +17,7 @@ public function __construct (UL $ul, AttR $attR) {
 $this->ul=$ul;
 $this->gl=[
 "ul"=>$ul,
-"hasPreviousAttempt"=>!!$attR->findLastByCurrentUser(),
+"hasActualAttempt"=>!!$attR->findLastActualByCurrentUser(),
 ];
 }
 

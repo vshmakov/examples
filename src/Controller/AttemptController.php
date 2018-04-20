@@ -54,7 +54,7 @@ if ($this->isGranted("VIEW", $att)) return $this->redirectToRoute('attempt_show'
 else throw new AccessDeniedException();
 }
 
-$exR->findLastByAttemptOrGetNew($att);
+$exR->findLastUnansweredByAttemptOrGetNew($att);
 return $this->render('attempt/solve.html.twig', [
 "jsParams"=>[
 "attData"=>$att->setER($attR)->getData(),
@@ -68,7 +68,7 @@ return $this->render('attempt/solve.html.twig', [
 *@Route("/last", name="attempt_last")
 */
 public function last(AttR $attR) {
-if ($att=$attR->findLastByCurrentUser()) return $this->redirectToRoute('attempt_solve', ['id'=>$att->getId()]);
+if ($att=$attR->findLastActualByCurrentUser()) return $this->redirectToRoute('attempt_solve', ['id'=>$att->getId()]);
 return $this->render("attempt/last.html.twig");
 }
 
@@ -85,7 +85,7 @@ return $this->redirectToRoute('attempt_solve', ['id'=>$attR->getNewByCurrentUser
 public function answer(Attempt $att, Request $request, ExR $exR, EM $em) {
 if (!$this->isGranted("ANSWER", $att)) return $this->json(['finish'=>true]);
 
-$ex=$exR->findLastByAttempt($att);
+$ex=$exR->findLastUnansweredByAttempt($att);
 $an=(float) $request->request->get('answer');
 $ex->setAnswer($an);
 $em->flush();

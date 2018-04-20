@@ -44,10 +44,10 @@ return $this->canCreate() && $this->ul->getUser() === $p->getAuthor() && !$p->is
 }
 
 private function canDelete($p) {
-return $this->canEdit();
+return $this->canEdit($p);
 } 
 
 private function canAppoint($p) {
-return $this->canCreate() && $this->canView();
+return $this->canCreate($p) && $this->canView($p);
 } 
 }

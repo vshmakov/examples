@@ -30,7 +30,7 @@ var v=b.val();
 if (pr.indexOf(v) == -1) pr.push(v);
 });
 
-$.post(P.profile_stage, {profiles: pr}, this.setClases.bind(this));
+$.post(P.profile_state, {profiles: pr}, this.setClases.bind(this));
 },
 
 cannotCl: "btn-cannot",

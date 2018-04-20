@@ -446,7 +446,13 @@ return $this->getDescription();
 }
 
 public function getData() {
-return getArrByKeies((array) $this, 
-getArrByStr("duration examplesCount addMin addMax subMin subMax minSub multMin multMax divMin divMax minDiv addPerc subPerc multPerc divPerc"));;
+$d=[];
+$f=getArrByStr("duration examplesCount addMin addMax subMin subMax minSub multMin multMax divMin divMax minDiv addPerc subPerc multPerc divPerc");
+
+foreach ($this as $k=>$v) {
+if (in_array($k, $f)) $d[$k]=$v;
+}
+
+return $d;
 }
 }

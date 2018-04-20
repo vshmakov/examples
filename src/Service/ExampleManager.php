@@ -24,10 +24,10 @@ public function getRandEx($set) {
 $sign=$this->sign($set);
 $m=[1=>"add", "sub", "mult", "div"][$sign];
 $nums=$this->$m($set);
-return (object) $nums+["sign"=>$sign];
+return (object) ($nums+["sign"=>$sign]);
 }
 
-private function sign($set) 
+private function sign($set) {
 $rand=mt_rand(1, 100);
 $k=0;
 $sign=1;

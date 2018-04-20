@@ -25,7 +25,7 @@ class ProfileController extends MainController
     {
         return $this->render('profile/index.html.twig', [
 "jsParams"=>[
-"profile_stage"=>$this->generateUrl("profile_stage"),
+"profile_state"=>$this->generateUrl("profile_state"),
 ],
 'public'=>$pR->findByIsPublic(true),
 'profiles' => $pR->findByCurrentAuthor(),
@@ -118,17 +118,16 @@ return $this->json(true);
 }
 
 /**
-     * @Route("/stage", name="profile_stage", methods="POST")
+     * @Route("/state", name="profile_state", methods="POST")
 */
-public function stage(Request $r, ProfileRepository $pR, UserRepository $uR, UserLoader $ul, Log $l) {
+public function state(Request $r, ProfileRepository $pR, UserRepository $uR, UserLoader $ul, Log $l) {
 $pr=$r->request->get("profiles", []);
-dump($r->request);
 $l->debug(json_encode($pr));
 $an=["app"=>[], "del"=>[]];
 
 foreach ($pr as $id) {
 $p=$pR->find($id);
-$up=$uR->getSelfOrPublicProfile($ul->getUser());
+$up=$uR->getCurrentProfile($ul->getUser());
 $an["app"][$id]=["can"=>$this->isGranted("APPOINT", $p), "cur"=>$up===$p];
 $an["del"][$id]=["can"=>$this->isGranted("DELETE", $p), "cur"=>$up===$p];
 }

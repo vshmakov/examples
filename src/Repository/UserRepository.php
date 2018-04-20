@@ -16,7 +16,7 @@ use BaseTrait;
         parent::__construct($registry, User::class);
     }
 
-public function getSelfOrPublicProfile($u) {
+public function getCurrentProfile($u) {
 $pR=$this->er(Profile::class);
 $p=$u->getProfile() ?? $pR->findOneByAuthor($u) ?? $pR->findOnePublic();
 if (!$p) throw new \Exception("Принадлежащие данному пользователю и общие профили отсутствуют");

@@ -37,19 +37,19 @@ return $this->checkRight($attribute, $subject->setER($this->attR), $token);
     }
 
 private function canSolve($att) {
-if (!$this->canView()) return false;
+if (!$this->canView($att)) return false;
 $ul=$this->ul;
 $u=$ul->getUser();
 
 if (($ul->isGuest() && $att->getSession() !== $this->sR->findOneByCurrentUser())
 or ($att->getRemainedExamplesCount() == 0)
-or ($att->getRemainedTime() == 0)) ) return false;
+or ($att->getRemainedTime() == 0)) return false;
 return true;
 }
 
 private function canAnswer($att) {
 $ex=$this->exR->findLastUnansweredByAttempt($att);
-return $this->canSolve() && $ex;
+return $this->canSolve($att) && $ex;
 }
 
 private function canView($att) {

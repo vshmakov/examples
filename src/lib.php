@@ -53,11 +53,12 @@ foreach ($ka as $k) {
 if (isset($arr[$k])) $res[$k]=$arr[$k];
 }
 
-return $res;
+return ($res);
 }
 
 function getArrByStr($s) {
-return explode(" ", $s);
+$a=explode(" ", $s);
+return $a;
 }
 
 function getMethodName($s, $p="") {

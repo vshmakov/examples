@@ -95,7 +95,7 @@ public function getNewByCurrentUser() {
 $u=$this->ul->getUser()->setER($this->uR);
 $att=(new Attempt())
 ->setSession($this->sR->findOneByCurrentUserOrGetNew())
-->setSettings($u->getSelfOrPublicProfile());
+->setSettings($u->getCurrentProfile());
 $em=$this->em();
 $em->persist($att);
 $em->flush();
@@ -108,7 +108,7 @@ return !!$this->exR->findLastByAttempt($att);
 
 public function getData($att) {
 $exR=$this->exR;
-if (!$ex=$exR->findLastByAttempt($att)) return false;
+if (!$ex=$exR->findLastUnansweredByAttempt($att)) return false;
 $ex->setER($exR);
 $att->setEr($this);
 

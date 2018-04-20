@@ -57,7 +57,7 @@ use DTTrait;
     private $addTime;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", nullable=true)
      */
     private $answerTime;
 
@@ -122,7 +122,7 @@ use DTTrait;
     public function setAnswer(?float $answer): self
     {
         $this->answer = $answer;
-$this->setIsRight($answer === ExMng::solve(($this->first, $this->second, $this->sign));
+$this->setIsRight($answer === ExMng::solve($this->first, $this->second, $this->sign));
 $this->setAnswerTime(new \DateTime());
         return $this;
     }

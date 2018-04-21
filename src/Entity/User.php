@@ -36,10 +36,21 @@ use BaseTrait;
      */
     private $profile;
 
+    /**
+     * @ORM\Column(type="smallint")
+     */
+    private $money=0;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $limitTime;
+
     public function __construct()
     {
         $this->sessions = new ArrayCollection();
         $this->profiles = new ArrayCollection();
+$this->limitTime=(new \DateTime())->add(new \DateTimeInterval("P7D"));
     }
 
     public function getId()
@@ -117,6 +128,30 @@ use BaseTrait;
     public function setProfile(?Profile $profile): self
     {
         $this->profile = $profile;
+
+        return $this;
+    }
+
+    public function getMoney(): ?int
+    {
+        return $this->money;
+    }
+
+    public function setMoney(int $money): self
+    {
+        $this->money = $money;
+
+        return $this;
+    }
+
+    public function getLimitTime(): ?\DateTimeInterface
+    {
+        return $this->dt($this->limitTime);
+    }
+
+    public function setLimitTime(\DateTimeInterface $limitTime): self
+    {
+        $this->limitTime = $limitTime;
 
         return $this;
     }

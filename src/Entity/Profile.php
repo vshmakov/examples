@@ -126,6 +126,11 @@ use DTTrait;
      */
     private $description;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $isDemanding=true;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
@@ -437,7 +442,7 @@ public function getDescription(): ?string
 public function setDescription(string $description): self
 {
     $this->description = $description;
-    $__EXTRA__LINE;
+
     return $this;
 }
 
@@ -454,5 +459,16 @@ if (in_array($k, $f)) $d[$k]=$v;
 }
 
 return $d;
+}
+
+public function getIsDemanding(): ?bool
+{
+    return $this->isDemanding;
+}
+
+public function setIsDemanding(bool $isDemanding): self
+{
+    $this->isDemanding = $isDemanding;
+    return $this;
 }
 }

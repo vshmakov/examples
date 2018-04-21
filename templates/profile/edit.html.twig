@@ -1,9 +1,45 @@
-{% extends 'profile/form.html.twig' %}
+{% extends 'main.html.twig' %}
 
 {% block title %}{{profile.title}}{% endblock %}
 
+{%macro inp(i, t)%}
+<div>
+<div>
+{{form_label(i, t)}}:
+</div>
+<div>
+{{form_widget(i)}}
+{{form_errors(i)}}
+</div>
+</div>
+{%endmacro%}
+
+{%macro div(f, inps)%}
+{%from _self import inp as inp%}
+<ul>
+{%for t, k in inps%}
+<li>{{inp(f[k], t)}}</li>
+{%endfor%}
+</ul>
+{%endmacro%}
+
 {% block main%}
-   <h1>Edit Profile</h1>
-{%block form parent()%}
+   <h1>Редактировать профиль</h1>
+{{ form_start(form) }}
+{{form_errors(form)}}
+{%from _self import div as div%}
+{{div(form, {"Описание профиля": "description"})}}
+    <button class="btn">Сохранить</button>
+{{ form_end(form) }}
+<a href="{{path("profile_index")}}">Вернуться к списку профилей</a>
+{%if is_granted("DELETE", profile)%}
+{{include("profile/_delete_form.html.twig")}}
+{%endif%}
 {% endblock %}
 
+{%block javascripts%}
+{{parent()}}
+<script>
+if (!P.canEdit) $("input, button, select").attr("disabled", true);
+</script>
+{%endblock%}

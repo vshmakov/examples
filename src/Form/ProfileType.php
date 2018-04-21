@@ -37,13 +37,10 @@ $this->ch=$ch;
             ->add('subPerc')
             ->add('multPerc')
             ->add('divPerc')
-            ->add('addTime');
-
-if ($this->ch->isGranted("ROLE_SUPER_ADMIN")) {
-        $builder
+->add("isDemanding")
             ->add('isPublic')
-            ->add('author');
-}
+            ->add('author')
+            ->add('addTime');
     }
 
     public function configureOptions(OptionsResolver $resolver)

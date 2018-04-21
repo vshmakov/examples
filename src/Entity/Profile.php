@@ -461,7 +461,7 @@ if (in_array($k, $f)) $d[$k]=$v;
 return $d;
 }
 
-public function getIsDemanding(): ?bool
+public function isDemanding(): ?bool
 {
     return $this->isDemanding;
 }
@@ -470,5 +470,9 @@ public function setIsDemanding(bool $isDemanding): self
 {
     $this->isDemanding = $isDemanding;
     return $this;
+}
+
+public function getInstance() {
+return $this;
 }
 }

@@ -5,13 +5,10 @@
     {{ form_widget(form) }}
     <button class="btn">{{ button_label|default('Save') }}</button>
 {{ form_end(form) }}
-abcdef
-    <a href="{{ path('profile_index') }}">back to list</a>
-
+<a href="{{path("profile_index")}}">Вернуться к списку профилей</a>
 {%if is_granted("DELETE", profile)%}
-    {{ include('profile/_delete_form.html.twig') }}
+{{include("profile/delete_form.html.twig")}}
 {%endif%}
-
 {%block javascripts%}
 {{parent()}}
 <script>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        {% block stylesheets %}{% endblock %}
+<script>
+var P={{(jsParams ?? {})|json_encode|raw}};
+</script>
+    </head>
+    <body>
+{%block page%}
+        {% block body %}
+{%block nav%}
+<ul>
+<li><a href="{{path("homepage")}}">На главную</a></li>
+<li><a href="{{path("attempt_index")}}">Архив</a></li>
+{%if hasActualAttempt%}
+<li><a href="{{path("attempt_last")}}">Последняя попытка</a></li>
+{%endif%}
+<li><a href="{{path("attempt_new")}}">Новая попытка</a></li>
+<li><a href="{{path("profile_index")}}">Профили настроек</a></li>
+{%if is_granted("IS_AUTHENTICATED_REMEMBERED")%}
+<li><a href="{{path("fos_user_security_logout")}}">Выйти</a></li>
+{%else%}
+<li><a href="{{path("fos_user_security_login")}}">Войти</a></li>
+<li><a href="{{path("fos_user_registration_register")}}">Зарегистрироваться</a></li>
+{%endif%}
+</ul>
+{%endblock%}
+
+{%block main ""%}
+{% endblock %}
+{%endblock%}
+
+        {% block javascripts %}
+<script src="{{asset("/assets/jquery.js")}}"></script>
+<script src="{{asset("/assets/helper.js")}}"></script>
+{% endblock %}
+    </body>
+</html>

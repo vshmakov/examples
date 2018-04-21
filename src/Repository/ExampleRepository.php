@@ -25,6 +25,13 @@ order by e.addTime desc")
 ->setParameter("a", $att));
 }
 
+public function findLastByAttempt($att) {
+return $this->v($this->q("select e from App:Example e
+where e.attempt = :a 
+order by e.addTime desc")
+->setParameter("a", $att));
+}
+
 public function getErrorNum($ex) {
 if ($ex->isRight() !== false) return;
 return $this->v($this->q("select count(e) from App:Example e
@@ -33,9 +40,10 @@ where e.attempt = :a and e.isRight = false and e.addTime <= :dt")
 }
 
 public function getNumber($ex) {
+$wh=$ex->getAttempt()->getSettings()->isDemanding() ? " and e.isRight != false" : "";
 return $this->v($this->q("select count(e) from App:Example e
-where e.attempt = :a and e.addTime <= :dt")
-->setParameters(["a"=>$ex->getAttempt(), "dt"=>$ex->getAddTime()]));
+where e.attempt = :a and e.addTime < :dt $wh")
+->setParameters(["a"=>$ex->getAttempt(), "dt"=>$ex->getAddTime()]))+1;
 }
 
 public function findLastUnansweredByAttemptOrGetNew($att) {
@@ -45,9 +53,13 @@ return $this->findLastUnansweredByAttempt($att) ?? $this->getNew($att);
 public function getNew($att) {
 $ex=new Example();
 $ex->setAttempt($att);
+if ($att->getSettings()->isDemanding() && ($l=$this->findLastByAttempt($att)) && !$l->isRight()) {
+$ex->setFirst($l->getFirst())->setSecond($l->getSecond())->setSign($l->getSign());
+} else {
 ($set=$att->getSettings()->getData());
 $d=$this->exMng->getRandEx($set);
 $ex->setFirst($d->first)->setSecond($d->second)->setSign($d->sign);
+}
 $em=$this->em();
 $em->persist($ex);
 $em->flush();

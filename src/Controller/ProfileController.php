@@ -77,7 +77,7 @@ $profile->SetDescription($pR->getTitle($profile));
 $canEdit=$this->isGranted("EDIT", $profile);
         $form = $this->createForm(ProfileType::class, $profile);
         $form->handleRequest($request);
-
+dump($profile);
         if ($form->isSubmitted() && $form->isValid() && $canEdit) {
 $profile->normPerc();
             $this->getDoctrine()->getManager()->flush();
@@ -89,7 +89,7 @@ $profile->normPerc();
 "jsParams"=>[
 "canEdit"=>$canEdit,
 ],
-            'profile' => $profile,
+            'profile' => $profile->setER($pR),
             'form' => $form->createView(),
         ]);
     }

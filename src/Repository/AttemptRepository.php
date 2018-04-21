@@ -63,11 +63,20 @@ order by e.answerTime desc
 }
 
 public function getSolvedExamplesCount($att) {
+return $att->getSettings()->isDemanding() ? $this->v(
+$this->q("select count(e) from App:Attempt a
+join a.examples e
+where e.isRight = true and a = :a
+")->setParameters(["a"=>$att, ])
+) : $this->getAnsweredExamplesCount($att);
+}
+
+public function getAnsweredExamplesCount($att) {
 return $this->v(
 $this->q("select count(e) from App:Attempt a
 join a.examples e
-where e.answer != false and e.answer is not null and a = :a
-")->setParameter("a", $att)
+where e.answer is not null and a = :a
+")->setParameters(["a"=>$att, ])
 );
 }
 
@@ -95,7 +104,7 @@ public function getNewByCurrentUser() {
 $u=$this->ul->getUser()->setER($this->uR);
 $att=(new Attempt())
 ->setSession($this->sR->findOneByCurrentUserOrGetNew())
-->setSettings($u->getCurrentProfile());
+->setSettings($u->getCurrentProfile()->getInstance());
 $em=$this->em();
 $em->persist($att);
 $em->flush();

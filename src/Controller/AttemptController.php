@@ -51,7 +51,7 @@ public function solve(Attempt $att, ExR $exR, AttR $attR, \Symfony\Component\Htt
 if ($this->isGranted("VIEW", $att)) return $this->redirectToRoute('attempt_show', ['id'=>$att->getId()]);
 else throw new AccessDeniedException();
 }
-
+dump($att->getSettings());
 $exR->findLastUnansweredByAttemptOrGetNew($att);
 return $this->render('attempt/solve.html.twig', [
 "jsParams"=>[

@@ -1,0 +1,6 @@
+{%set t="'Вы уверены, что хотите удалить "~'"'~profile.title~'"'~"?'"%}
+<form method="post" action="{{ path('profile_delete', {'id': profile.id}) }}" onsubmit="return confirm({{t}});">
+    <input type="hidden" name="_method" value="DELETE">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ profile.id) }}">
+    <button class="btn">Удалить</button>
+</form>

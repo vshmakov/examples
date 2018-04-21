@@ -1,67 +1,14 @@
-{%extends 'base.html.twig'%}
+{%extends 'main.html.twig'%}
 
 {%block title "Профили настроек"%}
 
-{%macro prTable(profiles, pR, curPr)%}
-{%if profiles%}
-<table>
-<thead>
-	<th>Выбрать</th>
-	<th>Описание</th>
-<th>Время создания</th>
-<th>Удалить</th>
-</thead>
-{%for profile in profiles%}
-<tr>
-<td><button class="appoint-profile-button" data-href="{{path("profile_appoint", {"id": profile.id})}}" data-can="{{is_granted("APPOINT", profile)}}" data-is-current="{{profile == curPr}}" value="{{profile.setER(pR).id}}" alt="V"></button></td>
-	<td><a href="{{path('profile_edit', {'id':profile.id})}}">{{profile.title}}</a></td>
-<td>{{profile.addTime}}</td>
-<td><button class="delete-profile-button" data-href="{{path("profile_delete", {"id": profile.id})}}" data-can="{{is_granted("DELETE", profile)}}" data-is-current="{{profile == curPr}}" value="{{profile.setER(pR).id}}" alt="V"></button></td>
-</tr>
-{%endfor%}
-<table>
-{%else%}
-Нет профилей
-{%endif%}
-{%endmacro%}
-
 {%block main%}
-{%import _self as s%}
+{%from "profile/macros.html.twig" import list_table as  t%}
 <h1>Общие профили</h1>
-{{s.prTable(public, pR)}}
+{{t(public, pR)}}
 
 <h1>Личные профили</h1>
-{{s.prTable(profiles, pR)}}
+{{t(profiles, pR)}}
 
-{%if is_granted("ROLE_ADMIN")%}
-<h1>Все профили</h1>
-{%if all%}
-<table>
-<thead>
-	<th>Выбрать</th>
-	<th>Описание</th>
-<th>Пользователь</th>
-<th>Время создания</th>
-<th>Удалить</th>
-</thead>
-{%for profile in all%}
-<tr>
-<td><button class="choose-profile-button" value="{{profile.setER(pR).id}}" alt="V"></button></td>
-	<td><a href="{{path('profile_edit', {'id':profile.id})}}">{{profile.title}}</a></td>
-<td>{{profile.author.username}}</td>
-<td>{{profile.addTime}}</td>
-<td><button class="delete-profile-button" value="{{profile.id}}" data-href="{{path("profile_delete", {'id': profile.id})}}" alt="Удалить"></button></td>
-</tr>
-{%endfor%}
-<table>
-{%else%}
-Нет профилей
-{%endif%}
-{%endif%}
-<a href="{{path("profile_new")}}">Создать профиль</a>
-{%endblock%}
-
-{%block javascripts%}
-{{parent()}}
-<script src="{{asset("assets/profile/index.js")}}"></script>
+<a href="{{path("profile_new")}}">Создать новый профиль</a>
 {%endblock%}

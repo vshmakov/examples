@@ -20,13 +20,13 @@ $this->ul=$ul;
 $this->ch=$ch;
 }
 
-    protected function supports($attribute, $subject)
-    {
-        return             $subject instanceof Profile;
+    protected function supports($attribute, $subject)     {
+        return             !is_array($subject) ? $subject instanceof Profile : $this->supportsArr($attribute, $subject);
     }
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
     {
+if (is_array($subject)) return $this->voteOnArr($attribute, $subject, $token);
 if ($this->ch->isGranted("ROLE_SUPER_ADMIN")) return true;
 return $this->checkRight($attribute, $subject, $token);
     }

@@ -1,0 +1,36 @@
+{%macro list_table(profiles, pR, curPr)%}
+{%if profiles%}
+{%set isA=is_granted("ROLE_ADMIN")%}
+{%set canDel=is_granted("DELETE", profiles)%}
+<table width="100%">
+<thead>
+	<th>Выбрать</th>
+	<th>Описание</th>
+<th>Время создания</th>
+{%if isA%}
+<th>Пользователь</th>
+{%endif%}
+{%if canDel%}
+<th>Удалить</th>
+{%endif%}
+</thead>
+<tbody>
+{%for profile in profiles%}
+<tr>
+<td><input type="radio" value="{{profile.id}}" data-href="{{path("profile_appoint", {"id": profile.id})}}"></td>
+	<td><a href="{{path('profile_edit', {'id':profile.id})}}">{{profile.setER(pR).title}}</a></td>
+<td>{{profile.addTime}}</td>
+{%if isA%}
+<td>{{profile.author.username}}</td>
+{%endif%}
+{%if canDel%}
+<td>{{include("profile/_delete_form.html.twig")}}</td>
+{%endif%}
+</tr>
+{%endfor%}
+</tbody>
+<table>
+{%else%}
+<p>Нет профилей</p>
+{%endif%}
+{%endmacro%}

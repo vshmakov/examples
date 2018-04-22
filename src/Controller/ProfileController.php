@@ -41,7 +41,7 @@ class ProfileController extends MainController
     {
         $profile = new Profile();
 $profile->SetDescription($pR->getTitle($profile));
-        $form = $this->createForm(ProfileType::class, $profile);
+        $form = $this->buildForm($profile);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid() && $this->isGranted("CREATE", $profile)) {
@@ -133,5 +133,17 @@ $an["del"][$id]=["can"=>$this->isGranted("DELETE", $p), "cur"=>$up===$p];
 }
 
 return $this->json($an);
+}
+
+private function buildForm($profile) {
+$f=$this->createForm(ProfileType::class, $profile);
+
+if ($this->isGranted("ROLE_ADMIN")) {
+$f            ->add('isPublic')
+            ->add('author')
+            ->add('addTime');
+}
+
+return $f;
 }
 }

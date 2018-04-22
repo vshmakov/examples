@@ -50,7 +50,7 @@ use BaseTrait;
     {
         $this->sessions = new ArrayCollection();
         $this->profiles = new ArrayCollection();
-$this->limitTime=(new \DateTime())->add(new \DateTimeInterval("P7D"));
+$this->limitTime=(new \DateTime())->add(new \DateInterval("P7D"));
     }
 
     public function getId()

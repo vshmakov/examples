@@ -38,9 +38,7 @@ $this->ch=$ch;
             ->add('multPerc')
             ->add('divPerc')
 ->add("isDemanding")
-            ->add('isPublic')
-            ->add('author')
-            ->add('addTime');
+;
     }
 
     public function configureOptions(OptionsResolver $resolver)

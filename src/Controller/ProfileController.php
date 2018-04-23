@@ -21,11 +21,12 @@ class ProfileController extends MainController
     /**
      * @Route("/", name="profile_index", methods="GET")
      */
-    public function index(ProfileRepository $pR): Response
+    public function index(ProfileRepository $pR, UserLoader $ul, UserRepository $uR): Response
     {
         return $this->render('profile/index.html.twig', [
 "jsParams"=>[
 "profile_state"=>$this->generateUrl("profile_state"),
+"current"=>$uR->getCurrentProfile($ul->getUser())->getId(),
 ],
 'public'=>$pR->findByIsPublic(true),
 'profiles' => $pR->findByCurrentAuthor(),
@@ -37,22 +38,26 @@ class ProfileController extends MainController
     /**
      * @Route("/new", name="profile_new", methods="GET|POST")
      */
-    public function new(Request $request, ProfileRepository $pR): Response
+    public function new(Request $request, ProfileRepository $pR, UserLoader $ul): Response
     {
         $profile = new Profile();
 $profile->SetDescription($pR->getTitle($profile));
         $form = $this->buildForm($profile);
         $form->handleRequest($request);
+$canCreate=$this->isGranted("CREATE", $profile);
 
-        if ($form->isSubmitted() && $form->isValid() && $this->isGranted("CREATE", $profile)) {
+        if ($form->isSubmitted() && $form->isValid() && $canCreate) {
             $em = $this->getDoctrine()->getManager();
-            $em->persist($profile->normPerc());
+            $em->persist($profile->setAuthor($ul->getUser())->normPerc());
             $em->flush();
 
             return $this->redirectToRoute('profile_index');
         }
 
         return $this->render('profile/new.html.twig', [
+"jsParams"=>[
+"canEdit"=>$canCreate,
+],
             'profile' => $profile,
             'form' => $form->createView(),
         ]);
@@ -107,14 +112,14 @@ $this->denyAccessUnlessGranted("DELETE", $profile);
     }
 
     /**
-     * @Route("/{id}/appoint", name="profile_appoint", methods="POST")
+     * @Route("/{id}/appoint", name="profile_appoint", methods="GET")
      */
 public function appoint(Profile $profile, UserLoader $ul) {
 $this->denyAccessUnlessGranted("APPOINT", $profile);
 $u=$ul->getUser();
 $u->setProfile($profile);
 $this->em()->flush();
-return $this->json(true);
+return $this->redirectToRoute("profile_index");
 }
 
 /**

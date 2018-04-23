@@ -23,7 +23,7 @@
 {%endmacro%}
 
 {% block main%}
-   <h1>Редактировать профиль</h1>
+   <h1>{{h1Title ?? "Редактировать профиль"}}</h1>
 {{ form_start(form) }}
 {{form_errors(form)}}
 {%from _self import row as row%}
@@ -59,11 +59,9 @@
 <ul>
 {%endif%}
 
-{%block save_button%}
-{%if is_granted("EDIT", profile)%}
+{%if is_granted(canEdit ?? "EDIT", profile)%}
     <button class="btn">Сохранить</button>
 {%endif%}
-{%endblock%}
 {{ form_end(form) }}
 
 <a href="{{path("profile_index")}}">Вернуться к списку профилей</a>

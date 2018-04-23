@@ -12,3 +12,13 @@
 
 <a href="{{path("profile_new")}}">Создать новый профиль</a>
 {%endblock%}
+
+{%block javascripts%}
+{{parent()}}
+<script>
+var r=$("[type=radio]").click(function (e) {
+location.href=$(e.target).data("href");
+});
+r.filter("[value="+P.current+"]").attr("checked", true);
+</script>
+{%endblock%}

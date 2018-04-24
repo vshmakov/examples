@@ -447,7 +447,7 @@ public function setDescription(string $description): self
 }
 
 public function __toString() {
-return $this->getDescription();
+return $this->getDescription()." - ".$this->getAuthor()->getUsername();
 }
 
 public function getData() {

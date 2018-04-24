@@ -71,7 +71,7 @@ class UserController extends Controller
             return $this->redirectToRoute('user_edit', ['id' => $user->getId()]);
         }
 
-        return $this->render('user/edit.html.twig', [
+        return $this->render('admin/user/edit.html.twig', [
             'user' => $user,
             'form' => $form->createView(),
         ]);

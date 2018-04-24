@@ -1,8 +1,13 @@
-{% extends 'main.html.twig' %}
+{% extends 'account/base.html.twig' %}
 
 {% block title %}Аккаунт{% endblock %}
 
 {%block main%}
 <h1>Аккаунт</h1>
-{{u.remainedTime.roundDaies}}
+<ul>
+<li>Имя: {{u.username}}</li>
+<li>Эл. почта: {{u.email}}</li>
+<li>Счет: {{u.money}} рублей</li>
+<li>Оплачено: {{u.remainedTime.roundDaies}} дн.</li>
+</ul>
 {%endblock%}

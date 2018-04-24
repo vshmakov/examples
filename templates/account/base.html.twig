@@ -1,0 +1,11 @@
+{% extends 'main.html.twig' %}
+
+{%block nav%}
+{{parent()}}
+<ul>
+<li><a href="{{path("account_index")}}">Аккаунт</a></li>
+<li><a href="{{path("account_index")}}">Редактировать</a></li>
+<li><a href="{{path("account_Recharge")}}">Пополнить счёт</a></li>
+<li><a href="{{path("account_index")}}">Оплатить использование сервиса</a></li>
+</ul>
+{%endblock%}

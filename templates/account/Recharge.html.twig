@@ -1,0 +1,11 @@
+{% extends 'account/base.html.twig' %}
+
+{% block title %}Пополнить счёт{% endblock %}
+
+{%block main%}
+<h1>На счёте: {{u.money}} рублей</h1>
+<form method="post">
+<input name="money"  value="{{m}}"><br>
+<input type="submit" value="Пополнить">
+</form>
+{%endblock%}

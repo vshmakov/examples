@@ -16,13 +16,41 @@ use App\Service\UserLoader;
  */
 class AccountController extends Controller
 {
+private $u;
+
+public function __construct(UserRepository $uR, UserLoader $ul) {
+$this->u=$ul->getUser()->setER($uR);
+}
+
     /**
      * @Route("/", name="account_index", methods="GET")
      */
-    public function index(UserRepository $uR, UserLoader $ul): Response
+    public function index(): Response
     {
         return $this->render('account/index.html.twig', [
-"u"=>$ul->getUser()->setER($uR),
+"u"=>$this->u,
 ]);
     }
+
+/**
+*@Route("/Recharge", name="account_Recharge")
+*/
+public function Recharge(Request $r) {
+$form=$this->createFormBuilder($this->u)
+->add("money")
+->getForm();
+$m=(int) $r->request->get("money");
+
+if ($m) {
+$u=$this->u;
+$u->setMoney($u->getMoney() + $m);
+$this->getDoctrine()->getManager()->flush();
+}
+
+return $this->render("account/Recharge.html.twig", [
+"u"=>$this->u,
+"form"=>$form->createView(),
+"m"=>$m ?: "",
+]);
+}
 }

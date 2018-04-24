@@ -13,6 +13,7 @@ class CodeType extends AbstractType
     {
         $builder
             ->add('string')
+            ->add('money')
             ->add('addTime')
             ->add('activateTime')
             ->add('activated')

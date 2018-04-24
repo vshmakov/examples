@@ -9,6 +9,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Code
 {
+use DTTrait;
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -39,7 +41,16 @@ class Code
     /**
      * @ORM\Column(type="boolean")
      */
-    private $activated;
+    private $activated=false;
+
+    /**
+     * @ORM\Column(type="smallint")
+     */
+    private $money=100;
+
+public function __construct() {
+
+}
 
     public function getId()
     {
@@ -102,6 +113,18 @@ class Code
     public function setActivated(bool $activated): self
     {
         $this->activated = $activated;
+
+        return $this;
+    }
+
+    public function getMoney(): ?int
+    {
+        return $this->money;
+    }
+
+    public function setMoney(int $money): self
+    {
+        $this->money = $money;
 
         return $this;
     }

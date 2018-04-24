@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Admin;
+namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\UserType;
@@ -20,7 +20,7 @@ class UserController extends Controller
      */
     public function index(UserRepository $userRepository): Response
     {
-        return $this->render('admin/user/index.html.twig', [
+        return $this->render('user/index.html.twig', [
 'users' => $userRepository->findAll(),
 "uR"=>$userRepository,
 ]);
@@ -71,7 +71,7 @@ class UserController extends Controller
             return $this->redirectToRoute('user_edit', ['id' => $user->getId()]);
         }
 
-        return $this->render('admin/user/edit.html.twig', [
+        return $this->render('user/edit.html.twig', [
             'user' => $user,
             'form' => $form->createView(),
         ]);

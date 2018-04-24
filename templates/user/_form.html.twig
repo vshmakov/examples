@@ -1,0 +1,4 @@
+{{ form_start(form) }}
+    {{ form_widget(form) }}
+    <button class="btn" onclick="return confirm('Do you really want to save this user?')">{{ button_label|default('Save') }}</button>
+{{ form_end(form) }}

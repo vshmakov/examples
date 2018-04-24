@@ -20,7 +20,10 @@ class UserController extends Controller
      */
     public function index(UserRepository $userRepository): Response
     {
-        return $this->render('admin/user/index.html.twig', ['users' => $userRepository->findAll()]);
+        return $this->render('admin/user/index.html.twig', [
+'users' => $userRepository->findAll(),
+"uR"=>$userRepository,
+]);
     }
 
     /**

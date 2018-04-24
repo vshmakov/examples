@@ -1,0 +1,11 @@
+{% extends 'account/base.html.twig' %}
+
+{% block title %}Оплатить сервис{% endblock %}
+
+{%block main%}
+<h1>Оплачено: {{u.remainedTime.roundDaies}} дн.</h1>
+<form method="post">
+<input name="months"  value="{{m}}"><br>
+<input type="submit" value="Оплатить">
+</form>
+{%endblock%}

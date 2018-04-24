@@ -48,4 +48,8 @@ return $this->stFormat();
 public function getRoundDaies() {
 return round($this->getTimestamp()/DAY);
 }
+
+public function isPast() {
+return $this->getTimestamp() < time();
+}
 }

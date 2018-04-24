@@ -14,7 +14,7 @@ use App\Service\UserLoader;
 /**
  * @Route("/account")
  */
-class AccountController extends Controller
+class AccountController extends MainController
 {
 private $u;
 
@@ -44,13 +44,35 @@ $m=(int) $r->request->get("money");
 if ($m) {
 $u=$this->u;
 $u->setMoney($u->getMoney() + $m);
-$this->getDoctrine()->getManager()->flush();
+$this->em()->flush();
 }
 
 return $this->render("account/Recharge.html.twig", [
 "u"=>$this->u,
 "form"=>$form->createView(),
 "m"=>$m ?: "",
+]);
+}
+
+/**
+*@Route("/pay", name="account_pay")
+*/
+public function pay(Request $r) {
+$m=(int) $r->request->get("months");
+$u=$this->u;
+$remMon=$u->getMoney() - $m*50;
+
+if ($m && $remMon >= 0) {
+$f=$u->getLimitTime();
+if ($f->isPast()) $f=new DT();
+$u->setLimitTime($f->add(new \DateInterval("P{$m}M")))
+->setMoney($remMon);
+$this->em()->flush();
+}
+
+return $this->render("account/pay.html.twig", [
+"m"=>$m ?: "",
+"u"=>$this->u,
 ]);
 }
 }

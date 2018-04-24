@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Code index{% endblock %}
+
+{% block body %}
+    <h1>Code index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>String</th>
+                <th>AddTime</th>
+                <th>ActivateTime</th>
+                <th>Activated</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for code in codes %}
+            <tr>
+                <td>{{ code.id }}</td>
+                <td>{{ code.string }}</td>
+                <td>{{ code.addTime ? code.addTime|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ code.activateTime ? code.activateTime|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ code.activated ? 'Yes' : 'No' }}</td>
+                <td>
+                    <a href="{{ path('code_show', {'id': code.id}) }}">show</a>
+                    <a href="{{ path('code_edit', {'id': code.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('code_new') }}">Create new</a>
+{% endblock %}

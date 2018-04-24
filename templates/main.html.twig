@@ -28,6 +28,12 @@ var P={{(jsParams ?? {})|json_encode|raw}};
 <li><a href="{{path("fos_user_registration_register")}}">Зарегистрироваться</a></li>
 {%endif%}
 </ul>
+
+{%if is_granted("ROLE_ADMIN")%}
+<ul>
+<li><a href="{{path("user_index")}}">Пользователи</a>
+</ul>
+{%endif%}
 {%endblock%}
 
 {%block main ""%}

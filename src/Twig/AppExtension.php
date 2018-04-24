@@ -15,10 +15,16 @@ private $ul;
 private $gl=[];
 
 public function __construct (UL $ul, AttR $attR, UR $uR) {
+try {
+$hasAtt=!!$attR->findLastActualByCurrentUser();
+} catch (\Exception $ex) {
+$hasAtt=false;
+}
+
 $this->ul=$ul;
 $this->gl=[
 "user"=>$ul->getUser()->setER($uR),
-"hasActualAttempt"=>!!$attR->findLastActualByCurrentUser(),
+"hasActualAttempt"=>$hasAtt,
 ];
 }
 

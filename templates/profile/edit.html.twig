@@ -64,7 +64,10 @@
 {%endif%}
 {{ form_end(form) }}
 
+{%block back_link%}
 <a href="{{path("profile_index")}}">Вернуться к списку профилей</a>
+{%endblock%}
+
 {%if is_granted("DELETE", profile)%}
 {{include("profile/_delete_form.html.twig")}}
 {%endif%}

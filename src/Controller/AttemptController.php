@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Form\ProfileType;
+use App\Repository\ProfileRepository;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Doctrine\ORM\EntityManagerInterface as EM;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -78,7 +80,7 @@ return $this->redirectToRoute('attempt_solve', ['id'=>$attR->getNewByCurrentUser
 }
 
 /**
-*@Route("/{id}/answer", name="attempt_answer")
+*@Route("/{id}/answer", name="attempt_answer", methods="POST")
 */
 public function answer(Attempt $att, Request $request, ExR $exR, EM $em, AttR $attR) {
 if (!$this->isGranted("ANSWER", $att)) return $this->json(['finish'=>true]);
@@ -101,4 +103,20 @@ private function getDataByAtt($att) {
 return [];
 }
 
+/**
+*@Route("/{id}/profile", name="attempt_profile")
+*/
+public function profile(Attempt $att, ProfileRepository $pR, AttR $attR) {
+$this->denyAccessUnlessGranted("VIEW", $att);
+$p=$att->getSettings()->setER($pR);
+
+return $this->render("attempt/profile.html.twig", [
+"jsParams"=>[
+"canEdit"=>false,
+],
+"profile"=>$p,
+"form"=>$this->createForm(ProfileType::class, $p)->createView(),
+"att"=>$att->setER($attR),
+]);
+}
 }

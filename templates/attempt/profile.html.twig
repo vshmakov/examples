@@ -1,0 +1,8 @@
+{%extends "profile/edit.html.twig"%}
+
+{%set h1Title="Настройки попытки №"~att.number%}
+{%block title h1Title%}
+
+{%block back_link%}
+<a href="{{path("attempt_show", {"id": att.id})}}">Назад к попытке №{{att.number}}</a>
+{%endblock%}

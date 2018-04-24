@@ -47,11 +47,17 @@ use DTTrait;
      */
     private $limitTime;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Code", mappedBy="user")
+     */
+    private $codes;
+
     public function __construct()
     {
         $this->sessions = new ArrayCollection();
         $this->profiles = new ArrayCollection();
 $this->limitTime=(new \DateTime())->add(new \DateInterval("P7D"));
+$this->codes = new ArrayCollection();
     }
 
     public function getId()
@@ -160,5 +166,36 @@ $this->limitTime=(new \DateTime())->add(new \DateInterval("P7D"));
 public function getRemainedTime() {
 $d=$this->getLimitTime()->getTimestamp() - time();
 return DT::createFromTimestamp($d > 0 ? $d  : 0);
+}
+
+/**
+ * @return Collection|Code[]
+ */
+public function getCodes(): Collection
+{
+    return $this->codes;
+}
+
+public function addCode(Code $code): self
+{
+    if (!$this->codes->contains($code)) {
+        $this->codes[] = $code;
+        $code->setUser($this);
+    }
+
+    return $this;
+}
+
+public function removeCode(Code $code): self
+{
+    if ($this->codes->contains($code)) {
+        $this->codes->removeElement($code);
+        // set the owning side to null (unless already changed)
+        if ($code->getUser() === $this) {
+            $code->setUser(null);
+        }
+    }
+
+    return $this;
 }
 }

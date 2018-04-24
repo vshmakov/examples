@@ -6,13 +6,14 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\User as BaseUser;
+use App\DT;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  */
 class User extends BaseUser
 {
-use BaseTrait;
+use DTTrait;
 
     /**
      * @ORM\Id()
@@ -155,4 +156,9 @@ $this->limitTime=(new \DateTime())->add(new \DateInterval("P7D"));
 
         return $this;
     }
+
+public function getRemainedTime() {
+$d=$this->getLimitTime()->getTimestamp() - time();
+return DT::createFromTimestamp($d > 0 ? $d  : 0);
+}
 }

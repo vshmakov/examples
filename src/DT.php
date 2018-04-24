@@ -45,4 +45,7 @@ public function __toString() {
 return $this->stFormat();
 }
 
+public function getRoundDaies() {
+return round($this->getTimestamp()/DAY);
+}
 }

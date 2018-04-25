@@ -50,6 +50,7 @@
 <h2>Параметры примеров на деление</h2>
 {{list(form, {"Минимальное делимое": "divMin", "Максимальное делимое": "divMax", "Минимальная частное": "minDiv", "Процент примеров на деление": "divPerc"})}}
 
+{%block advanced_parameters%}
 {%if is_granted("ROLE_ADMIN")%}
 <h2>Параметры для администратора</h2>
 <ul>
@@ -58,19 +59,24 @@
 <li>{{form_label(form.addTime, "Время создания профиля")}}{{form_widget(form.addTime)}}</li>
 <ul>
 {%endif%}
+{%endblock%}
 
+{%block save_button%}
 {%if is_granted(canEdit ?? "EDIT", profile)%}
     <button class="btn">Сохранить</button>
 {%endif%}
+{%endblock%}
 {{ form_end(form) }}
 
 {%block back_link%}
 <a href="{{path("profile_index")}}">Вернуться к списку профилей</a>
 {%endblock%}
 
+{%block delete_button%}
 {%if is_granted("DELETE", profile)%}
 {{include("profile/_delete_form.html.twig")}}
 {%endif%}
+{%endblock%}
 {% endblock %}
 
 {%block javascripts%}

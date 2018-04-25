@@ -58,7 +58,7 @@ $canCreate=$this->isGranted("CREATE", $profile);
 "jsParams"=>[
 "canEdit"=>$canCreate,
 ],
-            'profile' => $profile,
+            'profile' => $profile->setER($pR),
             'form' => $form->createView(),
         ]);
     }
@@ -80,7 +80,7 @@ $this->denyAccessUnlessGranted("VIEW", $profile);
 $this->denyAccessUnlessGranted("VIEW", $profile);
 $profile->SetDescription($pR->getTitle($profile));
 $canEdit=$this->isGranted("EDIT", $profile);
-        $form = $this->createForm(ProfileType::class, $profile);
+        $form = $this->buildForm($profile);
         $form->handleRequest($request);
 dump($profile);
         if ($form->isSubmitted() && $form->isValid() && $canEdit) {

@@ -40,12 +40,16 @@ this[k].html(o[k]);
 timer: h.createObj({
 constructor: function () {
 this.finishTime=P.attData.limTime*1000;
-setInterval(this.setTime.bind(this), 1000);
+this.intId=setInterval(this.setTime.bind(this), 1000);
 },
 
 setTime: function () {
-var remained=Math.abs(this.finishTime-(new Date().getTime()));
-var dt=new Date(remained);
+var remained=(this.finishTime-(new Date().getTime()));
+if (remained < 0) {
+clearInterval(this.intId);
+return location.reload();
+}
+var dt=new Date(Math.abs(remained));
 
 var getTime=function (value) {
 return (value>9) ? value : "0"+value;

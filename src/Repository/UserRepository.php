@@ -18,6 +18,7 @@ use BaseTrait;
 
 public function getCurrentProfile($u) {
 $pR=$this->er(Profile::class);
+if ($u->getLimitTime()->isPast()) return $pR->findOneBy(["description"=>"Тестовый профиль", "isPublic"=>true]);
 $p=$u->getProfile() ?? $pR->findOneByAuthor($u) ?? $pR->findOnePublic();
 if (!$p) throw new \Exception("Принадлежащие данному пользователю и общие профили отсутствуют");
 return $p;

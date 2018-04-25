@@ -48,6 +48,6 @@ return $this->canEdit($p);
 } 
 
 private function canAppoint($p) {
-return $this->canCreate($p) && $this->canView($p);
+return !$this->ul->getUser()->getLimitTime()->isPast() && $this->canCreate($p) && $this->canView($p);
 } 
 }

@@ -23,13 +23,15 @@ class ProfileController extends MainController
      */
     public function index(ProfileRepository $pR, UserLoader $ul, UserRepository $uR): Response
     {
+$profiles=$pR->findByCurrentAuthor();
+
         return $this->render('profile/index.html.twig', [
 "jsParams"=>[
-"profile_state"=>$this->generateUrl("profile_state"),
 "current"=>$uR->getCurrentProfile($ul->getUser())->getId(),
+"canAppoint"=>$this->isGranted("APPOINT", $profiles),
 ],
 'public'=>$pR->findByIsPublic(true),
-'profiles' => $pR->findByCurrentAuthor(),
+'profiles' => $profiles,
 "all"=>($this->isGranted("ROLE_SUPER_ADMIN")) ? $pR->findAll() : [],
 "pR"=>$pR,
 ]);

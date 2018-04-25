@@ -20,5 +20,6 @@ var r=$("[type=radio]").click(function (e) {
 location.href=$(e.target).data("href");
 });
 r.filter("[value="+P.current+"]").attr("checked", true);
+if (!P.canAppoint) r.attr("disabled", true);
 </script>
 {%endblock%}

@@ -1,8 +1,8 @@
-{%block title "Последняя начатая попытка не найдена"%}
+{%block title "Последняя актуальная попытка не найдена"%}
 
-{%extends 'content.html.twig'%}
+{%extends 'main.html.twig'%}
 
-{%block content%}
-<p>В вашем аккаунте пока не начато ни одной попытки.</p>
-<div><a href="{{path("attempt_new")}}">Начать сейчас</a></div>
+{%block main%}
+<p>У вас нет ни одной актуальной попытки.</p>
+<div><a href="{{path("attempt_new")}}">Начните новую</a></div>
 {%endblock%}

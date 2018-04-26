@@ -52,4 +52,10 @@ return round($this->getTimestamp()/DAY);
 public function isPast() {
 return $this->getTimestamp() < time();
 }
+
+public function getRoundUpDaies() {
+$t=$this->getTimestamp();
+if (!$t) return 0;
+return (((int) ($t/DAY))+1);
+}
 }

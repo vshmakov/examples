@@ -23,8 +23,9 @@ $hasAtt=false;
 
 $this->ul=$ul;
 $this->gl=[
-"user"=>$ul->getUser()->setER($uR),
+"user"=>$u=$ul->getUser()->setER($uR),
 "hasActualAttempt"=>$hasAtt,
+"remainedDaies"=>$u->getRemainedTime()->getRoundUpDaies(),
 ];
 }
 

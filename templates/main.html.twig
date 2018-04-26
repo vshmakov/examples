@@ -38,8 +38,15 @@ var P={{(jsParams ?? {})|json_encode|raw}};
 {%endif%}
 {{item("attempt_new", "Новая попытка")}}
 {{item("profile_index", "Профили настроек")}}
+
 {%if is_granted("IS_AUTHENTICATED_REMEMBERED")%}
-{{item("account_index", "Аккаунт")}}
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle account-button" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Аккаунт</a>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item" href="{{path("account_recharge")}}">Пополнить счёт <em>({{user.money}} рублей)</em></a>
+                    <a class="dropdown-item" href="{{path("account_pay")}}">Оплатить сервис <em>({{user.remainedTime.roundDaies}}  дн.)</em></a>
+                  </div>
+                </li>
 {{item("fos_user_security_logout", "Выход")}}
 {%else%}
 {{item("fos_user_security_login", "Вход")}}
@@ -68,6 +75,11 @@ var P={{(jsParams ?? {})|json_encode|raw}};
     <script src="js/popper.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/custom.js"></script>
+<script>
+var d={{remainedDaies}};
+c=d == 0 ? "red" : d <=7 ? "orange" : d <= 14 ? "yellow" : "green";
+$(".account-button").css("background", c);
+</script>
 {% endblock %}
     </body>
 </html>

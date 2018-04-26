@@ -34,9 +34,9 @@ $this->u=$ul->getUser()->setER($uR);
     }
 
 /**
-*@Route("/Recharge", name="account_Recharge")
+*@Route("/Recharge", name="account_recharge")
 */
-public function Recharge(Request $r) {
+public function recharge(Request $r) {
 $form=$this->createFormBuilder($this->u)
 ->add("money")
 ->getForm();

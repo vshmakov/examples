@@ -2,10 +2,12 @@
 
 {%block nav%}
 {{parent()}}
+{#
 <ul>
 <li><a href="{{path("account_index")}}">Аккаунт</a></li>
 <li><a href="{{path("account_index")}}">Редактировать</a></li>
 <li><a href="{{path("account_Recharge")}}">Пополнить счёт ({{user.money}} руб.)</a></li>
 <li><a href="{{path("account_pay")}}">Оплатить использование сервиса ({{user.remainedTime.roundDaies}}  дн.)</a></li>
 </ul>
+#}
 {%endblock%}

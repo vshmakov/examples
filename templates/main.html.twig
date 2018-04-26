@@ -13,6 +13,7 @@ var P={{(jsParams ?? {})|json_encode|raw}};
     <body>
 {%block page%}
         {% block body %}
+<div class="container">
 {%block nav%}
             <div class="bs-component">
               <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
@@ -58,7 +59,8 @@ var P={{(jsParams ?? {})|json_encode|raw}};
 {%endblock%}
 
 {%block main ""%}
-{% endblock %}
+{% endblock body%}
+</div>
 {%endblock%}
 
         {% block javascripts %}

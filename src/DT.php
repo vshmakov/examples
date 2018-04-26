@@ -55,7 +55,7 @@ return $this->getTimestamp() < time();
 
 public function getRoundUpDaies() {
 $t=$this->getTimestamp();
-if (!$t) return 0;
-return (((int) ($t/DAY))+1);
+$d=(((int) ($t/DAY)));
+return ($t % DAY == 0 ? $d : $d+1);
 }
 }

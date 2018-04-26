@@ -3,7 +3,9 @@
     <head>
         <meta charset="UTF-8">
         <title>{% block title %}Welcome!{% endblock %}</title>
-        {% block stylesheets %}{% endblock %}
+        {% block stylesheets %}
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+{% endblock %}
 <script>
 var P={{(jsParams ?? {})|json_encode|raw}};
 </script>
@@ -12,22 +14,40 @@ var P={{(jsParams ?? {})|json_encode|raw}};
 {%block page%}
         {% block body %}
 {%block nav%}
-<ul>
-<li><a href="{{path("homepage")}}">На главную</a></li>
-<li><a href="{{path("attempt_index")}}">Архив</a></li>
+            <div class="bs-component">
+              <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+                <a class="navbar-brand" href="#">Навигация</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Навигация">
+                  <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarColor01">
+                  <ul class="navbar-nav mr-auto">
+{%macro item(r, t)%}
+                    <li class="nav-item {#active#}">
+                      <a class="nav-link" href="{{path(r)}}">{{t}} {#<span class="sr-only">(current)</span>#}</a>
+                    </li>
+{%endmacro%}
+
+{%from _self import item as item%}
+{{item("homepage", "На главную")}}
+{{item("attempt_index", "Архив попыток")}}
 {%if hasActualAttempt%}
-<li><a href="{{path("attempt_last")}}">Последняя попытка</a></li>
+{{item("attempt_last", "Последняя попытка")}}
 {%endif%}
-<li><a href="{{path("attempt_new")}}">Новая попытка</a></li>
-<li><a href="{{path("profile_index")}}">Профили настроек</a></li>
+{{item("attempt_new", "Новая попытка")}}
+{{item("profile_index", "Профили настроек")}}
 {%if is_granted("IS_AUTHENTICATED_REMEMBERED")%}
-<li><a href="{{path("account_index")}}">Аккаунт</a></li>
-<li><a href="{{path("fos_user_security_logout")}}">Выйти</a></li>
+{{item("account_index", "Аккаунт")}}
+{{item("fos_user_security_logout", "Выход")}}
 {%else%}
-<li><a href="{{path("fos_user_security_login")}}">Войти</a></li>
-<li><a href="{{path("fos_user_registration_register")}}">Зарегистрироваться</a></li>
+{{item("fos_user_security_login", "Вход")}}
+{{item("fos_user_registration_register", "Регистрация")}}
 {%endif%}
-</ul>
+                  </ul>
+                </div>
+              </nav>
+            </div>
 
 {%if is_granted("ROLE_ADMIN")%}
 <ul>
@@ -42,8 +62,10 @@ var P={{(jsParams ?? {})|json_encode|raw}};
 {%endblock%}
 
         {% block javascripts %}
-<script src="{{asset("/assets/jquery.js")}}"></script>
-<script src="{{asset("/assets/helper.js")}}"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/popper.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/custom.js"></script>
 {% endblock %}
     </body>
 </html>

@@ -138,6 +138,8 @@ $row=getKeiesFromEntity("title addTime finishTime examplesCount solvedExamplesCo
 $att->setER($attR));
 
 $row[0]=sprintf('<a href="%s">%s</a>', $this->generateUrl("attempt_show", ["id"=>$att->getId()]), $row[0]);
+$row[1]="".$row[1];
+$row[2]="".$row[2];
 $d[]=$row;
 }
 

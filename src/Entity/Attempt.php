@@ -128,13 +128,4 @@ public function getLimitTime() {
 return DT::createFromTimestamp($this->getAddTime()->getTimestamp()+$this->getSettings()->getDuration());
 }
 
-public function getData() {
-$d=[];
-
-foreach($this as $k=>$v) {
-$d[$k]=$v;
-}
-
-return $d;
-}
 }

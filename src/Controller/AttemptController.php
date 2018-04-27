@@ -132,10 +132,10 @@ $d=[];
 $q=$req->query;
 $s=$q->get("start");
 $l=$q->get("length");
-_log($s, $l);
+
 foreach ($attR->findAllByCurrentUserAndLimit($s, $l) as $att) {
-$row=getKeiesFromEntity("title addTime finishTime examplesCount solvedExamplesCount errorsCount rating",
-$att->setER($attR));
+$ks="title addTime finishTime examplesCount solvedExamplesCount errorsCount rating";
+$row=createNumArr(getKeiesFromEntity($ks, $att->setER($attR)));
 
 $row[0]=sprintf('<a href="%s">%s</a>', $this->generateUrl("attempt_show", ["id"=>$att->getId()]), $row[0]);
 $row[1]="".$row[1];

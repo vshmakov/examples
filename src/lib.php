@@ -74,7 +74,7 @@ $d=[];
 
 foreach ((getArrByStr($s)) as $k) {
 $m=entityGetter($k);
-$d[]=$e->$m();
+$d[$k]=$e->$m();
 }
 
 return $d;
@@ -82,4 +82,12 @@ return $d;
 
 function _log(...$attr) {
 file_put_contents(__dir__."/log.log", json_encode($attr));
+}
+
+function createNumArr($a) {
+$rn=[];
+foreach ($a as $v) {
+$rn[]=$v;
+}
+return $rn;
 }

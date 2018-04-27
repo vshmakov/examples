@@ -89,7 +89,7 @@ dump($profile);
 $profile->normPerc();
             $this->getDoctrine()->getManager()->flush();
 
-            return $this->redirectToRoute('profile_edit', ['id' => $profile->getId()]);
+            return $this->redirectToRoute('profile_index');
         }
 
         return $this->render('profile/edit.html.twig', [

@@ -47,6 +47,15 @@ var P={{(jsParams ?? {})|json_encode|raw}};
                     <a class="dropdown-item" href="{{path("account_pay")}}">Оплатить сервис <em>({{user.remainedTime.roundDaies}}  дн.)</em></a>
                   </div>
                 </li>
+
+{%if is_granted("ROLE_ADMIN")%}
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle account-button" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Панель управления</a>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item" href="{{path("user_index")}}">Пользователи</a>
+                  </div>
+                </li>
+{%endif%}
 {{item("fos_user_security_logout", "Выход")}}
 {%else%}
 {{item("fos_user_security_login", "Вход")}}
@@ -56,13 +65,6 @@ var P={{(jsParams ?? {})|json_encode|raw}};
                 </div>
               </nav>
             </div>
-
-{%if is_granted("ROLE_ADMIN")%}
-<ul>
-<li><a href="{{path("user_index")}}">Пользователи</a>
-<li><a href="{{path("code_index")}}">Коды</a>
-</ul>
-{%endif%}
 {%endblock%}
 
 {%block main ""%}

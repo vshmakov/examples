@@ -44,7 +44,12 @@ var P={{(jsParams ?? {})|json_encode|raw}};
                   <a class="nav-link dropdown-toggle account-button" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Аккаунт</a>
                   <div class="dropdown-menu">
                     <a class="dropdown-item" href="{{path("account_recharge")}}">Пополнить счёт <em>({{user.money}} рублей)</em></a>
-                    <a class="dropdown-item" href="{{path("account_pay")}}">Оплатить сервис <em>({{user.remainedTime.roundDaies}}  дн.)</em></a>
+                    <a class="dropdown-item" href="{{path("account_pay")}}">
+Оплатить сервис 
+{%if not user.remainedTime.isPast%}
+<em>({{user.remainedTime.roundDaies}}  дн.)</em>
+{%endif%}
+</a>
                   </div>
                 </li>
 

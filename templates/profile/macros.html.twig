@@ -1,5 +1,4 @@
 {%macro list_table(profiles, pR, curPr)%}
-{%if profiles%}
 {%set isA=is_granted("ROLE_ADMIN")%}
 {%set canDel=is_granted("DELETE", profiles)%}
 <table width="100%">
@@ -29,8 +28,5 @@
 </tr>
 {%endfor%}
 </tbody>
-<table>
-{%else%}
-<p>Нет профилей</p>
-{%endif%}
+</table>
 {%endmacro%}

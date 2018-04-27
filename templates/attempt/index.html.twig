@@ -1,5 +1,7 @@
 {%extends 'base.html.twig'%}
 
+{%block title "Архив попыток"%}
+
 {%block main%}
 <h1>Архив попыток</h1>
 {%if attempts%}
@@ -13,7 +15,7 @@
 	<th>Ошибок</th>
 	<th>Оценка</th>
 </thead>
-
+<tbody>
 {%for att in attempts%}
 {%set att=att.setER(attR)%}
 <tr>
@@ -26,8 +28,23 @@
 	<td>{{att.rating}}</td>
 </tr>
 {%endfor%}
+</tbody>
 <table>
 {%else%}
 Нет начатых попыток
 {%endif%}
+{%endblock%}
+
+{%block javascripts%}
+{{parent()}}
+<script src="/js/jquery.datatables.min.js"></script>
+<script>
+$("table").DataTable({
+ordering: false,
+searching: false,
+language: {
+url: "/js/datatables.language.json",
+}
+});
+</script>
 {%endblock%}

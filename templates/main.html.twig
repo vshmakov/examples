@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <title>{% block title %}Welcome!{% endblock %}</title>
         {% block stylesheets %}
-    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
 {% endblock %}
 <script>
 var P={{(jsParams ?? {})|json_encode|raw}};
@@ -71,13 +71,13 @@ var P={{(jsParams ?? {})|json_encode|raw}};
 {%endblock%}
 
         {% block javascripts %}
-    <script src="js/jquery.min.js"></script>
-    <script src="js/popper.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/custom.js"></script>
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/popper.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/custom.js"></script>
 <script>
 var d={{remainedDaies}};
-c=d == 0 ? "red" : d <=7 ? "orange" : d <= 14 ? "yellow" : "green";
+c=d == 0 ? "red" : d <=3 ? "orange" : d <= 7 ? "yellow" : "green";
 $(".account-button").css("background", c);
 </script>
 {% endblock %}

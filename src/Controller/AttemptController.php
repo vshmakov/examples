@@ -134,12 +134,15 @@ $s=$q->get("start");
 $l=$q->get("length");
 _log($s, $l);
 foreach ($attR->findAllByCurrentUserAndLimit($s, $l) as $att) {
-$d[]=getKeiesFromEntity("title addTime finishTime examplesCount solvedExamplesCount errorsCount rating",
+$row=getKeiesFromEntity("title addTime finishTime examplesCount solvedExamplesCount errorsCount rating",
 $att->setER($attR));
+
+$row[0]=sprintf('<a href="%s">%s</a>', $this->generateUrl("attempt_show", ["id"=>$att->getId()]), $row[0]);
+$d[]=$row;
 }
 
 return $this->json([
-"draw"=>mt_rand(1, 1000),
+"draw"=>$q->get("draw"),
 "recordsTotal"=>$c,
 "recordsFiltered"=>$c,
 "data"=>$d,

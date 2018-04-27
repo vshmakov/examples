@@ -91,6 +91,14 @@ public function getRating($att) {
 return 5;
 }
 
+public function countByCurrentUser() {
+return $this->v($this->q("select count(a) from App:Attempt a
+join a.session s
+join s.user u
+where u = :u")
+->setParameter("u", $this->ul->getUser()));
+}
+
 public function findAllByCurrentUser() {
 return $this->q("select a from App:Attempt a
 join a.session s
@@ -140,5 +148,27 @@ return $c > 0 ? $c : 0;
 public function getRemainedTime($att) {
 $t=$att->getLimitTime()->getTimestamp() - time();
 return $t > 0 ? $t : 0;
+}
+
+public function getAllData($att) {
+$d=$att->setER($this)->getData();
+
+foreach (strToArr("title number finishTime solvedExamplesCount answeredExamplesCount errorsCount rating") as $k) {
+$d[$k]=$att->__call($k);
+}
+
+return $d;
+}
+
+public function findAllByCurrentUserAndLimit($s, $l) {
+return $this->q("select a from App:Attempt a
+join a.session s
+join s.user u
+where u = :u
+order by a.addTime desc")
+->setParameters(["u"=>$this->ul->getUser()])
+->setFirstResult($s)
+->setMaxResults($l)
+->getResult();
 }
 }

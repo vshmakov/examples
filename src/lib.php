@@ -64,3 +64,22 @@ return $a;
 function getMethodName($s, $p="") {
 return $p.ucfirst($s);
 }
+
+function entityGetter($v) {
+return preg_match("#^get[A-Z]#", $v) ? $v : "get".ucfirst($v);
+}
+
+function getKeiesFromEntity($s, $e) {
+$d=[];
+
+foreach ((getArrByStr($s)) as $k) {
+$m=entityGetter($k);
+$d[]=$e->$m();
+}
+
+return $d;
+}
+
+function _log(...$attr) {
+file_put_contents(__dir__."/log.log", json_encode($attr));
+}

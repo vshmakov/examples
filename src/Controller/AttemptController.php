@@ -28,6 +28,9 @@ $this->attR=$attR;
 */
 public function index(AttR $r) {
 return $this->render('attempt/index.html.twig', [
+"jsParams"=>[
+"api_attempt_index_table"=>$this->generateUrl("api_attempt_index_table"),
+],
 "attempts"=>$r->findAllByCurrentUser(),
 "attR"=>$r,
 ]);
@@ -117,6 +120,29 @@ return $this->render("attempt/profile.html.twig", [
 "profile"=>$p,
 "form"=>$this->createForm(ProfileType::class, $p)->createView(),
 "att"=>$att->setER($attR),
+]);
+}
+
+/**
+*@Route("/api/index-table", name="api_attempt_index_table")
+*/
+public function apiIndexTable(Request $req, AttR $attR) {
+$c=$attR->CountByCurrentUser();
+$d=[];
+$q=$req->query;
+$s=$q->get("start");
+$l=$q->get("length");
+_log($s, $l);
+foreach ($attR->findAllByCurrentUserAndLimit($s, $l) as $att) {
+$d[]=getKeiesFromEntity("title addTime finishTime examplesCount solvedExamplesCount errorsCount rating",
+$att->setER($attR));
+}
+
+return $this->json([
+"draw"=>mt_rand(1, 1000),
+"recordsTotal"=>$c,
+"recordsFiltered"=>$c,
+"data"=>$d,
 ]);
 }
 }

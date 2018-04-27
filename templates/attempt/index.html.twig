@@ -4,7 +4,6 @@
 
 {%block main%}
 <h1>Архив попыток</h1>
-{%if attempts%}
 <table>
 <thead>
 	<th>№</th>
@@ -16,23 +15,8 @@
 	<th>Оценка</th>
 </thead>
 <tbody>
-{%for att in attempts%}
-{%set att=att.setER(attR)%}
-<tr>
-	<td><a href="{{path("attempt_show", {'id': att.id})}}">{{att.title}}</a></td>
-	<td>{{att.addTime}}</td>
-	<td>{{att.finishTime}}</td>
-	<td>{{att.examplesCount}}</td>
-	<td>{{att.solvedExamplesCount}}</td>
-	<td>{{att.errorsCount}}</td>
-	<td>{{att.rating}}</td>
-</tr>
-{%endfor%}
 </tbody>
 <table>
-{%else%}
-Нет начатых попыток
-{%endif%}
 {%endblock%}
 
 {%block javascripts%}
@@ -42,6 +26,8 @@
 $("table").DataTable({
 ordering: false,
 searching: false,
+serverSide: true,
+ajax: P.api_attempt_index_table,
 language: {
 url: "/js/datatables.language.json",
 }

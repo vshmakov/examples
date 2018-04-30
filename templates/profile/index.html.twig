@@ -3,14 +3,14 @@
 {%block title "Профили настроек"%}
 
 {%block main%}
-{%from "profile/macros.html.twig" import list_table as  t%}
-<h1>Общие профили</h1>
-{{t(public, pR)}}
+{%from "profile/list_table.html.twig" import list_table as  t%}
 
-<h1>Личные профили</h1>
-{{t(profiles, pR)}}
+{{t("Профили по умолчанию", public, pR)}}
+{{t("Личные профили", profiles, pR)}}
 
-<a href="{{path("profile_new")}}">Создать новый профиль</a>
+<div class="row mx-auto">
+<a class="btn btn-link" role="button" href="{{path("profile_new")}}">Создать новый профиль</a>
+</div>
 {%endblock%}
 
 {%block javascripts%}

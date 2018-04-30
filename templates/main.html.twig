@@ -46,7 +46,7 @@ var P={{(jsParams ?? {})|json_encode|raw}};
                     <a class="dropdown-item" href="{{path("account_recharge")}}">Пополнить счёт <em>({{user.money}} рублей)</em></a>
                     <a class="dropdown-item" href="{{path("account_pay")}}">
 Оплатить сервис 
-{%if not user.remainedTime.isPast%}
+{%if not user.limitTime.isPast%}
 <em>({{user.remainedTime.roundDaies}}  дн.)</em>
 {%endif%}
 </a>
@@ -55,7 +55,7 @@ var P={{(jsParams ?? {})|json_encode|raw}};
 
 {%if is_granted("ROLE_ADMIN")%}
                 <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle account-button" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Панель управления</a>
+                  <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Панель управления</a>
                   <div class="dropdown-menu">
                     <a class="dropdown-item" href="{{path("user_index")}}">Пользователи</a>
                   </div>

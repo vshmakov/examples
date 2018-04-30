@@ -1,8 +1,12 @@
-{%macro list_table(profiles, pR, curPr)%}
+{%macro list_table(t, profiles, pR)%}
+<div class="row">
+<h1>{{t}}</h1>
+{#{%set pR=app.pR%}#}
 {%set isA=is_granted("ROLE_ADMIN")%}
 {%set canDel=is_granted("DELETE", profiles)%}
-<table width="100%">
-<thead>
+
+<table class="table table-striped table-bordered">
+<thead class="thead-light">
 	<th>Выбрать</th>
 	<th>Описание</th>
 <th>Время создания</th>
@@ -16,7 +20,7 @@
 <tbody>
 {%for profile in profiles%}
 <tr>
-<td><input type="radio" value="{{profile.id}}" data-href="{{path("profile_appoint", {"id": profile.id})}}"></td>
+<td><input type="radio" class="form-check-input" value="{{profile.id}}" data-href="{{path("profile_appoint", {"id": profile.id})}}"></td>
 	<td><a href="{{path('profile_edit', {'id':profile.id})}}">{{profile.setER(pR).title}}</a></td>
 <td>{{profile.addTime}}</td>
 {%if isA%}
@@ -29,4 +33,5 @@
 {%endfor%}
 </tbody>
 </table>
+</div>
 {%endmacro%}

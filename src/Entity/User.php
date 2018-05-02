@@ -198,4 +198,8 @@ public function removeCode(Code $code): self
 
     return $this;
 }
+
+public function addMoney(int $m) {
+return $this->setMoney($this->getMoney() + $m);
+}
 }

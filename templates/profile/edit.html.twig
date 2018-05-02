@@ -63,7 +63,7 @@
 
 {%block save_button%}
 {%if is_granted(canEdit ?? "EDIT", profile)%}
-    <button class="btn">Сохранить</button>
+    <button class="btn btn-success">Сохранить</button>
 {%endif%}
 {%endblock%}
 {{ form_end(form) }}

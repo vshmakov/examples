@@ -18,6 +18,7 @@ use App\Service\UserLoader;
 class AccountController extends MainController
 {
 private $u;
+private $t="Пополнение счёта пользователя ";
 
 public function __construct(UserRepository $uR, UserLoader $ul) {
 $this->u=$ul->getUser()->setER($uR);
@@ -34,29 +35,35 @@ $this->u=$ul->getUser()->setER($uR);
     }
 
 /**
-*@Route("/Recharge", name="account_recharge")
+*@Route("/recharge", name="account_recharge")
 */
-public function recharge(Request $r) {
-$form=$this->createFormBuilder($this->u)
-->add("money")
-->getForm();
-$m=(int) $r->request->get("money");
-
-if ($m) {
-$u=$this->u;
-$u->setMoney($u->getMoney() + $m);
-$this->em()->flush();
-}
-
+public function recharge() {
 return $this->render("account/Recharge.html.twig", [
-"u"=>$this->u,
-"form"=>$form->createView(),
-"m"=>$m ?: "",
+"t"=>$this->t,
 ]);
 }
 
+    /**
+     * @Route("/request", name="account_request", methods="POST")
+     */
+public function request(Request $req) {
+$r=$req->request;
+$code=400;
+$u=preg_match("#^".$this->t."(.+)$#u", $r->get(""), $arr) ? $uR->findOneByEmail($arr[1]) : null;
+$un=$r->get("unaccepted");
+
+if ($u && $op=$r->get("operation_id") && $un != "true") {
+$wa=$r->get("withdraw_amount");
+$u->addMoney($wa);
+$this->em()->flush();
+$code=200;
+}
+
+return new Response("", $code);
+}
+
 /**
-*@Route("/pay", name="account_pay")
+*@Route("/pay", name="account_pay", methods="GET")
 */
 public function pay(Request $r) {
 $m=(int) $r->request->get("months");

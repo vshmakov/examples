@@ -1,26 +1,32 @@
-{%extends 'base.html.twig'%}
+{%extends 'main.html.twig'%}
 
 {%block title att.title%}
 
 {%block main%}
+<div class="row">
 <h1>Статистика</h1>
-<ul>
+
+<ul class="list-group">
 	<li>Начало попытки: {{att.addTime}}</li>
 	<li>Конец попытки: {{att.finishTime}}</li>
 	<li>Примеров в попытке: {{att.examplesCount}}</li>
 	<li>Решено примеров: {{att.solvedExamplesCount}}</li>
 <li>Ошибок: {{att.errorsCount}}</li>
 	<li>Оценка: {{att.rating}}</li>
-	<li><a href="{{path("attempt_profile", {"id": att.id})}}">Настройки попытки</a></li>
+	<li><a href="{{path("attempt_profile", {"id": att.id})}}">Настройки этой попытки</a></li>
 </ul>
+</div>
 
+<div class="row">
 <h1>Примеры</h1>
-<table>
-	<thead>
+
+<table class="table table-striped table-bordered">
+	<thead class="thead-light">
 		<th>№</th>
 		<th>Пример</th>
 		<th>Ответ</th>
 	</thead>
+<tbody>
 	{%for ex in examples|reverse%}
 {%if not ex.isRight%}
 <tr>
@@ -39,5 +45,7 @@
 <td colspan="3">Нет Примеров в попытке</td>
 </tr>
 	{%endfor%}
+</tbody>
 </table>
+</div>
 {%endblock%}

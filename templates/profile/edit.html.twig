@@ -2,53 +2,38 @@
 
 {% block title %}{{profile.title}}{% endblock %}
 
-{%macro el(t, i)%}
-<li>{{t|raw}}: {{i|raw}}</li>
-{%endmacro%}
-
-
-{%macro row(t, i)%}
-{%from _self import el as el%}
-{{el(form_label(i, t), form_widget(i))}}
-{%endmacro%}
-
-{%macro list(f, inps)%}
-{%from _self import row as row%}
-<ul>
-{%for t, k in inps%}
+{%macro list(f, t, inps)%}
+<div class="row">
+<h2>{{t}}</h2>
+<ul class="list-group">
+{%for d, k in inps%}
 {%set i=f[k]%}
-{{row(t, i)}}
+<li>{{d}}: {{form_widget(i)}}</li>
 {%endfor%}
 </ul>
+</div>
 {%endmacro%}
 
 {% block main%}
-   <h1>{{h1Title ?? "Редактировать профиль"}}</h1>
 {{ form_start(form) }}
 {{form_errors(form)}}
-{%from _self import row as row%}
-{%from _self import el as el%}
 {%from _self import list as list%}
 
+   <h1>{%block main_heading  "Редактировать профиль"%}</h1>
+<div class="row">
 <h2>Параметры попытки</h2>
-<ul>
-{{row("Описание профиля", form.description)}}
-{{row("Количество примеров в попытке", form.examplesCount)}}
-{{el("Длительность попытки (мин:сек):", form_widget(form.minutes)~":"~form_widget(form.seconds))}}
+<ul class="list-group">
+<li>Описание профиля: {{form_widget(form.description)}}</li>
+<li>Количество примеров в попытке: {{form_widget(form.examplesCount)}}</li>
+<li>Длительность попытки (мин:сек): {{form_widget(form.minutes)~":"~form_widget(form.seconds)}}</li>
 <li>{{(form_label(form.isDemanding, "Повторять пример до получения правильного ответа")~form_widget(form.isDemanding))|raw}}</li>
 </ul>
+</div>
 
-<h2>Параметры примеров на сложение</h2>
-{{list(form, {"Минимальное слагаемое": "addMin", "Максимальное слагаемое": "addMax", "Процент примеров на сложение": "addPerc"})}}
-
-<h2>Параметры примеров на вычитание</h2>
-{{list(form, {"Минимальное уменьшаемое": "subMin", "Максимальное уменьшаемое": "subMax", "Минимальная разность": "minSub", "Процент примеров на вычитание": "subPerc"})}}
-
-<h2>Параметры примеров на умножение</h2>
-{{list(form, {"Минимальный множитель": "multMin", "Максимальный множитель": "multMax", "Процент примеров на умножение": "multPerc"})}}
-
-<h2>Параметры примеров на деление</h2>
-{{list(form, {"Минимальное делимое": "divMin", "Максимальное делимое": "divMax", "Минимальная частное": "minDiv", "Процент примеров на деление": "divPerc"})}}
+{{list(form, ""Параметры примеров на сложение", {"Минимальное слагаемое": "addMin", "Максимальное слагаемое": "addMax", "Процент примеров на сложение": "addPerc"})}}
+{{list(form, "Параметры примеров на вычитание", {"Минимальное уменьшаемое": "subMin", "Максимальное уменьшаемое": "subMax", "Минимальная разность": "minSub", "Процент примеров на вычитание": "subPerc"})}}
+{{list(form, "Параметры примеров на умножение", {"Минимальный множитель": "multMin", "Максимальный множитель": "multMax", "Процент примеров на умножение": "multPerc"})}}
+{{list(form, "Параметры примеров на деление", {"Минимальное делимое": "divMin", "Максимальное делимое": "divMax", "Минимальная частное": "minDiv", "Процент примеров на деление": "divPerc"})}}
 
 {%block advanced_parameters%}
 {%if is_granted("ROLE_ADMIN")%}
@@ -63,7 +48,11 @@
 
 {%block save_button%}
 {%if is_granted(canEdit ?? "EDIT", profile)%}
-    <button class="btn btn-success">Сохранить</button>
+<div>    <button class="btn btn-success">Сохранить</button></div>
+{%endif%}
+
+{%if is_granted("APPOINT", profile)%}
+CopyButton
 {%endif%}
 {%endblock%}
 {{ form_end(form) }}

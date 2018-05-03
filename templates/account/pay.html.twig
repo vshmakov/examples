@@ -3,9 +3,61 @@
 {% block title %}Оплатить сервис{% endblock %}
 
 {%block main%}
-<h1>Оплачено: {{u.remainedTime.roundDaies}} дн.</h1>
+<div class="row">
+<h1>Оплачено: {{user.remainedTime.roundDaies}} дн.</h1>
 <form method="post">
-<input name="months"  value="{{m}}"><br>
-<input type="submit" value="Оплатить">
+<input type="number" class="form-control" name="months"  value="{{m ?: 1}}"><br>
+<input type="submit" class="btn btn-success" value="Оплатить">
 </form>
+
+<ul class="list-group">
+<li class="list-group-item">
+Стоимость сервиса: 
+<b>
+<span class="p">{{price}}</span>
+ руб/мес
+</b>
+</li>
+<li class="list-group-item">
+На счёте: 
+<b>
+<span class="h">{{user.money}}</span>
+</b>
+</li>
+<li class="list-group-item">
+Требуется: 
+<b>
+<span class="need-money">0</span> 
+</b>
+</li>
+</ul>
+<a href="{{path("account_recharge")}}">Пополнить счёт</a>
+</div>
+{%endblock%}
+
+{%block javascripts%}
+{{parent()}}
+<script>
+var nm=$(".need-money");
+var inp=$("[type=number]");
+var p=$(".p").html();
+var h=$(".h").html();
+var s=$("[type=submit]");
+
+function valid() {
+var v=Math.abs(inp.val());
+var n=v*p;
+inp.val(v);
+nm.html(n);
+
+var k=n <= h && v > 0;
+$(inp).add(nm).css("background", !k  ? "red" : "green");
+var wc="btn-warning";
+if (k) s.removeClass(wc);
+else s.addClass(wc);
+}
+
+valid();
+inp.keyup(valid);
+</script>
 {%endblock%}

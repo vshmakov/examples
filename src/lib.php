@@ -2,6 +2,8 @@
 
 use App\DT;
 
+define("PRICE", 97);
+
 function dt($dt) {
 return DT::createFromDT($dt);
 }

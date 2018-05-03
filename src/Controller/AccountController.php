@@ -63,12 +63,12 @@ return new Response("", $code);
 }
 
 /**
-*@Route("/pay", name="account_pay", methods="GET")
+*@Route("/pay", name="account_pay", methods="GET|POST")
 */
 public function pay(Request $r) {
 $m=(int) $r->request->get("months");
 $u=$this->u;
-$remMon=$u->getMoney() - $m*50;
+$remMon=$u->getMoney() - $m*PRICE;
 
 if ($m && $remMon >= 0) {
 $f=$u->getLimitTime();
@@ -76,11 +76,12 @@ if ($f->isPast()) $f=new DT();
 $u->setLimitTime($f->add(new \DateInterval("P{$m}M")))
 ->setMoney($remMon);
 $this->em()->flush();
+$m=0;
 }
 
 return $this->render("account/pay.html.twig", [
 "m"=>$m ?: "",
-"u"=>$this->u,
+"price"=>PRICE,
 ]);
 }
 }

@@ -3,6 +3,7 @@
 {% block title %}Пополнить счёт{% endblock %}
 
 {%block main%}
+<div class="row">
 <h1>На счёте: {{user.money}} рублей</h1>
 <p>
 <b>Пожалуйста, не меняйте на странице перевода яндекс.денег значение поля "Назначение перевода"!</b><br>
@@ -10,4 +11,5 @@
 </p>
 {%set targets=t~user.email%}
 <iframe src="https://money.yandex.ru/quickpay/shop-widget?writer=seller&targets={{targets|url_encode}}&targets-hint=&default-sum=500&button-text=11&hint=&successURL=&quickpay=shop&account=410015203245933" width="450" height="171" frameborder="0" allowtransparency="true" scrolling="no"></iframe>
+</div>
 {%endblock%}

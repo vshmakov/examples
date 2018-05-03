@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use App\Entity\User;
 use App\Entity\Profile;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -10,18 +11,19 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 class UserRepository extends ServiceEntityRepository
 {
 use BaseTrait;
+private $ch;
 
-    public function __construct(RegistryInterface $registry)
+    public function __construct(RegistryInterface $registry, AuthorizationCheckerInterface $ch)
     {
         parent::__construct($registry, User::class);
+$this->ch=$ch;
     }
 
 public function getCurrentProfile($u) {
 $pR=$this->er(Profile::class);
-if ($u->getLimitTime()->isPast()) return $pR->findOneBy(["description"=>"Тестовый профиль", "isPublic"=>true]);
 $p=$u->getProfile() ?? $pR->findOneByAuthor($u) ?? $pR->findOnePublic();
 if (!$p) throw new \Exception("Принадлежащие данному пользователю и общие профили отсутствуют");
-return $p;
+return $this->ch->isGranted("APPOINT", $p) ? $p : $pR->findOneBy(["description"=>"Тестовый профиль", "isPublic"=>true]);
 }
 
 public function getAttemptsCount($u) {

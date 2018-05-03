@@ -5,21 +5,21 @@
 {%block main%}
 <form>
 <h1>Пример №<span id="num">*</span></h1>
-<div>
+<div class="row">
 <span>
-<span id="str">* + *</span> =
-<input type="text" name="" id="">
+<b><span id="str">* + *</span> =</b>
+<input type="text" name="" id="" class="form-control">
 </span>
 </div>
 
-<button type="submit">Ответить</button>
+<button type="submit" class="btn btn-primary btn-lg">Ответить</button>
 </form>
 
-<h1>Статистика</h1>
-<ul>
-<li>Ошибок: <span id="errors">*</span></li>
-	<li>Осталось времени: <span id="timeRem">*</span></li>
-	<li>Осталось примеров: <span id="exRem">*</span></li>
+<h2>Статистика</h2>
+<ul class="list-group">
+<li class="list-group-item">Ошибок: <span id="errors">*</span></li>
+	<li class="list-group-item">Осталось времени: <span id="timeRem">*</span></li>
+	<li class="list-group-item">Осталось примеров: <span id="exRem">*</span></li>
 	</ul>
 {%endblock%}
 

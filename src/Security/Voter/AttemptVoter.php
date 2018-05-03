@@ -2,6 +2,7 @@
 
 namespace App\Security\Voter;
 
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use App\Repository\ExampleRepository as ExR;
 use App\Repository\AttemptRepository;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -18,12 +19,14 @@ private $ul;
 private $sR;
 private $attR;
 private $exR;
+private $ch;
 
-public function __construct(UserLoader $ul, SessionRepository $sR, AttemptRepository $attR, ExR $exR) {
+public function __construct(UserLoader $ul, SessionRepository $sR, AttemptRepository $attR, ExR $exR, AuthorizationCheckerInterface $ch) {
 $this->ul=$ul;
 $this->sR=$sR;
 $this->attR=$attR;
 $this->exR=$exR;
+$this->ch=$ch;
 }
 
     protected function supports($attribute, $subject)
@@ -33,6 +36,7 @@ $this->exR=$exR;
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
     {
+if ($this->ch->isGranted("ROLE_ADMIN")) return true;
 return $this->checkRight($attribute, $subject->setER($this->attR), $token);
     }
 

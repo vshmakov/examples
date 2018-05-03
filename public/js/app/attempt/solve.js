@@ -57,6 +57,13 @@ return (value>9) ? value : "0"+value;
 
 var time=getTime(dt.getMinutes())+":"+getTime(dt.getSeconds());
 this.html(time);
+this.paint(remained);
+},
+
+paint: function (r) {
+if (r > 40) return;
+this.css("background",
+r <= 10 ? "red" : r <= 20 ? "orange" : "yellow");
 },
 
 prototype:$('#timeRem'),

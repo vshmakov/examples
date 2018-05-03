@@ -25,6 +25,7 @@ if (!P.canAppoint) r.attr("disabled", true);
 <script src="/js/jquery.datatables.min.js"></script>
 <script>
 $("table").DataTable({
+ordering: false,
 language: {    
 "decimal":        "",    "emptyTable":     "Нет профилей",    "info":           "Показано с _START_ по _END_ из _TOTAL_ строк",    "infoEmpty":      "Показано с _START_ по _END_ из _TOTAL_ строк",   "infoFiltered":   "(Отфильтровано из _MAX_ строк)",    "infoPostFix":    "",    "thousands":      ",",    "lengthMenu":     "Показать _MENU_ строк",    "loadingRecords": "Идёт загрузка...",    "search":         "Поиск:",    "zeroRecords":    "Соответствующих записей не найдено",    
 "paginate": {        "first":      "В начало",        "last":       "В конец",        "next":       "Вперед",        "previous":   "Назад"    },

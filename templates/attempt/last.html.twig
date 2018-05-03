@@ -3,6 +3,8 @@
 {%extends 'main.html.twig'%}
 
 {%block main%}
+<div class="row">
+<h1>Последняя актуальная попытка не найдена</h1>
 <p>У вас нет ни одной актуальной попытки.</p>
-<div><a href="{{path("attempt_new")}}">Начните новую</a></div>
+<div><a class="btn btn-link" role="button" href="{{path("attempt_new")}}">Начать новую</a></div>
 {%endblock%}

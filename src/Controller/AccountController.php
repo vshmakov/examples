@@ -24,16 +24,6 @@ public function __construct(UserRepository $uR, UserLoader $ul) {
 $this->u=$ul->getUser()->setER($uR);
 }
 
-    /**
-     * @Route("/", name="account_index", methods="GET")
-     */
-    public function index(): Response
-    {
-        return $this->render('account/index.html.twig', [
-"u"=>$this->u,
-]);
-    }
-
 /**
 *@Route("/recharge", name="account_recharge")
 */

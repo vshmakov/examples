@@ -25,12 +25,12 @@
 <ul class="list-group">
 <li>Описание профиля: {{form_widget(form.description)}}</li>
 <li>Количество примеров в попытке: {{form_widget(form.examplesCount)}}</li>
-<li>Длительность попытки (мин:сек): {{form_widget(form.minutes)~":"~form_widget(form.seconds)}}</li>
+<li>Длительность попытки (мин:сек): {{(form_widget(form.minutes)~":"~form_widget(form.seconds))|raw}}</li>
 <li>{{(form_label(form.isDemanding, "Повторять пример до получения правильного ответа")~form_widget(form.isDemanding))|raw}}</li>
 </ul>
 </div>
 
-{{list(form, ""Параметры примеров на сложение", {"Минимальное слагаемое": "addMin", "Максимальное слагаемое": "addMax", "Процент примеров на сложение": "addPerc"})}}
+{{list(form, "Параметры примеров на сложение", {"Минимальное слагаемое": "addMin", "Максимальное слагаемое": "addMax", "Процент примеров на сложение": "addPerc"})}}
 {{list(form, "Параметры примеров на вычитание", {"Минимальное уменьшаемое": "subMin", "Максимальное уменьшаемое": "subMax", "Минимальная разность": "minSub", "Процент примеров на вычитание": "subPerc"})}}
 {{list(form, "Параметры примеров на умножение", {"Минимальный множитель": "multMin", "Максимальный множитель": "multMax", "Процент примеров на умножение": "multPerc"})}}
 {{list(form, "Параметры примеров на деление", {"Минимальное делимое": "divMin", "Максимальное делимое": "divMax", "Минимальная частное": "minDiv", "Процент примеров на деление": "divPerc"})}}
@@ -51,7 +51,7 @@
 <div>    <button class="btn btn-success">Сохранить</button></div>
 {%endif%}
 
-{%if is_granted("APPOINT", profile)%}
+{%if is_granted("COPY", profile)%}
 CopyButton
 {%endif%}
 {%endblock%}
@@ -71,6 +71,6 @@ CopyButton
 {%block javascripts%}
 {{parent()}}
 <script>
-if (!P.canEdit) $("input, button, select").attr("disabled", true);
+if (!P.canEdit) $(".main").find("input, button, select").attr("disabled", true);
 </script>
 {%endblock%}

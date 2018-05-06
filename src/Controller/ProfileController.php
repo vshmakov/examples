@@ -14,7 +14,7 @@ use App\Service\UserLoader;
 use App\Repository\UserRepository;
 
 /**
- * @Route("/attempt-profile")
+ * @Route("/profile")
  */
 class ProfileController extends MainController
 {

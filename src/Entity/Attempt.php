@@ -128,4 +128,8 @@ public function getLimitTime() {
 return DT::createFromTimestamp($this->getAddTime()->getTimestamp()+$this->getSettings()->getDuration());
 }
 
+public function getMaxTime() {
+return $this->dts($this->getSettings()->getDuration());
+}
+
 }

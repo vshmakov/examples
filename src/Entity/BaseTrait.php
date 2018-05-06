@@ -5,6 +5,8 @@ namespace App\Entity;
 Use App\DT;
 
 trait BaseTrait {
+use \App\BaseTrait;
+
 private $er;
 
 public function setER($er) {

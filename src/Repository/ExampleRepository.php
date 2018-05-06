@@ -66,4 +66,19 @@ $em->flush();
 return $ex;
 }
 
+public function getSolvingTime($ex) {
+$s=0;
+
+if ($ex->getAnswerTime()) {
+$p=$this->v($this->q("select e from App:Example e
+where e.attempt = :att and e.addTime < :dt
+order by e.addTime desc")
+->setParameters(["dt"=>$ex->getAddTime(), "att"=>$ex->getAttempt()]));
+
+$f=$p ? $p->getAnswerTime() : $ex->getAttempt()->getAddTime();
+$s=$ex->getAnswerTime()->getTimestamp() - $f->getTimestamp();
+}
+
+return $this->dts($s);
+}
 }

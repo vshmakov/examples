@@ -171,4 +171,14 @@ order by a.addTime desc")
 ->setMaxResults($l)
 ->getResult();
 }
+
+public function getSolvedTime($att) {
+return $this->dts($this->getFinishTime($att)->getTimestamp() - $att->getAddTime()->getTimestamp());
+}
+
+public function getAverSolveTime($att) {
+return $this->dts(
+round($this->getSolvedTime($att)->getTimestamp() / $this->getSolvedExamplesCount($att))
+);
+}
 }

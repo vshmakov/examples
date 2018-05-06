@@ -9,8 +9,10 @@
 <ul class="list-group">
 	<li>Начало попытки: {{att.addTime}}</li>
 	<li>Конец попытки: {{att.finishTime}}</li>
+<li>Затраченное время: {{att.solvedTime.minSecFormat}}</li>
 	<li>Примеров в попытке: {{att.examplesCount}}</li>
 	<li>Решено примеров: {{att.solvedExamplesCount}}</li>
+<li>Секунд/пример: {{att.averSolveTime.timestamp}}</li>
 <li>Ошибок: {{att.errorsCount}}</li>
 	<li>Оценка: {{att.rating}}</li>
 	<li><a href="{{path("attempt_profile", {"id": att.id})}}">Посмотреть настройки этой попытки</a></li>
@@ -25,24 +27,27 @@
 		<th>№</th>
 		<th>Пример</th>
 		<th>Ответ</th>
+<th>Время (сек)</th>
 	</thead>
 <tbody>
 	{%for ex in examples|reverse%}
+{%set ex=ex.setER(exR)%}
 {%if not ex.isRight%}
 <tr>
-<td colspan="3">
-<h6>{{(ex.answer is not null) ? "Ошибка №"~exR.getErrorNum(ex) : "Пример не решен"}}</h6>
+<td colspan="4">
+<h6>{{(ex.answer is not null) ? "Ошибка №"~ex.errorNum : "Пример не решен"}}</h6>
 </td>
 </tr>
 {%endif%}
 	<tr>
-		<td>{{exR.getNumber(ex)}}</td>
+		<td>{{ex.number}}</td>
 		<td>{{ex}}</td>
 		<td>{{ex.answer ?? '-'}}</td>
+<td>{{ex.setER(exR).solvingTime.timestamp}}</td>
 	</tr>
 {%else%}
 <tr>
-<td colspan="3">Нет Примеров в попытке</td>
+<td colspan="4">Нет Примеров в попытке</td>
 </tr>
 	{%endfor%}
 </tbody>

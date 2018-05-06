@@ -58,4 +58,8 @@ $t=$this->getTimestamp();
 $d=(((int) ($t/DAY)));
 return ($t % DAY == 0 ? $d : $d+1);
 }
+
+public function minSecFormat() {
+return $this->format("i:s");
+}
 }

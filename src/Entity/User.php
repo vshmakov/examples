@@ -43,6 +43,11 @@ use DTTrait;
     private $money=0;
 
     /**
+     * @ORM\Column(type="integer")
+     */
+    private $allMoney=0;
+
+    /**
      * @ORM\Column(type="datetime")
      */
     private $limitTime;
@@ -139,6 +144,11 @@ $this->codes = new ArrayCollection();
         return $this;
     }
 
+    public function getAllMoney(): ?int
+    {
+        return $this->allMoney;
+    }
+
     public function getMoney(): ?int
     {
         return $this->money;
@@ -200,6 +210,7 @@ public function removeCode(Code $code): self
 }
 
 public function addMoney(int $m) {
+$this->allMoney+=$m;
 return $this->setMoney($this->getMoney() + $m);
 }
 }

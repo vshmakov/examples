@@ -12,6 +12,7 @@
                 <th>Username</th>
                 <th>email</th>
                 <th>Money</th>
+                <th>All money</th>
                 <th>Limit time</th>
                 <th>Attempts</th>
                 <th>Examples</th>
@@ -26,6 +27,7 @@
                 <td>{{ user.username}}</td>
                 <td>{{ user.email}}</td>
                 <td>{{ user.money}}</td>
+                <td>{{ user.allMoney}}</td>
                 <td>{{ user.limitTime}}</td>
                 <td>{{ user.attemptsCount}}</td>
                 <td>{{ user.examplesCount}}</td>
@@ -36,7 +38,7 @@
             </tr>
         {% else %}
             <tr>
-                <td colspan="9">no records found</td>
+                <td colspan="10">no records found</td>
             </tr>
         {% endfor %}
         </tbody>

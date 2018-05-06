@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Service\ExampleManager as ExMng;
 use App\Service\UserLoader;
 use App\Entity\Attempt;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -88,7 +89,7 @@ return $this->exR->count([
 }
 
 public function getRating($att) {
-return 5;
+return ExMng::rating($att->getExamplesCount(), $this->getRongExamplesCount($att));
 }
 
 public function countByCurrentUser() {
@@ -177,8 +178,13 @@ return $this->dts($this->getFinishTime($att)->getTimestamp() - $att->getAddTime(
 }
 
 public function getAverSolveTime($att) {
+$c=$this->getSolvedExamplesCount($att);
 return $this->dts(
-round($this->getSolvedTime($att)->getTimestamp() / $this->getSolvedExamplesCount($att))
+$c ? round($this->getSolvedTime($att)->getTimestamp() / $c) : 0
 );
+}
+
+public function getRongExamplesCount($att) {
+return $this->getErrorsCount($att) + $att->getExamplesCount() - $this->getSolvedExamplesCount($att);
 }
 }

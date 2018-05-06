@@ -134,12 +134,12 @@ $s=$q->get("start");
 $l=$q->get("length");
 
 foreach ($attR->findAllByCurrentUserAndLimit($s, $l) as $att) {
-$ks="title addTime finishTime examplesCount solvedExamplesCount errorsCount rating";
+$ks="title addTime solvedTime solvedExamplesCount errorsCount rating";
 $row=createNumArr(getKeiesFromEntity($ks, $att->setER($attR)));
 
 $row[0]=sprintf('<a href="%s">%s</a>', $this->generateUrl("attempt_show", ["id"=>$att->getId()]), $row[0]);
-$row[1]="".$row[1];
-$row[2]="".$row[2];
+$row[2]=sprintf("%s / %s", $row[2]->minSecFormat(), $att->getMaxTime()->minSecFormat());
+$row[3]=sprintf("%s / %s", $row[3], $att->getExamplesCount());
 $d[]=$row;
 }
 

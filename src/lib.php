@@ -93,3 +93,7 @@ $rn[]=$v;
 }
 return $rn;
 }
+
+function minVal($k, $v) {
+return $v >= $k ? $v : $k;
+}

@@ -138,8 +138,15 @@ $ks="title addTime solvedTime solvedExamplesCount errorsCount rating";
 $row=createNumArr(getKeiesFromEntity($ks, $att->setER($attR)));
 
 $row[0]=sprintf('<a href="%s">%s</a>', $this->generateUrl("attempt_show", ["id"=>$att->getId()]), $row[0]);
+$row[1]="".$row[1];
 $row[2]=sprintf("%s / %s", $row[2]->minSecFormat(), $att->getMaxTime()->minSecFormat());
 $row[3]=sprintf("%s / %s", $row[3], $att->getExamplesCount());
+$o=$row[5];
+$c="red";
+if ($o==3) $c="orange";
+if ($o==4) $c="yellow";
+if ($o==5) $c="green";
+$row[5]=sprintf('<span style="background: %s;">%s</span>', $c, $o);
 $d[]=$row;
 }
 

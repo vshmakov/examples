@@ -35,7 +35,8 @@ private function canCreate() {
 return !$this->ul->isGuest();
 }
 
-private function canView($p) {
+private function canView() {
+$p=$this->subj;
 return $p->isPublic() or $this->ul->getUser() === $p->getAuthor();
 }
 
@@ -50,4 +51,9 @@ return $this->canEdit($p);
 private function canAppoint($p) {
 return !$this->ul->getUser()->getLimitTime()->isPast() && $this->canCreate($p) && $this->canView($p);
 } 
+
+private function canCopy() {
+return $this->canCreate() && $this->canView();
+}
+
 }

@@ -5,7 +5,10 @@ namespace App\Security\Voter;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 trait BaseTrait {
+private $subj;
+
 private function checkRight($p, $o, $t) {
+$this->subj=$o;
 $m=getMethodName(strtolower($p), "can");
 return method_exists($this, $m) ? $this->$m($o, $t) : false;
 }

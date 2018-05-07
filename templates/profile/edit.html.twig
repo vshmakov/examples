@@ -52,7 +52,7 @@
 {%endif%}
 
 {%if is_granted("COPY", profile)%}
-CopyButton
+<button type="submit" name="copy" value="1" class="btn btn-info">Скопировать</button>
 {%endif%}
 {%endblock%}
 {{ form_end(form) }}
@@ -71,6 +71,8 @@ CopyButton
 {%block javascripts%}
 {{parent()}}
 <script>
-if (!P.canEdit) $(".main").find("input, button, select").attr("disabled", true);
+if (!P.canEdit) {
+$(".main").find("input, select").attr("disabled", true);
+}
 </script>
 {%endblock%}

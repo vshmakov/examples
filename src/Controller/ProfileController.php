@@ -77,24 +77,33 @@ $this->denyAccessUnlessGranted("VIEW", $profile);
     /**
      * @Route("/{id}/edit", name="profile_edit", methods="GET|POST")
      */
-    public function edit(Request $request, Profile $profile, ProfileRepository $pR): Response
+    public function edit(Request $request, Profile $profile, ProfileRepository $pR, UserLoader $ul): Response
     {
 $this->denyAccessUnlessGranted("VIEW", $profile);
 $profile->SetDescription($pR->getTitle($profile));
 $canEdit=$this->isGranted("EDIT", $profile);
+$canCopy=$this->isGranted("COPY", $profile);
+$copying=$request->request->has("copy") && $canCopy;
+if ($copying) {
+($profile=clone($profile));
+$profile->setAuthor($ul->getUser());
+dump($request->request);
+}
         $form = $this->buildForm($profile);
         $form->handleRequest($request);
-dump($profile);
-        if ($form->isSubmitted() && $form->isValid() && $canEdit) {
+
+        if (dump($form->isSubmitted()) && dump($form->isValid()) && ($canEdit or $copying)) {
 $profile->normPerc();
-            $this->getDoctrine()->getManager()->flush();
+$em=            $this->getDoctrine()->getManager();
+$em->persist($profile);
+$em->flush();
 
             return $this->redirectToRoute('profile_index');
         }
 
         return $this->render('profile/edit.html.twig', [
 "jsParams"=>[
-"canEdit"=>$canEdit,
+"canEdit"=>$canEdit or $canCopy,
 ],
             'profile' => $profile->setER($pR),
             'form' => $form->createView(),

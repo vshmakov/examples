@@ -9,9 +9,8 @@
 <ul class="list-group">
 	<li>Начало попытки: {{att.addTime}}</li>
 	<li>Конец попытки: {{att.finishTime}}</li>
-<li>Затраченное время: {{att.solvedTime.minSecFormat}}</li>
-	<li>Примеров в попытке: {{att.examplesCount}}</li>
-	<li>Решено примеров: {{att.solvedExamplesCount}}</li>
+<li>Затраченное время: {{att.solvedTime.minSecFormat}} из {{att.maxTime.minSecFormat}}</li>
+	<li>Решено примеров: {{att.solvedExamplesCount}} из {{att.examplesCount}}</li>
 <li>Секунд/пример: {{att.averSolveTime.timestamp}}</li>
 <li>Ошибок: {{att.errorsCount}}</li>
 	<li>Оценка: {{att.rating}}</li>

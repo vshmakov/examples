@@ -475,4 +475,9 @@ public function setIsDemanding(bool $isDemanding): self
 public function getInstance() {
 return $this;
 }
+
+public function __clone() {
+$this->id=null;
+$this->initAddTime();
+}
 }

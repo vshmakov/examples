@@ -127,7 +127,6 @@ return $this->render("attempt/profile.html.twig", [
 *@Route("/api/index-table", name="api_attempt_index_table")
 */
 public function apiIndexTable(Request $req, AttR $attR) {
-$c=$attR->CountByCurrentUser();
 $d=[];
 $q=$req->query;
 $s=$q->get("start");
@@ -152,7 +151,7 @@ $d[]=$row;
 
 return $this->json([
 "draw"=>$q->get("draw"),
-"recordsTotal"=>$c,
+"recordsTotal"=>$c=$attR->CountByCurrentUser(),
 "recordsFiltered"=>$c,
 "data"=>$d,
 ]);

@@ -221,7 +221,7 @@ $this->initAddTime();
 
     public function setAddMax(int $addMax): self
     {
-        ($this->addMax = minVal($this->addMin, $addMax));
+        $this->addMax = $addMax;
 
         return $this;
     }
@@ -245,7 +245,7 @@ $this->initAddTime();
 
     public function setSubMax(int $subMax): self
     {
-        $this->subMax = minVal($this->subMin, $subMax);
+        $this->subMax = $subMax;
 
         return $this;
     }
@@ -479,6 +479,23 @@ return $this;
 
 public function __clone() {
 $this->id=null;
+$this->author=null;
+$this->isPublic=false;
 $this->initAddTime();
+}
+
+public function normData() {
+$this->normPerc();
+
+$this->addMax=minVal($this->addMin, $this->addMax);
+$this->multMax=minVal($this->multMin, $this->multMax);
+
+        $this->subMax = minVal($this->subMin, $this->subMax);
+$this->minSub=maxVal($this->subMax - $this->subMin, $this->minSub);
+
+        $this->divMax = minVal($this->divMin, $this->divMax);
+$this->minDiv=maxVal($this->divMax / $this->divMin, $this->minDiv);
+
+return $this;
 }
 }

@@ -86,18 +86,23 @@ $canCopy=$this->isGranted("COPY", $profile);
 $copying=$request->request->has("copy") && $canCopy;
 if ($copying) {
 ($profile=clone($profile));
-$profile->setAuthor($ul->getUser())->setIsPublic(false);
+$profile->setAuthor($ul->getUser());
 }
         $form = $this->buildForm($profile);
         $form->handleRequest($request);
 
-        if (dump($form->isSubmitted()) && dump($form->isValid()) && ($canEdit or $copying)) {
-$profile->normPerc();
+        if (($form->isSubmitted()) && ($form->isValid()) && ($canEdit or $copying)) {
+$profile->normData();
 $em=            $this->getDoctrine()->getManager();
 $em->persist($profile);
 $em->flush();
 
-            return $this->redirectToRoute('profile_index');
+if ($this->isGranted("APPOINT", $profile)) {
+$ul->getUser()->setProfile($profile);
+$em->flush();
+}
+
+            return $this->redirectToRoute('profile_edit', ["id"=>$profile->getId()]);
         }
 
         return $this->render('profile/edit.html.twig', [

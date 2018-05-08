@@ -10,6 +10,7 @@ private $subj;
 private function checkRight($p, $o, $t) {
 $this->subj=$o;
 $m=getMethodName(strtolower($p), "can");
+if (!method_exists($this, $m)) throw new \Exception(sprintf("%s has not %s priv handler", self::class, $p));
 return method_exists($this, $m) ? $this->$m($o, $t) : false;
 }
 

@@ -97,3 +97,11 @@ return $rn;
 function minVal($k, $v) {
 return $v >= $k ? $v : $k;
 }
+
+function maxVal($k, $v) {
+return $v <= $k ? $v : $k;
+}
+
+function btwVal($min, $max, $v) {
+return maxVal($max, minVal($min, $v));
+}

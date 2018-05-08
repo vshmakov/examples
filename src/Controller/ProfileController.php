@@ -86,7 +86,7 @@ $canCopy=$this->isGranted("COPY", $profile);
 $copying=$request->request->has("copy") && $canCopy;
 if ($copying) {
 ($profile=clone($profile));
-$profile->setAuthor($ul->getUser());
+$profile->setAuthor($ul->getUser())->setIsPublic(false);
 dump($request->request);
 }
         $form = $this->buildForm($profile);

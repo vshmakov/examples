@@ -185,7 +185,7 @@ $this->initAddTime();
 
     public function setDuration(int $duration): self
     {
-        $this->duration = $duration;
+        $this->duration = btwVal(30, HOUR-1, $duration);
 
         return $this;
     }
@@ -197,7 +197,7 @@ $this->initAddTime();
 
     public function setExamplesCount(int $examplesCount): self
     {
-        $this->examplesCount = $examplesCount;
+        $this->examplesCount = btwVal(3, 150, $examplesCount);
 
         return $this;
     }
@@ -221,7 +221,7 @@ $this->initAddTime();
 
     public function setAddMax(int $addMax): self
     {
-        $this->addMax = $addMax;
+        ($this->addMax = minVal($this->addMin, $addMax));
 
         return $this;
     }
@@ -245,7 +245,7 @@ $this->initAddTime();
 
     public function setSubMax(int $subMax): self
     {
-        $this->subMax = $subMax;
+        $this->subMax = minVal($this->subMin, $subMax);
 
         return $this;
     }
@@ -420,7 +420,8 @@ return ($this->duration/MIN);
 }
 
 public function setMinutes(int $min) {
-$this->duration=$min*MIN+$this->getSeconds();
+$min=minVal(0, $min);
+$this->setDuration($min*MIN+$this->getSeconds());
 return $this;
 }
 
@@ -429,8 +430,8 @@ return $this->duration%MIN;
 }
 
 public function setSeconds(int $sec) {
-$sec=$sec%MIN;
-$this->duration=$this->getMinutes()*MIN+$sec;
+$sec=btwVal(0, 59, $sec);
+$this->setDuration($this->getMinutes()*MIN+$sec);
 return $this;
 }
 

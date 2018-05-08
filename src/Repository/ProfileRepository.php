@@ -58,4 +58,10 @@ where p.author =:a and p.id <= :id")
 ->setParameters(["a"=>$p->getAuthor(), "id"=>$p->getId()])
 ) : $this->countByCurrentAuthor()+1;
 }
+
+public function getNewByCurrentUser() {
+$p=(new Profile());
+return $p->SetDescription($this->getTitle($p))
+->setAuthor($this->ul->getUser());
+}
 }

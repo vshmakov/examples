@@ -22,8 +22,19 @@ $this->ch=$ch;
 public function getCurrentProfile($u) {
 $pR=$this->er(Profile::class);
 $p=$u->getProfile() ?? $pR->findOneByAuthor($u) ?? $pR->findOnePublic();
-if (!$p) throw new \Exception("Принадлежащие данному пользователю и общие профили отсутствуют");
-return $this->ch->isGranted("APPOINT", $p) ? $p : $pR->findOneBy(["description"=>"Тестовый профиль", "isPublic"=>true]);
+$testDesc="Тестовый профиль";
+
+if (!$p) {
+$p=$pR->getNewByCurrentUser()
+->setDescription($testDesc)
+->setIsPublic(true);
+
+$em=$this->em();
+$em->persist($p);
+$em->flush();
+}
+
+return $this->ch->isGranted("APPOINT", $p) ? $p : $pR->findOneBy(["description"=>$testDesc, "isPublic"=>true]);
 }
 
 public function getAttemptsCount($u) {

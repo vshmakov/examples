@@ -1,6 +1,7 @@
 {% extends 'main.html.twig' %}
 
-{% block title %}{{profile.title}}{% endblock %}
+{%set cur=user.currentProfile is same as(profile) ? " (текущий)" : ""%}
+{% block title %}{{profile.title~cur}}{% endblock %}
 
 {%macro list(f, t, inps)%}
 <div class="row">
@@ -19,11 +20,16 @@
 {{form_errors(form)}}
 {%from _self import list as list%}
 
-   <h1>{%block main_heading  "Редактировать профиль"%}</h1>
+   <h1>{%block main_heading%}Редактировать профиль <em>{{cur}}</em>{%endblock%}</h1>
+<div class="row">
+<ul class="list-group">
+<li>Описание профиля: {{form_widget(form.description)}}</li>
+</ul>
+</div>
+
 <div class="row">
 <h2>Параметры попытки</h2>
 <ul class="list-group">
-<li>Описание профиля: {{form_widget(form.description)}}</li>
 <li>Количество примеров в попытке: {{form_widget(form.examplesCount)}}</li>
 <li>Длительность попытки (мин:сек): {{(form_widget(form.minutes)~":"~form_widget(form.seconds))|raw}}</li>
 <li>{{(form_label(form.isDemanding, "Повторять пример до получения правильного ответа")~form_widget(form.isDemanding))|raw}}</li>

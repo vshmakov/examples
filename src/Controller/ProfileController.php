@@ -50,7 +50,7 @@ $canCreate=$this->isGranted("CREATE", $profile);
 
         if ($form->isSubmitted() && $form->isValid() && $canCreate) {
             $em = $this->getDoctrine()->getManager();
-            $em->persist($profile->setAuthor($ul->getUser())->normPerc());
+            $em->persist($profile->normData());
             $em->flush();
 
             return $this->redirectToRoute('profile_index');

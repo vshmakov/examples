@@ -41,6 +41,7 @@ fos_user:
     registration: 
         confirmation: 
             enabled: true
+            template: '@FOSUser/registration/email.email.twig'
     resetting: 
         retry_ttl: 0 # Value in seconds, logic will use as hours 
         token_ttl: 86400 

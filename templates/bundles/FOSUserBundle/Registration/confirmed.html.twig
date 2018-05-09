@@ -1,12 +1,24 @@
 {% extends "@FOSUser/layout.html.twig" %}
 
-{%block title "Электронная почта подтверждена"%}
+{%block title "Аккаунт подтверждён"%}
 
 {% trans_default_domain 'FOSUserBundle' %}
 
 {% block fos_user_content %}
+<h1>Аккаунт подтверждён</h1>
     <p>{{ 'registration.confirmed'|trans({'%username%': user.username}) }}</p>
-    {% if targetUrl %}
-    <p><a href="{{ targetUrl }}">{{ 'registration.back'|trans }}</a></p>
-    {% endif %}
+
+<h2>Что дальше?</h2>
+<p>
+<ol class="list-group">
+<li><a href="{{path("profile_index")}}">Выберете подходящий профиль настроек или создайте свой</a></li>
+<li><a href="{{path("attempt_new")}}">Начните развивать свои арифметические навыки!</a></li>
+<li>Все достигнутые вами результаты будут храниться <a href="{{path("attempt_index")}}">здесь</a></li>
+<li>
+<a href="{{path("account_recharge")}}">Не забудьте пополнить счёт на сайте</a>
+ и по окончании демонстрационного периода <a href="{{path("account_pay")}}">оплатите сервис</a>:
+ всего {{PRICE}} руб/мес за неограниченное число профилей и примеров!
+</li>
+</ol>
+</p>
 {% endblock fos_user_content %}

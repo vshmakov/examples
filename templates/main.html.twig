@@ -47,7 +47,7 @@ var P={{(jsParams ?? {})|json_encode|raw}};
                     <a class="dropdown-item" href="{{path("account_pay")}}">
 Оплатить сервис 
 {%if not user.limitTime.isPast%}
-<em>({{user.remainedTime.roundDaies}}  дн.)</em>
+<em>({{user.remainedTime.roundDays}}  дн.)</em>
 {%endif%}
 </a>
                   </div>
@@ -86,7 +86,7 @@ var P={{(jsParams ?? {})|json_encode|raw}};
     <script src="/js/bootstrap.min.js"></script>
     <script src="/js/custom.js"></script>
 <script>
-var d={{remainedDaies}};
+var d={{user.remainedTime.roundUpDays}};
 c=d == 0 ? "red" : d <=3 ? "orange" : d <= 7 ? "yellow" : "green";
 $(".account-button").css("background", c);
 </script>

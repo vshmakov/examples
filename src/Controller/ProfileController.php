@@ -26,12 +26,12 @@ class ProfileController extends MainController
 $profiles=$pR->findByCurrentAuthor();
 
         return $this->render('profile/index.html.twig', [
+'public'=>$pub=$pR->findByIsPublic(true),
+'profiles' => $profiles,
 "jsParams"=>[
 "current"=>$uR->getCurrentProfile($ul->getUser())->getId(),
-"canAppoint"=>$this->isGranted("APPOINT", $profiles),
+"canAppoint"=>$this->isGranted("APPOINT", array_merge($profiles, $pub)),
 ],
-'public'=>$pR->findByIsPublic(true),
-'profiles' => $profiles,
 "all"=>($this->isGranted("ROLE_SUPER_ADMIN")) ? $pR->findAll() : [],
 "pR"=>$pR,
 ]);

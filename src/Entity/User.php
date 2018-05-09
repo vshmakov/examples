@@ -61,7 +61,8 @@ use DTTrait;
     {
         $this->sessions = new ArrayCollection();
         $this->profiles = new ArrayCollection();
-$this->limitTime=(new \DateTime())->add(new \DateInterval("P7D"));
+$l=TEST_DAYS;
+$this->limitTime=(new \DateTime())->add(new \DateInterval("P{$l}D"));
 $this->codes = new ArrayCollection();
     }
 

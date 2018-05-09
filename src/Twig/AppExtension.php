@@ -25,7 +25,6 @@ $this->ul=$ul;
 $this->gl=[
 "user"=>$u=$ul->getUser()->setER($uR),
 "hasActualAttempt"=>$hasAtt,
-"remainedDaies"=>$u->getRemainedTime()->getRoundUpDaies(),
 ];
 }
 

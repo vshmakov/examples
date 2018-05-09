@@ -45,7 +45,7 @@ public function __toString() {
 return $this->stFormat();
 }
 
-public function getRoundDaies() {
+public function getRoundDays() {
 return round($this->getTimestamp()/DAY);
 }
 
@@ -53,7 +53,7 @@ public function isPast() {
 return $this->getTimestamp() < time();
 }
 
-public function getRoundUpDaies() {
+public function getRoundUpDays() {
 $t=$this->getTimestamp();
 $d=(((int) ($t/DAY)));
 return ($t % DAY == 0 ? $d : $d+1);

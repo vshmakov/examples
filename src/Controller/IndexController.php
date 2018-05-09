@@ -14,6 +14,7 @@ class IndexController extends Controller
      */
     public function index(\App\Service\UserLoader $ul, \App\Repository\UserRepository $uR, \Symfony\Component\DependencyInjection\ContainerInterface $con)
     {
+//dump($con);
         return $this->render('index/index.html.twig', [
             'controller_name' => 'IndexController',
         ]);

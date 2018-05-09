@@ -9,4 +9,5 @@
 <p>
 {{ 'resetting.check_email'|trans({'%tokenLifetime%': tokenLifetime})|nl2br }}
 </p>
+<a href="{{path("fos_user_resetting_request")}}" role="button" class="btn btn-link">Попробовать ещё раз</a>
 {% endblock %}

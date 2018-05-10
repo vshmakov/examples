@@ -67,7 +67,7 @@ return $ex;
 }
 
 public function getSolvingTime($ex) {
-$s=0;
+$s=null;
 
 if ($ex->getAnswerTime()) {
 $p=$this->v($this->q("select e from App:Example e

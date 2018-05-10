@@ -9,16 +9,5 @@
     <p>{{ 'registration.confirmed'|trans({'%username%': user.username}) }}</p>
 
 <h2>Что дальше?</h2>
-<p>
-<ol class="list-group">
-<li><a href="{{path("profile_index")}}">Выберете подходящий профиль настроек или создайте свой</a></li>
-<li><a href="{{path("attempt_new")}}">Начните развивать свои арифметические навыки!</a></li>
-<li>Все достигнутые вами результаты будут храниться <a href="{{path("attempt_index")}}">здесь</a></li>
-<li>
-<a href="{{path("account_recharge")}}">Не забудьте пополнить счёт на сайте</a>
- и по окончании демонстрационного периода <a href="{{path("account_pay")}}">оплатите сервис</a>:
- всего {{PRICE}} руб/мес за неограниченное число профилей и примеров!
-</li>
-</ol>
-</p>
+{{include("index/using_steps.html.twig")}}
 {% endblock fos_user_content %}

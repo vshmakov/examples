@@ -401,7 +401,7 @@ $this->initAddTime();
         return $this;
     }
 
-public function normPerc() {
+private function normPerc() {
 $pKeies=['addPerc', 'subPerc', 'multPerc', 'divPerc'];
 $p=[];
 foreach ($pKeies as $k) {
@@ -495,6 +495,7 @@ $this->minSub=maxVal($this->subMax - $this->subMin, $this->minSub);
 
         $this->divMax = minVal($this->divMin, $this->divMax);
 $this->minDiv=maxVal($this->divMax / $this->divMin, $this->minDiv);
+if ($this->divMin == 0) $this->divMin=1;
 
 return $this;
 }

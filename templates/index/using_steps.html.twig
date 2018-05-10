@@ -1,0 +1,15 @@
+<p>
+<ol class="list-group">
+{%if not is_granted("IS_AUTHENTICATED_REMEMBERED")%}
+<li><a href="{{path("fos_user_security_login")}}">Войдите</a> или <a href="{{path("fos_user_registration_register")}}">зарегистрируйтесь</a></li>
+{%endif%}
+<li><a href="{{path("profile_index")}}">Выберете подходящий профиль настроек или создайте свой</a></li>
+<li><a href="{{path("attempt_new")}}">Начните развивать свои арифметические навыки!</a></li>
+<li>Все достигнутые вами результаты будут храниться <a href="{{path("attempt_index")}}">здесь</a></li>
+<li>
+<a href="{{path("account_recharge")}}">Не забудьте пополнить счёт на сайте</a>
+ и по окончании демонстрационного периода <a href="{{path("account_pay")}}">оплатите сервис</a>:
+ всего {{PRICE}} руб/мес за неограниченное число профилей и примеров!
+</li>
+</ol>
+</p>

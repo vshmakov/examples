@@ -42,7 +42,7 @@
 		<td>{{ex.number}}</td>
 		<td>{{ex}}</td>
 		<td>{{ex.answer ?? '-'}}</td>
-<td>{{ex.setER(exR).solvingTime.timestamp}}</td>
+<td>{{ex.solvingTime ? ex.solvingTime.timestamp : '-'}}</td>
 	</tr>
 {%else%}
 <tr>

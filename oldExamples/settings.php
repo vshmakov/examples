@@ -1,0 +1,2 @@
+<?php
+function __autoload($classname){static $dir_path;$pref=substr($classname, 0, 2);switch ($pref) {case 'c_':$path="inc/c/{$classname}.php";$dir_path=null;break;case 'm_':$dir_path="inc/m/{$classname}/";$path=$dir_path.'_construct.php';break;default:$path=$dir_path.$classname.'.php';break;}if (file_exists($path)) require_once($path);}

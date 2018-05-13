@@ -1,0 +1,56 @@
+body {
+    font-family: Georgia, 'Times New Roman', Times, serif;;
+    font-size: 14px;
+    color: #000;
+}
+
+a {
+    color: dodgerblue;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+input[type="text"] {
+    width: 500px;
+}
+
+textarea {
+    width: 500px;
+    height: 300px;
+}
+
+.delete {
+    color: red;
+    padding-left: 20px;
+}
+
+h1 {
+    text-align: center;
+    font-size: 4em;
+    color: darkblue;
+    text-decoration: underline;
+}
+
+.article {
+    width: 800px;
+    margin: 0 auto;
+    background-color: aliceblue;
+    padding: 20px;
+}
+
+.article > p {
+    text-align: justify;
+}
+
+.short_article {
+    font-style: italic;
+    padding-left: 50px;
+}
+
+.error > p {
+	color: red;
+	font-size: 36px;
+	text-align:center;
+}

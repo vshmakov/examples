@@ -20,6 +20,29 @@ break;
 }
 }
 
+public static function rating($c, $e) {
+$r=$c-abs($e);
+$x=[];
+
+for ($i=5; $i>=1; $i--) {
+$prev=$i == 5 ? $c : $x[$i+1];
+$p=$i == 5 ? 0.98 : 0.97;
+if ($c <=50) $p=$i == 5 ? 0.96 : 0.94;
+if ($c <=30) $p=$i == 5 ? 0.97 : 0.92;
+if ($c  <= 15) $p=$i == 5 ? 0.94 : 0.88;
+if ($c  <= 9) $p=$i == 5 ? 1 : 0.85;
+
+$x[$i]=abs((int) ($prev*$p));
+}
+
+$o=1;
+for ($i=1; $i<=5; $i++) {
+if ($r >= $x[$i]) $o=$i;
+}
+
+return $o;
+}
+
 public function getRandEx($set) {
 $sign=$this->sign($set);
 $m=[1=>"add", "sub", "mult", "div"][$sign];
@@ -110,35 +133,16 @@ return ["a"=>$a, "b"=>$b];
 
 private function div($set) {
 extract($set);
-$to=((int) $divMin!=0) ? $divMax/$divMin: 0;
-$c=mt_rand($minDiv, (int) $to);
-$from=((int) $divMin!=0) ? $divMin : 1;
-$to=($c!=0) ? $divMax/$c : 1;
-$b=mt_rand($from, (int) $to);
-$a=$c*$b;
-return ["first"=>$a, "second"=>$b];
+extract($this->mult([
+"multFMin"=>$divMin,
+"multFMax"=>$divMax,
+"multSMin"=>$divSMin,
+"multSMax"=>$divSMax,
+"multMin"=>$divFMin,
+"multMax"=>$divFMax,
+]));
+
+return ["a"=>$a * $b, "b"=>$b];
 }
 
-public static function rating($c, $e) {
-$r=$c-abs($e);
-$x=[];
-
-for ($i=5; $i>=1; $i--) {
-$prev=$i == 5 ? $c : $x[$i+1];
-$p=$i == 5 ? 0.98 : 0.97;
-if ($c <=50) $p=$i == 5 ? 0.96 : 0.94;
-if ($c <=30) $p=$i == 5 ? 0.97 : 0.92;
-if ($c  <= 15) $p=$i == 5 ? 0.94 : 0.88;
-if ($c  <= 9) $p=$i == 5 ? 1 : 0.85;
-
-$x[$i]=abs((int) ($prev*$p));
-}
-
-$o=1;
-for ($i=1; $i<=5; $i++) {
-if ($r >= $x[$i]) $o=$i;
-}
-
-return $o;
-}
 }

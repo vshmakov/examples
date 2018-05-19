@@ -23,7 +23,8 @@ break;
 public function getRandEx($set) {
 $sign=$this->sign($set);
 $m=[1=>"add", "sub", "mult", "div"][$sign];
-$nums=$this->$m($set);
+extract($this->$m($set));
+$nums=["first"=>$a, "second"=>$b];
 return (object) ($nums+["sign"=>$sign]);
 }
 
@@ -65,15 +66,21 @@ $t1=btwVal($addFMin, $addFMax, $addMax-$b);
 $a=mt_rand($f1, $t1);
 }
 
-return ["first"=>$a, "second"=>$b];
+return ["a"=>$a, "b"=>$b];
 }
 
 private function sub($set) {
 extract($set);
-$a=mt_rand($subMin+$minSub, $subMax);
-$c=mt_rand($minSub, $a-$subMin);
-$b=$a-$c;
-return ["first"=>$a, "second"=>$b];
+extract($this->add([
+"addFMin"=>$subMin,
+"addFMax"=>$subMax,
+"addSMin"=>$subSMin,
+"addSMax"=>$subSMax,
+"addMin"=>$subFMin,
+"addMax"=>$subFMax,
+]));
+
+return ["a"=>$a+$b, "b"=>$b];
 }
 
 private function mult($set) {

@@ -36,7 +36,7 @@ $this->ch=$ch;
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
     {
-if ($this->ch->isGranted("ROLE_ADMIN")) return true;
+
 return $this->checkRight($attribute, $subject->setER($this->attR), $token);
     }
 
@@ -57,6 +57,7 @@ return $this->canSolve($att) && $ex;
 }
 
 private function canView($att) {
+if ($this->ch->isGranted("ROLE_ADMIN")) return true;
 $ul=$this->ul;
 $u=$ul->getUser();
 

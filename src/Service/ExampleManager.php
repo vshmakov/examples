@@ -45,8 +45,26 @@ return $sign;
 
 private function add($set) {
 extract($set);
-$a=mt_rand($addMin, $addMax);
-$b=mt_rand($addMin, $addMax);
+$k=(bool) mt_rand(0, 1);
+
+if ($k) {
+$f1=btwVal($addFMin, $addFMax, $addMin-$addSMax);
+$t1=btwVal($addFMin, $addFMax, $addMax-$addSMin);
+$a=mt_rand($f1, $t1);
+
+$f2=btwVal($addSMin, $addSMax, $addMin-$a);
+$t2=btwVal($addSMin, $addSMax, $addMax-$a);
+$b=mt_rand($f2, $t2);
+} else {
+$f2=btwVal($addSMin, $addSMax, $addMin-$addFMax);
+$t2=btwVal($addSMin, $addSMax, $addMax-$addFMin);
+$b=mt_rand($f2, $t2);
+
+$f1=btwVal($addFMin, $addFMax, $addMin-$b);
+$t1=btwVal($addFMin, $addFMax, $addMax-$b);
+$a=mt_rand($f1, $t1);
+}
+
 return ["first"=>$a, "second"=>$b];
 }
 

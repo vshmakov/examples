@@ -24,8 +24,10 @@ private function getSetter($method, $p) {
 foreach (['get', 'set'] as $action) {
 if (preg_match("#^$action(.+)$#", $method, $arr)) {
 $v=lcfirst($arr[1]);
+if (isset($this->$v)) {
 if (!$g=$action == 'get') $this->$v=$p[0];
 return ["ret"=>$g ? $this->$v : $this];
+}
 }
 }
 

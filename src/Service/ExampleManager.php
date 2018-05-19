@@ -85,9 +85,27 @@ return ["a"=>$a+$b, "b"=>$b];
 
 private function mult($set) {
 extract($set);
-$a=mt_rand($multMin, $multMax);
-$b=mt_rand($multMin, $multMax);
-return ["first"=>$a, "second"=>$b];
+$k=(bool) mt_rand(0, 1);
+
+if ($k) {
+$f1=btwVal($multFMin, $multFMax, $multMin / ($multSMax ?: 1));
+$t1=btwVal($multFMin, $multFMax, $multMax / ($multSMin ?: 1));
+$a=mt_rand($f1, $t1);
+
+$f2=btwVal($multSMin, $multSMax, $multMin / ($a ?: 1));
+$t2=btwVal($multSMin, $multSMax, $multMax / ($a ?: 1));
+$b=mt_rand($f2, $t2);
+} else {
+$f2=btwVal($multSMin, $multSMax, $multMin / ($multFMax ?: 1));
+$t2=btwVal($multSMin, $multSMax, $multMax/ ($multFMin ?: 1));
+$b=mt_rand($f2, $t2);
+
+$f1=btwVal($multFMin, $multFMax, $multMin/ ($b ?: 1));
+$t1=btwVal($multFMin, $multFMax, $multMax / ($b ?: 1));
+$a=mt_rand($f1, $t1);
+}
+
+return ["a"=>$a, "b"=>$b];
 }
 
 private function div($set) {

@@ -49,7 +49,7 @@ $profile->SetDescription($pR->getTitle($profile));
 $canCreate=$this->isGranted("CREATE", $profile);
 
         if ($form->isSubmitted() && $form->isValid() && $canCreate) {
-return $this->saveAndRedirect($profile, $form);
+return $this->saveAndRedirect($profile, $form, $ul);
         }
 
         return $this->render('profile/new.html.twig', [
@@ -88,7 +88,7 @@ $profile->setAuthor($ul->getUser());
         $form->handleRequest($request);
 
         if (($form->isSubmitted()) && ($form->isValid()) && ($canEdit or $copying)) {
-return $this->saveAndRedirect($profile, $form);
+return $this->saveAndRedirect($profile, $form, $ul);
         }
 
         return $this->render('profile/edit.html.twig', [
@@ -153,7 +153,7 @@ $f            ->add('isPublic')
 return $f;
 }
 
-private function saveAndRedirect($profile, $form) {
+private function saveAndRedirect($profile, $form, $ul) {
 $profile->normData();
 $em=            $this->getDoctrine()->getManager();
 $em->persist($profile);

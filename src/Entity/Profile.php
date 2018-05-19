@@ -446,27 +446,28 @@ $max=$k.$n."Max";
 $this->$max=minVal($this->$min, $this->$max);
 }
 }
+if ($this->divSMin == 0) $this->divSMin=1;
+$this->divSMax=minVal($this->divSMin, $this->divSMax);
 
 $addMin=$this->addFMin + $this->addSMin;
 $addMax=$this->addFMax + $this->addSMax;
-$this->addMin=btwVal($addMin, $addMax, $this->addMin);
-$this->addMax=btwVal($addMin, $addMax, $this->addMax);
+$this->addMin=btwVal($addMin, $addMax, $this->addMin, false);
+$this->addMax=btwVal($addMin, $addMax, $this->addMax, true);
 
 $subMin=$this->subFMin - $this->subSMax;
 $subMax=$this->subFMax - $this->subSMin;
-$this->subMin=btwVal($subMin, $subMax, $this->subMin);
-$this->subMax=btwVal($subMin, $subMax, $this->subMax);
+$this->subMin=btwVal($subMin, $subMax, $this->subMin, false);
+$this->subMax=btwVal($subMin, $subMax, $this->subMax, true);
 
 $multMin=$this->multFMin * $this->multSMin;
 $multMax=$this->multFMax * $this->multSMax;
-$this->multMin=btwVal($multMin, $multMax, $this->multMin);
-$this->multMax=btwVal($multMin, $multMax, $this->multMax);
+$this->multMin=btwVal($multMin, $multMax, $this->multMin, false);
+$this->multMax=btwVal($multMin, $multMax, $this->multMax, true);
 
 $divMin=$this->divFMin / $this->divSMax;
 $divMax=$this->divFMax / $this->divSMin;
-$this->divMin=seil(btwVal($divMin, $divMax, $this->divMin));
-$this->divMax=btwVal($divMin, $divMax, $this->divMax);
-if ($this->divSMin == 0) $this->divSMin=1;
+$this->divMin=ceil(btwVal($divMin, $divMax, $this->divMin, false));
+$this->divMax=btwVal($divMin, $divMax, $this->divMax, true);
 
 foreach (["add", "sub", "mult", "div"] as $k) {
 foreach (["F", "S", ""] as $n) {

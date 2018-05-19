@@ -103,6 +103,10 @@ function maxVal($k, $v) {
 return $v <= $k ? $v : $k;
 }
 
-function btwVal($min, $max, $v) {
-return maxVal($max, minVal($min, $v));
+function btwVal($min, $max, $v, $k=null) {
+if ($k === null) return maxVal($max, minVal($min, $v));
+
+$out=(($v < $min) or ($v > $max));
+if ($k) return $out ? $max : $v;
+ else return ($out) ? $min : $v;
 }

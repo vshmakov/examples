@@ -39,72 +39,72 @@ use DTTrait;
     /**
      * @ORM\Column(type="smallint")
      */
-    private $duration=300;
+    private $duration=180;
 
     /**
      * @ORM\Column(type="smallint")
      */
-    private $examplesCount=10;
+    private $examplesCount=5;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $addFMin=1;
+    private $addFMin=0;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $addFMax=10;
+    private $addFMax=3;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $addSMin=1;
+    private $addSMin=0;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $addSMax=10;
+    private $addSMax=3;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $addMin=2;
+    private $addMin=-1;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $addMax=20;
+    private $addMax=-1;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $subFMin=1;
+    private $subFMin=0;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $subFMax=1;
+    private $subFMax=5;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $subSMin=1;
+    private $subSMin=0;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $subSMax=1;
+    private $subSMax=5;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $subMin=1;
+    private $subMin=0;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $subMax=20;
+    private $subMax=1000;
 
     /**
      * @ORM\Column(type="integer")
@@ -114,7 +114,7 @@ use DTTrait;
     /**
      * @ORM\Column(type="integer")
      */
-    private $multFMax=4;
+    private $multFMax=3;
 
     /**
      * @ORM\Column(type="integer")
@@ -124,27 +124,27 @@ use DTTrait;
     /**
      * @ORM\Column(type="integer")
      */
-    private $multSMax=4;
+    private $multSMax=3;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $multMin=0;
+    private $multMin=-1;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $multMax=4;
+    private $multMax=-1;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $divFMin=1;
+    private $divFMin=0;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $divFMax=1;
+    private $divFMax=6;
 
     /**
      * @ORM\Column(type="integer")
@@ -154,17 +154,17 @@ use DTTrait;
     /**
      * @ORM\Column(type="integer")
      */
-    private $divSMax=1;
+    private $divSMax=6;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $divMin=1;
+    private $divMin=-1;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $divMax=20;
+    private $divMax=-1;
 
     /**
      * @ORM\Column(type="smallint")

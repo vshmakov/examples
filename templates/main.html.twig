@@ -5,6 +5,7 @@
         <title>{% block title %}Welcome!{% endblock %} || ExMaster || Отработка арифметических навыков</title>
         {% block stylesheets %}
     <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/style.css">
 {% endblock %}
 <script>
 var P={{(jsParams ?? {})|json_encode|raw}};
@@ -71,12 +72,21 @@ var P={{(jsParams ?? {})|json_encode|raw}};
               </nav>
 {%endblock nav%}
 
-<div class="main row">
+<main class="main row">
 {%block main ""%}
-</div>
+</main>
 
 {% endblock body%}
 </div>
+
+<footer class="{#navbar-fixed-bottom#}">
+<div class="row">
+{%set y=date()|date("Y")%}
+<small>
+<em>© {{y != 2018 ? "2018 - " : ""}} {{y}}, Вадим Шмаков</em>
+</small>
+</div>
+</footer>
 {%endblock%}
 
         {% block javascripts %}

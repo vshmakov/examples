@@ -32,4 +32,12 @@ return ["ret"=>$g ? $this->$v : $this];
 return false;
 }
 
+public function __get($v) {
+return $this->$v;
+}
+
+public function __set($v, $p) {
+$this->$v=$p;
+return $this;
+}
 }

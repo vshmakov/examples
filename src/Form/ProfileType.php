@@ -23,22 +23,21 @@ $this->ch=$ch;
             ->add('minutes')
             ->add('seconds')
             ->add('examplesCount')
-            ->add('addMin')
-            ->add('addMax')
-            ->add('subMin')
-            ->add('subMax')
-            ->add('minSub')
-            ->add('multMin')
-            ->add('multMax')
-            ->add('divMin')
-            ->add('divMax')
-            ->add('minDiv')
             ->add('addPerc')
             ->add('subPerc')
             ->add('multPerc')
             ->add('divPerc')
 ->add("isDemanding")
 ;
+
+foreach (["add", "sub", "mult", "div"] as $k) {
+foreach (["F", "S", ""] as $n) {
+foreach (["Min", "Max"] as $m) {
+$v=$k.$n.$m;
+        $builder->add($v);
+}
+}
+}
     }
 
     public function configureOptions(OptionsResolver $resolver)

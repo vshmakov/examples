@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Service\UserLoader;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use App\Entity\User;
 use App\Entity\Profile;
@@ -11,12 +12,14 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 class UserRepository extends ServiceEntityRepository
 {
 use BaseTrait;
+const GUEST_LOGIN="__guest";
 private $ch;
 
     public function __construct(RegistryInterface $registry, AuthorizationCheckerInterface $ch)
     {
         parent::__construct($registry, User::class);
 $this->ch=$ch;
+
     }
 
 public function getCurrentProfile($u) {
@@ -27,7 +30,8 @@ $testDesc="Тестовый профиль";
 if (!$p) {
 $p=$pR->getNewByCurrentUser()
 ->setDescription($testDesc)
-->setIsPublic(true);
+->setIsPublic(true)
+->setAuthor($this->getGuest());
 
 $em=$this->em();
 $em->persist($p);
@@ -60,4 +64,27 @@ join u.profiles p
 where u = :u")
 ->setParameter("u", $u));
 }
+
+public function getGuest() {
+static $u=false;
+$gl=self::GUEST_LOGIN;
+
+if ($u===false) $u=$this->findOneByUsername($gl);
+if (!$u) {
+$u=new User();
+$u->setUsername($gl)
+->setUsernameCanonical($gl)
+->setEmail('')
+->setEmailCanonical('')
+->setPassword('')
+->setEnabled(true);
+
+$em=$this->em();
+$em->persist($u);
+$em->flush();
+}
+
+return $u;
+}
+
 }

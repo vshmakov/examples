@@ -62,15 +62,6 @@ return $this->saveAndRedirect($profile, $form, $ul);
     }
 
     /**
-     * @Route("/{id}", name="profile_show", methods="GET")
-     */
-    public function show(Profile $profile): Response
-    {
-$this->denyAccessUnlessGranted("VIEW", $profile);
-        return $this->render('profile/show.html.twig', ['profile' => $profile]);
-    }
-
-    /**
      * @Route("/{id}/edit", name="profile_edit", methods="GET|POST")
      */
     public function edit(Request $request, Profile $profile, ProfileRepository $pR, UserLoader $ul): Response
@@ -101,12 +92,17 @@ return $this->saveAndRedirect($profile, $form, $ul);
     }
 
     /**
-     * @Route("/{id}", name="profile_delete", methods="GET")
+     * @Route("/{id}/delete", name="profile_delete", methods="DELETE")
      */
-    public function delete(Request $request, Profile $profile): Response
+    public function delete(Request $request, Profile $profile, UserRepository $uR): Response
     {
 $this->denyAccessUnlessGranted("DELETE", $profile);
+foreach ($uR->findByProfile($profile) as $u) {
+$u->setProfile(null);
+}
+
             $em = $this->getDoctrine()->getManager();
+            $em->flush();
             $em->remove($profile);
             $em->flush();
         return $this->redirectToRoute('profile_index');

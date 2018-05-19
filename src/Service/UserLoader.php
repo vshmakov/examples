@@ -9,7 +9,6 @@ use App\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class UserLoader {
-const GUEST_LOGIN="__guest";
 private $user;
 private $uR;
 private $em;
@@ -29,23 +28,6 @@ return !($this->user instanceof UserInterface);
 }
 
 public function getGuest() {
-static $u=false;
-$gl=self::GUEST_LOGIN;
-if ($u===false) $u=$this->uR->findOneByUsername($gl);
-if (!$u) {
-$u=new User();
-$u->setUsername($gl)
-->setUsernameCanonical($gl)
-->setEmail('')
-->setEmailCanonical('')
-->setPassword('')
-->setEnabled(true);
-
-$em=$this->em;
-$em->persist($u);
-$em->flush();
+return $this->uR->getGuest();
 }
-return $u;
-}
-
 }

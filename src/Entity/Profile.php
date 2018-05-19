@@ -49,12 +49,52 @@ use DTTrait;
     /**
      * @ORM\Column(type="integer")
      */
-    private $addMin=1;
+    private $addFMin=1;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $addMax=10;
+    private $addFMax=10;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $addSMin=1;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $addSMax=10;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $addMin=2;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $addMax=20;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $subFMin=1;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $subFMax=1;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $subSMin=1;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $subSMax=1;
 
     /**
      * @ORM\Column(type="integer")
@@ -69,7 +109,22 @@ use DTTrait;
     /**
      * @ORM\Column(type="integer")
      */
-    private $minSub=1;
+    private $multFMin=0;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $multFMax=4;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $multSMin=0;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $multSMax=4;
 
     /**
      * @ORM\Column(type="integer")
@@ -84,17 +139,32 @@ use DTTrait;
     /**
      * @ORM\Column(type="integer")
      */
+    private $divFMin=1;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $divFMax=1;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $divSMin=1;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $divSMax=1;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
     private $divMin=1;
 
     /**
      * @ORM\Column(type="integer")
      */
     private $divMax=20;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $minDiv=2;
 
     /**
      * @ORM\Column(type="smallint")
@@ -135,6 +205,7 @@ use DTTrait;
     {
         $this->users = new ArrayCollection();
 $this->initAddTime();
+$this->normData();
     }
 
     public function getId()
@@ -198,126 +269,6 @@ $this->initAddTime();
     public function setExamplesCount(int $examplesCount): self
     {
         $this->examplesCount = btwVal(3, 150, $examplesCount);
-
-        return $this;
-    }
-
-    public function getAddMin(): ?int
-    {
-        return $this->addMin;
-    }
-
-    public function setAddMin(int $addMin): self
-    {
-        $this->addMin = $addMin;
-
-        return $this;
-    }
-
-    public function getAddMax(): ?int
-    {
-        return $this->addMax;
-    }
-
-    public function setAddMax(int $addMax): self
-    {
-        $this->addMax = $addMax;
-
-        return $this;
-    }
-
-    public function getSubMin(): ?int
-    {
-        return $this->subMin;
-    }
-
-    public function setSubMin(int $subMin): self
-    {
-        $this->subMin = $subMin;
-
-        return $this;
-    }
-
-    public function getSubMax(): ?int
-    {
-        return $this->subMax;
-    }
-
-    public function setSubMax(int $subMax): self
-    {
-        $this->subMax = $subMax;
-
-        return $this;
-    }
-
-    public function getMinSub(): ?int
-    {
-        return $this->minSub;
-    }
-
-    public function setMinSub(int $minSub): self
-    {
-        $this->minSub = $minSub;
-
-        return $this;
-    }
-
-    public function getMultMin(): ?int
-    {
-        return $this->multMin;
-    }
-
-    public function setMultMin(int $multMin): self
-    {
-        $this->multMin = $multMin;
-
-        return $this;
-    }
-
-    public function getMultMax(): ?int
-    {
-        return $this->multMax;
-    }
-
-    public function setMultMax(int $multMax): self
-    {
-        $this->multMax = $multMax;
-
-        return $this;
-    }
-
-    public function getDivMin(): ?int
-    {
-        return $this->divMin;
-    }
-
-    public function setDivMin(int $divMin): self
-    {
-        $this->divMin = $divMin;
-
-        return $this;
-    }
-
-    public function getDivMax(): ?int
-    {
-        return $this->divMax;
-    }
-
-    public function setDivMax(int $divMax): self
-    {
-        $this->divMax = $divMax;
-
-        return $this;
-    }
-
-    public function getMinDiv(): ?int
-    {
-        return $this->minDiv;
-    }
-
-    public function setMinDiv(int $minDiv): self
-    {
-        $this->minDiv = $minDiv;
 
         return $this;
     }
@@ -453,7 +404,7 @@ return $this->getDescription()." - ".$this->getAuthor()->getUsername();
 
 public function getData() {
 $d=[];
-$f=getArrByStr("duration examplesCount addMin addMax subMin subMax minSub multMin multMax divMin divMax minDiv addPerc subPerc multPerc divPerc");
+$f=getArrByStr("duration examplesCount addFMin addFMax addSMin addSMax addMin addMax subFMin subFMax subSMin subSMax subMin subMax multFMin multFMax multSMin multSMax multMin multMax divFMin divFMax divSMin divSMax divMin divMax addPerc subPerc multPerc divPerc");
 
 foreach ($this as $k=>$v) {
 if (in_array($k, $f)) $d[$k]=$v;

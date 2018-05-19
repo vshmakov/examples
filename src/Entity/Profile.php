@@ -403,6 +403,7 @@ return $this->getDescription()." - ".$this->getAuthor()->getUsername();
 }
 
 public function getData() {
+$this->normData();
 $d=[];
 $f=getArrByStr("duration examplesCount addFMin addFMax addSMin addSMax addMin addMax subFMin subFMax subSMin subSMax subMin subMax multFMin multFMax multSMin multSMax multMin multMax divFMin divFMax divSMin divSMax divMin divMax addPerc subPerc multPerc divPerc");
 
@@ -438,15 +439,43 @@ $this->initAddTime();
 public function normData() {
 $this->normPerc();
 
-$this->addMax=minVal($this->addMin, $this->addMax);
-$this->multMax=minVal($this->multMin, $this->multMax);
+foreach (["add", "sub", "mult", "div"] as $k) {
+foreach (["F", "S"] as $n) {
+$min=$k.$n."Min";
+$max=$k.$n."Max";
+$this->$max=minVal($this->$min, $this->$max);
+}
+}
 
-        $this->subMax = minVal($this->subMin, $this->subMax);
-$this->minSub=maxVal($this->subMax - $this->subMin, $this->minSub);
+$addMin=$this->addFMin + $this->addSMin;
+$addMax=$this->addFMax + $this->addSMax;
+$this->addMin=btwVal($addMin, $addMax, $this->addMin);
+$this->addMax=btwVal($addMin, $addMax, $this->addMax);
 
-        $this->divMax = minVal($this->divMin, $this->divMax);
-$this->minDiv=maxVal($this->divMax / $this->divMin, $this->minDiv);
-if ($this->divMin == 0) $this->divMin=1;
+$subMin=$this->subFMin - $this->subSMax;
+$subMax=$this->subFMax - $this->subSMin;
+$this->subMin=btwVal($subMin, $subMax, $this->subMin);
+$this->subMax=btwVal($subMin, $subMax, $this->subMax);
+
+$multMin=$this->multFMin * $this->multSMin;
+$multMax=$this->multFMax * $this->multSMax;
+$this->multMin=btwVal($multMin, $multMax, $this->multMin);
+$this->multMax=btwVal($multMin, $multMax, $this->multMax);
+
+$divMin=$this->divFMin / $this->divSMax;
+$divMax=$this->divFMax / $this->divSMin;
+$this->divMin=seil(btwVal($divMin, $divMax, $this->divMin));
+$this->divMax=btwVal($divMin, $divMax, $this->divMax);
+if ($this->divSMin == 0) $this->divSMin=1;
+
+foreach (["add", "sub", "mult", "div"] as $k) {
+foreach (["F", "S", ""] as $n) {
+foreach (["Min", "Max"] as $m) {
+$v=$k.$n.$m;
+$this->$v=(int) $this->$v;
+}
+}
+}
 
 return $this;
 }

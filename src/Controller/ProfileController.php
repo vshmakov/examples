@@ -28,11 +28,11 @@ $profiles=$pR->findByCurrentAuthor();
         return $this->render('profile/index.html.twig', [
 'public'=>$pub=$pR->findByIsPublic(true),
 'profiles' => $profiles,
+"canAppoint"=>$can=$this->isGranted("APPOINT", array_merge($profiles, $pub)),
 "jsParams"=>[
 "current"=>$uR->getCurrentProfile($ul->getUser())->getId(),
-"canAppoint"=>$this->isGranted("APPOINT", array_merge($profiles, $pub)),
+"canAppoint"=>$can,
 ],
-"all"=>($this->isGranted("ROLE_SUPER_ADMIN")) ? $pR->findAll() : [],
 "pR"=>$pR,
 ]);
     }
@@ -74,8 +74,6 @@ $copying=$request->request->has("copy") && $canCopy;
 if ($copying) {
 ($profile=clone($profile));
 $profile->setAuthor($ul->getUser());
-//dump($profile);
-//die();
 }
         $form = $this->buildForm($profile, $copying);
 

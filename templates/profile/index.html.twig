@@ -5,6 +5,24 @@
 {%block main%}
 {%from "profile/list_table.html.twig" import list_table as  t%}
 
+{%if not canAppoint%}
+<div class="row">
+              <div class="card text-white bg-danger mb-3" style="max-width: 20rem;">
+                <div class="card-header">Внимание!</div>
+                <div class="card-body">
+                  <h4 class="card-title">Вы не можете выбирать профили настроек!</h4>
+                  <p class="card-text">
+{%if isGuest%}
+Пожалуйста, <a href="{{path("fos_user_security_login")}}">войдите</a> или <a href="{{path("fos_user_registration_register")}}">зарегистрируйтесь</a>, чтобы иметь возможность выбирать текущие профили настроек.
+{%else%}
+Пожалуйста, <a href="{{path("account_pay")}}">оплатите сервис</a>, чтобы иметь возможность выбирать текущие профили настроек.
+{%endif%}
+</p>
+                </div>
+              </div>
+</div>
+{%endif%}
+
 {{t("Профили по умолчанию", public, pR)}}
 {{t("Личные профили", profiles, pR)}}
 

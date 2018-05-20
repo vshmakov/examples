@@ -3,7 +3,7 @@
 use App\DT;
 
 define("PRICE", 97);
-define("TEST_DAYS", 5);
+define("TEST_DAYS", 3);
 
 function dt($dt) {
 return DT::createFromDT($dt);

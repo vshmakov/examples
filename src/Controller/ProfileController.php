@@ -74,9 +74,20 @@ $copying=$request->request->has("copy") && $canCopy;
 if ($copying) {
 ($profile=clone($profile));
 $profile->setAuthor($ul->getUser());
+//dump($profile);
+//die();
 }
-        $form = $this->buildForm($profile);
-        $form->handleRequest($request);
+        $form = $this->buildForm($profile, $copying);
+
+if ($request->isMethod('POST')) {
+$d=$request->request->get($form->getName());
+if ($copying) {
+foreach (getArrByStr("isPublic author addTime") as $k) {
+if (isset($d[$k])) unset($d[$k]);
+}
+}
+$form->submit($d);
+}
 
         if (($form->isSubmitted()) && ($form->isValid()) && ($canEdit or $copying)) {
 return $this->saveAndRedirect($profile, $form, $ul);
@@ -137,10 +148,10 @@ $an["del"][$id]=["can"=>$this->isGranted("DELETE", $p), "cur"=>$up===$p];
 return $this->json($an);
 }
 
-private function buildForm($profile) {
+private function buildForm($profile, $copying=null) {
 $f=$this->createForm(ProfileType::class, $profile);
 
-if ($this->isGranted("ROLE_ADMIN")) {
+if ($this->isGranted("ROLE_ADMIN") && !$copying) {
 $f            ->add('isPublic')
             ->add('author')
             ->add('addTime');

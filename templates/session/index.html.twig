@@ -13,6 +13,7 @@
                 <th>Email</th>
                 <th>Count of attempts</th>
                 <th>AddTime</th>
+                <th>Last time</th>
                 <th>Sid</th>
                 <th>actions</th>
             </tr>
@@ -24,7 +25,8 @@
                 <td>{{ session.user.username}}</td>
                 <td>{{ session.user.email}}</td>
                 <td>{{ session.attempts.count}}</td>
-                <td>{{ session.addTime ? session.addTime }}</td>
+                <td>{{ session.addTime ? session.addTime.shDbFormat : "" }}</td>
+                <td>{{ session.lastTime ? session.lastTime.shDbFormat : "" }}</td>
                 <td>{{ session.sid }}</td>
                 <td>
                     <a href="{{ path('session_show', {'id': session.id}) }}">show</a>
@@ -47,7 +49,7 @@
 <script src="/js/jquery.datatables.min.js"></script>
 <script>
 $("table").DataTable({
-order: [0, "desc"],
+order: [5, "desc"],
 });
 </script>
 {%endblock%}

@@ -62,4 +62,8 @@ return ($t % DAY == 0 ? $d : $d+1);
 public function minSecFormat() {
 return $this->format("i:s");
 }
+
+public function shDbFormat() {
+return $this->format("y-m-d H:i:s");
+}
 }

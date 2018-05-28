@@ -10,7 +10,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 trait BaseTrait {
 use \App\BaseTrait;
 
-private function em() {
+public function em() {
 return $this->getEntityManager();
 }
 

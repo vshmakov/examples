@@ -26,6 +26,11 @@ use DTTrait;
     private $addTime;
 
     /**
+     * @ORM\Column(type="datetime")
+     */
+    private $lastTime;
+
+    /**
      * @ORM\Column(type="string", length=32)
      */
     private $sid;
@@ -45,12 +50,22 @@ use DTTrait;
     {
         $this->attempts = new ArrayCollection();
 $this->initAddTime();
+$this->lastTime=new \DateTime;
     }
 
     public function getId()
     {
         return $this->id;
     }
+
+public function getLastTime() {
+return $this->dt($this->lastTime);
+}
+
+public function setLastTime($dt) {
+$this->lastTime=$dt;
+return $this;
+}
 
     public function getAddTime(): ?\DateTimeInterface
     {

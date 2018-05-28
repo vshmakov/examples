@@ -11,6 +11,8 @@
                 <th>Id</th>
                 <th>Username</th>
                 <th>email</th>
+                <th>Registration time</th>
+                <th>Last visit time</th>
                 <th>Money</th>
                 <th>All money</th>
                 <th>Limit time</th>
@@ -26,9 +28,12 @@
                 <td>{{ user.setER(uR).id }}</td>
                 <td>{{ user.username}}</td>
                 <td>{{ user.email}}</td>
+                <td>{{ user.addTime.shDbFormat}}</td>
+{%set ls=user.sessions.last%}
+                <td>{{ ls ? ls.lastTime.shDbFormat : "-"}}</td>
                 <td>{{ user.money}}</td>
                 <td>{{ user.allMoney}}</td>
-                <td>{{ user.limitTime}}</td>
+                <td>{{ user.limitTime.shDbFormat}}</td>
                 <td>{{ user.attemptsCount}}</td>
                 <td>{{ user.examplesCount}}</td>
                 <td>{{ user.profilesCount}}</td>
@@ -36,10 +41,6 @@
                     <a href="{{ path('user_edit', {'id': user.id}) }}">edit</a>
 {{include("user/_delete_form.html.twig")}}
                 </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="10">no records found</td>
             </tr>
         {% endfor %}
         </tbody>
@@ -54,7 +55,7 @@
 <script src="/js/jquery.datatables.min.js"></script>
 <script>
 $("table").DataTable({
-order: [0, "desc"],
+order: [4, "desc"],
 });
 </script>
 {%endblock%}

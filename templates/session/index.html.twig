@@ -33,10 +33,6 @@
                     <a href="{{ path('session_edit', {'id': session.id}) }}">edit</a>
                 </td>
             </tr>
-        {% else %}
-            <tr>
-                <td colspan="4">no records found</td>
-            </tr>
         {% endfor %}
         </tbody>
     </table>

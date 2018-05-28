@@ -50,6 +50,11 @@ use DTTrait;
     /**
      * @ORM\Column(type="datetime")
      */
+    private $addTime;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
     private $limitTime;
 
     /**
@@ -63,12 +68,25 @@ use DTTrait;
         $this->profiles = new ArrayCollection();
 $l=TEST_DAYS;
 $this->limitTime=(new \DateTime())->add(new \DateInterval("P{$l}D"));
+$this->addTime=new \DateTime;
 $this->codes = new ArrayCollection();
     }
 
     public function getId()
     {
         return $this->id;
+    }
+
+    public function getAddTime(): ?\DateTimeInterface
+    {
+        return $this->dt($this->addTime);
+    }
+
+    public function setAddTime(\DateTimeInterface $addTime): self
+    {
+        $this->addTime = $addTime;
+
+        return $this;
     }
 
     /**

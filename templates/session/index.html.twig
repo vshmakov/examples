@@ -24,7 +24,7 @@
                 <td>{{ session.user.username}}</td>
                 <td>{{ session.user.email}}</td>
                 <td>{{ session.attempts.count}}</td>
-                <td>{{ session.addTime ? session.addTime|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ session.addTime ? session.addTime }}</td>
                 <td>{{ session.sid }}</td>
                 <td>
                     <a href="{{ path('session_show', {'id': session.id}) }}">show</a>

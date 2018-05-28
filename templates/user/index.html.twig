@@ -47,3 +47,14 @@
 
     <a href="{{ path('user_new') }}">Create new</a>
 {% endblock %}
+
+
+{%block javascripts%}
+{{parent()}}
+<script src="/js/jquery.datatables.min.js"></script>
+<script>
+$("table").DataTable({
+order: [0, "desc"],
+});
+</script>
+{%endblock%}

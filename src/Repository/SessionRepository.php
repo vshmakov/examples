@@ -51,6 +51,8 @@ return $this->findOneBy($p);
 
 private function getNewByUserAndSid($u, $sid) { 
 if ($s=$this->findOneByUserAndSid($u, $sid)) return $s;
+$this->clearSessions();
+
 $s=(new Session())
 ->setUser($u)
 ->setSid(($this->ul->isGuest()) ? $sid : "");
@@ -60,4 +62,17 @@ $em->flush();
 return $s;
 }
 
+public function clearSessions() {
+$s=$this->q("select s from App:Session s
+left join s.attempts a
+where a.id is null")
+->getResult();
+$em=$this->em();
+
+foreach ($s as $i) {
+$em->remove($i);
+}
+
+$em->flush();
+}
 }

@@ -11,6 +11,7 @@
                 <th>Id</th>
                 <th>Username</th>
                 <th>Email</th>
+                <th>Count of attempts</th>
                 <th>AddTime</th>
                 <th>Sid</th>
                 <th>actions</th>
@@ -22,6 +23,7 @@
                 <td>{{ session.id }}</td>
                 <td>{{ session.user.username}}</td>
                 <td>{{ session.user.email}}</td>
+                <td>{{ session.attempts.count}}</td>
                 <td>{{ session.addTime ? session.addTime|date('Y-m-d H:i:s') : '' }}</td>
                 <td>{{ session.sid }}</td>
                 <td>

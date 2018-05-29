@@ -7,8 +7,8 @@
 
 {%if not canAppoint%}
 <div class="row">
-              <div class="card text-white bg-danger mb-3" style="max-width: 20rem;">
-                <div class="card-header">Внимание!</div>
+              <div class="text-white bg-danger mb-3 profile-index-card">
+                <div class="card-header" style="font-size: 130%;">Внимание!</div>
                 <div class="card-body">
                   <h4 class="card-title">Вы не можете выбирать профили настроек!</h4>
                   <p class="card-text">
@@ -26,8 +26,8 @@
 {{t("Профили по умолчанию", public, pR)}}
 {{t("Личные профили", profiles, pR)}}
 
-<div class="row mx-auto">
-<a class="btn btn-link" role="button" href="{{path("profile_new")}}">Создать новый профиль</a>
+<div class="row profile-index-create-div">
+<a class="profile-index-create-button btn btn-link" role="button" href="{{path("profile_new")}}">Создать новый профиль</a>
 </div>
 {%endblock%}
 

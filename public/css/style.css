@@ -5,7 +5,7 @@ html {
 
 body {
     margin-bottom: 10vh;
-background-color: #fafffa;
+background-color: #caffca;
 }
 
 footer {
@@ -17,4 +17,22 @@ footer {
 
 footer .row{
     background-color: #193441;
+}
+
+.profile-index-card {
+margin-bottom: 20px;
+background-color: blue;
+}
+
+.profile-index-create-div {
+margin: 0 auto;
+}
+
+.profile-index-create-button {
+font-size: 200%;
+}
+
+.profile-index-create-button:hover {
+color: orange;
+border: 3px solid yellow;
 }

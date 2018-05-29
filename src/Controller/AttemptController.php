@@ -72,7 +72,7 @@ return $this->render('attempt/solve.html.twig', [
 */
 public function last(AttR $attR) {
 if ($att=$attR->findLastActualByCurrentUser()) return $this->redirectToRoute('attempt_solve', ['id'=>$att->getId()]);
-return $this->render("attempt/last.html.twig");
+return $this->redirectToRoute("attempt_index");
 }
 
 /**
@@ -138,8 +138,8 @@ $row=createNumArr(getKeiesFromEntity($ks, $att->setER($attR)));
 
 $row[0]=sprintf('<a href="%s">%s</a>', $this->generateUrl("attempt_show", ["id"=>$att->getId()]), $row[0]);
 $row[1]="".$row[1];
-$row[2]=sprintf("%s / %s (%s сек/пример)", $row[2]->minSecFormat(), $att->getMaxTime()->minSecFormat(), $att->getAverSolveTime()->getTimestamp());
-$row[3]=sprintf("%s / %s", $row[3], $att->getExamplesCount());
+$row[2]=sprintf("%s из %s (%s сек/пример)", $row[2]->minSecFormat(), $att->getMaxTime()->minSecFormat(), $att->getAverSolveTime()->getTimestamp());
+$row[3]=sprintf("%s из %s", $row[3], $att->getExamplesCount());
 $o=$row[5];
 $c="red";
 if ($o==3) $c="orange";

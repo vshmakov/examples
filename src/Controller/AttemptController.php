@@ -133,8 +133,8 @@ $s=$q->get("start");
 $l=$q->get("length");
 
 foreach ($attR->findAllByCurrentUserAndLimit($s, $l) as $att) {
-$ks="title addTime solvedTime solvedExamplesCount errorsCount rating";
-$row=createNumArr(getKeiesFromEntity($ks, $att->setER($attR)));
+$ks="title addTime solvedTime solvedExamplesCount errorsCount rating finishTime";
+$row=createNumArr(getKeysFromEntity($ks, $att->setER($attR)));
 
 $row[0]=sprintf('<a href="%s">%s</a>', $this->generateUrl("attempt_show", ["id"=>$att->getId()]), $row[0]);
 $row[1]="".$row[1];
@@ -146,7 +146,9 @@ if ($o==3) $c="orange";
 if ($o==4) $c="yellow";
 if ($o==5) $c="green";
 $row[5]=sprintf('<span style="background: %s;">%s</span>', $c, $o);
-$d[]=$row;
+
+extract(makeVarKeys($row, 'r'));
+$d[]=[$r0, $r1, "$r6", $r2, $r3, $r4, $r5];
 }
 
 return $this->json([

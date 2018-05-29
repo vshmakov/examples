@@ -72,7 +72,7 @@ function entityGetter($v) {
 return preg_match("#^get[A-Z]#", $v) ? $v : "get".ucfirst($v);
 }
 
-function getKeiesFromEntity($s, $e) {
+function getKeysFromEntity($s, $e) {
 $d=[];
 
 foreach ((getArrByStr($s)) as $k) {
@@ -109,4 +109,11 @@ if ($k === null) return maxVal($max, minVal($min, $v));
 $out=(($v < $min) or ($v > $max));
 if ($k) return $out ? $max : $v;
  else return ($out) ? $min : $v;
+}
+
+function makeVarKeys($a, $s="x") {
+foreach ($a as $k=>$v) {
+$a[$s.$k]=$v;
+}
+return $a;
 }

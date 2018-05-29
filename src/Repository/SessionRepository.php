@@ -65,8 +65,8 @@ return $s;
 public function clearSessions() {
 $s=$this->q("select s from App:Session s
 left join s.attempts a
-where a.id is null and s.addTime < :dt")
-->setParameter("dt", (new \DateTime)->sub(new \DateInterval("PT12H")))
+where a.id is null and s.lastTime < :dt")
+->setParameter("dt", (new \DateTime)->sub(new \DateInterval("PT3H")))
 ->getResult();
 $em=$this->em();
 

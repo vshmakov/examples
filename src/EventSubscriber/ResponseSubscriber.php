@@ -5,7 +5,7 @@ namespace App\EventSubscriber;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 
-class LastVisitSubscriber implements EventSubscriberInterface
+class ResponseSubscriber implements EventSubscriberInterface
 {
 private $sR;
 

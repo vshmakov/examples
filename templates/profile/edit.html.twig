@@ -68,7 +68,7 @@
 <li>{{form_label(form.isPublic, "Общий профиль")}}{{form_widget(form.isPublic)}}</li>
 <li>{{form_label(form.author, "Создатель профиля")}}{{form_widget(form.author)}}</li>
 <li>{{form_label(form.addTime, "Время создания профиля")}}{{form_widget(form.addTime)}}</li>
-<ul>
+</ul>
 {%endif%}
 {%endblock%}
 
@@ -83,15 +83,17 @@
 {%endblock%}
 {{ form_end(form) }}
 
-
 {%block delete_button%}
 {%if is_granted("DELETE", profile)%}
 {{include("profile/_delete_form.html.twig")}}
 {%endif%}
 {%endblock%}
+
+<div class="profile-back-link">
 {%block back_link%}
-<a class="profile-back-link" href="{{path("profile_index")}}">Вернуться к списку профилей</a>
+<a href="{{path("profile_index")}}">Вернуться к списку профилей</a>
 {%endblock%}
+</div>
 
 </div>
 {% endblock %}

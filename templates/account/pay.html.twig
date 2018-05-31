@@ -51,7 +51,7 @@ inp.val(v);
 nm.html(n);
 
 var k=n <= h && v > 0;
-$(inp).add(nm).css("background", !k  ? "red" : "green");
+$(inp).add(nm).css("background", !k  ? "red" : "green").css("color", !k ? "black" : "red");
 var wc="btn-warning";
 if (k) s.removeClass(wc);
 else s.addClass(wc);

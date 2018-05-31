@@ -16,6 +16,7 @@
 {%endmacro%}
 
 {% block main%}
+<div class="profile-edit">
 {{ form_start(form) }}
 {{form_errors(form)}}
 {%from _self import list as list%}
@@ -73,7 +74,7 @@
 
 {%block save_button%}
 {%if is_granted(canEdit ?? "EDIT", profile)%}
-<div>    <button class="btn btn-success">Сохранить</button></div>
+    <button class="btn btn-success">Сохранить</button>
 {%endif%}
 
 {%if is_granted("COPY", profile)%}
@@ -82,15 +83,17 @@
 {%endblock%}
 {{ form_end(form) }}
 
-{%block back_link%}
-<a href="{{path("profile_index")}}">Вернуться к списку профилей</a>
-{%endblock%}
 
 {%block delete_button%}
 {%if is_granted("DELETE", profile)%}
 {{include("profile/_delete_form.html.twig")}}
 {%endif%}
 {%endblock%}
+{%block back_link%}
+<a class="profile-back-link" href="{{path("profile_index")}}">Вернуться к списку профилей</a>
+{%endblock%}
+
+</div>
 {% endblock %}
 
 {%block javascripts%}

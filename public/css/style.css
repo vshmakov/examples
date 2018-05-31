@@ -36,3 +36,21 @@ font-size: 200%;
 color: orange;
 border: 3px solid yellow;
 }
+
+.profile-edit ul {
+margin-left: 25px;
+margin-bottom: 35px;
+}
+
+.profile-edit {
+
+}
+
+.profile-edit button {
+margin-top: 10px;
+}
+
+.profile-back-link {
+color: green;
+font-size: 200%;
+}

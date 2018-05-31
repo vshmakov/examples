@@ -2,7 +2,7 @@
 
 use App\DT;
 
-define("PRICE", 97);
+define("PRICE", 49);
 define("TEST_DAYS", 3);
 
 function dt($dt) {

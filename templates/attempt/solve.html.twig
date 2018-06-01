@@ -3,9 +3,10 @@
 {%block title att.title%}
 
 {%block main%}
+<div class="attempt-solve">
 <form>
 <h1>Пример №<span id="num">*</span></h1>
-<div class="row">
+<div class="row example-area">
 <span>
 <b><span id="str">* + *</span> =</b>
 <input type="text" name="" id="" class="form-control">
@@ -15,12 +16,15 @@
 <button type="submit" class="btn btn-primary btn-lg">Ответить</button>
 </form>
 
+<div class="attempt-solve-statistic">
 <h2>Статистика</h2>
 <ul class="list-group">
 <li class="list-group-item">Ошибок: <span id="errors">*</span></li>
 	<li class="list-group-item">Осталось времени: <span id="timeRem">*</span></li>
 	<li class="list-group-item">Осталось примеров: <span id="exRem">*</span></li>
 	</ul>
+</div>
+</div>
 {%endblock%}
 
 {%block javascripts%}

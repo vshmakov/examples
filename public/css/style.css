@@ -46,7 +46,54 @@ margin-bottom: 35px;
 margin-top: 10px;
 }
 
-.profile-back-link {
+.profile-back-link a {
 color: green;
 font-size: 200%;
+}
+
+.profile-back-link a:hover {
+color: blue;
+}
+
+.email-link {
+color: green;
+}
+
+.example-area, .example-area input {
+font-size:35px;
+}
+
+.attempt-solve-statistic {
+float: right;
+margin-left: 100px;
+}
+
+.attempt-solve ul {
+font-size: 150%;
+}
+
+.attempt-solve form {
+float: left;
+}
+
+.attempt-show-extbl .error, .attempt-show-extbl h6  {
+color: red;
+}
+
+.attempt-show-extbl td {
+border-collapse: collapse;
+border: 1px solid black;
+}
+
+.attempt-show-extbl {
+float: right;
+margin-left: 200px;
+}
+
+.attempt-show-statistic {
+float: left;
+}
+
+.attempt-show-statistic ul {
+margin-top: -5px;
 }

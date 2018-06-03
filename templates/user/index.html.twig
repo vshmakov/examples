@@ -28,12 +28,12 @@
                 <td>{{ user.setER(uR).id }}</td>
                 <td>{{ user.username}}</td>
                 <td>{{ user.email}}</td>
-                <td>{{ user.addTime.shDbFormat}}</td>
+                <td>{{ user.addTime.dbFormat}}</td>
 {%set ls=user.sessions.last%}
-                <td>{{ ls ? ls.lastTime.shDbFormat : "-"}}</td>
+                <td>{{ ls ? ls.lastTime.dbFormat : "-"}}</td>
                 <td>{{ user.money}}</td>
                 <td>{{ user.allMoney}}</td>
-                <td>{{ user.limitTime.shDbFormat}}</td>
+                <td>{{ user.limitTime.dbFormat}}</td>
                 <td>{{ user.attemptsCount}}</td>
                 <td>{{ user.examplesCount}}</td>
                 <td>{{ user.profilesCount}}</td>

@@ -66,4 +66,16 @@ return $this->format("i:s");
 public function shDbFormat() {
 return $this->format("y-m-d H:i:s");
 }
+
+public function shOrdFormat() {
+return $this->format(sprintf("y-n-j G:%s:%s", $this->getMinutes(), $this->getSeconds()));
+}
+
+public function getMinutes() {
+return (int) ($this->getTimestamp() % HOUR / MIN);
+}
+
+public function getSeconds() {
+return $this->getTimeStamp() % MIN;
+}
 }

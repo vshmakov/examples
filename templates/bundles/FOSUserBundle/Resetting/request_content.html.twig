@@ -1,6 +1,6 @@
 {% trans_default_domain 'FOSUserBundle' %}
 
-<form action="{{ path('fos_user_resetting_send_email') }}" method="POST" class="fos_user_resetting_request">
+<form class="auth-form" action="{{ path('fos_user_resetting_send_email') }}" method="POST" class="fos_user_resetting_request">
 <h1>Сброс пароля</h1>
     <div>
         <label for="username">{{ 'resetting.request.username'|trans }}</label>
@@ -11,4 +11,6 @@
     </div>
 </form>
 
+<div class="auth-links">
 <a href="{{path("fos_user_security_login")}}">Вход</a>
+</div>

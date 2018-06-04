@@ -97,3 +97,34 @@ float: left;
 .attempt-show-statistic ul {
 margin-top: -5px;
 }
+
+.login-error {
+color: red;
+font-size: 200%;
+}
+
+.auth-links a {
+color: green;
+font-size: 200%;
+}
+
+.auth-links a:hover {
+color: orange;
+}
+
+.auth-form .btn {
+font-size: 200%;
+}
+
+.auth-form label {
+font-size: 200%;
+}
+
+.register-form .btn {
+background-color: yellow;
+border: 2px solid black;
+}
+
+.register-form .btn:hover {
+background-color: green;
+}

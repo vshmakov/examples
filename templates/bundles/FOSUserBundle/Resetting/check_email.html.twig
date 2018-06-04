@@ -1,13 +1,16 @@
 {% extends "@FOSUser/layout.html.twig" %}
 
-{%block title "сброс пароля"%}
+{%block title "Письмо отправлено"%}
 
 {% trans_default_domain 'FOSUserBundle' %}
 
 {% block fos_user_content %}
 <h1>сброс пароля</h1>
-<p>
+<p class="resetting-email">
 {{ 'resetting.check_email'|trans({'%tokenLifetime%': tokenLifetime})|nl2br }}
 </p>
+
+<div class="auth-links">
 <a href="{{path("fos_user_resetting_request")}}" role="button" class="btn btn-link">Попробовать ещё раз</a>
+</div>
 {% endblock %}

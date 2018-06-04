@@ -19,6 +19,10 @@ footer .row{
     background-color: #193441;
 }
 
+main {
+font-size: 33px;
+}
+
 .profile-index-card {
 margin-bottom: 20px;
 background-color: blue;
@@ -127,4 +131,13 @@ border: 2px solid black;
 
 .register-form .btn:hover {
 background-color: green;
+}
+
+.resetting-email {
+font-size: 200%;
+}
+
+.register-form ul {
+color: red;
+font-size: 200%;
 }

@@ -12,6 +12,9 @@
 {% endblock %}
 
 {% block body_html %}
+{{include("@FOSUser/email-style.html.twig")}}
+
+<div class="body">
 <h2>Приветствуем, {{user.username}}</h2>
 <p>
 Для сброса пароля, пожалуйста, пройдите по <a href="{{confirmationUrl}}">ссылке</a> 
@@ -23,4 +26,5 @@
 команда сайта.
 </em>
 </p>
+</div>
 {% endblock %}

@@ -34,6 +34,7 @@ margin: 0 auto;
 
 .profile-index-create-button {
 font-size: 200%;
+color: green;
 }
 
 .profile-index-create-button:hover {
@@ -120,8 +121,10 @@ color: orange;
 font-size: 200%;
 }
 
-.auth-form label {
-font-size: 200%;
+#remember_me {
+}
+
+.login-rem {
 }
 
 .register-form .btn {

@@ -1,7 +1,7 @@
 {% extends 'main.html.twig' %}
 
 {%set isGuest=not is_granted("IS_AUTHENTICATED_REMEMBERED")%}
-{% block title %}{{isGuest ? "Добро пожаловать!" : "Главная страница"}}{% endblock %}
+{% block title %}{{isGuest ? "Сервис по улучшению навыков счёта" : "Главная страница"}}{% endblock %}
 
 {%block main%}
 <content>

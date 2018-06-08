@@ -26,9 +26,11 @@
 {{t("Профили по умолчанию", public, pR)}}
 {{t("Личные профили", profiles, pR)}}
 
+{%if is_granted("CREATE_PROFILE")%}
 <div class="row profile-index-create-div">
 <a class="profile-index-create-button btn " role="button" href="{{path("profile_new")}}">Создать новый профиль</a>
 </div>
+{%endif%}
 {%endblock%}
 
 {%block javascripts%}

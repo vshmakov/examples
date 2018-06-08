@@ -32,7 +32,7 @@ return $this->checkRight($attribute, $subject, $token);
     }
 
 private function canCreateProfile() {
-return ($this->canCreate(), "abc");
+return $this->canCreate();
 }
 
 private function canCreate() {

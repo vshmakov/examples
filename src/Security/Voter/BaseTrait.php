@@ -9,9 +9,17 @@ private $subj;
 
 private function checkRight($p, $o, $t) {
 $this->subj=$o;
-$m=getMethodName(strtolower($p), "can");
+$m=$this->getHandlerName($p);
 if (!method_exists($this, $m)) throw new \Exception(sprintf("%s has not %s priv handler", self::class, $p));
-return method_exists($this, $m) ? $this->$m($o, $t) : false;
+return $this->hasHandler($p) ? $this->$m($o, $t) : false;
+}
+
+private function getHandlerName($s) {
+return getMethodName(getVarName($s), "can");
+}
+
+private function hasHandler($s) {
+return method_exists($this, $this->getHandlerName($s));
 }
 
 private function supportsArr(string $attribute, array $arr):bool {

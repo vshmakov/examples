@@ -117,3 +117,14 @@ $a[$s.$k]=$v;
 }
 return $a;
 }
+
+function getVarName($s) {
+$a=explode("_", strtolower($s));
+$v=array_shift($a);
+
+foreach ($a as $t) {
+$v.=ucfirst($t);
+}
+
+return $v;
+}

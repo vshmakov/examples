@@ -1,6 +1,7 @@
 
 ###> symfony/framework-bundle ###
 /.env
+/*.bat
 /public/bundles/
 /var/
 /vendor/

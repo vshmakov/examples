@@ -23,6 +23,10 @@ body {
 font-size: 32px;
 }
 
+.navbar-brand {
+font-size: 45px;
+}
+
 .profile-index-card {
 margin-bottom: 20px;
 background-color: blue;

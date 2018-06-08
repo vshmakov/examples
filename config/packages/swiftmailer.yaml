@@ -1,6 +1,7 @@
 swiftmailer:
+    transport: '%env(MAILER_TRANSPORT)%'
     url: '%env(MAILER_URL)%'
     spool: { type: 'memory' }
 
 parameters:
-    mailer_user: "shm.v.a@yandex.ru"
+    mailer_user: '%env(MAILER_USER)%'

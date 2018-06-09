@@ -4,6 +4,7 @@ use App\DT;
 
 define("PRICE", 49);
 define("TEST_DAYS", 3);
+define("RECHARGE_TITLE", "Пополнение счёта exmasters.ru пользователя ");
 
 function dt($dt) {
 return DT::createFromDT($dt);

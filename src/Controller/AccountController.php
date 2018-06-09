@@ -18,7 +18,6 @@ use App\Service\UserLoader;
 class AccountController extends MainController
 {
 private $u;
-private $t="Пополнение счёта exmasters.ru пользователя ";
 
 public function __construct(UserRepository $uR, UserLoader $ul) {
 $this->u=$ul->getUser()->setER($uR);
@@ -29,27 +28,8 @@ $this->u=$ul->getUser()->setER($uR);
 */
 public function recharge() {
 return $this->render("account/Recharge.html.twig", [
-"t"=>$this->t,
+"t"=>RECHARGE_TITLE,
 ]);
-}
-
-    /**
-     * @Route("/request-yandex", name="account_request", methods="POST")
-     */
-public function request(Request $req) {
-$r=$req->request;
-$code=400;
-$u=preg_match("#^".$this->t."(.+)$#u", $r->get(""), $arr) ? $uR->findOneByEmail($arr[1]) : null;
-$un=$r->get("unaccepted");
-
-if ($u && $op=$r->get("operation_id") && $un != "true") {
-$wa=$r->get("withdraw_amount");
-$u->addMoney($wa);
-$this->em()->flush();
-$code=200;
-}
-
-return new Response("", $code);
 }
 
 /**

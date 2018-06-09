@@ -18,7 +18,7 @@ use App\Service\UserLoader;
 class AccountController extends MainController
 {
 private $u;
-private $t="Пополнение счёта пользователя ";
+private $t="Пополнение счёта exmasters.ru пользователя ";
 
 public function __construct(UserRepository $uR, UserLoader $ul) {
 $this->u=$ul->getUser()->setER($uR);

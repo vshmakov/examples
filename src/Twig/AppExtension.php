@@ -27,6 +27,7 @@ $this->gl=[
 "hasActualAttempt"=>$hasAtt,
 "PRICE"=>PRICE,
 "isGuest"=>$ul->isGuest(),
+"FEEDBACK_EMAIL"=>"post@exmasters.ru",
 ];
 }
 

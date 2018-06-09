@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %} || ExMaster || Решение примеров</title>
+        <title>{% block title %}Welcome!{% endblock %} || ExMasters || Решение примеров</title>
         {% block stylesheets %}
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/style.css">
@@ -84,7 +84,11 @@ var P={{(jsParams ?? {})|json_encode|raw}};
 <div class="row">
 {%set y=date()|date("Y")%}
 <small>
-<em>© {{y != 2018 ? "2018 - " : ""}} {{y}}, Вадим Шмаков</em>
+<em>
+© {{y != 2018 ? "2018 - " : ""}} {{y}}, VSH-Studio
+<hr>
+Обратная связь: <a href="mailto:{{FEEDBACK_EMAIL}}">{{FEEDBACK_EMAIL}}</a>
+</em>
 </small>
 </div>
 </footer>

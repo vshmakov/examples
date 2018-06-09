@@ -34,7 +34,7 @@ return $this->render("account/Recharge.html.twig", [
 }
 
     /**
-     * @Route("/request", name="account_request", methods="POST")
+     * @Route("/request-yandex", name="account_request", methods="POST")
      */
 public function request(Request $req) {
 $r=$req->request;

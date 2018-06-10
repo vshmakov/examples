@@ -46,10 +46,12 @@ return $o;
 public function getRandEx($sign, $set, $prevs) {
 $m=$this->actName($sign);
 $k=0;
+$anK=prob(80);
+$deltK=prob(70);
 
 for ($i=1; $i<=20; $i++) {
 extract($this->$m($set));
-$as=$this->assess($a, $b, $sign, $set, $prevs);
+$as=$this->assess($a, $b, $sign, $set, $prevs, $anK, $deltK);
 if ($as > $k) {
 $k=$as;
 $nums=["first"=>$a, "second"=>$b];
@@ -59,7 +61,7 @@ $nums=["first"=>$a, "second"=>$b];
 return (object) ($nums+["sign"=>$sign]);
 }
 
-private function assess($a, $b, $sign, $set, $prevs) {
+private function assess($a, $b, $sign, $set, $prevs, $anK, $deltK) {
 $k=100;
 $rk=$sk=$dk=0;
 $ec=count($prevs);
@@ -69,17 +71,17 @@ if ($p->getFirst() == $a && $p->getSecond() == $b && $p->getSign() == $sign) {
 $rk=1/$ec*60;
 }
 
-if ((self::solve($a, $b, $sign) == $p->getAnswer()) && prob(80)) {
+if ((self::solve($a, $b, $sign) == $p->getAnswer()) && $anK) {
 $sk+=1/$ec*30;
 }
 }
 
-if (prob(70)) {
-$dk=round($this->dist($a, $b, $sign, $set)*10/100);
+if ($deltK) {
+$dk=($this->dist($a, $b, $sign, $set)*10/100/($ec**0.2));
 }
 
 $k-=$rk+$sk+$dk;
-show($a, $b, $rk, $sk, $dk, $k);
+
 return $k;
 }
 

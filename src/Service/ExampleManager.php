@@ -47,7 +47,7 @@ public function getRandEx($sign, $set, $prevs) {
 $m=$this->actName($sign);
 $k=0;
 
-for ($i=1; $i<=5; $i++) {
+for ($i=1; $i<=20; $i++) {
 extract($this->$m($set));
 $as=$this->assess($a, $b, $sign, $set, $prevs);
 if ($as > $k) {

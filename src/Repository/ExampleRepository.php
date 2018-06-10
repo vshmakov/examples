@@ -6,16 +6,19 @@ use App\Entity\Example;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use App\Service\ExampleManager as ExMNG;
+use App\Service\UserLoader;
 
 class ExampleRepository extends ServiceEntityRepository
 {
 use BaseTrait;
 private $exMng;
+private $ul;
 
-   public function __construct(RegistryInterface $registry, ExMng $m)
+   public function __construct(RegistryInterface $registry, ExMng $m, UserLoader $ul)
     {
         parent::__construct($registry, Example::class);
 $this->exMng=$m;
+$this->ul=$ul;
     }
 
 public function findLastUnansweredByAttempt($att) {
@@ -58,7 +61,14 @@ $ex->setFirst($l->getFirst())->setSecond($l->getSecond())->setSign($l->getSign()
 ($set=$att->getSettings()->getData());
 $m=$this->exMng;
 $s=$m->getRandSign($set);
-$d=$m->getRandEx($s, $set, $this->findBy(["attempt"=>$att, "sign"=>$s, "isRight"=>true]));
+$exs=$this->q("select e from App:Example e
+join e.attempt a
+join a.session s
+join s.user u
+where u = :u and a.addTime > :dt")
+->setParameters(["u"=>$this->ul->getUser(), "dt"=>(new \DateTime)->sub(new \DateInterval("P7D"))])
+->getResult();
+$d=$m->getRandEx($s, $set, $exs);
 $ex->setFirst($d->first)->setSecond($d->second)->setSign($d->sign);
 }
 $em=$this->em();

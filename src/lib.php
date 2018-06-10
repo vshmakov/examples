@@ -6,6 +6,10 @@ define("PRICE", 49);
 define("TEST_DAYS", 3);
 define("RECHARGE_TITLE", "Пополнение счёта exmasters.ru пользователя ");
 
+function show(...$vars) {
+dump(implode(' - ', $vars));
+}
+
 function dt($dt) {
 return DT::createFromDT($dt);
 }
@@ -128,4 +132,15 @@ $v.=ucfirst($t);
 }
 
 return $v;
+}
+
+function distPerc(float $v, float $f, float $t) {
+$o=($t-$f)/2;
+$d=($o-$v);
+$r=round(abs($d)/abs($o)*100);
+return $r;
+}
+
+function prob($p) {
+return mt_rand(1, 100) <= $p;
 }

@@ -51,13 +51,14 @@ return $this->findLastUnansweredByAttempt($att) ?? $this->getNew($att);
 }
 
 public function getNew($att) {
-$ex=new Example();
-$ex->setAttempt($att);
+$ex=(new Example)->setAttempt($att);
 if ($att->getSettings()->isDemanding() && ($l=$this->findLastByAttempt($att)) && !$l->isRight()) {
 $ex->setFirst($l->getFirst())->setSecond($l->getSecond())->setSign($l->getSign());
 } else {
 ($set=$att->getSettings()->getData());
-$d=$this->exMng->getRandEx($set);
+$m=$this->exMng;
+$s=$m->getRandSign($set);
+$d=$m->getRandEx($s, $set, $this->findBy(["attempt"=>$att, "sign"=>$s, "isRight"=>true]));
 $ex->setFirst($d->first)->setSecond($d->second)->setSign($d->sign);
 }
 $em=$this->em();

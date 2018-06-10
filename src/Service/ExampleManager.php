@@ -43,15 +43,71 @@ if ($r >= $x[$i]) $o=$i;
 return $o;
 }
 
-public function getRandEx($set) {
-$sign=$this->sign($set);
-$m=[1=>"add", "sub", "mult", "div"][$sign];
+public function getRandEx($sign, $set, $prevs) {
+$m=$this->actName($sign);
+$k=0;
+
+for ($i=1; $i<=5; $i++) {
 extract($this->$m($set));
+$as=$this->assess($a, $b, $sign, $set, $prevs);
+if ($as > $k) {
+$k=$as;
 $nums=["first"=>$a, "second"=>$b];
+}
+}
+
 return (object) ($nums+["sign"=>$sign]);
 }
 
-private function sign($set) {
+private function assess($a, $b, $sign, $set, $prevs) {
+if (prob(15)) return 100;
+$k=100;
+$rk=$sk=0;
+$ec=$set["examplesCount"];
+
+foreach ($prevs as $p) {
+if ($p->getFirst() == $a && $p->getSecond() == $b && $p->getSign() == $sign) {
+$rk=1/$ec*60;
+}
+
+if (self::solve($a, $b, $sign) == $p->getAnswer()) {
+$sk+=1/$ec*30;
+}
+}
+
+$dk=round($this->dist($a, $b, $sign, $set)*10/100);
+$k-=$rk+$sk+$dk;
+
+show($a, $b, $rk, $sk, $dk, $k);
+return $k;
+}
+
+private function dist($a, $b, $sign, $set) {
+if (prob(50)) return 0;
+
+$act=($this->actName($sign));
+foreach (["F", "S", ""] as $n) {
+foreach (["Min", "Max"] as $m) {
+$v=lcfirst($n.$m);
+$$v=$set[$act.$n.$m];
+}
+}
+
+$k=0;
+$k+=distPerc($a, $fMin, $fMax);
+$k+=distPerc($b, $sMin, $sMax);
+$an=self::solve($a, $b, $sign);
+//$k+=distPerc($an, $min, $max);
+$k=round(($k/3)**0.7);
+
+return $k;
+}
+
+private function actName($sign) {
+return [1=>"add", "sub", "mult", "div"][$sign];
+}
+
+public function getRandSign($set) {
 $rand=mt_rand(1, 100);
 $k=0;
 $sign=1;

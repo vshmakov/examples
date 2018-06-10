@@ -60,9 +60,8 @@ return (object) ($nums+["sign"=>$sign]);
 }
 
 private function assess($a, $b, $sign, $set, $prevs) {
-if (prob(15)) return 100;
 $k=100;
-$rk=$sk=0;
+$rk=$sk=$dk=0;
 $ec=$set["examplesCount"];
 
 foreach ($prevs as $p) {
@@ -70,21 +69,21 @@ if ($p->getFirst() == $a && $p->getSecond() == $b && $p->getSign() == $sign) {
 $rk=1/$ec*60;
 }
 
-if (self::solve($a, $b, $sign) == $p->getAnswer()) {
+if ((self::solve($a, $b, $sign) == $p->getAnswer()) && prob(70)) {
 $sk+=1/$ec*30;
 }
 }
 
+if (prob(70)) {
 $dk=round($this->dist($a, $b, $sign, $set)*10/100);
-$k-=$rk+$sk+$dk;
+}
 
+$k-=$rk+$sk+$dk;
 show($a, $b, $rk, $sk, $dk, $k);
 return $k;
 }
 
 private function dist($a, $b, $sign, $set) {
-if (prob(50)) return 0;
-
 $act=($this->actName($sign));
 foreach (["F", "S", ""] as $n) {
 foreach (["Min", "Max"] as $m) {

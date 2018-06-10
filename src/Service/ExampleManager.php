@@ -64,7 +64,7 @@ return (object) ($nums+["sign"=>$sign]);
 private function assess($a, $b, $sign, $set, $prevs, $anK, $deltK) {
 $k=100;
 $rk=$sk=$dk=0;
-$ec=count($prevs);
+$ec=count($prevs) ?: 1;
 
 foreach ($prevs as $p) {
 if ($p->getFirst() == $a && $p->getSecond() == $b && $p->getSign() == $sign) {

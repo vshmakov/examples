@@ -62,14 +62,14 @@ return (object) ($nums+["sign"=>$sign]);
 private function assess($a, $b, $sign, $set, $prevs) {
 $k=100;
 $rk=$sk=$dk=0;
-$ec=$set["examplesCount"];
+$ec=count($prevs);
 
 foreach ($prevs as $p) {
 if ($p->getFirst() == $a && $p->getSecond() == $b && $p->getSign() == $sign) {
 $rk=1/$ec*60;
 }
 
-if ((self::solve($a, $b, $sign) == $p->getAnswer()) && prob(70)) {
+if ((self::solve($a, $b, $sign) == $p->getAnswer()) && prob(80)) {
 $sk+=1/$ec*30;
 }
 }

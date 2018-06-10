@@ -66,9 +66,9 @@ join e.attempt a
 join a.session s
 join s.user u
 where u = :u and a.addTime > :dt")
-->setParameters(["u"=>$this->ul->getUser(), "dt"=>(new \DateTime)->sub(new \DateInterval("P7D"))])
+->setParameters(["u"=>$this->ul->getUser(), "dt"=>(new \DateTime)->sub(new \DateInterval("P3D"))])
 ->getResult();
-$d=$m->getRandEx($s, $set, $exs);
+$d=$m->getRandEx($s, $set, ($exs));
 $ex->setFirst($d->first)->setSecond($d->second)->setSign($d->sign);
 }
 $em=$this->em();

@@ -29,6 +29,11 @@ $this->ch=$ch;
     }
 
 public function findLastActualByCurrentUser() {
+$att=$this->findLastByCurrentUser();
+return ($this->ch->isGranted("SOLVE", $att)) ? $att : null;
+}
+
+public function findLastByCurrentUser() {
 $ul=$this->ul;
 $w=(!$ul->isGuest()) ? "s.user = :u" : "a.session = :s";
 $q=$this->q("select a from App:Attempt a
@@ -37,7 +42,7 @@ where $w
 order by a.addTime desc");
 !$ul->isGuest() ? $q->setParameter("u", $ul->getUser()) : $q->setParameter("s", $this->sR->findOneByCurrentUserOrGetNew());
 $att=$this->v($q);
-return ($this->ch->isGranted("SOLVE", $att)) ? $att : null;
+return $att;
 }
 
 public function getTitle($att) {

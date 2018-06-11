@@ -70,6 +70,7 @@ $l=TEST_DAYS;
 $this->limitTime=(new \DateTime())->add(new \DateInterval("P{$l}D"));
 $this->addTime=new \DateTime;
 $this->codes = new ArrayCollection();
+$this->money=DEFAULT_MONEY;
     }
 
     public function getId()

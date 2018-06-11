@@ -4,8 +4,12 @@ namespace App;
 
 class DT extends \DateTime {
 public static function createFromFormat($f, $s, $o=null) {
-$dt=DateTime::createFromFormat($f, $s);
+$dt=\DateTime::createFromFormat($f, $s);
 return ($dt && $dt->getTimestamp() > 0) ? self::createFromDT($dt) : false;
+}
+
+public function createFromDbFormat($s) {
+return self::createFromFormat("Y-m-d H:i:s", $s);
 }
 
 public static function createFromDT($dt) {

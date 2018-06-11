@@ -4,6 +4,7 @@ use App\DT;
 
 define("PRICE", 49);
 define("TEST_DAYS", 3);
+define("DEFAULT_MONEY", 50);
 define("RECHARGE_TITLE", "Пополнение счёта exmasters.ru пользователя ");
 
 function show(...$vars) {

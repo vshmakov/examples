@@ -34,4 +34,20 @@ $this->gl=[
 public function getGlobals() {
 return $this->gl;
 }
+
+public function getFunctions() {
+return [
+new TwigFunction("addTimeNumber", [$this, "getAddTimeNumber"]),
+];
+}
+
+public function getAddTimeNumber(\DateTimeInterface $dt, array $ents) {
+$n=count($ents);
+
+foreach ($ents as $e) {
+if ($dt->getTimestamp() < $e->getAddTime()->getTimestamp()) $n--;
+}
+
+return $n;
+}
 }

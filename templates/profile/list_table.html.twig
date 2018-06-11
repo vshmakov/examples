@@ -8,6 +8,7 @@
 <table class="table table-striped table-bordered">
 <thead class="thead-light">
 	<th>Выбрать</th>
+<th>№</th>
 	<th>Описание</th>
 <th>Время создания</th>
 {%if isA%}
@@ -21,6 +22,7 @@
 {%for profile in profiles%}
 <tr>
 <td><input type="radio" class="form-check-input" value="{{profile.id}}" data-href="{{path("profile_appoint", {"id": profile.id})}}"></td>
+<td>{{addTimeNumber(profile.addTime, profiles)}}</td>
 	<td><a href="{{path('profile_edit', {'id':profile.id})}}">{{profile.setER(pR).title}}</a></td>
 <td>{{profile.addTime}}</td>
 {%if isA%}

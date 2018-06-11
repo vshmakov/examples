@@ -42,6 +42,11 @@ border: 1px solid black;
 
 }
 
+table {
+text-align: center;
+vertical-align: middle;
+}
+
 .profile-index-card {
 margin-bottom: 20px;
 }

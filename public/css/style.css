@@ -6,6 +6,7 @@ html {
 body {
     margin-bottom: 10vh;
 background-color: #caffca;
+font-size: 20px;
 }
 
 footer {
@@ -19,17 +20,30 @@ footer .row{
     background-color: #193441;
 }
 
-body {
-font-size: 32px;
+a:hover {
+text-decoration: underline;
 }
 
-.navbar-brand {
-font-size: 45px;
+.main-menu {
+border-bottom: 1px solid black;
+}
+
+main {
+margin-top: 15px;
+margin-bottom: 15px;
+border: 1px solid black;
+}
+
+footer {
+border: 1px solid black;
+}
+
+.ya-share2 {
+
 }
 
 .profile-index-card {
 margin-bottom: 20px;
-background-color: blue;
 }
 
 .profile-index-create-div {

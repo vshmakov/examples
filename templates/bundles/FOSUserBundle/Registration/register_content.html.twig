@@ -2,7 +2,26 @@
 
 <div class="auth-form register-form">
 {{ form_start(form, {'method': 'post', 'action': path('fos_user_registration_register'), 'attr': {'class': 'fos_user_registration_register'}}) }}
-    {{ form_widget(form) }}
+<table>
+<tr>
+<td>Логин</td>
+<td>{{form_widget(form.username)}}</td>
+</tr>
+<tr>
+<td>Электронная почта</td>
+<td>{{form_widget(form.email)}}</td>
+</tr>
+<tr>
+<td>Пароль</td>
+<td>{{form_widget(form.plainPassword.first)}}</td>
+</tr>
+<tr>
+<td>Подтвердите пароль</td>
+<td>{{form_widget(form.plainPassword.second)}}</td>
+</tr>
+</table>
+{{form_widget(form)}}
+
     <div>
         <input type="submit" class="btn  " value="{{ 'registration.submit'|trans }}" />
     </div>

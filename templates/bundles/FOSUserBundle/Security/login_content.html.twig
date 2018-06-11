@@ -9,12 +9,16 @@
         <input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />
     {% endif %}
 
-    <label for="username">{{ 'resetting.request.username'|trans }}</label>
-    <input type="text" class="form-control" id="username" name="_username" value="{{ last_username }}" required="required" autocomplete="username" />
-
-    <label for="password">{{ 'security.login.password'|trans }}</label>
-    <input type="password" id="password" class="form-control" name="_password" required="required" autocomplete="current-password" />
-
+<table>
+<tr>
+<td>    <label for="username">{{ 'resetting.request.username'|trans }}</label></td>
+<td>    <input type="text" class="form-control" id="username" name="_username" value="{{ last_username }}" required="required" autocomplete="username" /></td>
+</tr>
+<tr>
+<td>    <label for="password">{{ 'security.login.password'|trans }}</label></td>
+<td>    <input type="password" id="password" class="form-control" name="_password" required="required" autocomplete="current-password" /></td>
+</tr>
+</table>
     <input type="checkbox" id="remember_me" name="_remember_me" value="on" />
     <label class="login-rem" for="remember_me">{{ 'security.login.remember_me'|trans }}</label>
 

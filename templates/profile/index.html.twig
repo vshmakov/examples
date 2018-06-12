@@ -4,11 +4,11 @@
 
 {%block main%}
 {%from "profile/list_table.html.twig" import list_table as  t%}
-
+<div class="profile-index">
 {%if not canAppoint%}
 <div class="row">
               <div class="text-white bg-danger mb-3 profile-index-card">
-                <div class="card-header" style="font-size: 130%;">Внимание!</div>
+                <div class="card-header">Внимание!</div>
                 <div class="card-body">
                   <h4 class="card-title">Вы не можете выбирать профили настроек!</h4>
                   <p class="card-text">
@@ -28,9 +28,10 @@
 
 {%if is_granted("CREATE_PROFILE")%}
 <div class="row profile-index-create-div">
-<a class="profile-index-create-button btn " role="button" href="{{path("profile_new")}}">Создать новый профиль</a>
+<a class="profile-index-create-button btn active-btn" role="button" href="{{path("profile_new")}}">Создать новый профиль</a>
 </div>
 {%endif%}
+</div>
 {%endblock%}
 
 {%block javascripts%}

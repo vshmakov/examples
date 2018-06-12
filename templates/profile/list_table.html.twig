@@ -19,10 +19,10 @@
 {%endif%}
 </thead>
 <tbody>
-{%for profile in profiles%}
+{%for profile in sortProfiles(profiles)%}
 <tr>
 <td><input type="radio" class="form-check-input" value="{{profile.id}}" data-href="{{path("profile_appoint", {"id": profile.id})}}"></td>
-<td>{{addTimeNumber(profile.addTime, profiles)}}</td>
+<td>{{addTimeNumber(profile, profiles)}}</td>
 	<td><a href="{{path('profile_edit', {'id':profile.id})}}">{{profile.setER(pR).title}}</a></td>
 <td>{{profile.addTime}}</td>
 {%if isA%}

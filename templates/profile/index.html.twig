@@ -37,7 +37,9 @@
 {%block javascripts%}
 {{parent()}}
 <script>
-var r=$("[type=radio]").click(function (e) {
+var r=$("[type=radio]");
+r.click(function (e) {
+r.attr("disabled", true);
 location.href=$(e.target).data("href");
 });
 r.filter("[value="+P.current+"]").attr("checked", true);

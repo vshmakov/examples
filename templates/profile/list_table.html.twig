@@ -1,12 +1,12 @@
 {%macro list_table(t, profiles, pR)%}
-<div class="row">
+<div class="">
 <h1>{{t}}</h1>
 {#{%set pR=app.pR%}#}
 {%set isA=is_granted("ROLE_ADMIN")%}
 {%set canDel=is_granted("DELETE", profiles)%}
 
-<table class="table table-striped table-bordered">
-<thead class="thead-light">
+<table class="table table-striped} tbl-bordered">
+<thead class="thead-dark">
 	<th>Выбрать</th>
 <th>№</th>
 	<th>Описание</th>

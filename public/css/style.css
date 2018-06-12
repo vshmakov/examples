@@ -31,6 +31,7 @@ border-bottom: 1px solid black;
 main {
 margin-top: 15px;
 margin-bottom: 15px;
+padding: 40px;
 border: 1px solid black;
 }
 
@@ -39,12 +40,17 @@ border: 1px solid black;
 }
 
 .ya-share2 {
-
+margin-left: 100px;
+margin-top: 10px;
 }
 
 table {
 text-align: center;
 vertical-align: middle;
+}
+
+.profile-index table {
+margin-left: 0px;
 }
 
 /*
@@ -166,4 +172,9 @@ color: #f55;
 .card-header {
 font-size: 130%;
 font-weight: bold;
+}
+
+.tbl-bordered td, .tbl-bordered th, .tbl-bordered thead{
+border-collapse: collapse;
+border: 1px solid black;
 }

@@ -26,6 +26,12 @@ text-decoration: underline;
 
 .main-menu {
 border-bottom: 1px solid black;
+    background-color: #193441;
+font-size: 19px;
+}
+
+.main-menu a {
+color: white;
 }
 
 main {

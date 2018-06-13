@@ -4,7 +4,7 @@
 {% block title %}{{profile.title~cur}}{% endblock %}
 
 {%macro list(f, t, inps)%}
-<div class="row">
+<div class="">
 <h2>{{t}}</h2>
 <table class="prf-stg-grp">
 {%for d, k in inps%}
@@ -53,6 +53,8 @@
 </table>
 </div>
 
+<div>
+<div class="set-group">
 {{list(form, "Сложение", {
  "Минимальное первое слагаемое": "addFMin", "Максимальное первое слагаемое": "addFMax",
  "Минимальное второе слагаемое": "addSMin", "Максимальное второе слагаемое": "addSMax",
@@ -64,7 +66,9 @@
 "Минимальное вычитаемое": "subSMin", "Максимальное вычитаемое": "subSMax", 
 "Минимальная разность": "subMin", "Максимальная разность": "subMax", 
 "Процент примеров на вычитание": "subPerc"})}}
+</div>
 
+<div class="set-group">
 {{list(form, "Умножение", {
 "Минимальный первый множитель": "multFMin",  "Максимальный первый множитель": "multFMax", 
 "Минимальный второй множитель": "multSMin",  "Максимальный второй множитель": "multSMax", 
@@ -76,6 +80,8 @@
 "Минимальный делитель": "divSMin", "Максимальный делитель": "divSMax", 
 "Минимальная частное": "divMin", "Максимальное частное": "divMax", 
 "Процент примеров на деление": "divPerc"})}}
+</div>
+</div>
 
 {%block advanced_parameters%}
 {%if is_granted("ROLE_ADMIN")%}

@@ -21,7 +21,11 @@
 <tbody>
 {%for profile in sortProfiles(profiles)%}
 <tr>
-<td><input type="radio" class="form-check-input" value="{{profile.id}}" data-href="{{path("profile_appoint", {"id": profile.id})}}"></td>
+<td>
+<div		 class="profile-check-radio">
+<input type="radio" class="form-check-input" value="{{profile.id}}" data-href="{{path("profile_appoint", {"id": profile.id})}}">
+</div>
+</td>
 <td>{{addTimeNumber(profile, profiles)}}</td>
 	<td><a href="{{path('profile_edit', {'id':profile.id})}}">{{profile.setER(pR).title}}</a></td>
 <td>{{profile.addTime}}</td>

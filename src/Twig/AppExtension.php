@@ -40,6 +40,7 @@ return [
 new TwigFunction("addTimeNumber", [$this, "getAddTimeNumber"]),
 new TwigFunction("sortByAddTime", [$this, "sortByAddTime"]),
 new TwigFunction("sortProfiles", [$this, "sortProfiles"]),
+new TwigFunction("getIpInfo", '\App\Service\IpInformer::getInfoByIp'),
 ];
 }
 

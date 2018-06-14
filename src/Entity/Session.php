@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Service\IpInformer as IpInf;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\SessionRepository")
@@ -133,4 +134,10 @@ return $this;
 
         return $this;
     }
+
+public function getIpInfo() {
+static $a=[];
+$ip=$this->sid;
+return $a[$ip] ?? $a[$ip]=IpInf::getInfoByIp($ip);
+}
 }

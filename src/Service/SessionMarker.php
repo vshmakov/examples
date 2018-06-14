@@ -17,9 +17,7 @@ $this->req=$rs->getMasterRequest();
 }
 
 public function getKey() {
-$ip=$this->req->getClientIp();
-//$val=$this->getRand();
-$val=$ip;
+$val=$this->req ? $this->req->getClientIp() : $this->getRand();
 
 $s=$this->s;
 $key="VISIT_KEY";

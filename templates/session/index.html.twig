@@ -15,6 +15,9 @@
                 <th>AddTime</th>
                 <th>Last time</th>
                 <th>Sid</th>
+                <th>Country</th>
+                <th>Region</th>
+                <th>City</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -28,7 +31,10 @@
                 <td>{{ session.addTime ? session.addTime.dbFormat : "" }}</td>
                 <td>{{ session.lastTime ? session.lastTime.dbFormat : "" }}</td>
                 <td>{{ session.sid }}</td>
-                <td>
+                <td>{{ session.ipInfo.countryName ?? "-"}}</td>
+                <td>{{ session.ipInfo.stateProv ?? "-"}}</td>
+                <td>{{ session.ipInfo.city ?? "-"}}</td>
+<td>
                     <a href="{{ path('session_show', {'id': session.id}) }}">show</a>
                     <a href="{{ path('session_edit', {'id': session.id}) }}">edit</a>
                 </td>

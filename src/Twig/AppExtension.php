@@ -38,6 +38,7 @@ return $this->gl;
 public function getFunctions() {
 return [
 new TwigFunction("addTimeNumber", [$this, "getAddTimeNumber"]),
+new TwigFunction("getIpInfo", '\App\Service\IpInformer::getInfoByIp'),
 ];
 }
 

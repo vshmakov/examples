@@ -1,0 +1,7 @@
+{% extends 'session/index.html.twig' %}
+
+{% block title %}Sessions of {{username}}{% endblock %}
+
+{%block bottom_links%}
+    <a href="{{ path('user_index') }}">Back to user index</a>
+{%endblock%}

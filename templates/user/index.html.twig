@@ -47,6 +47,7 @@
 </ol>
 </td>
                 <td>
+                    <a href="{{ path('user_sessions', {'id': user.id}) }}">Sessions ({{user.sessions.count}})</a>
                     <a href="{{ path('user_edit', {'id': user.id}) }}">edit</a>
 {{include("user/_delete_form.html.twig")}}
                 </td>

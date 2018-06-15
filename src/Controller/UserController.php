@@ -4,7 +4,10 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\UserType;
-use App\Repository\UserRepository;
+use App\Repository\{
+UserRepository,
+SessionRepository,
+};
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -90,4 +93,14 @@ class UserController extends Controller
 
         return $this->redirectToRoute('user_index');
     }
+
+/**
+*@Route("/{id}/sessions", name="user_sessions")
+*/
+public function sessions(User $u, SessionRepository $sR) {
+return $this->render("user/sessions.html.twig", [
+"username"=>$u->getUsername(),
+"sessions"=>$sR->findByUser($u),
+]);
+}
 }

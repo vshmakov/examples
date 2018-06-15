@@ -76,6 +76,7 @@ $this->limitTime=(new \DateTime())->add(new \DateInterval("P{$l}D"));
 $this->addTime=new \DateTime;
 $this->codes = new ArrayCollection();
 $this->money=DEFAULT_MONEY;
+$this->ips=[];
     }
 
     public function getId()
@@ -241,7 +242,7 @@ return $this->setMoney($this->getMoney() + $m);
 
 public function getIps(): ?array
 {
-    return $this->ips;
+    return $this->ips ?: [];
 }
 
 public function setIps(array $ips): self
@@ -249,5 +250,10 @@ public function setIps(array $ips): self
     $this->ips = $ips;
 
     return $this;
+}
+
+public function addIp($ip) {
+if (!in_array($ip, $this->ips)) $this->ips[]=$ip;
+return $this;
 }
 }

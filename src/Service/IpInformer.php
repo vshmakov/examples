@@ -6,6 +6,9 @@ use Goutte\Client;
 
 class IpInformer {
 public static function getInfoByIp($ip) {
+static $ips=[];
+
+if (!isset($ips[$ip])) {
 $client=self::getClient();
 $crawler = $client->request('GET', 
 "http://api.db-ip.com/v2/free/".urlencode($ip));
@@ -17,7 +20,10 @@ $r[$k]=$an[$k] ?? null;
 }
 
 $r["error"]=(bool) $r["errorCode"];
-return $r+(array) $an;
+$ips[$ip]=$r+(array) $an;
+}
+
+return $ips[$ip];
 }
 
 private static function getClient() {

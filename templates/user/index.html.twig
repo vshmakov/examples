@@ -38,7 +38,7 @@
                 <td>{{ user.attemptsCount}}</td>
                 <td>{{ user.examplesCount}}</td>
                 <td>{{ user.profilesCount}}</td>
-                <td>{{ dump(user.ips))}}</td>
+                <td>{{ dump(user.ips)}}</td>
                 <td>
                     <a href="{{ path('user_edit', {'id': user.id}) }}">edit</a>
 {{include("user/_delete_form.html.twig")}}

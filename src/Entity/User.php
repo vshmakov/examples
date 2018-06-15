@@ -63,12 +63,13 @@ use DTTrait;
     private $codes;
 
     /**
-     * @ORM\Column(type="array")
+     * @ORM\Column(type="array", nullable=true)
      */
     private $ips;
 
     public function __construct()
     {
+$this->roles=[];
         $this->sessions = new ArrayCollection();
         $this->profiles = new ArrayCollection();
 $l=TEST_DAYS;
@@ -242,7 +243,7 @@ return $this->setMoney($this->getMoney() + $m);
 
 public function getIps(): ?array
 {
-    return $this->ips ?: [];
+    return is_array($this->ips) ? $this->ips : [];
 }
 
 public function setIps(array $ips): self
@@ -253,7 +254,7 @@ public function setIps(array $ips): self
 }
 
 public function addIp($ip) {
-if (!in_array($ip, $this->ips)) $this->ips[]=$ip;
+if (!in_array($ip, $this->getIps())) $this->ips[]=$ip;
 return $this;
 }
 }

@@ -42,7 +42,7 @@
 <ol>
 {%for ip in user.ips%}
 {%set info=getIpInfo(ip)%}
-<li>{{ip}} - {{info.countryName}} - {{info.stateProv}} - {{info.city}}</li>
+<li>{{info.countryName}} - {{info.stateProv}} - {{info.city}} - {{ip}}</li>
 {%endfor%}
 </ol>
 </td>

@@ -62,6 +62,11 @@ use DTTrait;
      */
     private $codes;
 
+    /**
+     * @ORM\Column(type="array")
+     */
+    private $ips;
+
     public function __construct()
     {
         $this->sessions = new ArrayCollection();
@@ -232,5 +237,17 @@ public function removeCode(Code $code): self
 public function addMoney(int $m) {
 $this->allMoney+=$m;
 return $this->setMoney($this->getMoney() + $m);
+}
+
+public function getIps(): ?array
+{
+    return $this->ips;
+}
+
+public function setIps(array $ips): self
+{
+    $this->ips = $ips;
+
+    return $this;
 }
 }

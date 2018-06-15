@@ -38,7 +38,14 @@
                 <td>{{ user.attemptsCount}}</td>
                 <td>{{ user.examplesCount}}</td>
                 <td>{{ user.profilesCount}}</td>
-                <td>{{ dump(user.ips)}}</td>
+                <td>
+<ol>
+{%for ip in user.ips%}
+{%set info=getIpInfo(ip)%}
+<li>{{ip}} - {{info.countryName}} - {{info.stateProv}} - {{info.city}}</li>
+{%endfor%}
+</ol>
+</td>
                 <td>
                     <a href="{{ path('user_edit', {'id': user.id}) }}">edit</a>
 {{include("user/_delete_form.html.twig")}}

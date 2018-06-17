@@ -17,8 +17,7 @@ var P={{(jsParams ?? {})|json_encode|raw}};
 <div class="container">
 
 {%block nav%}
-              <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-                <a class="navbar-brand" href="#">Навигация</a>
+              <nav class="navbar navbar-expand-lg {#navbar-dark bg-primary#} main-menu">
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Открыть меню">
                   <span class="navbar-toggler-icon"></span>
                 </button>
@@ -83,13 +82,12 @@ var P={{(jsParams ?? {})|json_encode|raw}};
 <footer class="{#navbar-fixed-bottom#}">
 <div class="row">
 {%set y=date()|date("Y")%}
-<small>
 <em>
 © {{y != 2018 ? "2018 - " : ""}} {{y}}, VSH-Studio
-<hr>
-Обратная связь: <a href="mailto:{{FEEDBACK_EMAIL}}">{{FEEDBACK_EMAIL}}</a>
 </em>
-</small>
+<p>
+Обратная связь: <a href="mailto:{{FEEDBACK_EMAIL}}">{{FEEDBACK_EMAIL}}</a>
+</p>
 </div>
 </footer>
 {%endblock%}

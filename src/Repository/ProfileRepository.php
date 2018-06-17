@@ -64,4 +64,21 @@ $p=(new Profile());
 return $p->SetDescription($this->getTitle($p))
 ->setAuthor($this->ul->getUser());
 }
+
+public function getCopyingDescriptionByCurrentUser($p) {
+$i=0;
+
+while (true) {
+$d=$p->getDescription();
+if ($i) $d.=" ($i)";
+$c=$this->v($this->q("select count(p) from App:Profile p
+where p.description = :d and p.author = :a")
+->setParameters(["d"=>$d, "a"=>$this->ul->getUser()])
+);
+if (!$c) break;
+$i++;
+}
+
+return ($d);
+}
 }

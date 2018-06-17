@@ -82,14 +82,12 @@ var P={{(jsParams ?? {})|json_encode|raw}};
 <footer class="{#navbar-fixed-bottom#}">
 <div class="row">
 {%set y=date()|date("Y")%}
-<small>
 <em>
 © {{y != 2018 ? "2018 - " : ""}} {{y}}, VSH-Studio
 </em>
 <p>
 Обратная связь: <a href="mailto:{{FEEDBACK_EMAIL}}">{{FEEDBACK_EMAIL}}</a>
 </p>
-</small>
 </div>
 </footer>
 {%endblock%}

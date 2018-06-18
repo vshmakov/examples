@@ -19,6 +19,7 @@
                 <th>Attempts</th>
                 <th>Examples</th>
                 <th>Profiles</th>
+                <th>Enabled</th>
                 <th>Ip collection</th>
                 <th>actions</th>
             </tr>
@@ -38,6 +39,7 @@
                 <td>{{ user.attemptsCount}}</td>
                 <td>{{ user.examplesCount}}</td>
                 <td>{{ user.profilesCount}}</td>
+                <td>{{ user.enabled ? "Yes" : "No"}}</td>
                 <td>
 <ol>
 {%for ip in user.ips%}

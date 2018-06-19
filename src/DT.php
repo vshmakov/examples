@@ -8,6 +8,10 @@ $dt=\DateTime::createFromFormat($f, $s);
 return ($dt && $dt->getTimestamp() > 0) ? self::createFromDT($dt) : false;
 }
 
+public static function start() {
+return self::createFromTimestamp(0);
+}
+
 public function createFromDbFormat($s) {
 return self::createFromFormat("Y-m-d H:i:s", $s);
 }
@@ -81,5 +85,13 @@ return (int) ($this->getTimestamp() % HOUR / MIN);
 
 public function getSeconds() {
 return $this->getTimeStamp() % MIN;
+}
+
+public function diff($dt, $abs=null) {
+return DTI::createFromDTI(parent::diff($dt, $abs));
+}
+
+public function getRoundTimestamp() {
+return round($this->format("U.u"));
 }
 }

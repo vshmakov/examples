@@ -63,7 +63,7 @@ use DTTrait;
     private $codes;
 
     /**
-     * @ORM\Column(type="array", nullable=true)
+     * @ORM\ManyToMany(targetEntity="App\Entity\Ip", inversedBy="users")
      */
     private $ips;
 
@@ -77,7 +77,7 @@ $this->limitTime=(new \DateTime())->add(new \DateInterval("P{$l}D"));
 $this->addTime=new \DateTime;
 $this->codes = new ArrayCollection();
 $this->money=DEFAULT_MONEY;
-$this->ips=[];
+$this->ips = new ArrayCollection();
     }
 
     public function getId()
@@ -241,20 +241,38 @@ $this->allMoney+=$m;
 return $this->setMoney($this->getMoney() + $m);
 }
 
-public function getIps(): ?array
+/**
+ * @return Collection|Ip[]
+ */
+public function getIps(): Collection
 {
-    return is_array($this->ips) ? $this->ips : [];
+    return $this->ips;
 }
 
-public function setIps(array $ips): self
+public function addIp(Ip $ip): self
 {
-    $this->ips = $ips;
+    if (!$this->ips->contains($ip) && $ip->isValid()) {
+$con=false;
+foreach ($this->ips as $e) {
+if ($e->getIp() == $ip->getIp()) {
+$con=true;
+break;
+}
+}
+
+if (!$con)         $this->ips[] = $ip;
+    }
 
     return $this;
 }
 
-public function addIp($ip) {
-if (!in_array($ip, $this->getIps())) $this->ips[]=$ip;
-return $this;
+public function removeIp(Ip $ip): self
+{
+    if ($this->ips->contains($ip)) {
+        $this->ips->removeElement($ip);
+    }
+
+    return $this;
 }
+
 }

@@ -10,6 +10,7 @@ RequestStack,
 };
 use App\Service\UserLoader;
 use App\Repository\SessionRepository;
+use App\Entity\Ip;
 
 class ResponseSubscriber implements EventSubscriberInterface
 {
@@ -27,13 +28,16 @@ $this->ul=$ul;
     {
 if ($s=$this->sR->findOneByCurrentUser()) {
 $s->setLastTime(new \DateTime);
+$em=$this->sR->em();
 
 if ($req=$this->req) {
 $u=$this->ul->getUser();
-$u->addIp($req->getClientIp());
+$ip=(new Ip)->setIp($req->getClientIp());
+if ($ip->isValid()) $em->persist($ip);
+$u->addIp($ip);
 }
 
-$this->sR->em()->flush();
+$em->flush();
 }
     }
 

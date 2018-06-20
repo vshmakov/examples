@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Ip{% endblock %}
+
+{% block body %}
+    <h1>Edit Ip</h1>
+
+    {{ include('ip/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('ip_index') }}">back to list</a>
+
+    {{ include('ip/_delete_form.html.twig') }}
+{% endblock %}

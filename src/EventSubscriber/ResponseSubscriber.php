@@ -9,17 +9,19 @@ Session\SessionInterface,
 RequestStack,
 };
 use App\Service\UserLoader;
-use App\Repository\SessionRepository;
+use App\Repository\{SessionRepository, IpRepository};
 use App\Entity\Ip;
 
 class ResponseSubscriber implements EventSubscriberInterface
 {
 private $sR;
+private $ipR;
 private $req;
 private $ul;
 
-public function __construct(SessionRepository $sR, RequestStack $rs, UserLoader $ul) {
+public function __construct(SessionRepository $sR, RequestStack $rs, UserLoader $ul, IpRepository $ipR) {
 $this->sR=$sR;
+$this->ipR=$ipR;
 $this->req=$rs->getMasterRequest();
 $this->ul=$ul;
 }
@@ -33,7 +35,7 @@ $em=$this->sR->em();
 if ($req=$this->req) {
 $u=$this->ul->getUser();
 $ip=(new Ip)->setIp($req->getClientIp());
-if ($ip->isValid()) $em->persist($ip);
+if ($ip->isValid() && !$this->ipR->countByIp($ip->getIp())) $em->persist($ip);
 $u->addIp($ip);
 }
 

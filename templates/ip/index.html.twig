@@ -1,0 +1,43 @@
+{% extends 'session/index.html.twig' %}
+
+{% block title %}Ip index{% endblock %}
+
+{% block body %}
+    <h1>Ip index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Ip</th>
+                <th>Country</th>
+                <th>Region</th>
+                <th>City</th>
+                <th>AddTime</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for ip in ips %}
+            <tr>
+                <td>{{ ip.id }}</td>
+                <td>{{ ip.ip }}</td>
+                <td>{{ ip.country }}</td>
+                <td>{{ ip.region }}</td>
+                <td>{{ ip.city }}</td>
+                <td>{{ ip.addTime ? ip.addTime|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('ip_show', {'id': ip.id}) }}">show</a>
+                    <a href="{{ path('ip_edit', {'id': ip.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="7">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('ip_new') }}">Create new</a>
+{% endblock %}

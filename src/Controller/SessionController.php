@@ -2,9 +2,9 @@
 
 namespace App\Controller;
 
-use App\Entity\Session;
+use App\Entity\{Session, Ip};
 use App\Form\SessionType;
-use App\Repository\SessionRepository;
+use App\Repository\{SessionRepository, IpRepository};
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,9 +18,17 @@ class SessionController extends Controller
     /**
      * @Route("/", name="session_index", methods="GET")
      */
-    public function index(SessionRepository $sessionRepository): Response
+    public function index(SessionRepository $sessionRepository, IpRepository $ipR): Response
     {
-        return $this->render('session/index.html.twig', ['sessions' => $sessionRepository->findAll()]);
+$sessions=$sessionRepository->findAll();
+foreach ($sessions as $s) {
+$ipR->hasOrCreateByIp($s->getSid());
+}
+
+        return $this->render('session/index.html.twig', [
+'sessions' =>$sessions, 
+"ipR"=>$ipR,
+]);
     }
 
     /**

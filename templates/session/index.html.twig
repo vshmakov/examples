@@ -31,9 +31,10 @@
                 <td>{{ session.addTime ? session.addTime.dbFormat : "" }}</td>
                 <td>{{ session.lastTime ? session.lastTime.dbFormat : "" }}</td>
                 <td>{{ session.sid }}</td>
-                <td>{{ session.ipInfo.countryName ?? "-"}}</td>
-                <td>{{ session.ipInfo.stateProv ?? "-"}}</td>
-                <td>{{ session.ipInfo.city ?? "-"}}</td>
+{%set ip=ipR.findOneByIp(session.sid)%}
+                <td>{{ ip and ip.country ? ip.country : "-"}}</td>
+                <td>{{ ip and ip.region ? ip.region :  "-"}}</td>
+                <td>{{ ip and ip.city ? ip.city : "-"}}</td>
 <td>
                     <a href="{{ path('session_show', {'id': session.id}) }}">show</a>
                     <a href="{{ path('session_edit', {'id': session.id}) }}">edit</a>

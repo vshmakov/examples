@@ -7,6 +7,8 @@ use App\Form\UserType;
 use App\Repository\{
 UserRepository,
 SessionRepository,
+ExampleRepository,
+AttemptRepository,
 };
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -101,6 +103,17 @@ public function sessions(User $u, SessionRepository $sR) {
 return $this->render("user/sessions.html.twig", [
 "username"=>$u->getUsername(),
 "sessions"=>$sR->findByUser($u),
+]);
+}
+
+/**
+*@Route("/{id}/examples", name="user_examples")
+*/
+public function examples(User $u, ExampleRepository $exR, AttemptRepository $attR) {
+return $this->render("user/examples.html.twig", [
+"username"=>$u->getUsername(),
+"examples"=>$exR->findByUser($u),
+"attR"=>$attR,
 ]);
 }
 }

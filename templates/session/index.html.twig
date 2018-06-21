@@ -54,7 +54,8 @@
 <script src="/js/jquery.datatables.min.js"></script>
 <script>
 $("table").DataTable({
-order: [5, "desc"],
+{%block dt_order%}order: [5, "desc"]{%endblock%}
+,
 });
 </script>
 {%endblock%}

@@ -37,7 +37,7 @@
                 <td>{{ user.allMoney}}</td>
                 <td>{{ user.limitTime.dbFormat}}</td>
                 <td>{{ user.attemptsCount}}</td>
-                <td>{{ user.examplesCount}}</td>
+                <td><a href="{{path("user_examples", {"id": user.id})}}">{{ user.examplesCount}}</a></td>
                 <td>{{ user.profilesCount}}</td>
                 <td>{{ user.enabled ? "Yes" : "No"}}</td>
                 <td>

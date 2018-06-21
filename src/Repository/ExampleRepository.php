@@ -92,4 +92,13 @@ $s=$ex->getAnswerTime()->getTimestamp() - $f->getTimestamp();
 
 return $this->dts($s);
 }
+
+public function findByUser($u) {
+return $this->q("select e from App:Example e
+join e.attempt a
+join a.session s
+where s.user = :u")
+->setParameter("u", $u)
+->getResult();
+}
 }

@@ -1,0 +1,53 @@
+{% extends 'session/index.html.twig' %}
+
+{% block title %}Example index{% endblock %}
+
+{% block body %}
+    <h1>Example index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Example</th>
+                <th>Answer</th>
+                <th>IsRight</th>
+                <th>Attempt</th>
+                <th>User</th>
+                <th>AddTime</th>
+                <th>AnswerTime</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for example in examples %}
+            <tr>
+                <td>{{ example.id }}</td>
+                <td>{{ example}}</td>
+                <td>{{ example.answer }}</td>
+                <td>{{ example.isRight  is not same as(null) ? (example.isRight ? 'Yes' : 'No') : "-" }}</td>
+                <td>{{ attR.number(example.attempt)}}</td>
+                <td>{{ example.attempt.session.user.username}}</td>
+                <td>{{ example.addTime ? example.addTime|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ example.answerTime ? example.answerTime|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('example_show', {'id': example.id}) }}">show</a>
+                    <a href="{{ path('example_edit', {'id': example.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="9">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{%block bottom_links%}
+    <a href="{{ path('example_new') }}">Create new</a>
+{%endblock%}
+{% endblock %}
+
+{%block dt_order%}
+order: [0, "desc"]
+{%endblock%}

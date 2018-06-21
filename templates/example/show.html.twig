@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Example{% endblock %}
+
+{% block body %}
+    <h1>Example</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ example.id }}</td>
+            </tr>
+            <tr>
+                <th>First</th>
+                <td>{{ example.first }}</td>
+            </tr>
+            <tr>
+                <th>Sign</th>
+                <td>{{ example.sign }}</td>
+            </tr>
+            <tr>
+                <th>Second</th>
+                <td>{{ example.second }}</td>
+            </tr>
+            <tr>
+                <th>Answer</th>
+                <td>{{ example.answer }}</td>
+            </tr>
+            <tr>
+                <th>IsRight</th>
+                <td>{{ example.isRight ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>AddTime</th>
+                <td>{{ example.addTime ? example.addTime|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>AnswerTime</th>
+                <td>{{ example.answerTime ? example.answerTime|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('example_index') }}">back to list</a>
+
+    <a href="{{ path('example_edit', {'id': example.id}) }}">edit</a>
+
+    {{ include('example/_delete_form.html.twig') }}
+{% endblock %}

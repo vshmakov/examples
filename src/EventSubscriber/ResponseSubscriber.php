@@ -30,6 +30,8 @@ $this->ul=$ul;
     {
 if ($s=$this->sR->findOneByCurrentUser()) {
 $s->setLastTime(new \DateTime);
+}
+
 $em=$this->sR->em();
 
 if ($req=$this->req) {
@@ -39,7 +41,6 @@ if ($ip) $u->addIp($ip);
 }
 
 $em->flush();
-}
     }
 
     public static function getSubscribedEvents()

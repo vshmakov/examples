@@ -54,7 +54,7 @@ return $this->v(
 $this->q("select count(a) from App:Attempt a
 join a.session s
 where s.user = :u and a.addTime <= :dt
-")->setParameters(["u"=>$this->ul->getUser(), "dt"=>$att->getAddTime()])
+")->setParameters(["u"=>$att->GetSession()->GetUser(), "dt"=>$att->getAddTime()])
 );
 }
 

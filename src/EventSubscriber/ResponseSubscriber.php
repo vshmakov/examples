@@ -34,9 +34,8 @@ $em=$this->sR->em();
 
 if ($req=$this->req) {
 $u=$this->ul->getUser();
-$ip=(new Ip)->setIp($req->getClientIp());
-if ($ip->isValid() && !$this->ipR->countByIp($ip->getIp())) $em->persist($ip);
-$u->addIp($ip);
+$ip=$this->ipR->findOneByIpOrNew($req->getClientIp());
+if ($ip) $u->addIp($ip);
 }
 
 $em->flush();

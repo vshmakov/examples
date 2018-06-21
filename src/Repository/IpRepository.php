@@ -24,4 +24,15 @@ $em->persist($e);
 $em->flush();
 }
 }
+
+public function findOneByIpOrNew($ip) {
+if ($ip=$this->findOneByIp($ip)) return $ip;
+if (!IpInfo::isIp($ip)) return  false;
+
+$ip=(new Ip)->setIp($ip);
+$em=$this->em();
+$em->persist($ip);
+$em->flush();
+return $ip;
+}
 }

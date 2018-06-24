@@ -145,3 +145,15 @@ return $r;
 function prob($p) {
 return mt_rand(1, 100) <= $p;
 }
+
+function randStr($length = 32) {
+		$chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPRQSTUVWXYZ0123456789";
+		$code = "";
+		$clen = strlen($chars) - 1;  
+
+		while (strlen($code) < $length) {
+            $code .= $chars[mt_rand(0, $clen)];  
+}
+
+		return $code;
+	}

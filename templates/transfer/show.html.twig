@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Transfer{% endblock %}
+
+{% block body %}
+    <h1>Transfer</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ transfer.id }}</td>
+            </tr>
+            <tr>
+                <th>Label</th>
+                <td>{{ transfer.label }}</td>
+            </tr>
+            <tr>
+                <th>AddTime</th>
+                <td>{{ transfer.addTime ? transfer.addTime|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Held</th>
+                <td>{{ transfer.held ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>HeldTime</th>
+                <td>{{ transfer.heldTime ? transfer.heldTime|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('transfer_index') }}">back to list</a>
+
+    <a href="{{ path('transfer_edit', {'id': transfer.id}) }}">edit</a>
+
+    {{ include('transfer/_delete_form.html.twig') }}
+{% endblock %}

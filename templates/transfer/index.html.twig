@@ -1,0 +1,41 @@
+{% extends 'example/index.html.twig' %}
+
+{% block title %}Transfer index{% endblock %}
+
+{% block body %}
+    <h1>Transfer index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Label</th>
+                <th>AddTime</th>
+                <th>Held</th>
+                <th>HeldTime</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for transfer in transfers %}
+            <tr>
+                <td>{{ transfer.id }}</td>
+                <td>{{ transfer.label }}</td>
+                <td>{{ transfer.addTime ? transfer.addTime|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ transfer.held ? 'Yes' : 'No' }}</td>
+                <td>{{ transfer.heldTime ? transfer.heldTime|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('transfer_show', {'id': transfer.id}) }}">show</a>
+                    <a href="{{ path('transfer_edit', {'id': transfer.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('transfer_new') }}">Create new</a>
+{% endblock %}

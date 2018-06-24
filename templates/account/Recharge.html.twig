@@ -3,26 +3,25 @@
 {% block title %}Пополнить счёт{% endblock %}
 
 {%block main%}
-<div class="row">
+<div class="">
 <h1>На счёте: {{user.money}} рублей</h1>
 {%set email=FEEDBACK_EMAIL%}
 
 <p>
-
+В случае возникновения проблем во время пополнения счёта обратитесь по адресу: <a href="mailto:{{email}}" class="email-link">{{email}}</a>
 </p>
-<em>
-Данный раздел сайта находится в стадии разработки и будет запущен в течении {{remDays}} дней<br>
-А пока вы можете <a href="{{path("account_pay")}}">воспользоваться</a> средствами, доступными вашему аккаунту по умолчанию.
-</em>
-{#
-<p>
-<b>Пожалуйста, не меняйте на странице перевода яндекс.денег значение поля "Назначение перевода"!</b><br>
-Без него мы не сможем правильно идентифицировать отправителя платежа и зачислить деньги на ваш счёт на сайте.<br>
-В случае возникновения проблем во время пополнения счёта вы можете обратиться по адресу: <a href="mailto:{{email}}" class="email-link">{{email}}</a>
 
-</p>
-{%set targets=t~user.email%}
-<iframe src="https://money.yandex.ru/quickpay/shop-widget?writer=seller&targets={{targets|url_encode}}&targets-hint=&default-sum=500&button-text=11&hint=&successURL=&quickpay=shop&account=410015203245933" width="450" height="171" frameborder="0" allowtransparency="true" scrolling="no"></iframe>
-#}
+<form method="POST" action="https://money.yandex.ru/quickpay/confirm.xml">
+    <input type="hidden" name="receiver" value="410015203245933">
+    <input type="hidden" name="targets" value="Пополнение счёта на сайте exmasters.ru">
+    <input type="hidden" name="label" value="{{123}}">
+    <input type="hidden" name="quickpay-form" value="shop">
+    <input type="number" name="sum" value="500" data-type="number">
+
+    <label><input type="radio" name="paymentType" value="PC">Яндекс.Деньгами</label>
+    <label><input type="radio" name="paymentType" value="AC">Банковской картой</label>
+    <input type="submit" value="Пополнить счёт">
+</form>
+
 </div>
 {%endblock%}

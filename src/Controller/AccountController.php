@@ -5,7 +5,10 @@ namespace App\Controller;
 use App\DT;
 use App\Entity\User;
 use App\Form\UserType;
-use App\Repository\UserRepository;
+use App\Repository\{
+UserRepository,
+TransferRepository,
+};
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,10 +29,10 @@ $this->u=$ul->getUser()->setER($uR);
 /**
 *@Route("/recharge", name="account_recharge")
 */
-public function recharge() {
+public function recharge(TransferRepository $tR) {
 return $this->render("account/Recharge.html.twig", [
 "t"=>RECHARGE_TITLE,
-"remDays"=>(new DT)->diff(DT::createFromDbFormat("2018-06-30 00:00:00"))->d,
+"label"=>$tR->findUnheldByCurrentUserOrNew()->getLabel(),
 ]);
 }
 

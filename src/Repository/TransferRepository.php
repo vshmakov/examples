@@ -2,49 +2,34 @@
 
 namespace App\Repository;
 
+use App\Service\UserLoader;
 use App\Entity\Transfer;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-/**
- * @method Transfer|null find($id, $lockMode = null, $lockVersion = null)
- * @method Transfer|null findOneBy(array $criteria, array $orderBy = null)
- * @method Transfer[]    findAll()
- * @method Transfer[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- */
 class TransferRepository extends ServiceEntityRepository
 {
-    public function __construct(RegistryInterface $registry)
+use BaseTrait;
+
+private $ul;
+
+    public function __construct(RegistryInterface $registry, UserLoader $ul)
     {
         parent::__construct($registry, Transfer::class);
+$this->ul=$ul;
     }
 
-//    /**
-//     * @return Transfer[] Returns an array of Transfer objects
-//     */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('t')
-            ->andWhere('t.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('t.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+public function findUnheldByCurrentUserOrNew() {
+return $this->findOneBy(["held"=>false, "user"=>$this->ul->getUser()]) ?? $this->getNewByCurrentUser();
+}
 
-    /*
-    public function findOneBySomeField($value): ?Transfer
-    {
-        return $this->createQueryBuilder('t')
-            ->andWhere('t.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
+public function getNewByCurrentUser() {
+$e=(new Transfer)
+->setUser($this->ul->getUser())
+->setLabel(randStr(32));
+$em=$this->em();
+$em->persist($e);
+$em->flush();
+return $e;
+}
 }

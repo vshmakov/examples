@@ -67,6 +67,11 @@ use DTTrait;
      */
     private $ips;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Transfer", mappedBy="user", orphanRemoval=true)
+     */
+    private $transfers;
+
     public function __construct()
     {
 $this->roles=[];
@@ -78,6 +83,7 @@ $this->addTime=new \DateTime;
 $this->codes = new ArrayCollection();
 $this->money=DEFAULT_MONEY;
 $this->ips = new ArrayCollection();
+$this->transfers = new ArrayCollection();
     }
 
     public function getId()
@@ -270,6 +276,37 @@ public function removeIp(Ip $ip): self
 {
     if ($this->ips->contains($ip)) {
         $this->ips->removeElement($ip);
+    }
+
+    return $this;
+}
+
+/**
+ * @return Collection|Transfer[]
+ */
+public function getTransfers(): Collection
+{
+    return $this->transfers;
+}
+
+public function addTransfer(Transfer $transfer): self
+{
+    if (!$this->transfers->contains($transfer)) {
+        $this->transfers[] = $transfer;
+        $transfer->setUser($this);
+    }
+
+    return $this;
+}
+
+public function removeTransfer(Transfer $transfer): self
+{
+    if ($this->transfers->contains($transfer)) {
+        $this->transfers->removeElement($transfer);
+        // set the owning side to null (unless already changed)
+        if ($transfer->getUser() === $this) {
+            $transfer->setUser(null);
+        }
     }
 
     return $this;

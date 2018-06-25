@@ -34,7 +34,7 @@ static $c;
 return $c ??$c=new Client();
 }
 
-public function isIp($ip) {
+public static function isIp($ip) {
 return preg_match("#^(\d{1,3}\.?){4}$#", $ip);
 }
 }

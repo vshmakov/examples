@@ -10,8 +10,11 @@ UserRepository,
 };
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\{
+Request,
+Response,
+JsonResponse,
+};
 
 class IndexController extends Controller
 {
@@ -31,8 +34,10 @@ class IndexController extends Controller
      */
 public function request(Request $req, UserRepository $uR, TransferRepository $tR) {
 $r=$req->request;
+$label=$r->get("label");
 $code=400;
-$t=$tR->findOneBy(["label"=>$r->get("label"), "held"=>false]);
+$an=["error"=>"No transfer with $label label"];
+$t=$tR->findOneBy(["label"=>$label, "held"=>false]);
 $u= $t ? $t->getUser() : null;
 $un=$r->get("unaccepted");
 
@@ -44,9 +49,10 @@ $t->setMoney($wa)
 ->setHeld(true);
 $this->em()->flush();
 $code=200;
+$an["error"]=false;
 }
 
-return new Response("", $code);
+return new JsonResponse($an, $code);
 }
 
 }

@@ -13,5 +13,6 @@ class IndexControllerTest extends WebTestCase
         $client->request('POST', '/api/request/yandex');
 
         $this->assertEquals(400, $client->getResponse()->getStatusCode());
+echo $client->getResponse()->getContent();
     }
 }

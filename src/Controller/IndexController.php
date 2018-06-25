@@ -2,11 +2,14 @@
 
 namespace App\Controller;
 
-use App\Repository\SessionRepository;
+use App\Repository\{
+SessionRepository,
+TransferRepository,
+ProfileRepository as PR,
+UserRepository,
+};
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use App\Repository\ProfileRepository as PR;
-use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -26,15 +29,19 @@ class IndexController extends Controller
     /**
      * @Route("/api/request/yandex", name="api_request_yandex", methods="POST")
      */
-public function request(Request $req, UserRepository $uR) {
+public function request(Request $req, UserRepository $uR, TransferRepository $tR) {
 $r=$req->request;
 $code=400;
-$u=preg_match("#^".RECHARGE_TITLE."(.+)$#u", $r->get("label"), $arr) ? $uR->findOneByEmail($arr[1]) : null;
+$t=$tR->findOneBy(["label"=>$r->get("label"), "held"=>false]);
+$u= $t ? $t->getUser() : null;
 $un=$r->get("unaccepted");
 
-if ($u && $op=$r->get("operation_id") && $un != "true") {
+if ($u && $un != "true") {
 $wa=$r->get("withdraw_amount");
 $u->addMoney($wa);
+$t->setMoney($wa)
+->setHeldTime(new \DateTime)
+->setHeld(true);
 $this->em()->flush();
 $code=200;
 }

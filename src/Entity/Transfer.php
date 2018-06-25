@@ -42,6 +42,11 @@ class Transfer
      */
     private $user;
 
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $money;
+
 public function __construct() 
 {
 $this->addTime=new \DateTime;
@@ -108,6 +113,18 @@ $this->addTime=new \DateTime;
     public function setUser(?User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getMoney(): ?float
+    {
+        return $this->money;
+    }
+
+    public function setMoney(?float $money): self
+    {
+        $this->money = $money;
 
         return $this;
     }

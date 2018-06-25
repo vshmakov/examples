@@ -9,10 +9,12 @@
         <thead>
             <tr>
                 <th>Id</th>
+                <th>Login</th>
                 <th>Label</th>
                 <th>AddTime</th>
                 <th>Held</th>
                 <th>HeldTime</th>
+                <th>Money</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -20,10 +22,12 @@
         {% for transfer in transfers %}
             <tr>
                 <td>{{ transfer.id }}</td>
+                <td>{{ transfer.user.username}}</td>
                 <td>{{ transfer.label }}</td>
                 <td>{{ transfer.addTime ? transfer.addTime|date('Y-m-d H:i:s') : '' }}</td>
                 <td>{{ transfer.held ? 'Yes' : 'No' }}</td>
                 <td>{{ transfer.heldTime ? transfer.heldTime|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ transfer.money}}</td>
                 <td>
                     <a href="{{ path('transfer_show', {'id': transfer.id}) }}">show</a>
                     <a href="{{ path('transfer_edit', {'id': transfer.id}) }}">edit</a>

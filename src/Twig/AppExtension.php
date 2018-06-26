@@ -8,19 +8,23 @@ use Twig\TwigFunction;
 use App\Service\UserLoader as UL;
 use App\Repository\AttemptRepository as AttR;
 use App\Repository\UserRepository as UR;
+use   Doctrine\ORM\EntityManagerInterface as EM;
 
 class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsInterface
 {
 private $ul;
 private $gl=[];
+private $em;
 
-public function __construct (UL $ul, AttR $attR, UR $uR) {
+public function __construct (UL $ul, AttR $attR, UR $uR, EM $em) 
+{
 try {
 $hasAtt=!!$attR->findLastActualByCurrentUser();
 } catch (\Exception $ex) {
 $hasAtt=false;
 }
 
+$this->em=$em;
 $this->ul=$ul;
 $this->gl=[
 "user"=>$u=$ul->getUser()->setER($uR),
@@ -41,6 +45,7 @@ new TwigFunction("addTimeNumber", [$this, "getAddTimeNumber"]),
 new TwigFunction("sortByAddTime", [$this, "sortByAddTime"]),
 new TwigFunction("sortProfiles", [$this, "sortProfiles"]),
 new TwigFunction("getIpInfo", '\App\Service\IpInformer::getInfoByIp'),
+new TwigFunction("fillIp", [$this, "fillIp"]),
 ];
 }
 
@@ -75,5 +80,12 @@ if ($cp === $e2) return  1;
 return 0;
 });
 return $ps;
+}
+
+public function fillIp($ip) {
+if ($ip->getCity() && !$ip->getContinent()) {
+$ip->setIp($ip->getIp());
+$this->em->flush();
+}
 }
 }

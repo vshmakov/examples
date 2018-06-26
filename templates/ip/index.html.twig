@@ -20,6 +20,7 @@
         </thead>
         <tbody>
         {% for ip in ips %}
+{{fillIp(ip)}}
             <tr>
                 <td>{{ ip.id }}</td>
                 <td>{{ ip.ip }}</td>

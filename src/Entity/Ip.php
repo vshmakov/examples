@@ -51,6 +51,11 @@ use BaseTrait;
      */
 private $users;
 
+/**
+ * @ORM\Column(type="string", length=255, nullable=true)
+ */
+private $continent;
+
 
 public function __construct() {
 $this->addTime=new \DateTime;
@@ -75,6 +80,7 @@ return IpInfo::isIp($this->ip);
 if (IpInfo::isIp($ip)) {
         $this->ip = $ip;
 $info=IpInfo::getInfoByIp($ip);
+$this->continent=$info["continentName"];
 $this->country=$info["countryName"];
 $this->region=$info["stateProv"];
 $this->city=$info["city"];
@@ -154,6 +160,18 @@ public function removeUser(User $user): self
     if ($this->users->contains($user)) {
         $this->users->removeElement($user);
     }
+
+    return $this;
+}
+
+public function getContinent(): ?string
+{
+    return $this->continent;
+}
+
+public function setContinent(?string $continent): self
+{
+    $this->continent = $continent;
 
     return $this;
 }

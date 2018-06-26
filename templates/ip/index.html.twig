@@ -13,6 +13,7 @@
                 <th>Country</th>
                 <th>Region</th>
                 <th>City</th>
+                <th>Continent</th>
                 <th>AddTime</th>
                 <th>actions</th>
             </tr>
@@ -25,6 +26,7 @@
                 <td>{{ ip.country }}</td>
                 <td>{{ ip.region }}</td>
                 <td>{{ ip.city }}</td>
+                <td>{{ ip.continent}}</td>
                 <td>{{ ip.addTime ? ip.addTime|date('Y-m-d H:i:s') : '' }}</td>
                 <td>
                     <a href="{{ path('ip_show', {'id': ip.id}) }}">show</a>

@@ -11,16 +11,22 @@
 В случае возникновения проблем во время пополнения счёта обратитесь по адресу: <a href="mailto:{{email}}" class="email-link">{{email}}</a>
 </p>
 
-<form method="POST" action="https://money.yandex.ru/quickpay/confirm.xml">
+<form method="POST" action="https://money.yandex.ru/quickpay/confirm.xml" target="_blank">
     <input type="hidden" name="receiver" value="410015203245933">
     <input type="hidden" name="targets" value="Пополнение счёта на сайте exmasters.ru">
     <input type="hidden" name="label" value="{{label}}">
     <input type="hidden" name="quickpay-form" value="shop">
-    <input type="number" name="sum" value="500" data-type="number">
 
+<h2>Пополнить счёт</h2>
+
+<div>
+    <input type="number" name="sum" value="500" data-type="number">
+рублей
+</div>
     <label><input type="radio" name="paymentType" value="PC">Яндекс.Деньгами</label>
-    <label><input type="radio" name="paymentType" value="AC">Банковской картой</label>
-    <input type="submit" value="Пополнить счёт">
+    <label><input checked type="radio" name="paymentType" value="AC">Банковской картой</label>
+
+    <input class="btn btn-active" type="submit" value="Перевести">
 </form>
 
 </div>

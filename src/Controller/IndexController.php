@@ -30,7 +30,7 @@ class IndexController extends Controller
     }
 
     /**
-     * @Route("/api/request/yandex", name="api_request_yandex", methods="POST")
+     * @Route("/api/request/yandex", name="api_request_yandex", methods="GET|POST")
      */
 public function request(Request $req, UserRepository $uR, TransferRepository $tR) {
 $r=$req->request;

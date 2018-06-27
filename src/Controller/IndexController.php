@@ -40,7 +40,9 @@ if (!$r->get("operation_id")) $r=$req->query;
 $label=$r->get("label");
 $wa=$r->get("withdraw_amount");
 $un=$r->get("unaccepted");
-$l->debug($label)
+
+$l->debug($req->getMethod())
+->debug($label)
 ->debug($wa)
 ->log(600, $un);
 $code=400;

@@ -33,20 +33,15 @@ use BaseTrait;
     }
 
     /**
-     * @Route("/api/request/yandex", name="api_request_yandex", methods="GET|POST")
+     * @Route("/api/request/yandex", name="api_request_yandex", methods="POST")
      */
 public function request(Request $req, UserRepository $uR, TransferRepository $tR, L $l) {
 $r=$req->request;
-if (!$r->get("operation_id")) $r=$req->query;
 
 $label=$r->get("label");
 $wa=$r->get("withdraw_amount");
 $un=$r->get("unaccepted");
 
-$l->debug($req->getMethod())
-->debug($label)
-->debug($wa)
-->log(600, $un);
 $code=400;
 $an=["error"=>"No transfer with $label label"];
 $t=$tR->findOneBy(["label"=>$label, "held"=>false]);

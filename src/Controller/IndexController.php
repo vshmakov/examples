@@ -35,6 +35,8 @@ class IndexController extends Controller
      */
 public function request(Request $req, UserRepository $uR, TransferRepository $tR, L $l) {
 $r=$req->request;
+if (!$r->get("operation_id")) $r=$req->query;
+
 $label=$r->get("label");
 $wa=$r->get("withdraw_amount");
 $un=$r->get("unaccepted");

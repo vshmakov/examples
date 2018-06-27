@@ -15,6 +15,7 @@ Request,
 Response,
 JsonResponse,
 };
+use App\Service\JsonLogger as L;
 
 class IndexController extends Controller
 {
@@ -32,17 +33,20 @@ class IndexController extends Controller
     /**
      * @Route("/api/request/yandex", name="api_request_yandex", methods="GET|POST")
      */
-public function request(Request $req, UserRepository $uR, TransferRepository $tR) {
+public function request(Request $req, UserRepository $uR, TransferRepository $tR, L $l) {
 $r=$req->request;
 $label=$r->get("label");
+$wa=$r->get("withdraw_amount");
+$un=$r->get("unaccepted");
+$l->debug($label)
+->debug($wa)
+->log(600, $un);
 $code=400;
 $an=["error"=>"No transfer with $label label"];
 $t=$tR->findOneBy(["label"=>$label, "held"=>false]);
 $u= $t ? $t->getUser() : null;
-$un=$r->get("unaccepted");
 
 if ($u && $un != "true") {
-$wa=$r->get("withdraw_amount");
 $u->addMoney($wa);
 $t->setMoney($wa)
 ->setHeldTime(new \DateTime)

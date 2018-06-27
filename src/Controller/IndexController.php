@@ -19,6 +19,8 @@ use App\Service\JsonLogger as L;
 
 class IndexController extends Controller
 {
+use BaseTrait;
+
     /**
      * @Route("/", name="homepage")
      */

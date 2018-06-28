@@ -3,9 +3,10 @@
 {% block title %}Оплатить сервис{% endblock %}
 
 {%block main%}
-<div class="row">
+<div class="">
 <h1>Оплачено: {{user.remainedTime.roundDays}} дн.</h1>
 <form method="post">
+<h2>Оплатить (мес.)</h2>
 <input type="number" class="form-control" name="months"  value="{{m ?: 1}}"><br>
 <input type="submit" class="btn btn-success" value="Оплатить">
 </form>
@@ -51,7 +52,10 @@ inp.val(v);
 nm.html(n);
 
 var k=n <= h && v > 0;
-$(inp).add(nm).css("background", !k  ? "red" : "green").css("color", !k ? "black" : "red");
+$(inp).add(nm)
+//.css("background", !k  ? "red" : "green")
+.css("color", !k ? "black" : "red");
+
 var wc="btn-warning";
 if (k) s.removeClass(wc);
 else s.addClass(wc);

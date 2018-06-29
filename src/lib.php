@@ -157,3 +157,23 @@ function randStr($length = 32) {
 
 		return $code;
 	}
+
+function hugeNumStyle(int $n) {
+$rev=function (string $s) {
+$s1="";
+for ($i=strlen($s)-1; $i>=0; $i--) {
+$s1.=$s[$i];
+}
+return $s1;
+};
+
+$s=$rev($n);;
+$s1="";
+$to=strlen($s)-1;
+for ($i=0; $i<=$to; $i++) {
+$s1.=$s[$i];
+if ($i!=$to && (($i+1) % 3) == 0) $s1.=".";
+}
+
+return $rev($s1);
+}

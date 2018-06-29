@@ -38,7 +38,7 @@ use DTTrait;
     private $profile;
 
     /**
-     * @ORM\Column(type="smallint")
+     * @ORM\Column(type="integer")
      */
     private $money=0;
 

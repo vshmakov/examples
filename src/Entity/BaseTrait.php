@@ -17,6 +17,8 @@ return $this;
 public function __call($v, $p=[]) {
 if ($gs=$this->getSetter($v, $p)) return $gs["ret"];
 $m=entityGetter($v);
+$er=$this->er;
+if (!method_exists($er, $m)) throw new \Exception(sprintf("Entity %s and %s repository does not contain %s getter", self::class, is_object($er) ? get_class($er) : "empty", $v));
 return $this->er->$m($this);
 }
 

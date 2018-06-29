@@ -43,7 +43,8 @@ $profiles=$pR->findByCurrentAuthor();
     public function new(Request $request, ProfileRepository $pR, UserLoader $ul): Response
     {
         $profile = new Profile();
-$profile->SetDescription($pR->getTitle($profile));
+$profile->SetDescription($pR->getTitle($profile))
+->setAuthor($ul->getUser());
         $form = $this->buildForm($profile);
         $form->handleRequest($request);
 $canCreate=$this->isGranted("CREATE", $profile);

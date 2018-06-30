@@ -10,13 +10,11 @@ static $ips=[];
 $isIp=self::isIp($ip);
 
 if (!isset($ips[$ip])) {
-$client=self::getClient();
 if ($isIp) {
-$crawler = $client->request('GET', 
-"http://api.db-ip.com/v2/free/".urlencode($ip));
+$json=file_get_contents("http://api.db-ip.com/v2/free/".urlencode($ip));
 }
 
-$an=$isIp ? json_decode($client->getResponse()->getContent(), true) : ["errorCode"=>"IsNotIp"];
+$an=$isIp ? json_decode($json, true) : ["errorCode"=>"IsNotIp"];
 $r=[];
 foreach (getArrByStr("errorCode ipAddress continentCode continentName countryCode countryName stateProv city") as $k) {
 $r[$k]=$an[$k] ?? null;

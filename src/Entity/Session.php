@@ -47,6 +47,11 @@ use DTTrait;
      */
     private $attempts;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $pageCount=0;
+
     public function __construct()
     {
         $this->attempts = new ArrayCollection();
@@ -139,5 +144,22 @@ public function getIpInfo() {
 static $a=[];
 $ip=$this->sid;
 return $a[$ip] ?? $a[$ip]=IpInf::getInfoByIp($ip);
+}
+
+public function getPageCount(): int
+{
+    return $this->pageCount ?? 0;
+}
+
+public function setPageCount(int $pageCount): self
+{
+    $this->pageCount = $pageCount;
+
+    return $this;
+}
+
+public function incPageCount() {
+$this->pageCount=((int) $this->pageCount) + 1;
+return $this;
 }
 }

@@ -28,13 +28,17 @@ $this->ul=$ul;
 
     public function onKernelResponse(FilterResponseEvent $event)
     {
-if ($s=$this->sR->findOneByCurrentUser()) {
-$s->setLastTime(new \DateTime);
-}
-
+$req=$this->req;
 $em=$this->sR->em();
 
-if ($req=$this->req) {
+if ($s=$this->sR->findOneByCurrentUser()) {
+$s->setLastTime(new \DateTime);
+if (($event->isMasterRequest())) {
+$s->incPageCount();
+}
+}
+
+if ($req) {
 $u=$this->ul->getUser();
 $ip=$this->ipR->findOneByIpOrNew($req->getClientIp());
 if ($ip) $u->addIp($ip);

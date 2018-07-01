@@ -31,7 +31,7 @@
                 <td>{{ session.addTime ? session.addTime.dbFormat : "" }}</td>
                 <td>{{ session.lastTime ? session.lastTime.dbFormat : "" }}</td>
                 <td>{{ session.sid }}</td>
-{%set ip=ipR.findOneByIp(session.sid)%}
+{%set ip=session.ip ?? ipR.findOneByIp(session.sid)%}
                 <td>{{ ip and ip.country ? ip.country : "-"}}</td>
                 <td>{{ ip and ip.region ? ip.region :  "-"}}</td>
                 <td>{{ ip and ip.city ? ip.city : "-"}}</td>

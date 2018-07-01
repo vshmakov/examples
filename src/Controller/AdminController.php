@@ -22,10 +22,12 @@ $d0=[
 where i.addTime > :dt",
 "visits"=>"select count(v) from App:Visit v
 join v.session s
-where s.addTime > :dt",
+join s.ip i
+where i.addTime > :dt",
 "attempts"=>"select count(a) from App:Attempt a
 join a.session s
-where s.addTime > :dt",
+join s.ip i
+where i.addTime > :dt",
 "users"=>"select count(u) from App:User u
 where u.addTime > :dt",
       ];

@@ -56,9 +56,15 @@ private $users;
  */
 private $continent;
 
+/**
+ * @ORM\OneToMany(targetEntity="App\Entity\Session", mappedBy="ip")
+ */
+private $sessions;
+
 
 public function __construct() {
 $this->addTime=new \DateTime;
+$this->sessions = new ArrayCollection();
 }
 
     public function getId()
@@ -172,6 +178,37 @@ public function getContinent(): ?string
 public function setContinent(?string $continent): self
 {
     $this->continent = $continent;
+
+    return $this;
+}
+
+/**
+ * @return Collection|Session[]
+ */
+public function getSessions(): Collection
+{
+    return $this->sessions;
+}
+
+public function addSession(Session $session): self
+{
+    if (!$this->sessions->contains($session)) {
+        $this->sessions[] = $session;
+        $session->setIp($this);
+    }
+
+    return $this;
+}
+
+public function removeSession(Session $session): self
+{
+    if ($this->sessions->contains($session)) {
+        $this->sessions->removeElement($session);
+        // set the owning side to null (unless already changed)
+        if ($session->getIp() === $this) {
+            $session->setIp(null);
+        }
+    }
 
     return $this;
 }

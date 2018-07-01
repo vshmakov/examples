@@ -14,11 +14,11 @@ public function em() {
 return $this->getEntityManager();
 }
 
-private function q($dql) {
+public function q($dql) {
 return $this->em()->createQuery($dql);
 }
 
-private function v($q) {
+public function v($q) {
 $r=($q->setMaxResults(1)->getOneOrNullResult());
 if (!is_array($r)) return $r;
 foreach ($r as $v) {

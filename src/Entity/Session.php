@@ -52,6 +52,11 @@ use DTTrait;
      */
     private $visits;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Ip", inversedBy="sessions")
+     */
+    private $ip;
+
     public function __construct()
     {
         $this->attempts = new ArrayCollection();
@@ -168,6 +173,18 @@ public function removeVisit(Visit $visit): self
             $visit->setSession(null);
         }
     }
+
+    return $this;
+}
+
+public function getIp(): ?Ip
+{
+    return $this->ip;
+}
+
+public function setIp(?Ip $ip): self
+{
+    $this->ip = $ip;
 
     return $this;
 }

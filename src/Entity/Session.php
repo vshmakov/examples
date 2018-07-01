@@ -48,15 +48,16 @@ use DTTrait;
     private $attempts;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\OneToMany(targetEntity="App\Entity\Visit", mappedBy="session", orphanRemoval=true)
      */
-    private $pageCount=0;
+    private $visits;
 
     public function __construct()
     {
         $this->attempts = new ArrayCollection();
 $this->initAddTime();
 $this->lastTime=new \DateTime;
+$this->visits = new ArrayCollection();
     }
 
     public function getId()
@@ -140,26 +141,34 @@ return $this;
         return $this;
     }
 
-public function getIpInfo() {
-static $a=[];
-$ip=$this->sid;
-return $a[$ip] ?? $a[$ip]=IpInf::getInfoByIp($ip);
+/**
+ * @return Collection|Visit[]
+ */
+public function getVisits(): Collection
+{
+    return $this->visits;
 }
 
-public function getPageCount(): int
+public function addVisit(Visit $visit): self
 {
-    return $this->pageCount ?? 0;
-}
-
-public function setPageCount(int $pageCount): self
-{
-    $this->pageCount = $pageCount;
+    if (!$this->visits->contains($visit)) {
+        $this->visits[] = $visit;
+        $visit->setSession($this);
+    }
 
     return $this;
 }
 
-public function incPageCount() {
-$this->pageCount=((int) $this->pageCount) + 1;
-return $this;
+public function removeVisit(Visit $visit): self
+{
+    if ($this->visits->contains($visit)) {
+        $this->visits->removeElement($visit);
+        // set the owning side to null (unless already changed)
+        if ($visit->getSession() === $this) {
+            $visit->setSession(null);
+        }
+    }
+
+    return $this;
 }
 }

@@ -4,7 +4,11 @@ namespace App\Controller;
 
 use App\Entity\{Session, Ip};
 use App\Form\SessionType;
-use App\Repository\{SessionRepository, IpRepository};
+use App\Repository\{
+SessionRepository, 
+IpRepository,
+VisitRepository as VR,
+};
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -95,4 +99,13 @@ $ipR->hasOrCreateByIp($s->getSid());
 
         return $this->redirectToRoute('session_index');
     }
+
+    /**
+     * @Route("/{id}/visits", name="session_visits", methods="GET")
+     */
+public function visits(Session $s, VR $vR) {
+return $this->render("session/visits.html.twig", [
+"visits"=>$vR->findBySession($s),
+]);
+}
 }

@@ -1,0 +1,43 @@
+{% extends 'example/index.html.twig' %}
+
+{% block title %}Visit index{% endblock %}
+
+{% block body %}
+    <h1>Visit index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Login</th>
+                <th>RouteName</th>
+                <th>Uri</th>
+                <th>AddTime</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for visit in visits %}
+            <tr>
+                <td>{{ visit.id }}</td>
+                <td>{{ visit.session.user.username}}</td>
+                <td>{{ visit.routeName}}</td>
+                <td>{{ visit.uri }}</td>
+                <td>{{ visit.addTime ? visit.addTime|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('visit_show', {'id': visit.id}) }}">show</a>
+                    <a href="{{ path('visit_edit', {'id': visit.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{%block back_link%}
+    <a href="{{ path('visit_new') }}">Create new</a>
+{%endblock%}
+{% endblock %}

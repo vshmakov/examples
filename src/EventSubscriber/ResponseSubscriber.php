@@ -9,8 +9,14 @@ Session\SessionInterface,
 RequestStack,
 };
 use App\Service\UserLoader;
-use App\Repository\{SessionRepository, IpRepository};
-use App\Entity\Ip;
+use App\Repository\{
+SessionRepository, 
+IpRepository
+};
+use App\Entity\{
+Ip,
+Visit,
+};
 
 class ResponseSubscriber implements EventSubscriberInterface
 {
@@ -31,20 +37,21 @@ $this->ul=$ul;
 $req=$this->req;
 $em=$this->sR->em();
 
-if ($s=$this->sR->findOneByCurrentUser()) {
-$s->setLastTime(new \DateTime);
-if (($event->isMasterRequest())) {
-$s->incPageCount();
-}
-}
+if ($req && $event->isMasterRequest() && $s=$this->sR->findOneByCurrentUser()) {
+$v=(new Visit)
+->setUri($req->getRequestUri())
+->setRouteName($req->attributes->get("_route"))
+->setSession($s);
+$em->persist($v);
 
-if ($req) {
+$s->setLastTime(new \DateTime);
+
 $u=$this->ul->getUser();
 $ip=$this->ipR->findOneByIpOrNew($req->getClientIp());
 if ($ip) $u->addIp($ip);
-}
 
 $em->flush();
+}
     }
 
     public static function getSubscribedEvents()

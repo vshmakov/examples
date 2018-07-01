@@ -47,11 +47,17 @@ use DTTrait;
      */
     private $attempts;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Visit", mappedBy="session", orphanRemoval=true)
+     */
+    private $visits;
+
     public function __construct()
     {
         $this->attempts = new ArrayCollection();
 $this->initAddTime();
 $this->lastTime=new \DateTime;
+$this->visits = new ArrayCollection();
     }
 
     public function getId()
@@ -135,9 +141,34 @@ return $this;
         return $this;
     }
 
-public function getIpInfo() {
-static $a=[];
-$ip=$this->sid;
-return $a[$ip] ?? $a[$ip]=IpInf::getInfoByIp($ip);
+/**
+ * @return Collection|Visit[]
+ */
+public function getVisits(): Collection
+{
+    return $this->visits;
+}
+
+public function addVisit(Visit $visit): self
+{
+    if (!$this->visits->contains($visit)) {
+        $this->visits[] = $visit;
+        $visit->setSession($this);
+    }
+
+    return $this;
+}
+
+public function removeVisit(Visit $visit): self
+{
+    if ($this->visits->contains($visit)) {
+        $this->visits->removeElement($visit);
+        // set the owning side to null (unless already changed)
+        if ($visit->getSession() === $this) {
+            $visit->setSession(null);
+        }
+    }
+
+    return $this;
 }
 }

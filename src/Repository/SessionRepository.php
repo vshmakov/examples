@@ -71,6 +71,10 @@ where a.id is null and s.lastTime < :dt")
 $em=$this->em();
 
 foreach ($s as $i) {
+foreach ($i->getVisits() as $v) {
+$s->removeVisit($v);
+$em->remove($v);
+}
 $em->remove($i);
 }
 

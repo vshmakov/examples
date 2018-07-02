@@ -43,7 +43,9 @@ if ($rn != "_wdt") {
 $v=(new Visit)
 ->setUri($req->getRequestUri())
 ->setRouteName($rn)
-->setSession($s);
+->setMethod($req->getMethod())
+->setSession($s)
+->setStatusCode($event->getResponse()->getStatusCode());
 $em->persist($v);
 }
 

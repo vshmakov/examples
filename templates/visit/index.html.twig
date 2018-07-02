@@ -11,6 +11,8 @@
                 <th>Id</th>
                 <th>Login</th>
                 <th>RouteName</th>
+                <th>Method</th>
+                <th>StatusCode</th>
                 <th>Uri</th>
                 <th>AddTime</th>
                 <th>actions</th>
@@ -22,6 +24,8 @@
                 <td>{{ visit.id }}</td>
                 <td>{{ visit.session.user.username}}</td>
                 <td>{{ visit.routeName}}</td>
+                <td>{{ visit.method}}</td>
+                <td>{{ visit.statusCode}}</td>
                 <td>{{ visit.uri }}</td>
                 <td>{{ visit.addTime ? visit.addTime|date('Y-m-d H:i:s') : '' }}</td>
                 <td>

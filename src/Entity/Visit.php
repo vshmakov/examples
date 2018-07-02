@@ -37,6 +37,16 @@ class Visit
      */
     private $routeName;
 
+    /**
+     * @ORM\Column(type="smallint", nullable=true)
+     */
+    private $statusCode;
+
+    /**
+     * @ORM\Column(type="string", length=32, nullable=true)
+     */
+    private $method;
+
 public function __construct() {
 $this->addTime=new \DateTime;
 }
@@ -90,6 +100,30 @@ $this->addTime=new \DateTime;
     public function setRouteName(string $routeName): self
     {
         $this->routeName = $routeName;
+
+        return $this;
+    }
+
+    public function getStatusCode(): ?int
+    {
+        return $this->statusCode;
+    }
+
+    public function setStatusCode(?int $statusCode): self
+    {
+        $this->statusCode = $statusCode;
+
+        return $this;
+    }
+
+    public function getMethod(): ?string
+    {
+        return $this->method;
+    }
+
+    public function setMethod(?string $method): self
+    {
+        $this->method = $method;
 
         return $this;
     }

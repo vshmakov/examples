@@ -38,11 +38,14 @@ $req=$this->req;
 $em=$this->sR->em();
 
 if ($req && $event->isMasterRequest() && $s=$this->sR->findOneByCurrentUser()) {
+$rn=$req->attributes->get("_route", "not-found");
+if ($rn != "_wdt") {
 $v=(new Visit)
 ->setUri($req->getRequestUri())
-->setRouteName($req->attributes->get("_route"))
+->setRouteName($rn)
 ->setSession($s);
 $em->persist($v);
+}
 
 $s->setLastTime(new \DateTime);
 

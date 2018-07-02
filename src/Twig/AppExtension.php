@@ -9,6 +9,8 @@ use App\Service\UserLoader as UL;
 use App\Repository\AttemptRepository as AttR;
 use App\Repository\UserRepository as UR;
 use   Doctrine\ORM\EntityManagerInterface as EM;
+use   Psr\Container\ContainerInterface as Con;
+use   Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface as ConP;
 
 class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsInterface
 {
@@ -16,7 +18,7 @@ private $ul;
 private $gl=[];
 private $em;
 
-public function __construct (UL $ul, AttR $attR, UR $uR, EM $em) 
+public function __construct (UL $ul, AttR $attR, UR $uR, EM $em, Con $con, ConP $conP) 
 {
 try {
 $hasAtt=!!$attR->findLastActualByCurrentUser();
@@ -30,6 +32,7 @@ $this->gl=[
 "user"=>$u=$ul->getUser()->setER($uR),
 "hasActualAttempt"=>$hasAtt,
 "PRICE"=>PRICE,
+"app_name"=>$con->getParameter("app_name"),
 "isGuest"=>$ul->isGuest(),
 "FEEDBACK_EMAIL"=>"post@exmasters.ru",
 ];

@@ -5,7 +5,6 @@ framework:
     #default_locale: en
     #csrf_protection: true
     #http_method_override: true
-
     # Enables session support. Note that the session will ONLY be started if you read or write from it.
     # Remove or comment this section to explicitly disable session support.
     session:
@@ -49,3 +48,6 @@ fos_user:
             template: '@FOSUser/Resetting/email.email.twig'
     service:
         mailer: fos_user.mailer.twig_swift
+
+parameters:
+    app_name: '%env(APP_NAME)%'

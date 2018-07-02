@@ -18,6 +18,7 @@ class UserType extends AbstractType
 ->add("money")
 ->add("limitTime")
             ->add('profile')
+->add("enabled")
         ;
     }
 

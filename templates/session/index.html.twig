@@ -15,6 +15,7 @@
                 <th>AddTime</th>
                 <th>Last time</th>
                 <th>Sid</th>
+                <th>Ip id</th>
                 <th>Country</th>
                 <th>Region</th>
                 <th>City</th>
@@ -32,6 +33,7 @@
                 <td>{{ session.lastTime ? session.lastTime.dbFormat : "" }}</td>
                 <td>{{ session.sid }}</td>
 {%set ip=session.ip ?? ipR.findOneByIp(session.sid)%}
+                <td>{{ session.ip ? session.ip.id : "-"}}</td>
                 <td>{{ ip and ip.country ? ip.country : "-"}}</td>
                 <td>{{ ip and ip.region ? ip.region :  "-"}}</td>
                 <td>{{ ip and ip.city ? ip.city : "-"}}</td>

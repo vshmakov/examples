@@ -11,7 +11,15 @@
 </td>
 </tr>
 <tr>
-<td>Электронная почта</td>
+<td>
+Электронная почта<br>
+<small>
+<em>
+На неё будет выслано письмо<br>
+Для подтверждения регистрации
+</em>
+</small>
+</td>
 <td>
 <div class="error">{{form_errors(form.email)}}</div>
 {{form_widget(form.email)}}
@@ -39,6 +47,18 @@
     </div>
 {{ form_end(form) }}
 </div>
+
+<h3>Не пришло письмо подтверждения регистрации?</h3>
+<ol>
+<li>Подождите в течение 5 минут, а затем проверьте папку "Спам" вашего почтового ящика.</li>
+<li>Воспользуйтесь <a href="{{path("fos_user_resetting_request")}}">сбросом пароля</a> для подтверждения вашей почты.</li>
+{%set email=FEEDBACK_EMAIL%}
+<li>Напишите нам по адресу <a href="mailto:{{email}}">{{email}}</a>. Мы активируем ваш аккаунт вручную в самое короткое время!</li>
+</ol>
+
+<p>
+<b>Спасибо, что выбрали наш сервис!</b>
+</p>
 
 <div class="auth-links">
 <a href="{{path("fos_user_security_login")}}">Вход</a>

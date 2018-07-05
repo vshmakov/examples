@@ -51,7 +51,6 @@ return $this->findOneBy($p);
 
 private function getNewByUserAndSid($u, $sid) { 
 if ($s=$this->findOneByUserAndSid($u, $sid)) return $s;
-$this->clearSessions();
 
 $s=(new Session())
 ->setUser($u)
@@ -62,22 +61,28 @@ $em->flush();
 return $s;
 }
 
-public function clearSessions() {
+public function clearSessions($dt) {
 $s=$this->q("select s from App:Session s
 left join s.attempts a
 where a.id is null and s.lastTime < :dt")
-->setParameter("dt", (new \DateTime)->sub(new \DateInterval("P7D")))
+->setParameter("dt", $dt)
 ->getResult();
 $em=$this->em();
 
 foreach ($s as $i) {
-foreach ($i->getVisits() as $v) {
-$s->removeVisit($v);
-$em->remove($v);
-}
-$em->remove($i);
+$this->remove($i);
 }
 
 $em->flush();
+}
+
+public function remove($s) {
+$em=$this->em();
+foreach ($s->getVisits() as $v) {
+$s->removeVisit($v);
+$em->remove($v);
+}
+
+$em->remove($s);
 }
 }

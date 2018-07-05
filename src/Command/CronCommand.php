@@ -52,6 +52,8 @@ $em->remove($v);
 }
 
 $em->flush();
+
+$this->l->log(600, "Cron executed");
         $io->success("Cron command executed");
     }
 }

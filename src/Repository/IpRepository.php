@@ -26,13 +26,13 @@ $em->flush();
 }
 
 public function findOneByIpOrNew($ip) {
-if ($ip=$this->findOneByIp($ip)) return $ip;
+if ($e=$this->findOneByIp($ip)) return $e;
 if (!IpInfo::isIp($ip)) return  false;
 
-$ip=(new Ip)->setIp($ip);
+$e=(new Ip)->setIp($ip);
 $em=$this->em();
-$em->persist($ip);
+$em->persist($e);
 $em->flush();
-return $ip;
+return $e;
 }
 }

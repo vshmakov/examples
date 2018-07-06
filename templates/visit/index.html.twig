@@ -29,6 +29,7 @@
                 <td>{{ visit.uri }}</td>
                 <td>{{ visit.addTime ? visit.addTime|date('Y-m-d H:i:s') : '' }}</td>
                 <td>
+                    <a href="{{ path('session_visits', {'id': visit.session.id}) }}">Visits of session ({{visit.session.visits.count}})</a>
                     <a href="{{ path('visit_show', {'id': visit.id}) }}">show</a>
                     <a href="{{ path('visit_edit', {'id': visit.id}) }}">edit</a>
                 </td>

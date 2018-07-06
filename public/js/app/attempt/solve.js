@@ -22,7 +22,6 @@ $.post(P.attempt_answer, {answer:this.inp.val()}, this.getResult.bind(this));
 getResult: function (data) {
 if (data.finish === true) return location.reload();
 this.setData(data.attData);
-this.inp.val('');
 },
 
 setData: function (d) {
@@ -35,6 +34,9 @@ exRem: d.exRem
 for (var k in o) {
 this[k].html(o[k]);
 }
+
+this.inp.val('')
+.focus().click().select();
 },
 
 timer: h.createObj({

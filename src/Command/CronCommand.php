@@ -11,19 +11,24 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use App\Repository\{
 SessionRepository as SR,
 };
-use App\Service\JsonLogger as JL;
+use App\Service\{
+JsonLogger as JL,
+UserLoader as UL,
+};
 
 class CronCommand extends Command
 {
     protected static $defaultName = 'Cron';
 private $sR;
 private $l;
+private $ul;
 
-public function __construct(SR $sR, JL $l) 
+public function __construct(SR $sR, JL $l, UL $ul) 
 {
 parent::__construct();
 $this->sR=$sR;
 $this->l=$l;
+$this->ul=$ul;
 }
 
     protected function configure()
@@ -38,6 +43,7 @@ $this->l=$l;
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
+$this->ul->getGuest()->setIps([]);
 
 $dt=(new \DateTime)->sub(new \DateInterval("P7D"));
 $sR=$this->sR;
@@ -52,8 +58,6 @@ $em->remove($v);
 }
 
 $em->flush();
-
-$this->l->log(600, "Cron executed");
         $io->success("Cron command executed");
     }
 }

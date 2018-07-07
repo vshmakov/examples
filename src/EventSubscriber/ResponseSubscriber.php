@@ -55,7 +55,7 @@ $s->setLastTime(new \DateTime);
 $u=$this->ul->getUser();
 $ip=$this->ipR->findOneByIpOrNew($req->getClientIp());
 if ($ip) {
-$u->addIp($ip);
+if (!$this->ul->isGuest()) $u->addIp($ip);
 $s->setIp($ip);
 }
 

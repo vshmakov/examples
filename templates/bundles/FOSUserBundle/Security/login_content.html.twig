@@ -26,7 +26,12 @@
 </form>
 
 <p>
-<h3>При входе появляется ошибка "Аккаунт отключен"?</h3>
+<h3>При входе появляется ошибка "Учетная запись отключена"?</h3>
+
+
+<div class="login-links auth-links">
+<a href="{{path("fos_user_resetting_request")}}">Забыли пароль?</a>
+</div>
 
 <p>
 <b>
@@ -44,6 +49,5 @@
 </p>
 
 <div class="login-links auth-links">
-<a href="{{path("fos_user_resetting_request")}}">Забыли пароль?</a>
 <a href="{{path("fos_user_registration_register")}}">Регистрация</a>
 </div>

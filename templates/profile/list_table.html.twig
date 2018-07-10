@@ -14,9 +14,7 @@
 {%if isA%}
 <th>Пользователь</th>
 {%endif%}
-{%if canDel%}
-<th>Удалить</th>
-{%endif%}
+<th>Действия</th>
 </thead>
 <tbody>
 {%for profile in sortProfiles(profiles)%}
@@ -27,14 +25,16 @@
 </div>
 </td>
 <td>{{addTimeNumber(profile, profiles)}}</td>
-	<td><a href="{{path('profile_edit', {'id':profile.id})}}">{{profile.setER(pR).title}}</a></td>
+	<td>{{profile.setER(pR).title}}</td>
 <td>{{profile.addTime}}</td>
 {%if isA%}
 <td>{{profile.author.username}}</td>
 {%endif%}
+<td class="actions">
+<a href="{{path('profile_edit', {'id':profile.id})}}">Редактировать</a>
 {%if canDel%}
-<td>{{include("profile/_delete_form.html.twig")}}</td>
-{%endif%}
+{{include("profile/_delete_form.html.twig")}}{%endif%}
+</td>
 </tr>
 {%endfor%}
 </tbody>

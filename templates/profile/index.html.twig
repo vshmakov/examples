@@ -40,14 +40,26 @@
 var r=$("[type=radio]");
 r.click(function (e) {
 r.attr("disabled", true);
+e.stopPropagation();
 location.href=$(e.target).data("href");
 });
+
+$("table .actions").click(function (e) {
+e.stopPropagation();
+});
+
+$("tr").click(function () {
+var r=$(this).find("[type=radio]");
+if (!r.attr("disabled")) r.click();
+});
+
 r.filter("[value="+P.current+"]").attr("checked", true);
 if (!P.canAppoint) r.attr("disabled", true);
 </script>
 <script src="/js/jquery.datatables.min.js"></script>
 <script>
 $("table").DataTable({
+pageLength: 25,
 //order: [1, "asc"],
 language: {    
 "decimal":        "",    "emptyTable":     "Нет профилей",    "info":           "Показано с _START_ по _END_ из _TOTAL_ строк",    "infoEmpty":      "Показано с _START_ по _END_ из _TOTAL_ строк",   "infoFiltered":   "(Отфильтровано из _MAX_ строк)",    "infoPostFix":    "",    "thousands":      ",",    "lengthMenu":     "Показать _MENU_ строк",    "loadingRecords": "Идёт загрузка...",    "search":         "Поиск:",    "zeroRecords":    "Соответствующих записей не найдено",    

@@ -51,7 +51,8 @@ $sR->clearSessions($dt);
 $em=$sR->em();
 $vs=$em->createQuery("select v from App:Visit v
 where v.addTime < :dt")
-->setParameter("dt", $dt);
+->setParameter("dt", $dt)
+->getResult();
 
 foreach ($vs as $v) {
 $em->remove($v);

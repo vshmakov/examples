@@ -45,7 +45,10 @@ $this->ul=$ul;
         $io = new SymfonyStyle($input, $output);
 $this->ul->getGuest()->setIps([]);
 
-$dt=(new \DateTime)->sub(new \DateInterval("P7D"));
+$i=function ($d=7) {
+return (new \DateTime)->sub(new \DateInterval("P{$d}D"));
+};
+$dt=$i();
 $sR=$this->sR;
 $sR->clearSessions($dt);
 $em=$sR->em();
@@ -54,7 +57,12 @@ where v.addTime < :dt")
 ->setParameter("dt", $dt)
 ->getResult();
 
-foreach ($vs as $v) {
+$users=$em->createQuery("select u from App:User u
+where u.enabled = false and u.addTime < :dt")
+->setParameter("dt", $i(10))
+->getResult();
+
+foreach (array_merge($vs, $users) as $v) {
 $em->remove($v);
 }
 

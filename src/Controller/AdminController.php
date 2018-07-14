@@ -23,19 +23,19 @@ where i.addTime > :dt",
 "visits"=>"select count(v) from App:Visit v
 join v.session s
 join s.ip i
-where i.addTime > :dt",
+where v.addTime > :dt and i.addTime > :dt",
 "attempts"=>"select count(a) from App:Attempt a
 join a.session s
 join s.ip i
-where i.addTime > :dt",
+where a.addTime > :dt and i.addTime > :dt",
 "users"=>"select count(u) from App:User u
 where u.addTime > :dt",
       ];
 
 foreach ($d0 as $k=>$v) {
-foreach ([1, 7, 28] as $t) {
+foreach ([1, 7, 14, 30, 60, 90] as $t) {
 $d[$t][$k]=$ipR->v(
-$ipR->q($v)->setParameter("dt", (new \DateTime)->sub(new \DateInterval("P{$t}D")))
+$ipR->q($v)->setParameter("dt", \DT::createBySubD($t))
 );
 }
 }

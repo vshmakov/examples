@@ -48,6 +48,7 @@
     "autoload": {
 "files": ["src/lib.php"],
         "psr-4": {
+"": "lib/",
             "App\\": "src/"
         }
     },

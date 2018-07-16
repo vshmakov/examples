@@ -14,8 +14,14 @@ if (!method_exists($this, $m)) throw new \Exception(sprintf("%s has not %s priv 
 return $this->hasHandler($p) ? $this->$m($o, $t) : false;
 }
 
+private function hasPrefix($p, $s) {
+return preg_match("#^{$p}_#", $s);
+}
+
 private function getHandlerName($s) {
-return getMethodName(getVarName($s), "can");
+$p="can";
+if ($this->hasPrefix("IS", $s)) $p="";
+return getMethodName($s, $p);
 }
 
 private function hasHandler($s) {

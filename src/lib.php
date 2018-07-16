@@ -71,7 +71,9 @@ return $a;
 }
 
 function getMethodName($s, $p="") {
-return $p.ucfirst($s);
+$s=getVarName($s);
+if ($p) $s=ucfirst($s);
+return $p.$s;
 }
 
 function entityGetter($v) {

@@ -53,7 +53,7 @@ return $this->canEdit($p);
 } 
 
 private function canAppoint($p) {
-return !$this->ul->getUser()->getLimitTime()->isPast() && $this->canCreate($p) && $this->canView($p);
+return $this->ch->isGranted("IS_ACCOUNT_PAID") && $this->canCreate($p) && $this->canView($p);
 } 
 
 private function canCopy() {

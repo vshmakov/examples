@@ -33,7 +33,7 @@ where u.addTime > :dt",
       ];
 
 foreach ($d0 as $k=>$v) {
-foreach ([1, 7, 14, 30, 60, 90] as $t) {
+foreach ([1, 3, 7, 14, 30, 60, 90] as $t) {
 $d[$t][$k]=$ipR->v(
 $ipR->q($v)->setParameter("dt", \DT::createBySubD($t))
 );

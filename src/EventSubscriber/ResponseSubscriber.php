@@ -17,6 +17,7 @@ use App\Entity\{
 Ip,
 Visit,
 };
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface as CH;
 
 class ResponseSubscriber implements EventSubscriberInterface
 {
@@ -24,12 +25,15 @@ private $sR;
 private $ipR;
 private $req;
 private $ul;
+private $ch;
 
-public function __construct(SessionRepository $sR, RequestStack $rs, UserLoader $ul, IpRepository $ipR) {
+public function __construct(SessionRepository $sR, RequestStack $rs, UserLoader $ul, IpRepository $ipR, CH $ch)
+{
 $this->sR=$sR;
 $this->ipR=$ipR;
 $this->req=$rs->getMasterRequest();
 $this->ul=$ul;
+$this->ch=$ch;
 }
 
     public function onKernelResponse(FilterResponseEvent $event)
@@ -40,7 +44,7 @@ $em=$this->sR->em();
 if ($req && $event->isMasterRequest() && $s=$this->sR->findOneByCurrentUser()) {
 $uri=$req->getRequestUri();
 $rn=$req->attributes->get("_route", $uri);
-if ($rn != "_wdt") {
+if ($rn != "_wdt" && !$this->ch->isGranted("ROLE_ADMIN")) {
 $v=(new Visit)
 ->setUri($uri)
 ->setRouteName($rn)

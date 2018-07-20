@@ -63,13 +63,8 @@ return $s;
 
 public function clearSessions($dt) {
 $s=$this->q("select s from App:Session s
-join s.attempts a
-where s.lastTime < :dt or s in (select s1 from App:Session s1
-join s1.visits v1
-group by s1.id
-having count(v1) = 0)
-group by s.id
-having count(a) = 0")
+left join s.attempts a
+where a.id is null and s.lastTime < :dt")
 ->setParameter("dt", $dt)
 ->getResult();
 $em=$this->em();

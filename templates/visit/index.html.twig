@@ -15,6 +15,10 @@
                 <th>StatusCode</th>
                 <th>Uri</th>
                 <th>AddTime</th>
+                <th>Session id</th>
+                <th>Country</th>
+                <th>Region</th>
+                <th>City</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -26,8 +30,13 @@
                 <td>{{ visit.routeName}}</td>
                 <td>{{ visit.method}}</td>
                 <td>{{ visit.statusCode}}</td>
-                <td>{{ visit.uri }}</td>
+                <td><a href="{{visit.uri}}">{{ visit.uri }}</a></td>
                 <td>{{ visit.addTime ? visit.addTime|date('Y-m-d H:i:s') : '' }}</td>
+                <td><a href="{{path("session_show", {"id": visit.session.id})}}">{{ visit.session.id}}</td>
+{%set ip=visit.session.ip%}
+                <td>{{ ip and ip.country ? ip.country : "-"}}</td>
+                <td>{{ ip and ip.region ? ip.region :  "-"}}</td>
+                <td>{{ ip and ip.city ? ip.city : "-"}}</td>
                 <td>
                     <a href="{{ path('session_visits', {'id': visit.session.id}) }}">Visits of session ({{visit.session.visits.count}})</a>
                     <a href="{{ path('visit_show', {'id': visit.id}) }}">show</a>

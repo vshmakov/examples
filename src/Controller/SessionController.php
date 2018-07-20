@@ -63,7 +63,7 @@ $ipR->hasOrCreateByIp($s->getSid());
      */
     public function show(Session $session): Response
     {
-        return $this->render('session/show.html.twig', ['session' => $session]);
+        return $this->render('session/show.html.twig', ['sessions' => [$session]]);
     }
 
     /**

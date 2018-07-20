@@ -25,14 +25,13 @@
     <input class="btn btn-primary btn-active" type="submit" id="_submit" name="_submit" value="{{ 'security.login.submit'|trans }}" />
 </form>
 
-<p>
-<h3>При входе появляется ошибка "Учетная запись отключена"?</h3>
-
-
 <div class="login-links auth-links">
 <a href="{{path("fos_user_resetting_request")}}">Забыли пароль?</a>
+<a href="{{path("fos_user_registration_register")}}">Регистрация</a>
 </div>
 
+<p>
+<h3>При входе появляется ошибка "Учетная запись отключена"?</h3>
 <p>
 <b>
 Вам просто требуется подтвердить вашу электронную почту, которую вы указали при регистрации. Для этого перейдите по ссылке в присланном вам письме.
@@ -47,7 +46,3 @@
 <li>Напишите нам по адресу <a href="mailto:{{email}}">{{email}}</a>. Мы активируем ваш аккаунт вручную в самое короткое время!</li>
 </ol>
 </p>
-
-<div class="login-links auth-links">
-<a href="{{path("fos_user_registration_register")}}">Регистрация</a>
-</div>

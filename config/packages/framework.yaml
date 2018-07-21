@@ -51,3 +51,4 @@ fos_user:
 
 parameters:
     app_name: '%env(APP_NAME)%'
+    vk_app_id: 6639321

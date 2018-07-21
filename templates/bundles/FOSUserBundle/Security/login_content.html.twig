@@ -30,6 +30,17 @@
 <a href="{{path("fos_user_registration_register")}}">Регистрация</a>
 </div>
 
+<script type="text/javascript" src="https://vk.com/js/api/openapi.js?157"></script>
+<script type="text/javascript">
+  VK.init({apiId: {{vk_app_id}}});
+</script>
+
+<!-- VK Widget -->
+<div id="vk_auth"></div>
+<script type="text/javascript">
+  VK.Widgets.Auth("vk_auth", {"authUrl":"{{path("api_login_vk")}}"});
+</script>
+
 <p>
 <h3>При входе появляется ошибка "Учетная запись отключена"?</h3>
 <p>

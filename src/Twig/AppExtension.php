@@ -33,6 +33,7 @@ $this->gl=[
 "hasActualAttempt"=>$hasAtt,
 "PRICE"=>PRICE,
 "app_name"=>$con->getParameter("app_name"),
+"vk_app_id"=>$con->getParameter("vk_app_id"),
 "isGuest"=>$ul->isGuest(),
 "FEEDBACK_EMAIL"=>"post@exmasters.ru",
 ];

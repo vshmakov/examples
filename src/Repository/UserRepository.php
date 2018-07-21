@@ -71,13 +71,9 @@ $gl=self::GUEST_LOGIN;
 
 if ($u===false) $u=$this->findOneByUsername($gl);
 if (!$u) {
-$u=new User();
-$u->setUsername($gl)
-->setUsernameCanonical($gl)
-->setEmail('')
-->setEmailCanonical('')
-->setPassword('')
-->setEnabled(true);
+$u=$this->getNew()
+->setUsername($gl)
+->setUsernameCanonical($gl);
 
 $em=$this->em();
 $em->persist($u);
@@ -87,4 +83,27 @@ $em->flush();
 return $u;
 }
 
+private function getNew() {
+return (new User)
+->setUserName("")
+->setUsernameCanonical("")
+->setEmail('')
+->setEmailCanonical('')
+->setPassword('')
+->setEnabled(true);
+}
+
+public function findOneByVkCredentialsOrNew($d) {
+extract($d);
+if ($u=$this->findOneByVkId($uid)) return $u;
+
+$u=$this->getNew()
+->setVkId($uid)
+->setFirstName($first_name)
+->setLastName($last_name);
+$em=$this->em();
+$em->persist($u);
+$em->flush();
+return $u;
+}
 }

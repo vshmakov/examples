@@ -72,6 +72,11 @@ use DTTrait;
      */
     private $transfers;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $vkId;
+
     public function __construct()
     {
 $this->roles=[];
@@ -308,6 +313,52 @@ public function removeTransfer(Transfer $transfer): self
             $transfer->setUser(null);
         }
     }
+
+    return $this;
+}
+
+public function getVkId(): ?string
+{
+    return $this->vkId;
+}
+
+
+/**
+ * @ORM\Column(type="string", length=255, nullable=true)
+ */
+private $firstName;
+public function setVkId(?string $vkId): self
+{
+    $this->vkId = $vkId;
+
+    return $this;
+}
+
+public function getFirstName(): ?string
+{
+    return $this->firstName;
+}
+
+
+/**
+ * @ORM\Column(type="string", length=255, nullable=true)
+ */
+private $lastName;
+public function setFirstName(?string $firstName): self
+{
+    $this->firstName = $firstName;
+
+    return $this;
+}
+
+public function getLastName(): ?string
+{
+    return $this->lastName;
+}
+
+public function setLastName(?string $lastName): self
+{
+    $this->lastName = $lastName;
 
     return $this;
 }

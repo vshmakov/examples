@@ -17,6 +17,10 @@ security:
             form_login:
                 provider: fos_userbundle
                 csrf_token_generator: security.csrf.token_manager
+            guard:
+                provider: fos_userbundle
+                authenticators:
+                    - App\Security\VkAuthenticator
             logout:       true
             anonymous:    true
             remember_me:

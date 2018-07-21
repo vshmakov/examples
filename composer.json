@@ -46,9 +46,9 @@
         "sort-packages": true
     },
     "autoload": {
-"files": ["src/lib.php"],
+"files": ["src/functions.php"],
         "psr-4": {
-"": "lib/",
+"\\": "lib/",
             "App\\": "src/"
         }
     },

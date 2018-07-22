@@ -5,15 +5,18 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use FOS\UserBundle\Model\User as BaseUser;
+use FOS\UserBundle\Model\{
+UserInterface, 
+GroupableInterface
+};
 use App\DT;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  */
-class User 
+class User implements UserInterface, GroupableInterface
 {
-use DTTrait;
+use DTTrait, BaseUserTrait;
 
     /**
      * @ORM\Id()
@@ -156,7 +159,8 @@ use DTTrait;
 
     public function __construct()
     {
-$this->roles=[];
+        $this->enabled = false;
+        $this->roles = array();
         $this->sessions = new ArrayCollection();
         $this->profiles = new ArrayCollection();
 $l=TEST_DAYS;

@@ -38,7 +38,15 @@
 <!-- VK Widget -->
 <div id="vk_auth"></div>
 <script type="text/javascript">
-  VK.Widgets.Auth("vk_auth", {"authUrl":"{{path("api_login_vk")}}"});
+  VK.Widgets.Auth("vk_auth", {
+"authUrl": "{{path("api_login_vk")}}",
+onAuth: function (d) {
+var url=this.authUrl+"?";
+for (var k in d) {
+url+=k+"="+encodeURIComponent(d[k])+"&";
+}
+location.href=url;
+}});
 </script>
 
 <p>

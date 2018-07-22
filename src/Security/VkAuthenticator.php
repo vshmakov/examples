@@ -48,8 +48,6 @@ return $d;
 
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
-extract($credentials);
-dd($credentials);
 return $this->uR->findOneByVkCredentialsOrNew($credentials);
     }
 

@@ -85,11 +85,6 @@ return $u;
 
 private function getNew() {
 return (new User)
-->setUserName("")
-->setUsernameCanonical("")
-->setEmail('')
-->setEmailCanonical('')
-->setPassword('')
 ->setEnabled(true);
 }
 

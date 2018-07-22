@@ -7,7 +7,10 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\{
 UserInterface, 
-GroupableInterface
+GroupableInterface,
+GroupInterface,
+GroupManagerInterface,
+UserManagerInterface,
 };
 use App\DT;
 

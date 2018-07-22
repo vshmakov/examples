@@ -14,7 +14,12 @@ UserManagerInterface,
 };
 use App\DT;
 
-trait BaseUserTrait {
+trait BaseUserTrait
+{
+
+    protected $plainPassword;
+    protected $groups;
+
     /**
      * @return string
      */

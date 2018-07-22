@@ -3,7 +3,10 @@
 namespace App\Security;
 
 use   Psr\Container\ContainerInterface as Con;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\{
+Request,
+RedirectResponse,
+};
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -63,7 +66,7 @@ return null;
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
-return null;
+return new RedirectResponse("/");
     }
 
     public function start(Request $request, AuthenticationException $authException = null)

@@ -12,11 +12,10 @@ security:
         in_memory: { memory: ~ }
 
     firewalls:
-        main:
-            pattern: ^/
-            form_login:
-                provider: fos_userbundle
-                csrf_token_generator: security.csrf.token_manager
+
+        vk:
+            pattern: ^/api/login/vk
+            context: main
             guard:
                 provider: fos_userbundle
                 authenticators:
@@ -28,8 +27,24 @@ security:
                 lifetime: 604800 # 1 week in seconds
                 path:     /
                 user_provider: fos_userbundle
+
+        main:
+            pattern: ^/
+            context: main
+            form_login:
+                provider: fos_userbundle
+                csrf_token_generator: security.csrf.token_manager
+            logout:       true
+            anonymous:    true
+            remember_me:
+                secret:   '%kernel.secret%'
+                lifetime: 604800 # 1 week in seconds
+                path:     /
+                user_provider: fos_userbundle
+
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
+            #context: main
             security: false
 
     access_control:

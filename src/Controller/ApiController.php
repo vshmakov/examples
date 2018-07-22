@@ -66,7 +66,7 @@ $k=md5($appId.$uId.$secretKey);
 dump($appId, $uId, $k, $hash, $k==$hash);
 //uid, first_name, last_name, photo, photo_rec, hash 
 
-return new Response("");
-return $this->redirectToRoute("homepage");
+//return new Response("");
+return $this->redirectToRoute("fos_user_security_login");
 }
 }

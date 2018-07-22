@@ -26,7 +26,7 @@
         {% for visit in visits %}
             <tr>
                 <td>{{ visit.id }}</td>
-                <td>{{ visit.session.user.username}}</td>
+                <td>{{ visit.session.user.login}}</td>
                 <td>{{ visit.routeName}}</td>
                 <td>{{ visit.method}}</td>
                 <td>{{ visit.statusCode}}</td>

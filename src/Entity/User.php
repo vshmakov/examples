@@ -444,4 +444,7 @@ public function setLastName(?string $lastName): self
     return $this;
 }
 
+public function getLogin() {
+return $this->getUsername() ?? $this->getFirstName()." ".$this->getLastName();
+}
 }

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Security\VkAuthenticator as VkAuth;
 use   Psr\Container\ContainerInterface as Con;
 use App\Repository\{
 SessionRepository,
@@ -57,16 +58,16 @@ return new JsonResponse($an, $code);
      * @Route("/login/vk", name="api_login_vk")
      */
 public function vk(Request $req, Con $con) {
-$r=$req->query;
-$appId=$con->getParameter("vk_app_id");
-$secretKey="2jZQwVIL7krfQ7f9GSZS";
-$uId=$r->get("uid");
-$hash=$r->get("hash");
-$k=md5($appId.$uId.$secretKey);
-dump($appId, $uId, $k, $hash, $k==$hash);
-//uid, first_name, last_name, photo, photo_rec, hash 
-
-//return new Response("");
+dd($req->query->all(), 123);
 return $this->redirectToRoute("fos_user_security_login");
+}
+
+    /**
+     * @Route("/register/vk", name="api_register_vk")
+     */
+public function registerVk(Request $req, VkAuth $vkAuth, UserRepository $uR) {
+$d=$vkAuth->getCredentials($req);
+if ($vkAuth->checkCredentials($d)) $uR->findOneByVkCredentialsOrNew($d);
+return $this->redirectToRoute("api_login_vk", $d);
 }
 }

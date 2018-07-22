@@ -7,6 +7,10 @@ security:
         ROLE_SUPER_ADMIN: ROLE_ADMIN
 
     providers:
+        vk:
+            entity:
+                class: App\Entity\User
+                property: vkId
         fos_userbundle:
             id: fos_user.user_provider.username_email
         in_memory: { memory: ~ }
@@ -15,9 +19,10 @@ security:
 
         vk:
             pattern: ^/api/login/vk
+            #stateless: true
             context: main
             guard:
-                provider: fos_userbundle
+                provider: vk
                 authenticators:
                     - App\Security\VkAuthenticator
             logout:       true
@@ -26,11 +31,12 @@ security:
                 secret:   '%kernel.secret%'
                 lifetime: 604800 # 1 week in seconds
                 path:     /
-                user_provider: fos_userbundle
+                user_provider: vk
 
         main:
             pattern: ^/
-            context: main
+            #stateless: true
+            #context: main
             form_login:
                 provider: fos_userbundle
                 csrf_token_generator: security.csrf.token_manager

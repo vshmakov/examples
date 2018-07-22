@@ -29,15 +29,7 @@ $this->uR=$uR;
 
     public function supports(Request $request)
     {
-if ($request->attributes->get("_route") != "api_login_vk") return false;
-
-$r=$request->query;
-$appId=$this->con->getParameter("vk_app_id");
-$secretKey="2jZQwVIL7krfQ7f9GSZS";
-$uId=$r->get("uid");
-$hash=$r->get("hash");
-$k=md5($appId.$uId.$secretKey);
-return $hash == $k;
+return $request->attributes->get("_route") == "api_login_vk";
     }
 
     public function getCredentials(Request $request)
@@ -49,19 +41,23 @@ $d[$k]=$request->query->get($k);
 return $d;
     }
 
-    public function getUser($credentials, UserProviderInterface $userProvider)
+    public function getUser($d, UserProviderInterface $p)
     {
-return $this->uR->findOneByVkCredentialsOrNew($credentials);
+return $p->loadUserByUsername($d["uid"]);
     }
 
-    public function checkCredentials($credentials, UserInterface $user)
+    public function checkCredentials($credentials, UserInterface $user=null)
     {
-return true;
+extract($credentials);
+$appId=$this->con->getParameter("vk_app_id");
+$secretKey="2jZQwVIL7krfQ7f9GSZS";
+$k=md5($appId.$uid.$secretKey);
+return $hash == $k;
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
-return null;
+return new RedirectResponse("/login");
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)

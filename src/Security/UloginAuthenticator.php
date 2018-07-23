@@ -16,7 +16,7 @@ use App\Repository\{
 UserRepository as UR,
 };
 
-class VkAuthenticator extends AbstractGuardAuthenticator
+class UloginAuthenticator extends AbstractGuardAuthenticator
 {
 private $con;
 private $uR;
@@ -29,30 +29,35 @@ $this->uR=$uR;
 
     public function supports(Request $request)
     {
-return $request->attributes->get("_route") == "api_login_vk";
+return $request->attributes->get("_route") == "api_ulogin_login";
     }
 
     public function getCredentials(Request $request)
     {
+//                    $s = file_get_contents('http://ulogin.ru/token.php?token=' . $_POST['token'] . '&host=' . $_SERVER['HTTP_HOST']);
+$r=$request->request;
+if ($token = $r->get('token')) {
+$s=file_get_contents('http://ulogin.ru/token.php?token=' . $token . '&host=' . $_SERVER['HTTP_HOST']);
+                    $d= json_decode($s, true);
+}else {
 $d=[];
-foreach (getArrByStr("uid first_name last_name photo photo_rec hash") as $k) {
-$d[$k]=$request->query->get($k);
+foreach (getArrByStr("uid first_name last_name network") as $k) {
+$d[$k]=$r->get($k);
 }
+}
+
+$d["username"]=$d["network"].$d["uid"];
 return $d;
     }
 
     public function getUser($d, UserProviderInterface $p)
     {
-return $p->loadUserByUsername($d["uid"]);
+return $p->loadUserByUsername($d["username"]);
     }
 
-    public function checkCredentials($credentials, UserInterface $user=null)
+    public function checkCredentials($d, UserInterface $user=null)
     {
-extract($credentials);
-$appId=$this->con->getParameter("vk_app_id");
-$secretKey="2jZQwVIL7krfQ7f9GSZS";
-$k=md5($appId.$uid.$secretKey);
-return $hash == $k;
+return $d["username"];
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)

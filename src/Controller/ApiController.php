@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Security\VkAuthenticator as VkAuth;
+use App\Security\UloginAuthenticator as UloginAuth;
 use   Psr\Container\ContainerInterface as Con;
 use App\Repository\{
 SessionRepository,
@@ -65,9 +65,26 @@ return $this->redirectToRoute("fos_user_security_login");
     /**
      * @Route("/register/vk", name="api_register_vk")
      */
-public function registerVk(Request $req, VkAuth $vkAuth, UserRepository $uR) {
+public function registerVk(Request $req, VkAuth $vkAuth=null, UserRepository $uR) {
 $d=$vkAuth->getCredentials($req);
 if ($vkAuth->checkCredentials($d)) $uR->findOneByVkCredentialsOrNew($d);
 return $this->redirectToRoute("api_login_vk", $d);
 }
+
+    /**
+     * @Route("/ulogin/login", name="api_ulogin_login")
+     */
+public function ulogin(Request $req) {
+return $this->redirectToRoute("fos_user_security_login");
+}
+
+    /**
+     * @Route("/ulogin/register", name="api_ulogin_register")
+     */
+public function uloginRegister(Request $req, UloginAuth $uloginAuth, UserRepository $uR) {
+$d=$uloginAuth->getCredentials($req);
+if ($uloginAuth->checkCredentials($d)) $uR->findOneByUloginCredentialsOrNew($d);
+return $this->redirectToRoute("api_ulogin_login", $d);
+}
+
 }

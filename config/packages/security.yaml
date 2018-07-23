@@ -8,24 +8,24 @@ security:
         ROLE_SUPER_ADMIN: ROLE_ADMIN
 
     providers:
-        vk:
+        ulogin:
             entity:
                 class: App\Entity\User
-                property: vkId
+                property: username
         fos_userbundle:
             id: fos_user.user_provider.username_email
         in_memory: { memory: ~ }
 
     firewalls:
 
-        vk:
-            pattern: ^/api/login/vk
+        ulogin:
+            pattern: ^/api/ulogin/login
             #stateless: true
             context: main
             guard:
-                provider: vk
+                provider: ulogin
                 authenticators:
-                    - App\Security\VkAuthenticator
+                    - App\Security\UloginAuthenticator
             logout:       true
             anonymous:    true
             remember_me:

@@ -101,4 +101,19 @@ $em->persist($u);
 $em->flush();
 return $u;
 }
+
+public function findOneByUloginCredentialsOrNew($d) {
+extract($d);
+if ($u=$this->findOneByUsername($username)) return $u;
+
+$u=$this->getNew()
+->setUsername($username)
+->setFirstName($first_name)
+->setLastName($last_name);
+$em=$this->em();
+$em->persist($u);
+$em->flush();
+return $u;
+}
+
 }

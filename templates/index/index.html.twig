@@ -64,6 +64,10 @@
 {{include("index/using_steps.html.twig")}}
             </div>
 
+{%if isGuest%}
+{{include("widget/auth.html.twig")}}
+{%endif%}
+
 <div class="">
 <h2>Расскажите о нас!</h2>
 <script src="//yastatic.net/es5-shims/0.0.2/es5-shims.min.js"></script>

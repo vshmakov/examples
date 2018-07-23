@@ -21,7 +21,7 @@ $this->ch=$ch;
 }
 
     protected function supports($attribute, $subject)     {
-        return             !is_array($subject) ? $subject instanceof Profile or $this->hasHandler($attribute) : $this->supportsArr($attribute, $subject);
+        return             !is_array($subject) ? ($subject instanceof Profile or $subject === null && $this->hasHandler($attribute)) : $this->supportsArr($attribute, $subject);
     }
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)

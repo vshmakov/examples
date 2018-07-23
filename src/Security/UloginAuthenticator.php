@@ -29,7 +29,7 @@ $this->uR=$uR;
 
     public function supports(Request $request)
     {
-return $request->attributes->get("_route") == "api_ulogin_login";
+return ($request->attributes->get("_route") == "api_ulogin_login");
     }
 
     public function getCredentials(Request $request)
@@ -42,7 +42,7 @@ $s=file_get_contents('http://ulogin.ru/token.php?token=' . $token . '&host=' . $
 }else {
 $d=[];
 foreach (getArrByStr("uid first_name last_name network") as $k) {
-$d[$k]=$r->get($k);
+$d[$k]=$request->query->get($k);
 }
 }
 
@@ -52,12 +52,12 @@ return $d;
 
     public function getUser($d, UserProviderInterface $p)
     {
-return $p->loadUserByUsername($d["username"]);
+return ($p->loadUserByUsername($d["username"]));
     }
 
     public function checkCredentials($d, UserInterface $user=null)
     {
-return $d["username"];
+return !!$d["username"];
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)

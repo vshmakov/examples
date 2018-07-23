@@ -420,7 +420,7 @@ $this->setUsername("vk-".$vkId);
 
 public function getFirstName(): ?string
 {
-    return $this->firstName;
+    return $this->isSocial() ? $this->firstName : $this->getUsername();
 }
 
 

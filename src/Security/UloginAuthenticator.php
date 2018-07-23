@@ -46,7 +46,7 @@ $d[$k]=$request->query->get($k);
 }
 }
 
-$d["username"]=$d["network"].$d["uid"];
+$d["username"]=$d["network"]."-".$d["uid"];
 return $d;
     }
 

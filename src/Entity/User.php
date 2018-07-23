@@ -448,8 +448,13 @@ public function setLastName(?string $lastName): self
 }
 
 public function getLogin() {
-return $this->getUsername() ?? $this->getFirstName()." ".$this->getLastName();
+return !$this->isSocial() ? $this->getUsername() : $this->getFirstName()." ".$this->getLastName();
 }
+
+public function isSocial():bool {
+return !!$this->getVkId();
+}
+
 /*
 public function getUsername() {
 return $this->username ?? $this->getFirstName()." ".$this->getLastName();

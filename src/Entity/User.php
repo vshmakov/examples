@@ -78,11 +78,6 @@ use DTTrait, BaseUserTrait;
     private $transfers;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $vkId;
-
-    /**
      * @var string
      *
      * @ORM\Column(name="username", type="string", length=180, nullable=true)
@@ -116,6 +111,13 @@ use DTTrait, BaseUserTrait;
      * @ORM\Column(name="enabled", type="boolean", nullable=false)
      */
     private $enabled;
+
+    /**
+     * @var bool
+     *
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $isSocial=false;
 
     /**
      * @var string|null
@@ -400,23 +402,10 @@ public function removeTransfer(Transfer $transfer): self
     return $this;
 }
 
-public function getVkId(): ?string
-{
-    return $this->vkId;
-}
-
-
 /**
  * @ORM\Column(type="string", length=255, nullable=true)
  */
 private $firstName;
-public function setVkId(?string $vkId): self
-{
-    $this->vkId = $vkId;
-$this->setUsername("vk-".$vkId);
-
-    return $this;
-}
 
 public function getFirstName(): ?string
 {
@@ -452,7 +441,12 @@ return !$this->isSocial() ? $this->getUsername() : $this->getFirstName()." ".$th
 }
 
 public function isSocial():bool {
-return !!$this->getVkId();
+return $this->isSocial ?? false;
+}
+
+public function setIsSocial($s) {
+$this->isSocial=$s;
+return $this;
 }
 
 /*
@@ -461,5 +455,8 @@ return $this->username ?? $this->getFirstName()." ".$this->getLastName();
 }
 */
 
-
+public function setUsername($u) {
+$this->username=$u;
+return $this->setUsernameCanonical($u);
+}
 }

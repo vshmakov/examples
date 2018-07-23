@@ -18,7 +18,7 @@ class UserType extends AbstractType
 ->add("money")
 ->add("limitTime")
             ->add('profile')
-->add("vkId")
+->add("isSocial")
 ->add("enabled")
         ;
     }

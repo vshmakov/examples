@@ -88,26 +88,13 @@ return (new User)
 ->setEnabled(true);
 }
 
-public function findOneByVkCredentialsOrNew($d) {
-extract($d);
-if ($u=$this->findOneByVkId($uid)) return $u;
-
-$u=$this->getNew()
-->setVkId($uid)
-->setFirstName($first_name)
-->setLastName($last_name);
-$em=$this->em();
-$em->persist($u);
-$em->flush();
-return $u;
-}
-
 public function findOneByUloginCredentialsOrNew($d) {
 extract($d);
 if ($u=$this->findOneByUsername($username)) return $u;
 
 $u=$this->getNew()
 ->setUsername($username)
+->setIsSocial(true)
 ->setFirstName($first_name)
 ->setLastName($last_name);
 $em=$this->em();

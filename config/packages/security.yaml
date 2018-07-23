@@ -1,4 +1,5 @@
 security:
+
     encoders:
         FOS\UserBundle\Model\UserInterface: bcrypt
 
@@ -31,13 +32,15 @@ security:
                 secret:   '%kernel.secret%'
                 lifetime: 604800 # 1 week in seconds
                 path:     /
-                user_provider: vk
+                always_remember_me: true
+                user_provider: fos_userbundle
 
         main:
             pattern: ^/
             #stateless: true
             #context: main
             form_login:
+                always_use_default_target_path: true
                 provider: fos_userbundle
                 csrf_token_generator: security.csrf.token_manager
             logout:       true

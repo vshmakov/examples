@@ -10,6 +10,8 @@ UserInterface,
 GroupableInterface
 };
 use App\DT;
+use Symfony\Component\Security\Core\User\EquatableInterface;
+use Symfony\Component\Security\Core\User\UserInterface as SUI;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
@@ -411,6 +413,7 @@ private $firstName;
 public function setVkId(?string $vkId): self
 {
     $this->vkId = $vkId;
+$this->setUsername("vk-".$vkId);
 
     return $this;
 }
@@ -452,4 +455,6 @@ public function getUsername() {
 return $this->username ?? $this->getFirstName()." ".$this->getLastName();
 }
 */
+
+
 }

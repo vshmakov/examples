@@ -97,6 +97,9 @@ var P={{(jsParams ?? {})|json_encode|raw}};
 {%block main ""%}
 </main>
 
+{%block guest_auth%}
+{{include("widget/guest_auth.html.twig", {"h": "h4"})}}
+{%endblock%}
 {% endblock body%}
 </div>
 

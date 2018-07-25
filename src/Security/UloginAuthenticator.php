@@ -34,30 +34,32 @@ return ($request->attributes->get("_route") == "api_ulogin_login");
 
     public function getCredentials(Request $request)
     {
-//                    $s = file_get_contents('http://ulogin.ru/token.php?token=' . $_POST['token'] . '&host=' . $_SERVER['HTTP_HOST']);
+try {
 $r=$request->request;
-if ($token = $r->get('token')) {
+$token = $r->get('token',
+$request->query->get("token"));
 $s=file_get_contents('http://ulogin.ru/token.php?token=' . $token . '&host=' . $_SERVER['HTTP_HOST']);
                     $d= json_decode($s, true);
-}else {
-$d=[];
-foreach (getArrByStr("uid first_name last_name network") as $k) {
-$d[$k]=$request->query->get($k);
+$d+=[
+"token"=>$token,
+"username"=>$d["network"]."-".$d["uid"]
+];
+} catch(\Exception $ex) {
+return [];
 }
-}
-
-$d["username"]=$d["network"]."-".$d["uid"];
+//if ($request->isMethod("GET")) dd("");
 return $d;
     }
 
     public function getUser($d, UserProviderInterface $p)
     {
-return ($p->loadUserByUsername($d["username"]));
+$u=$d["username"] ?? null;
+return $u ? ($p->loadUserByUsername($u)) : null;
     }
 
     public function checkCredentials($d, UserInterface $user=null)
     {
-return !!$d["username"];
+return !!$d;
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)

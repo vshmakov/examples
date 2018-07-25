@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\{
 Request,
 Response,
 JsonResponse,
+Session\SessionInterface as SI,
 };
 use App\Service\JsonLogger as L;
 
@@ -81,10 +82,10 @@ return $this->redirectToRoute("fos_user_security_login");
     /**
      * @Route("/ulogin/register", name="api_ulogin_register")
      */
-public function uloginRegister(Request $req, UloginAuth $uloginAuth, UserRepository $uR) {
+public function uloginRegister(Request $req, UloginAuth $uloginAuth, UserRepository $uR, SI $s) {
 $d=$uloginAuth->getCredentials($req);
 if ($uloginAuth->checkCredentials($d)) $uR->findOneByUloginCredentialsOrNew($d);
-return $this->redirectToRoute("api_ulogin_login", $d);
+return $this->redirectToRoute("api_ulogin_login", ["token"=>$d["token"]]);
 }
 
 }

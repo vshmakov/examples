@@ -10,6 +10,7 @@
             <tr>
                 <th>Id</th>
                 <th>Login</th>
+                <th>Username</th>
                 <th>email</th>
                 <th>Registration time</th>
                 <th>Last visit time</th>
@@ -29,6 +30,7 @@
             <tr>
                 <td>{{ user.setER(uR).id }}</td>
                 <td>{{ user.login}}</td>
+                <td>{{ user.username}}</td>
                 <td>{{ user.email}}</td>
                 <td>{{ user.addTime.dbFormat}}</td>
 {%set ls=user.sessions.last%}

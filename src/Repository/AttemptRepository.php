@@ -2,12 +2,14 @@
 
 namespace App\Repository;
 
-use App\Service\ExampleManager as ExMng;
-use App\Service\UserLoader;
+use App\Service\{
+ExampleManager as ExMng,
+UserLoader,
+AuthChecker as AuthCh,
+};
 use App\Entity\Attempt;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class AttemptRepository extends ServiceEntityRepository
 {
@@ -18,7 +20,7 @@ private $sR;
 private $uR;
 private $ch;
 
-    public function __construct(RegistryInterface $registry, ExampleRepository $exR, UserLoader $ul, SessionRepository $sR, UserRepository $uR, AuthorizationCheckerInterface $ch)
+    public function __construct(RegistryInterface $registry, ExampleRepository $exR, UserLoader $ul, SessionRepository $sR, UserRepository $uR, AuthCh $ch)
     {
         parent::__construct($registry, Attempt::class);
 $this->exR=$exR;

@@ -20,11 +20,7 @@ private $em;
 
 public function __construct (UL $ul, AttR $attR, UR $uR, EM $em, Con $con, ConP $conP) 
 {
-try {
 $hasAtt=!!$attR->findLastActualByCurrentUser();
-} catch (\Exception $ex) {
-$hasAtt=false;
-}
 
 $this->em=$em;
 $this->ul=$ul;

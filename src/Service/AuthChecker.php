@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface as CH;
+use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException as Exc;
 
 class AuthChecker
 {
@@ -16,7 +17,7 @@ $this->ch=$ch;
 public function isGranted(...$p) {
 try {
 return $this->ch->isGranted(...$p);
-} catch(\Exception $ex) {
+} catch(Exc $ex) {
 return false;
 }
 }

@@ -17,7 +17,7 @@ use App\Entity\{
 Ip,
 Visit,
 };
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface as CH;
+use App\Service\AuthChecker as CH;
 
 class ResponseSubscriber implements EventSubscriberInterface
 {

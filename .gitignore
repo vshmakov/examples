@@ -24,3 +24,4 @@ yarn-error.log
 /.web-server-pid
 ###< symfony/web-server-bundle ###
 symfony.lock
+yarn.lock

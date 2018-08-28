@@ -2,180 +2,228 @@
 
 use App\DT;
 
-define("PRICE", 49);
-define("TEST_DAYS", 3);
-define("DEFAULT_MONEY", 0);
-define("RECHARGE_TITLE", "Пополнение счёта exmasters.ru пользователя ");
+define('PRICE', 49);
+define('TEST_DAYS', 3);
+define('DEFAULT_MONEY', 0);
+define('RECHARGE_TITLE', 'Пополнение счёта exmasters.ru пользователя ');
 
-function show(...$vars) {
-dump(implode(' - ', $vars));
+function show(...$vars)
+{
+    dump(implode(' - ', $vars));
 }
 
-function dt($dt) {
-return DT::createFromDT($dt);
+function dt($dt)
+{
+    return DT::createFromDT($dt);
 }
 
 call_user_func(function () {
-$min=60;
-$hour=60*$min;
-$day=24*$hour;
-$toUtc=-3*$hour;
+    $min = 60;
+    $hour = 60 * $min;
+    $day = 24 * $hour;
+    $toUtc = -3 * $hour;
 
-foreach(array(
-'MIN'=>$min,
-'HOUR'=>$hour,
-'DAY'=>$day,
-'MONTH'=>30*$day,
-'TO_UTC'=>$toUtc,
-) as $key=>$val) {
-define($key, $val);
-}
+    foreach ([
+        'MIN' => $min,
+        'HOUR' => $hour,
+        'DAY' => $day,
+        'MONTH' => 30 * $day,
+        'TO_UTC' => $toUtc,
+    ] as $key => $val) {
+        define($key, $val);
+    }
 });
 
-function normPerc($p) {
-$all1=0;
-foreach ($p as $k=>$v) {
-$all1+=abs($v);
+function normPerc($p)
+{
+    $all1 = 0;
+
+    foreach ($p as $k => $v) {
+        $all1 += abs($v);
+    }
+
+    if (!$all1) {
+        $all1 = 1;
+    }
+    $all2 = 0;
+
+    foreach ($p as $key => $val) {
+        $all2 += $p[$key] = round($val / $all1 * 100);
+    }
+
+    foreach (array_reverse($p) as $k => $v) {
+        if ($v) {
+            $p[$k] += 100 - $all2;
+
+            return $p;
+        }
+    }
+
+    $p[$k] += 100 - $all2;
+
+    return $p;
 }
 
-if (!$all1) $all1=1;
-$all2=0;
-foreach ($p as $key=>$val) {
-$all2+=$p[$key]=round($val/$all1*100);
+function getArrByKeies($arr, $ka)
+{
+    $res = [];
+
+    foreach ($ka as $k) {
+        if (isset($arr[$k])) {
+            $res[$k] = $arr[$k];
+        }
+    }
+
+    return $res;
 }
 
-foreach (array_reverse($p) as $k=>$v) {
-if ($v) {
-$p[$k]+=100-$all2;
-return $p;
-}
-}
+function getArrByStr($s)
+{
+    $a = explode(' ', $s);
 
-$p[$k]+=100-$all2;
-return $p;
+    return $a;
 }
 
-function getArrByKeies($arr, $ka) {
-$res=[];
+function getMethodName($s, $p = '')
+{
+    $s = getVarName($s);
 
-foreach ($ka as $k) {
-if (isset($arr[$k])) $res[$k]=$arr[$k];
+    if ($p) {
+        $s = ucfirst($s);
+    }
+
+    return $p.$s;
 }
 
-return ($res);
+function entityGetter($v)
+{
+    return preg_match('#^get[A-Z]#', $v) ? $v : 'get'.ucfirst($v);
 }
 
-function getArrByStr($s) {
-$a=explode(" ", $s);
-return $a;
+function getKeysFromEntity($s, $e)
+{
+    $d = [];
+
+    foreach ((getArrByStr($s)) as $k) {
+        $m = entityGetter($k);
+        $d[$k] = $e->$m();
+    }
+
+    return $d;
 }
 
-function getMethodName($s, $p="") {
-$s=getVarName($s);
-if ($p) $s=ucfirst($s);
-return $p.$s;
+function _log(...$attr)
+{
+    file_put_contents(__DIR__.'/log.log', json_encode($attr));
 }
 
-function entityGetter($v) {
-return preg_match("#^get[A-Z]#", $v) ? $v : "get".ucfirst($v);
+function createNumArr($a)
+{
+    $rn = [];
+
+    foreach ($a as $v) {
+        $rn[] = $v;
+    }
+
+    return $rn;
 }
 
-function getKeysFromEntity($s, $e) {
-$d=[];
-
-foreach ((getArrByStr($s)) as $k) {
-$m=entityGetter($k);
-$d[$k]=$e->$m();
+function minVal($k, $v)
+{
+    return $v >= $k ? $v : $k;
 }
 
-return $d;
+function maxVal($k, $v)
+{
+    return $v <= $k ? $v : $k;
 }
 
-function _log(...$attr) {
-file_put_contents(__dir__."/log.log", json_encode($attr));
+function btwVal($min, $max, $v, $k = null)
+{
+    if (null === $k) {
+        return maxVal($max, minVal($min, $v));
+    }
+
+    $out = (($v < $min) or ($v > $max));
+
+    if ($k) {
+        return $out ? $max : $v;
+    } else {
+        return ($out) ? $min : $v;
+    }
 }
 
-function createNumArr($a) {
-$rn=[];
-foreach ($a as $v) {
-$rn[]=$v;
-}
-return $rn;
-}
+function makeVarKeys($a, $s = 'x')
+{
+    foreach ($a as $k => $v) {
+        $a[$s.$k] = $v;
+    }
 
-function minVal($k, $v) {
-return $v >= $k ? $v : $k;
+    return $a;
 }
 
-function maxVal($k, $v) {
-return $v <= $k ? $v : $k;
+function getVarName($s)
+{
+    $a = explode('_', strtolower($s));
+    $v = array_shift($a);
+
+    foreach ($a as $t) {
+        $v .= ucfirst($t);
+    }
+
+    return $v;
 }
 
-function btwVal($min, $max, $v, $k=null) {
-if ($k === null) return maxVal($max, minVal($min, $v));
+function distPerc(float $v, float $f, float $t)
+{
+    $o = ($t - $f) / 2;
+    $d = ($o - $v);
+    $r = round(abs($d) / abs($o) * 100);
 
-$out=(($v < $min) or ($v > $max));
-if ($k) return $out ? $max : $v;
- else return ($out) ? $min : $v;
+    return $r;
 }
 
-function makeVarKeys($a, $s="x") {
-foreach ($a as $k=>$v) {
-$a[$s.$k]=$v;
-}
-return $a;
+function prob($p)
+{
+    return mt_rand(1, 100) <= $p;
 }
 
-function getVarName($s) {
-$a=explode("_", strtolower($s));
-$v=array_shift($a);
+function randStr($length = 32)
+{
+    $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPRQSTUVWXYZ0123456789';
+    $code = '';
+    $clen = strlen($chars) - 1;
 
-foreach ($a as $t) {
-$v.=ucfirst($t);
+    while (strlen($code) < $length) {
+        $code .= $chars[mt_rand(0, $clen)];
+    }
+
+    return $code;
 }
 
-return $v;
-}
+function hugeNumStyle(int $n)
+{
+    $rev = function (string $s) {
+        $s1 = '';
 
-function distPerc(float $v, float $f, float $t) {
-$o=($t-$f)/2;
-$d=($o-$v);
-$r=round(abs($d)/abs($o)*100);
-return $r;
-}
+        for ($i = strlen($s) - 1; $i >= 0; --$i) {
+            $s1 .= $s[$i];
+        }
 
-function prob($p) {
-return mt_rand(1, 100) <= $p;
-}
+        return $s1;
+    };
 
-function randStr($length = 32) {
-		$chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPRQSTUVWXYZ0123456789";
-		$code = "";
-		$clen = strlen($chars) - 1;  
+    $s = $rev($n);
+    $s1 = '';
+    $to = strlen($s) - 1;
 
-		while (strlen($code) < $length) {
-            $code .= $chars[mt_rand(0, $clen)];  
-}
+    for ($i = 0; $i <= $to; ++$i) {
+        $s1 .= $s[$i];
 
-		return $code;
-	}
+        if ($i != $to && 0 == (($i + 1) % 3)) {
+            $s1 .= '.';
+        }
+    }
 
-function hugeNumStyle(int $n) {
-$rev=function (string $s) {
-$s1="";
-for ($i=strlen($s)-1; $i>=0; $i--) {
-$s1.=$s[$i];
-}
-return $s1;
-};
-
-$s=$rev($n);;
-$s1="";
-$to=strlen($s)-1;
-for ($i=0; $i<=$to; $i++) {
-$s1.=$s[$i];
-if ($i!=$to && (($i+1) % 3) == 0) $s1.=".";
-}
-
-return $rev($s1);
+    return $rev($s1);
 }

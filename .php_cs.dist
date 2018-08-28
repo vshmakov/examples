@@ -3,6 +3,16 @@
 return PhpCsFixer\Config::create()
     ->setRules([
         '@Symfony' => true,
+//@Symfony,
+"@PSR1"=>true,
+"@PSR2"=>true,
+"align_multiline_comment"=>true,
+"array_indentation"=>true,
+"blank_line_before_return"=>true,
+"blank_line_before_statement"=>[
+"statements"=>
+['break', 'case', 'continue', 'declare', 'default', 'die', 'do', 'exit', 'for', 'foreach', 'goto', 'if', 'include', 'include_once', 'require', 'require_once', 'return', 'switch', 'throw', 'try', 'while', 'yield']
+],
         'array_syntax' => ['syntax' => 'short'],
     ])
 ;

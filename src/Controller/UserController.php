@@ -4,12 +4,10 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\UserType;
-use App\Repository\{
-UserRepository,
-SessionRepository,
-ExampleRepository,
-AttemptRepository,
-};
+use App\Repository\UserRepository;
+use App\Repository\SessionRepository;
+use App\Repository\ExampleRepository;
+use App\Repository\AttemptRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,9 +24,9 @@ class UserController extends Controller
     public function index(UserRepository $userRepository): Response
     {
         return $this->render('user/index.html.twig', [
-'users' => $userRepository->findAll(),
-"uR"=>$userRepository,
-]);
+            'users' => $userRepository->findAll(),
+            'uR' => $userRepository,
+        ]);
     }
 
     /**
@@ -96,24 +94,26 @@ class UserController extends Controller
         return $this->redirectToRoute('user_index');
     }
 
-/**
-*@Route("/{id}/sessions", name="user_sessions")
-*/
-public function sessions(User $u, SessionRepository $sR) {
-return $this->render("user/sessions.html.twig", [
-"username"=>$u->getUsername(),
-"sessions"=>$sR->findByUser($u),
-]);
-}
+    /**
+     *@Route("/{id}/sessions", name="user_sessions")
+     */
+    public function sessions(User $u, SessionRepository $sR)
+    {
+        return $this->render('user/sessions.html.twig', [
+            'username' => $u->getUsername(),
+            'sessions' => $sR->findByUser($u),
+        ]);
+    }
 
-/**
-*@Route("/{id}/examples", name="user_examples")
-*/
-public function examples(User $u, ExampleRepository $exR, AttemptRepository $attR) {
-return $this->render("user/examples.html.twig", [
-"username"=>$u->getUsername(),
-"examples"=>$exR->findByUser($u),
-"attR"=>$attR,
-]);
-}
+    /**
+     *@Route("/{id}/examples", name="user_examples")
+     */
+    public function examples(User $u, ExampleRepository $exR, AttemptRepository $attR)
+    {
+        return $this->render('user/examples.html.twig', [
+            'username' => $u->getUsername(),
+            'examples' => $exR->findByUser($u),
+            'attR' => $attR,
+        ]);
+    }
 }

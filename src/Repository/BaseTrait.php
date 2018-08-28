@@ -2,35 +2,40 @@
 
 namespace App\Repository;
 
-use App\DT;
-use App\Entity\Example;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+trait BaseTrait
+{
+    use \App\BaseTrait;
 
-trait BaseTrait {
-use \App\BaseTrait;
+    public function em()
+    {
+        return $this->getEntityManager();
+    }
 
-public function em() {
-return $this->getEntityManager();
-}
+    public function q($dql)
+    {
+        return $this->em()->createQuery($dql);
+    }
 
-public function q($dql) {
-return $this->em()->createQuery($dql);
-}
+    public function v($q)
+    {
+        $r = ($q->setMaxResults(1)->getOneOrNullResult());
 
-public function v($q) {
-$r=($q->setMaxResults(1)->getOneOrNullResult());
-if (!is_array($r)) return $r;
-foreach ($r as $v) {
-return $v;
-}
-}
+        if (!is_array($r)) {
+            return $r;
+        }
 
-private function qb() {
-return $this->createQueryBuilder();
-}
+        foreach ($r as $v) {
+            return $v;
+        }
+    }
 
-private function er($cl) {
-return $this->em()->getRepository($cl);
-}
+    private function qb()
+    {
+        return $this->createQueryBuilder();
+    }
+
+    private function er($cl)
+    {
+        return $this->em()->getRepository($cl);
+    }
 }

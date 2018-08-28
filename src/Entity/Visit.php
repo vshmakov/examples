@@ -47,9 +47,10 @@ class Visit
      */
     private $method;
 
-public function __construct() {
-$this->addTime=new \DateTime;
-}
+    public function __construct()
+    {
+        $this->addTime = new \DateTime();
+    }
 
     public function getId()
     {

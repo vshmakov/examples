@@ -2,4 +2,6 @@
 
 namespace App;
 
-class DT extends \DT {}
+class DT extends \DT
+{
+}

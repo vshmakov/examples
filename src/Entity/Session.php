@@ -5,14 +5,13 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use App\Service\IpInformer as IpInf;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\SessionRepository")
  */
 class Session
 {
-use DTTrait;
+    use DTTrait;
 
     /**
      * @ORM\Id()
@@ -60,9 +59,9 @@ use DTTrait;
     public function __construct()
     {
         $this->attempts = new ArrayCollection();
-$this->initAddTime();
-$this->lastTime=new \DateTime;
-$this->visits = new ArrayCollection();
+        $this->initAddTime();
+        $this->lastTime = new \DateTime();
+        $this->visits = new ArrayCollection();
     }
 
     public function getId()
@@ -70,14 +69,17 @@ $this->visits = new ArrayCollection();
         return $this->id;
     }
 
-public function getLastTime() {
-return $this->dt($this->lastTime);
-}
+    public function getLastTime()
+    {
+        return $this->dt($this->lastTime);
+    }
 
-public function setLastTime($dt) {
-$this->lastTime=$dt;
-return $this;
-}
+    public function setLastTime($dt)
+    {
+        $this->lastTime = $dt;
+
+        return $this;
+    }
 
     public function getAddTime(): ?\DateTimeInterface
     {
@@ -146,46 +148,46 @@ return $this;
         return $this;
     }
 
-/**
- * @return Collection|Visit[]
- */
-public function getVisits(): Collection
-{
-    return $this->visits;
-}
-
-public function addVisit(Visit $visit): self
-{
-    if (!$this->visits->contains($visit)) {
-        $this->visits[] = $visit;
-        $visit->setSession($this);
+    /**
+     * @return Collection|Visit[]
+     */
+    public function getVisits(): Collection
+    {
+        return $this->visits;
     }
 
-    return $this;
-}
-
-public function removeVisit(Visit $visit): self
-{
-    if ($this->visits->contains($visit)) {
-        $this->visits->removeElement($visit);
-        // set the owning side to null (unless already changed)
-        if ($visit->getSession() === $this) {
-            $visit->setSession(null);
+    public function addVisit(Visit $visit): self
+    {
+        if (!$this->visits->contains($visit)) {
+            $this->visits[] = $visit;
+            $visit->setSession($this);
         }
+
+        return $this;
     }
 
-    return $this;
-}
+    public function removeVisit(Visit $visit): self
+    {
+        if ($this->visits->contains($visit)) {
+            $this->visits->removeElement($visit);
+            // set the owning side to null (unless already changed)
+            if ($visit->getSession() === $this) {
+                $visit->setSession(null);
+            }
+        }
 
-public function getIp(): ?Ip
-{
-    return $this->ip;
-}
+        return $this;
+    }
 
-public function setIp(?Ip $ip): self
-{
-    $this->ip = $ip;
+    public function getIp(): ?Ip
+    {
+        return $this->ip;
+    }
 
-    return $this;
-}
+    public function setIp(?Ip $ip): self
+    {
+        $this->ip = $ip;
+
+        return $this;
+    }
 }

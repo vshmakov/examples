@@ -29,7 +29,7 @@ class Transfer
     /**
      * @ORM\Column(type="boolean")
      */
-    private $held=false;
+    private $held = false;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
@@ -47,10 +47,10 @@ class Transfer
      */
     private $money;
 
-public function __construct() 
-{
-$this->addTime=new \DateTime;
-}
+    public function __construct()
+    {
+        $this->addTime = new \DateTime();
+    }
 
     public function getId()
     {

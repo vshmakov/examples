@@ -12,7 +12,7 @@ use App\DT;
  */
 class Attempt
 {
-use DTTrait;
+    use DTTrait;
 
     /**
      * @ORM\Id()
@@ -45,7 +45,7 @@ use DTTrait;
     public function __construct()
     {
         $this->examples = new ArrayCollection();
-$this->initAddTime();
+        $this->initAddTime();
     }
 
     public function getId()
@@ -120,16 +120,18 @@ $this->initAddTime();
         return $this;
     }
 
-public function getExamplesCount() {
-return $this->getSettings()->getExamplesCount();
-}
+    public function getExamplesCount()
+    {
+        return $this->getSettings()->getExamplesCount();
+    }
 
-public function getLimitTime() {
-return DT::createFromTimestamp($this->getAddTime()->getTimestamp()+$this->getSettings()->getDuration());
-}
+    public function getLimitTime()
+    {
+        return DT::createFromTimestamp($this->getAddTime()->getTimestamp() + $this->getSettings()->getDuration());
+    }
 
-public function getMaxTime() {
-return $this->dts($this->getSettings()->getDuration());
-}
-
+    public function getMaxTime()
+    {
+        return $this->dts($this->getSettings()->getDuration());
+    }
 }

@@ -2,46 +2,62 @@
 
 namespace App\Entity;
 
-Use App\DT;
+trait BaseTrait
+{
+    use \App\BaseTrait;
 
-trait BaseTrait {
-use \App\BaseTrait;
+    private $er;
 
-private $er;
+    public function setER($er)
+    {
+        $this->er = $er;
 
-public function setER($er) {
-$this->er=$er;
-return $this;
-}
+        return $this;
+    }
 
-public function __call($v, $p=[]) {
-if ($gs=$this->getSetter($v, $p)) return $gs["ret"];
-$m=entityGetter($v);
-$er=$this->er;
-if (!method_exists($er, $m)) throw new \Exception(sprintf("Entity %s and %s repository does not contain %s getter", self::class, is_object($er) ? get_class($er) : "empty", $v));
-return $this->er->$m($this);
-}
+    public function __call($v, $p = [])
+    {
+        if ($gs = $this->getSetter($v, $p)) {
+            return $gs['ret'];
+        }
+        $m = entityGetter($v);
+        $er = $this->er;
 
-private function getSetter($method, $p) {
-foreach (['get', 'set'] as $action) {
-if (preg_match("#^$action(.+)$#", $method, $arr)) {
-$v=lcfirst($arr[1]);
-if (isset($this->$v)) {
-if (!$g=$action == 'get') $this->$v=$p[0];
-return ["ret"=>$g ? $this->$v : $this];
-}
-}
-}
+        if (!method_exists($er, $m)) {
+            throw new \Exception(sprintf('Entity %s and %s repository does not contain %s getter', self::class, is_object($er) ? get_class($er) : 'empty', $v));
+        }
 
-return false;
-}
+        return $this->er->$m($this);
+    }
 
-public function __get($v) {
-return $this->$v;
-}
+    private function getSetter($method, $p)
+    {
+        foreach (['get', 'set'] as $action) {
+            if (preg_match("#^$action(.+)$#", $method, $arr)) {
+                $v = lcfirst($arr[1]);
 
-public function __set($v, $p) {
-$this->$v=$p;
-return $this;
-}
+                if (isset($this->$v)) {
+                    if (!$g = 'get' == $action) {
+                        $this->$v = $p[0];
+                    }
+
+                    return ['ret' => $g ? $this->$v : $this];
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public function __get($v)
+    {
+        return $this->$v;
+    }
+
+    public function __set($v, $p)
+    {
+        $this->$v = $p;
+
+        return $this;
+    }
 }

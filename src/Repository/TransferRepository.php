@@ -9,27 +9,30 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class TransferRepository extends ServiceEntityRepository
 {
-use BaseTrait;
+    use BaseTrait;
 
-private $ul;
+    private $ul;
 
     public function __construct(RegistryInterface $registry, UserLoader $ul)
     {
         parent::__construct($registry, Transfer::class);
-$this->ul=$ul;
+        $this->ul = $ul;
     }
 
-public function findUnheldByCurrentUserOrNew() {
-return $this->findOneBy(["held"=>false, "user"=>$this->ul->getUser()]) ?? $this->getNewByCurrentUser();
-}
+    public function findUnheldByCurrentUserOrNew()
+    {
+        return $this->findOneBy(['held' => false, 'user' => $this->ul->getUser()]) ?? $this->getNewByCurrentUser();
+    }
 
-public function getNewByCurrentUser() {
-$e=(new Transfer)
+    public function getNewByCurrentUser()
+    {
+        $e = (new Transfer())
 ->setUser($this->ul->getUser())
 ->setLabel(randStr(32));
-$em=$this->em();
-$em->persist($e);
-$em->flush();
-return $e;
-}
+        $em = $this->em();
+        $em->persist($e);
+        $em->flush();
+
+        return $e;
+    }
 }

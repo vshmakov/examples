@@ -10,16 +10,17 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class ProfileType extends AbstractType
 {
-private $ch;
+    private $ch;
 
-public function __construct(AuthorizationCheckerInterface $ch) {
-$this->ch=$ch;
-}
+    public function __construct(AuthorizationCheckerInterface $ch)
+    {
+        $this->ch = $ch;
+    }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-->add("description")
+->add('description')
             ->add('minutes')
             ->add('seconds')
             ->add('examplesCount')
@@ -27,17 +28,17 @@ $this->ch=$ch;
             ->add('subPerc')
             ->add('multPerc')
             ->add('divPerc')
-->add("isDemanding")
+->add('isDemanding')
 ;
 
-foreach (["add", "sub", "mult", "div"] as $k) {
-foreach (["F", "S", ""] as $n) {
-foreach (["Min", "Max"] as $m) {
-$v=$k.$n.$m;
-        $builder->add($v);
-}
-}
-}
+        foreach (['add', 'sub', 'mult', 'div'] as $k) {
+            foreach (['F', 'S', ''] as $n) {
+                foreach (['Min', 'Max'] as $m) {
+                    $v = $k.$n.$m;
+                    $builder->add($v);
+                }
+            }
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver)

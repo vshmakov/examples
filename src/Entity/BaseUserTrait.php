@@ -3,20 +3,10 @@
 namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping as ORM;
-use FOS\UserBundle\Model\{
-UserInterface, 
-GroupableInterface,
-GroupInterface,
-GroupManagerInterface,
-UserManagerInterface,
-};
-use App\DT;
+use FOS\UserBundle\Model\GroupInterface;
 
 trait BaseUserTrait
 {
-
     protected $plainPassword;
     protected $groups;
 
@@ -34,6 +24,7 @@ trait BaseUserTrait
     public function addRole($role)
     {
         $role = strtoupper($role);
+
         if ($role === static::ROLE_DEFAULT) {
             return $this;
         }
@@ -50,7 +41,7 @@ trait BaseUserTrait
      */
     public function serialize()
     {
-        return serialize(array(
+        return serialize([
             $this->password,
             $this->salt,
             $this->usernameCanonical,
@@ -59,7 +50,7 @@ trait BaseUserTrait
             $this->id,
             $this->email,
             $this->emailCanonical,
-        ));
+        ]);
     }
 
     /**
@@ -404,7 +395,7 @@ trait BaseUserTrait
      */
     public function setRoles(array $roles)
     {
-        $this->roles = array();
+        $this->roles = [];
 
         foreach ($roles as $role) {
             $this->addRole($role);
@@ -426,7 +417,8 @@ trait BaseUserTrait
      */
     public function getGroupNames()
     {
-        $names = array();
+        $names = [];
+
         foreach ($this->getGroups() as $group) {
             $names[] = $group->getName();
         }

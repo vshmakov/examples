@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Code
 {
-use DTTrait;
+    use DTTrait;
 
     /**
      * @ORM\Id()
@@ -41,16 +41,16 @@ use DTTrait;
     /**
      * @ORM\Column(type="boolean")
      */
-    private $activated=false;
+    private $activated = false;
 
     /**
      * @ORM\Column(type="smallint")
      */
-    private $money=100;
+    private $money = 100;
 
-public function __construct() {
-
-}
+    public function __construct()
+    {
+    }
 
     public function getId()
     {

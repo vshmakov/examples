@@ -7,18 +7,19 @@ use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundE
 
 class AuthChecker
 {
-private $ch;
+    private $ch;
 
-public function __construct(CH $ch)
-{
-$this->ch=$ch;
-}
+    public function __construct(CH $ch)
+    {
+        $this->ch = $ch;
+    }
 
-public function isGranted(...$p) {
-try {
-return $this->ch->isGranted(...$p);
-} catch(Exc $ex) {
-return false;
-}
-}
+    public function isGranted(...$p)
+    {
+        try {
+            return $this->ch->isGranted(...$p);
+        } catch (Exc $ex) {
+            return false;
+        }
+    }
 }

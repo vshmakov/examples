@@ -5,20 +5,16 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use FOS\UserBundle\Model\{
-UserInterface, 
-GroupableInterface
-};
+use FOS\UserBundle\Model\UserInterface;
+use FOS\UserBundle\Model\GroupableInterface;
 use App\DT;
-use Symfony\Component\Security\Core\User\EquatableInterface;
-use Symfony\Component\Security\Core\User\UserInterface as SUI;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  */
 class User implements UserInterface, GroupableInterface
 {
-use DTTrait, BaseUserTrait;
+    use DTTrait, BaseUserTrait;
 
     /**
      * @ORM\Id()
@@ -45,12 +41,12 @@ use DTTrait, BaseUserTrait;
     /**
      * @ORM\Column(type="integer")
      */
-    private $money=0;
+    private $money = 0;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $allMoney=0;
+    private $allMoney = 0;
 
     /**
      * @ORM\Column(type="datetime")
@@ -117,7 +113,7 @@ use DTTrait, BaseUserTrait;
      *
      * @ORM\Column(type="boolean", nullable=true)
      */
-    private $isSocial=false;
+    private $isSocial = false;
 
     /**
      * @var string|null
@@ -164,16 +160,16 @@ use DTTrait, BaseUserTrait;
     public function __construct()
     {
         $this->enabled = false;
-        $this->roles = array();
+        $this->roles = [];
         $this->sessions = new ArrayCollection();
         $this->profiles = new ArrayCollection();
-$l=TEST_DAYS;
-$this->limitTime=(new \DateTime())->add(new \DateInterval("P{$l}D"));
-$this->addTime=new \DateTime;
-$this->codes = new ArrayCollection();
-$this->money=DEFAULT_MONEY;
-$this->ips = new ArrayCollection();
-$this->transfers = new ArrayCollection();
+        $l = TEST_DAYS;
+        $this->limitTime = (new \DateTime())->add(new \DateInterval("P{$l}D"));
+        $this->addTime = new \DateTime();
+        $this->codes = new ArrayCollection();
+        $this->money = DEFAULT_MONEY;
+        $this->ips = new ArrayCollection();
+        $this->transfers = new ArrayCollection();
     }
 
     public function getId()
@@ -296,167 +292,181 @@ $this->transfers = new ArrayCollection();
         return $this;
     }
 
-public function getRemainedTime() {
-$d=$this->getLimitTime()->getTimestamp() - time();
-return DT::createFromTimestamp($d > 0 ? $d  : 0);
-}
+    public function getRemainedTime()
+    {
+        $d = $this->getLimitTime()->getTimestamp() - time();
 
-/**
- * @return Collection|Code[]
- */
-public function getCodes(): Collection
-{
-    return $this->codes;
-}
-
-public function addCode(Code $code): self
-{
-    if (!$this->codes->contains($code)) {
-        $this->codes[] = $code;
-        $code->setUser($this);
+        return DT::createFromTimestamp($d > 0 ? $d : 0);
     }
 
-    return $this;
-}
+    /**
+     * @return Collection|Code[]
+     */
+    public function getCodes(): Collection
+    {
+        return $this->codes;
+    }
 
-public function removeCode(Code $code): self
-{
-    if ($this->codes->contains($code)) {
-        $this->codes->removeElement($code);
-        // set the owning side to null (unless already changed)
-        if ($code->getUser() === $this) {
-            $code->setUser(null);
+    public function addCode(Code $code): self
+    {
+        if (!$this->codes->contains($code)) {
+            $this->codes[] = $code;
+            $code->setUser($this);
         }
+
+        return $this;
     }
 
-    return $this;
-}
-
-public function addMoney(int $m) {
-$this->allMoney+=$m;
-return $this->setMoney($this->getMoney() + $m);
-}
-
-/**
- * @return Collection|Ip[]
- */
-public function getIps(): Collection
-{
-    return $this->ips;
-}
-
-public function addIp(Ip $ip): self
-{
-    if (!$this->ips->contains($ip) && $ip->isValid()) {
-$con=false;
-foreach ($this->ips as $e) {
-if ($e->getIp() == $ip->getIp()) {
-$con=true;
-break;
-}
-}
-
-if (!$con)         $this->ips[] = $ip;
-    }
-
-    return $this;
-}
-
-public function removeIp(Ip $ip): self
-{
-    if ($this->ips->contains($ip)) {
-        $this->ips->removeElement($ip);
-    }
-
-    return $this;
-}
-
-/**
- * @return Collection|Transfer[]
- */
-public function getTransfers(): Collection
-{
-    return $this->transfers;
-}
-
-public function addTransfer(Transfer $transfer): self
-{
-    if (!$this->transfers->contains($transfer)) {
-        $this->transfers[] = $transfer;
-        $transfer->setUser($this);
-    }
-
-    return $this;
-}
-
-public function removeTransfer(Transfer $transfer): self
-{
-    if ($this->transfers->contains($transfer)) {
-        $this->transfers->removeElement($transfer);
-        // set the owning side to null (unless already changed)
-        if ($transfer->getUser() === $this) {
-            $transfer->setUser(null);
+    public function removeCode(Code $code): self
+    {
+        if ($this->codes->contains($code)) {
+            $this->codes->removeElement($code);
+            // set the owning side to null (unless already changed)
+            if ($code->getUser() === $this) {
+                $code->setUser(null);
+            }
         }
+
+        return $this;
     }
 
-    return $this;
-}
+    public function addMoney(int $m)
+    {
+        $this->allMoney += $m;
 
-/**
- * @ORM\Column(type="string", length=255, nullable=true)
- */
-private $firstName;
+        return $this->setMoney($this->getMoney() + $m);
+    }
 
-public function getFirstName(): ?string
-{
-    return $this->isSocial() ? $this->firstName : $this->getUsername();
-}
+    /**
+     * @return Collection|Ip[]
+     */
+    public function getIps(): Collection
+    {
+        return $this->ips;
+    }
 
+    public function addIp(Ip $ip): self
+    {
+        if (!$this->ips->contains($ip) && $ip->isValid()) {
+            $con = false;
 
-/**
- * @ORM\Column(type="string", length=255, nullable=true)
- */
-private $lastName;
-public function setFirstName(?string $firstName): self
-{
-    $this->firstName = $firstName;
+            foreach ($this->ips as $e) {
+                if ($e->getIp() == $ip->getIp()) {
+                    $con = true;
 
-    return $this;
-}
+                    break;
+                }
+            }
 
-public function getLastName(): ?string
-{
-    return $this->lastName;
-}
+            if (!$con) {
+                $this->ips[] = $ip;
+            }
+        }
 
-public function setLastName(?string $lastName): self
-{
-    $this->lastName = $lastName;
+        return $this;
+    }
 
-    return $this;
-}
+    public function removeIp(Ip $ip): self
+    {
+        if ($this->ips->contains($ip)) {
+            $this->ips->removeElement($ip);
+        }
 
-public function getLogin() {
-return !$this->isSocial() ? $this->getUsername() : $this->getFirstName()." ".$this->getLastName();
-}
+        return $this;
+    }
 
-public function isSocial():bool {
-return $this->isSocial ?? false;
-}
+    /**
+     * @return Collection|Transfer[]
+     */
+    public function getTransfers(): Collection
+    {
+        return $this->transfers;
+    }
 
-public function setIsSocial($s) {
-$this->isSocial=$s;
-return $this;
-}
+    public function addTransfer(Transfer $transfer): self
+    {
+        if (!$this->transfers->contains($transfer)) {
+            $this->transfers[] = $transfer;
+            $transfer->setUser($this);
+        }
 
-/*
-public function getUsername() {
-return $this->username ?? $this->getFirstName()." ".$this->getLastName();
-}
-*/
+        return $this;
+    }
 
-public function setUsername($u) {
-$this->username=$u;
-return $this->setUsernameCanonical($u);
-}
+    public function removeTransfer(Transfer $transfer): self
+    {
+        if ($this->transfers->contains($transfer)) {
+            $this->transfers->removeElement($transfer);
+            // set the owning side to null (unless already changed)
+            if ($transfer->getUser() === $this) {
+                $transfer->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $firstName;
+
+    public function getFirstName(): ?string
+    {
+        return $this->isSocial() ? $this->firstName : $this->getUsername();
+    }
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $lastName;
+
+    public function setFirstName(?string $firstName): self
+    {
+        $this->firstName = $firstName;
+
+        return $this;
+    }
+
+    public function getLastName(): ?string
+    {
+        return $this->lastName;
+    }
+
+    public function setLastName(?string $lastName): self
+    {
+        $this->lastName = $lastName;
+
+        return $this;
+    }
+
+    public function getLogin()
+    {
+        return !$this->isSocial() ? $this->getUsername() : $this->getFirstName().' '.$this->getLastName();
+    }
+
+    public function isSocial(): bool
+    {
+        return $this->isSocial ?? false;
+    }
+
+    public function setIsSocial($s)
+    {
+        $this->isSocial = $s;
+
+        return $this;
+    }
+
+    /*
+    public function getUsername() {
+    return $this->username ?? $this->getFirstName()." ".$this->getLastName();
+    }
+    */
+
+    public function setUsername($u)
+    {
+        $this->username = $u;
+
+        return $this->setUsernameCanonical($u);
+    }
 }

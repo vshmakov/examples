@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Profile
 {
-use DTTrait;
+    use DTTrait;
 
     /**
      * @ORM\Id()
@@ -34,157 +34,157 @@ use DTTrait;
     /**
      * @ORM\Column(type="boolean")
      */
-    private $isPublic=false;
+    private $isPublic = false;
 
     /**
      * @ORM\Column(type="smallint")
      */
-    private $duration=180;
+    private $duration = 180;
 
     /**
      * @ORM\Column(type="smallint")
      */
-    private $examplesCount=5;
+    private $examplesCount = 5;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $addFMin=0;
+    private $addFMin = 0;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $addFMax=3;
+    private $addFMax = 3;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $addSMin=0;
+    private $addSMin = 0;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $addSMax=3;
+    private $addSMax = 3;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $addMin=-1;
+    private $addMin = -1;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $addMax=-1;
+    private $addMax = -1;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $subFMin=0;
+    private $subFMin = 0;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $subFMax=5;
+    private $subFMax = 5;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $subSMin=0;
+    private $subSMin = 0;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $subSMax=5;
+    private $subSMax = 5;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $subMin=0;
+    private $subMin = 0;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $subMax=1000;
+    private $subMax = 1000;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $multFMin=0;
+    private $multFMin = 0;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $multFMax=3;
+    private $multFMax = 3;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $multSMin=0;
+    private $multSMin = 0;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $multSMax=3;
+    private $multSMax = 3;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $multMin=-1;
+    private $multMin = -1;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $multMax=-1;
+    private $multMax = -1;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $divFMin=0;
+    private $divFMin = 0;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $divFMax=6;
+    private $divFMax = 6;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $divSMin=1;
+    private $divSMin = 1;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $divSMax=6;
+    private $divSMax = 6;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $divMin=-1;
+    private $divMin = -1;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $divMax=-1;
+    private $divMax = -1;
 
     /**
      * @ORM\Column(type="smallint")
      */
-    private $addPerc=25;
-
-   /**
-     * @ORM\Column(type="smallint")
-     */
-    private $subPerc=25;
+    private $addPerc = 25;
 
     /**
      * @ORM\Column(type="smallint")
      */
-    private $multPerc=25;
+    private $subPerc = 25;
 
     /**
      * @ORM\Column(type="smallint")
      */
-    private $divPerc=25;
+    private $multPerc = 25;
+
+    /**
+     * @ORM\Column(type="smallint")
+     */
+    private $divPerc = 25;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\User", mappedBy="profile")
@@ -199,13 +199,13 @@ use DTTrait;
     /**
      * @ORM\Column(type="boolean")
      */
-    private $isDemanding=true;
+    private $isDemanding = true;
 
     public function __construct()
     {
         $this->users = new ArrayCollection();
-$this->initAddTime();
-$this->normData();
+        $this->initAddTime();
+        $this->normData();
     }
 
     public function getId()
@@ -256,7 +256,7 @@ $this->normData();
 
     public function setDuration(int $duration): self
     {
-        $this->duration = btwVal(30, HOUR-1, $duration);
+        $this->duration = btwVal(30, HOUR - 1, $duration);
 
         return $this;
     }
@@ -352,132 +352,151 @@ $this->normData();
         return $this;
     }
 
-private function normPerc() {
-$pKeies=['addPerc', 'subPerc', 'multPerc', 'divPerc'];
-$p=[];
-foreach ($pKeies as $k) {
-$p[$k]=$this->$k;
-}
+    private function normPerc()
+    {
+        $pKeies = ['addPerc', 'subPerc', 'multPerc', 'divPerc'];
+        $p = [];
 
-foreach (normPerc($p) as $k=>$v) {
-$this->$k=$v;
-}
+        foreach ($pKeies as $k) {
+            $p[$k] = $this->$k;
+        }
 
-return $this;
-}
+        foreach (normPerc($p) as $k => $v) {
+            $this->$k = $v;
+        }
 
-public function getMinutes():int {
-return ($this->duration/MIN);
-}
+        return $this;
+    }
 
-public function setMinutes(int $min) {
-$min=minVal(0, $min);
-$this->setDuration($min*MIN+$this->getSeconds());
-return $this;
-}
+    public function getMinutes(): int
+    {
+        return $this->duration / MIN;
+    }
 
-public function getSeconds():int {
-return $this->duration%MIN;
-}
+    public function setMinutes(int $min)
+    {
+        $min = minVal(0, $min);
+        $this->setDuration($min * MIN + $this->getSeconds());
 
-public function setSeconds(int $sec) {
-$sec=btwVal(0, 59, $sec);
-$this->setDuration($this->getMinutes()*MIN+$sec);
-return $this;
-}
+        return $this;
+    }
 
-public function getDescription(): ?string
-{
-    return $this->description;
-}
+    public function getSeconds(): int
+    {
+        return $this->duration % MIN;
+    }
 
-public function setDescription(string $description): self
-{
-    $this->description = $description;
+    public function setSeconds(int $sec)
+    {
+        $sec = btwVal(0, 59, $sec);
+        $this->setDuration($this->getMinutes() * MIN + $sec);
 
-    return $this;
-}
+        return $this;
+    }
 
-public function __toString() {
-return $this->getDescription()." - ".$this->getAuthor()->getUsername();
-}
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
 
-public function getData() {
-$this->normData();
-$d=[];
-$f=getArrByStr("duration examplesCount addFMin addFMax addSMin addSMax addMin addMax subFMin subFMax subSMin subSMax subMin subMax multFMin multFMax multSMin multSMax multMin multMax divFMin divFMax divSMin divSMax divMin divMax addPerc subPerc multPerc divPerc");
+    public function setDescription(string $description): self
+    {
+        $this->description = $description;
 
-foreach ($this as $k=>$v) {
-if (in_array($k, $f)) $d[$k]=$v;
-}
+        return $this;
+    }
 
-return $d;
-}
+    public function __toString()
+    {
+        return $this->getDescription().' - '.$this->getAuthor()->getUsername();
+    }
 
-public function isDemanding(): ?bool
-{
-    return $this->isDemanding;
-}
+    public function getData()
+    {
+        $this->normData();
+        $d = [];
+        $f = getArrByStr('duration examplesCount addFMin addFMax addSMin addSMax addMin addMax subFMin subFMax subSMin subSMax subMin subMax multFMin multFMax multSMin multSMax multMin multMax divFMin divFMax divSMin divSMax divMin divMax addPerc subPerc multPerc divPerc');
 
-public function setIsDemanding(bool $isDemanding): self
-{
-    $this->isDemanding = $isDemanding;
-    return $this;
-}
+        foreach ($this as $k => $v) {
+            if (in_array($k, $f)) {
+                $d[$k] = $v;
+            }
+        }
 
-public function getInstance() {
-return $this;
-}
+        return $d;
+    }
 
-public function __clone() {
-$this->id=null;
-$this->author=null;
-$this->isPublic=false;
-$this->initAddTime();
-}
+    public function isDemanding(): ?bool
+    {
+        return $this->isDemanding;
+    }
 
-public function normData() {
-$this->normPerc();
+    public function setIsDemanding(bool $isDemanding): self
+    {
+        $this->isDemanding = $isDemanding;
 
-foreach (["add", "sub", "mult", "div"] as $k) {
-foreach (["F", "S"] as $n) {
-$min=$k.$n."Min";
-$max=$k.$n."Max";
-$this->$max=minVal($this->$min, $this->$max);
-}
-}
-if ($this->divSMin == 0) $this->divSMin=1;
-$this->divSMax=minVal($this->divSMin, $this->divSMax);
+        return $this;
+    }
 
-$addMin=$this->addFMin + $this->addSMin;
-$addMax=$this->addFMax + $this->addSMax;
-$this->addMin=btwVal($addMin, $addMax, $this->addMin, false);
-$this->addMax=btwVal($addMin, $addMax, $this->addMax, true);
+    public function getInstance()
+    {
+        return $this;
+    }
 
-$subMin=$this->subFMin - $this->subSMax;
-$subMax=$this->subFMax - $this->subSMin;
-$this->subMin=btwVal($subMin, $subMax, $this->subMin, false);
-$this->subMax=btwVal($subMin, $subMax, $this->subMax, true);
+    public function __clone()
+    {
+        $this->id = null;
+        $this->author = null;
+        $this->isPublic = false;
+        $this->initAddTime();
+    }
 
-$multMin=$this->multFMin * $this->multSMin;
-$multMax=$this->multFMax * $this->multSMax;
-$this->multMin=btwVal($multMin, $multMax, $this->multMin, false);
-$this->multMax=btwVal($multMin, $multMax, $this->multMax, true);
+    public function normData()
+    {
+        $this->normPerc();
 
-$divMin=$this->divFMin / $this->divSMax;
-$divMax=$this->divFMax / $this->divSMin;
-$this->divMin=ceil(btwVal($divMin, $divMax, $this->divMin, false));
-$this->divMax=btwVal($divMin, $divMax, $this->divMax, true);
+        foreach (['add', 'sub', 'mult', 'div'] as $k) {
+            foreach (['F', 'S'] as $n) {
+                $min = $k.$n.'Min';
+                $max = $k.$n.'Max';
+                $this->$max = minVal($this->$min, $this->$max);
+            }
+        }
 
-foreach (["add", "sub", "mult", "div"] as $k) {
-foreach (["F", "S", ""] as $n) {
-foreach (["Min", "Max"] as $m) {
-$v=$k.$n.$m;
-$this->$v=(int) $this->$v;
-}
-}
-}
+        if (0 == $this->divSMin) {
+            $this->divSMin = 1;
+        }
+        $this->divSMax = minVal($this->divSMin, $this->divSMax);
 
-return $this;
-}
+        $addMin = $this->addFMin + $this->addSMin;
+        $addMax = $this->addFMax + $this->addSMax;
+        $this->addMin = btwVal($addMin, $addMax, $this->addMin, false);
+        $this->addMax = btwVal($addMin, $addMax, $this->addMax, true);
+
+        $subMin = $this->subFMin - $this->subSMax;
+        $subMax = $this->subFMax - $this->subSMin;
+        $this->subMin = btwVal($subMin, $subMax, $this->subMin, false);
+        $this->subMax = btwVal($subMin, $subMax, $this->subMax, true);
+
+        $multMin = $this->multFMin * $this->multSMin;
+        $multMax = $this->multFMax * $this->multSMax;
+        $this->multMin = btwVal($multMin, $multMax, $this->multMin, false);
+        $this->multMax = btwVal($multMin, $multMax, $this->multMax, true);
+
+        $divMin = $this->divFMin / $this->divSMax;
+        $divMax = $this->divFMax / $this->divSMin;
+        $this->divMin = ceil(btwVal($divMin, $divMax, $this->divMin, false));
+        $this->divMax = btwVal($divMin, $divMax, $this->divMax, true);
+
+        foreach (['add', 'sub', 'mult', 'div'] as $k) {
+            foreach (['F', 'S', ''] as $n) {
+                foreach (['Min', 'Max'] as $m) {
+                    $v = $k.$n.$m;
+                    $this->$v = (int) $this->$v;
+                }
+            }
+        }
+
+        return $this;
+    }
 }

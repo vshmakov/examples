@@ -2,17 +2,19 @@
 
 namespace App\Entity;
 
-Use App\DT;
+use App\DT;
 
-trait DTTrait {
-use BaseTrait;
+trait DTTrait
+{
+    use BaseTrait;
 
-public function __construct() {
-$this->initAddTime();
-}
+    public function __construct()
+    {
+        $this->initAddTime();
+    }
 
-private function initAddTime($var="addTime") {
-$this->$var=new DT();
-}
-
+    private function initAddTime($var = 'addTime')
+    {
+        $this->$var = new DT();
+    }
 }

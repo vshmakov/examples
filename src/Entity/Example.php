@@ -11,7 +11,7 @@ use App\Service\ExampleManager as ExMNG;
  */
 class Example
 {
-use DTTrait;
+    use DTTrait;
 
     /**
      * @ORM\Id()
@@ -122,8 +122,9 @@ use DTTrait;
     public function setAnswer(?float $answer): self
     {
         $this->answer = $answer;
-$this->setIsRight($answer === ExMng::solve($this->first, $this->second, $this->sign));
-$this->setAnswerTime(new \DateTime());
+        $this->setIsRight($answer === ExMng::solve($this->first, $this->second, $this->sign));
+        $this->setAnswerTime(new \DateTime());
+
         return $this;
     }
 
@@ -163,8 +164,8 @@ $this->setAnswerTime(new \DateTime());
         return $this;
     }
 
-public function __toString() {
-return sprintf("%s %s %s", $this->first, [1=>"+", "-", "*", ":"][$this->sign], $this->second);
-}
-
+    public function __toString()
+    {
+        return sprintf('%s %s %s', $this->first, [1 => '+', '-', '*', ':'][$this->sign], $this->second);
+    }
 }

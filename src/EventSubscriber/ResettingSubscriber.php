@@ -9,22 +9,23 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ResettingSubscriber implements EventSubscriberInterface
 {
-private $ug;
+    private $ug;
 
-public function __construct(UrlGeneratorInterface $ug) {
-$this->ug=$ug;
-}
+    public function __construct(UrlGeneratorInterface $ug)
+    {
+        $this->ug = $ug;
+    }
 
     public function onFosUserResettingResetSuccess(FormEvent $event)
     {
-$url=$this->ug->generate("homepage");
+        $url = $this->ug->generate('homepage');
         $event->setResponse(new RedirectResponse($url));
     }
 
     public static function getSubscribedEvents()
     {
         return [
-           'fos_user.resetting.reset.success' => 'onFosUserResettingResetSuccess',
+            'fos_user.resetting.reset.success' => 'onFosUserResettingResetSuccess',
         ];
     }
 }

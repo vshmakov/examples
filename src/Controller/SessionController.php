@@ -2,13 +2,11 @@
 
 namespace App\Controller;
 
-use App\Entity\{Session, Ip};
+use App\Entity\Session;
 use App\Form\SessionType;
-use App\Repository\{
-SessionRepository, 
-IpRepository,
-VisitRepository as VR,
-};
+use App\Repository\SessionRepository;
+use App\Repository\IpRepository;
+use App\Repository\VisitRepository as VR;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,15 +22,16 @@ class SessionController extends Controller
      */
     public function index(SessionRepository $sessionRepository, IpRepository $ipR): Response
     {
-$sessions=$sessionRepository->findAll();
-foreach ($sessions as $s) {
-$ipR->hasOrCreateByIp($s->getSid());
-}
+        $sessions = $sessionRepository->findAll();
+
+        foreach ($sessions as $s) {
+            $ipR->hasOrCreateByIp($s->getSid());
+        }
 
         return $this->render('session/index.html.twig', [
-'sessions' =>$sessions, 
-"ipR"=>$ipR,
-]);
+            'sessions' => $sessions,
+            'ipR' => $ipR,
+        ]);
     }
 
     /**
@@ -103,9 +102,10 @@ $ipR->hasOrCreateByIp($s->getSid());
     /**
      * @Route("/{id}/visits", name="session_visits", methods="GET")
      */
-public function visits(Session $s, VR $vR) {
-return $this->render("session/visits.html.twig", [
-"visits"=>$vR->findBySession($s),
-]);
-}
+    public function visits(Session $s, VR $vR)
+    {
+        return $this->render('session/visits.html.twig', [
+            'visits' => $vR->findBySession($s),
+        ]);
+    }
 }

@@ -1,9 +1,15 @@
 <?php
 
+$finder = PhpCsFixer\Finder::create()
+//    ->exclude('somedir')
+//    ->notPath('src/Symfony/Component/Translation/Tests/fixtures/resources.php')
+    ->in(__DIR__."/src")
+    ->in(__DIR__."/lib")
+;
+
 return PhpCsFixer\Config::create()
     ->setRules([
         '@Symfony' => true,
-//@Symfony,
 "@PSR1"=>true,
 "@PSR2"=>true,
 "align_multiline_comment"=>true,
@@ -15,4 +21,5 @@ return PhpCsFixer\Config::create()
 ],
         'array_syntax' => ['syntax' => 'short'],
     ])
+    ->setFinder($finder)
 ;

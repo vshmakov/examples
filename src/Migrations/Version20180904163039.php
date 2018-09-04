@@ -8,7 +8,6 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use App\Repository\UserRepository as UR;
 
 /**
  * Auto-generated Migration: Please modify to your needs!
@@ -26,7 +25,6 @@ final class Version20180904163039 extends AbstractMigration implements Container
     {
         $this->abortIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), 'Migration can only be executed safely on \'mysql\'.');
 
-        dump(class_exists(UR::class));
         $em = $this->container
 ->get('doctrine.orm.default_entity_manager')
 ;

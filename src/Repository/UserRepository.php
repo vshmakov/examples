@@ -107,7 +107,10 @@ where u = :u')
 ->setUsername($username)
 ->setIsSocial(true)
 ->setFirstName($first_name)
-->setLastName($last_name);
+->setLastName($last_name)
+->setNetwork($network)
+->setNetworkId($uid)
+;
         $em = $this->em();
         $em->persist($u);
         $em->flush();

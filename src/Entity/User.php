@@ -8,9 +8,13 @@ use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\UserInterface;
 use FOS\UserBundle\Model\GroupableInterface;
 use App\DT;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
+ * @UniqueEntity(fields="username", message="Логин занят")
+ * @UniqueEntity(fields="email", message="Данный адрес электронной почты уже зарегистрирован")
  */
 class User implements UserInterface, GroupableInterface
 {
@@ -77,6 +81,10 @@ class User implements UserInterface, GroupableInterface
      * @var string
      *
      * @ORM\Column(name="username", type="string", length=180, nullable=true)
+     * @Assert\Regex(
+     *     pattern="/^[a-z0-9\._\-]+$/",
+     *     message="Логин может содержать только строчные латинские буквы, а также ._-"
+     * )
      */
     private $username;
 

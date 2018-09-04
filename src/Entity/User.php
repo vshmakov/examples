@@ -82,8 +82,12 @@ class User implements UserInterface, GroupableInterface
      *
      * @ORM\Column(name="username", type="string", length=180, nullable=true)
      * @Assert\Regex(
-     *     pattern="/^[a-z0-9\._\-]+$/",
-     *     message="Логин может содержать только строчные латинские буквы, а также ._-"
+     *     pattern="/^[a-z][a-z0-9\._\-]+[a-z0-9]$/",
+     *     message="Логин должен начинаться с буквы, заканчиваться буквой или цифрой  и может содержать только строчные латинские символы, цифры, а также ._-"
+     * )
+     * @Assert\Length(
+     * min = 3,
+     * minMessage = "Ваш логин должен содержать как минимум {{ limit }} символовlong",
      * )
      */
     private $username;
@@ -134,6 +138,10 @@ class User implements UserInterface, GroupableInterface
      * @var string
      *
      * @ORM\Column(name="password", type="string", length=255, nullable=true)
+     * @Assert\Length(
+     * min = 3,
+     * minMessage = "Ваш пароль должен содержать как минимум {{ limit }} символовlong",
+     * )
      */
     private $password;
 

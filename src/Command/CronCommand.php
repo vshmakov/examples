@@ -8,9 +8,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use App\Repository\{
-SessionRepository as SR,
-};
+use App\Repository\SessionRepository as SR;
 use App\Service\JsonLogger as JL;
 use App\Service\UserLoader as UL;
 

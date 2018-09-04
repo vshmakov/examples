@@ -10,9 +10,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
-use App\Repository\{
-UserRepository as UR,
-};
+use App\Repository\UserRepository as UR;
 
 class UloginAuthenticator extends AbstractGuardAuthenticator
 {
@@ -42,13 +40,13 @@ $request->query->get('token')
             $d = json_decode($s, true);
             $d += [
                 'token' => $token,
-                'username' => $d['network'].'-'.$d['uid'],
+                'username' => '^'.$d['network'].'-'.$d['uid'],
             ];
+
+            return $d;
         } catch (\Exception $ex) {
             return [];
         }
-        //if ($request->isMethod("GET")) dd("");
-        return $d;
     }
 
     public function getUser($d, UserProviderInterface $p)

@@ -57,7 +57,7 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
 
         foreach ($ents as $e) {
             if ($dt->getTimestamp() < $e->getAddTime()->getTimestamp()) {
-                $n--;
+                --$n;
             }
         }
 

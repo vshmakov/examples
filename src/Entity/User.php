@@ -421,6 +421,16 @@ class User implements UserInterface, GroupableInterface
      */
     private $lastName;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $network;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $networkId;
+
     public function setFirstName(?string $firstName): self
     {
         $this->firstName = $firstName;
@@ -468,5 +478,29 @@ class User implements UserInterface, GroupableInterface
         $this->username = $u;
 
         return $this->setUsernameCanonical($u);
+    }
+
+    public function getNetwork(): ?string
+    {
+        return $this->network;
+    }
+
+    public function setNetwork(?string $network): self
+    {
+        $this->network = $network;
+
+        return $this;
+    }
+
+    public function getNetworkId(): ?string
+    {
+        return $this->networkId;
+    }
+
+    public function setNetworkId(?string $networkId): self
+    {
+        $this->networkId = $networkId;
+
+        return $this;
     }
 }

@@ -8,6 +8,8 @@ use App\Repository\TransferRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\UserLoader;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 
 /**
  * @Route("/account")
@@ -56,6 +58,39 @@ class AccountController extends MainController
         return $this->render('account/pay.html.twig', [
             'm' => $m ?: '',
             'price' => PRICE,
+        ]);
+    }
+
+    /**
+     *@Route("/edit", name="account_edit", methods="GET|POST")
+     */
+    public function index(Request $request)
+    {
+        $u = $this->u;
+
+        if (preg_match('#^\^#', $u->getUsername())) {
+            $u->setUsername('');
+        }
+        $form = $this->createFormBuilder($u)
+->add('username', null, ['label' => 'Логин'])
+->add('firstName', null, ['label' => 'Имя'])
+->add('fatherName', null, ['label' => 'Отчество'])
+->add('lastName', null, ['label' => 'Фамилия'])
+->add('isTeacher', CheckboxType::class, ['label' => 'Учитель', 'required' => false])
+->add('save', SubmitType::class, ['label' => 'Сохранить'])
+->getForm()
+;
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->em()->flush();
+
+            return $this->redirectToRoute('homepage');
+        }
+
+        return $this->render('account/edit.html.twig', [
+            'form' => $form->createView(),
         ]);
     }
 }

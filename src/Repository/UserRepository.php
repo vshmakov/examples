@@ -95,11 +95,18 @@ where u = :u')
 ->setEnabled(true);
     }
 
+    public function findOneByUloginCredentials($d)
+    {
+        extract($d);
+
+        return $this->findOneBy(['network' => $network, 'networkId' => $uid]);
+    }
+
     public function findOneByUloginCredentialsOrNew($d)
     {
         extract($d);
 
-        if ($u = $this->findOneByUsername($username)) {
+        if ($u = $this->findOneByUloginCredentials($d)) {
             return $u;
         }
 

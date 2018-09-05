@@ -55,10 +55,13 @@ var P={{(jsParams ?? {})|json_encode|raw}};
 
 {%if is_granted("IS_AUTHENTICATED_REMEMBERED")%}
 
-{# 
+ 
                 <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle account-button" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Аккаунт</a>
                   <div class="dropdown-menu">
+                    <a class="dropdown-item" href="{{path("account_edit")}}">Редактировать профиль</a>
+
+{#
                     <a class="dropdown-item" href="{{path("account_recharge")}}">Пополнить счёт <em>({{user.money}} рублей)</em></a>
                     <a class="dropdown-item" href="{{path("account_pay")}}">
 Оплатить сервис 
@@ -66,9 +69,10 @@ var P={{(jsParams ?? {})|json_encode|raw}};
 <em>({{user.remainedTime.roundDays}}  дн.)</em>
 {%endif%}
 </a>
+#}
                   </div>
                 </li>
-#}
+
 
 {%if is_granted("ROLE_ADMIN")%}
                 <li class="nav-item dropdown">
@@ -124,7 +128,7 @@ var P={{(jsParams ?? {})|json_encode|raw}};
 <script>
 var d={{user.remainedTime.roundUpDays}};
 c=d == 0 ? "red" : d <=3 ? "orange" : d <= 7 ? "yellow" : "green";
-$(".account-button").css("background", c);
+//$(".account-button").css("background", c);
 </script>
 {% endblock %}
     </body>

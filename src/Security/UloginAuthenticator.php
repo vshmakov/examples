@@ -51,9 +51,7 @@ $request->query->get('token')
 
     public function getUser($d, UserProviderInterface $p)
     {
-        $u = $d['username'] ?? null;
-
-        return $u ? ($p->loadUserByUsername($u)) : null;
+        return $d ? $this->uR->findOneByUloginCredentials($d) : null;
     }
 
     public function checkCredentials($d, UserInterface $user = null)

@@ -186,6 +186,7 @@ class User implements UserInterface, GroupableInterface
         $this->money = DEFAULT_MONEY;
         $this->ips = new ArrayCollection();
         $this->transfers = new ArrayCollection();
+        $this->students = new ArrayCollection();
     }
 
     public function getId()
@@ -447,6 +448,26 @@ class User implements UserInterface, GroupableInterface
      */
     private $networkId;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $fatherName;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $isTeacher;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\User", mappedBy="teacher")
+     */
+    private $students;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="students")
+     */
+    private $teacher;
+
     public function setFirstName(?string $firstName): self
     {
         $this->firstName = $firstName;
@@ -516,6 +537,73 @@ class User implements UserInterface, GroupableInterface
     public function setNetworkId(?string $networkId): self
     {
         $this->networkId = $networkId;
+
+        return $this;
+    }
+
+    public function getFatherName(): ?string
+    {
+        return $this->fatherName;
+    }
+
+    public function setFatherName(?string $fatherName): self
+    {
+        $this->fatherName = $fatherName;
+
+        return $this;
+    }
+
+    public function isTeacher(): ?bool
+    {
+        return (bool) $this->isTeacher;
+    }
+
+    public function setIsTeacher(?bool $isTeacher): self
+    {
+        $this->isTeacher = $isTeacher;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|User[]
+     */
+    public function getStudents(): Collection
+    {
+        return $this->students;
+    }
+
+    public function addStudent(User $student): self
+    {
+        if (!$this->students->contains($student)) {
+            $this->students[] = $student;
+            $student->setTeacher($this);
+        }
+
+        return $this;
+    }
+
+    public function removeStudent(User $student): self
+    {
+        if ($this->students->contains($student)) {
+            $this->students->removeElement($student);
+            // set the owning side to null (unless already changed)
+            if ($student->getTeacher() === $this) {
+                $student->setTeacher(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getTeacher()
+    {
+        return $this->teacher;
+    }
+
+    public function setTeacher(User $teacher): self
+    {
+        $this->teacher = $teacher;
 
         return $this;
     }

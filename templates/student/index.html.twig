@@ -1,0 +1,33 @@
+{%extends "main.html.twig"%}
+
+{%block title "Список учеников"%}
+
+{%block main%}
+<h1>Список учеников</h1>
+<table>
+	<thead>
+		<tr>
+			<th>№</th>
+			<th>Фамилия / Имя</th>
+			<th>Логин</th>
+			<th>Время последней попытки</th>
+			<th>Количество завершенных попыток</th>
+			<th>Количество решенных примеров</th>
+		</tr>
+	</thead>
+			<tbody>
+{%for num, s in sortStudents(students)%}
+{%set s=s.setER(uR)%}
+				<tr>
+					<td>{{num+1}}</td>
+					<td>{{s.lastName}} {{s.firstName}}</td>
+					<td>{{s.username}}</td>
+{%set a=s.attempts.last%}
+					<td>{{a ? a.addTime : "-"}}</td>
+					<td>{{s.doneAttemptsCount}}</td>
+					<td>{{s.solvedExamplesCount}}</td>
+				</tr>
+{%endfor%}
+			</tbody>
+</table>
+{%endblock%}

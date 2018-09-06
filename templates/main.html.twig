@@ -54,12 +54,13 @@ var P={{(jsParams ?? {})|json_encode|raw}};
 {{item("profile_index", "Профили настроек")}}
 
 {%if is_granted("IS_AUTHENTICATED_REMEMBERED")%}
-
- 
                 <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle account-button" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Аккаунт</a>
                   <div class="dropdown-menu">
-                    <a class="dropdown-item" href="{{path("account_edit")}}">Редактировать профиль</a>
+                    <a class="dropdown-item" href="{{path("account_index")}}">Просмотреть профиль</a>
+{%if app.user.students.count%}
+                    <a class="dropdown-item" href="{{path("student_index")}}">Ученики</a>
+{%endif%}
                     <a class="dropdown-item" href="{{path("teacher_index")}}">Выбрать учителя</a>
 
 {#

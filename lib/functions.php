@@ -205,3 +205,20 @@ function hugeNumStyle(int $n)
 
     return $rev($s1);
 }
+
+function addTimeSorter($e1, $e2)
+{
+    $t1 = $e1->getAddTime()->getTimestamp();
+    $t2 = $e2->getAddTime()->getTimestamp();
+
+    return timeSorter($t1, $t2);
+}
+
+function timeSorter($t1, $t2)
+{
+    if ($t1 == $t2) {
+        return 0;
+    }
+
+    return $t1 > $t2 ? 1 : -1;
+}

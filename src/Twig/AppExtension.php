@@ -46,6 +46,7 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
             new TwigFunction('sortByAddTime', [$this, 'sortByAddTime']),
             new TwigFunction('sortProfiles', [$this, 'sortProfiles']),
             new TwigFunction('sortTeachers', [$this, 'sortTeachers']),
+            new TwigFunction('sortStudents', [$this, 'sortStudents']),
             new TwigFunction('getIpInfo', '\App\Service\IpInformer::getInfoByIp'),
             new TwigFunction('fillIp', [$this, 'fillIp']),
         ];
@@ -100,14 +101,7 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
 
     private function addTimeSorter($e1, $e2)
     {
-        $t1 = $e1->getAddTime()->getTimestamp();
-        $t2 = $e2->getAddTime()->getTimestamp();
-
-        if ($t1 == $t2) {
-            return 0;
-        }
-
-        return $t1 > $t2 ? 1 : -1;
+        return addTimeSorter($e1, $e2);
     }
 
     public function sortTeachers($ts)
@@ -133,5 +127,25 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
         });
 
         return $ts;
+    }
+
+    public function sortStudents($st)
+    {
+        usort($st, function ($e1, $e2) {
+            $a1 = $e1->getAttempts()->last();
+            $a2 = $e2->getAttempts()->last();
+
+            if ($a1) {
+                return 1;
+            }
+
+            if ($a2) {
+                return -1;
+            }
+
+            return timeSorter($a1->getAddTime(), $a2->getAddTime());
+        });
+
+        return $st;
     }
 }

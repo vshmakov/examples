@@ -5,6 +5,7 @@ namespace App\Repository;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use App\Entity\User;
 use App\Entity\Profile;
+use App\Entity\Attempt;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -123,5 +124,38 @@ where u = :u')
         $em->flush();
 
         return $u;
+    }
+
+    public function getDoneAttemptsCount($u)
+    {
+        $as = $this->q('select a from App:Attempt a
+join a.session s
+join s.user u
+where u = :u')
+->setParameters(['u' => $u])
+->getResult();
+
+        $attR = $this->er(Attempt::class);
+        $c = 0;
+
+        foreach ($as as $a) {
+            if ($attR->getSolvedExamplesCount($a) == $a->getSettings()->getExamplesCount()) {
+                $c++;
+            }
+        }
+
+        return $c;
+    }
+
+    public function getSolvedExamplesCount($u)
+    {
+        return $this->v(
+$this->q('select count(e) from App:Example e
+join e.attempt a
+join a.session s
+join s.user u
+where u = :u and e.isRight = true')
+->setParameters(['u' => $u])
+);
     }
 }

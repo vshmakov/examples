@@ -622,4 +622,15 @@ class User implements UserInterface, GroupableInterface
     {
         return $this->lastName.' '.$this->firstName.' '.$this->fatherName;
     }
+
+    public function getAttempts()
+    {
+        $as = [];
+
+        foreach ($this->sessions as $s) {
+            $as = array_merge($as, $s->getAttempts()->getValues());
+        }
+
+        return new ArrayCollection($as);
+    }
 }

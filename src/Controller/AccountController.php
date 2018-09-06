@@ -24,6 +24,14 @@ class AccountController extends MainController
     }
 
     /**
+     *@Route("/", name="account_index", methods="GET")
+     */
+    public function index()
+    {
+        return $this->render('account/index.html.twig');
+    }
+
+    /**
      *@Route("/recharge", name="account_recharge")
      */
     public function recharge(TransferRepository $tR)
@@ -64,7 +72,7 @@ class AccountController extends MainController
     /**
      *@Route("/edit", name="account_edit", methods="GET|POST")
      */
-    public function index(Request $request)
+    public function edit(Request $request)
     {
         $u = $this->u;
 
@@ -86,7 +94,7 @@ class AccountController extends MainController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->em()->flush();
 
-            return $this->redirectToRoute('homepage');
+            return $this->redirectToRoute('account_index');
         }
 
         return $this->render('account/edit.html.twig', [

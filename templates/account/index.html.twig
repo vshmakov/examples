@@ -1,0 +1,53 @@
+{%extends "main.html.twig"%}
+
+{%block title "Профиль"%}
+
+{%block main%}
+<h1>Профиль</h1>
+{%set u=app.user%}
+<table>
+	<tr>
+		<td>Фамилия</td>
+		<td>{{u.lastName}}</td>
+	</tr>
+	<tr>
+		<td>Имя</td>
+		<td>{{u.firstName}}</td>
+	</tr>
+	<tr>
+		<td>Отчество</td>
+		<td>{{u.fatherName ?? "-"}}</td>
+	</tr>
+	<tr>
+		<td>Логин</td>
+		<td>{{u.username ?? "-"}}</td>
+	</tr>
+	{#
+	<tr>
+		<td>Электронная почта</td>
+		<td>{{u.email  ?? "-"}}</td>
+	</tr>
+	#}
+	<tr>
+		<td>Является учителем</td>
+		<td>{{u.isTeacher ? "Да" : "Нет"}}</td>
+	</tr>
+	{%if u.isTeacher%}
+	<tr>
+		<td>Количество учеников</td>
+		<td>{{u.students.count}}</td>
+	</tr>
+	{%endif%}
+{%if u.hasTeacher%}
+	<tr>
+		<td>Выбранный учитель</td>
+		<td>{{u.teacher ? u.teacher.fio : '-'}}</td>
+	</tr>
+{%endif%}
+</table>
+
+<div>
+<a href="{{path("account_edit")}}">Редактировать профиль</a>
+<a href="{{path("teacher_index")}}">Выбрать учителя</a>
+</div>
+{%endblock%}

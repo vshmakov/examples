@@ -63,7 +63,7 @@ class DT extends DateTime
 
     public function dateFormat()
     {
-        return $this->format('d.m.y');
+        return $this->format('d.m.Y');
     }
 
     public function setDayS()

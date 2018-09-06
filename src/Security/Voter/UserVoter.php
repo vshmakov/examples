@@ -37,4 +37,16 @@ class UserVoter extends Voter
 
         return !$this->ul->isGuest();
     }
+
+    private function canAppointTeacher()
+    {
+        $t = $this->subj;
+
+        return !$this->ul->isGuest() && $t->isTeacher() && !$this->ul->getUser()->isUserTeacher($t);
+    }
+
+    private function canDisappointTeacher()
+    {
+        return $this->ul->getUser()->hasTeacher();
+    }
 }

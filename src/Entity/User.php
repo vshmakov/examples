@@ -601,10 +601,25 @@ class User implements UserInterface, GroupableInterface
         return $this->teacher;
     }
 
-    public function setTeacher(User $teacher): self
+    public function setTeacher(?User $teacher): self
     {
         $this->teacher = $teacher;
 
         return $this;
+    }
+
+    public function hasTeacher()
+    {
+        return (bool) $this->teacher;
+    }
+
+    public function isUserTeacher(User $teacher)
+    {
+        return $this->teacher === $teacher;
+    }
+
+    public function fio()
+    {
+        return $this->lastName.' '.$this->firstName.' '.$this->fatherName;
     }
 }

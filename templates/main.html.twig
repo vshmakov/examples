@@ -60,6 +60,7 @@ var P={{(jsParams ?? {})|json_encode|raw}};
                   <a class="nav-link dropdown-toggle account-button" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Аккаунт</a>
                   <div class="dropdown-menu">
                     <a class="dropdown-item" href="{{path("account_edit")}}">Редактировать профиль</a>
+                    <a class="dropdown-item" href="{{path("teacher_index")}}">Выбрать учителя</a>
 
 {#
                     <a class="dropdown-item" href="{{path("account_recharge")}}">Пополнить счёт <em>({{user.money}} рублей)</em></a>

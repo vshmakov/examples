@@ -1,0 +1,57 @@
+{%extends "main.html.twig"%}
+
+{%block title "Список учителей"%}
+
+{%block main%}
+<h1>Список учителей</h1>
+
+<table>
+<thead>
+	<tr>
+		<th>№</th>
+		<th>Ф.И.О</th>
+		<th>Логин</th>
+		<th>Количество учеников</th>
+		<th>Дата регистрации</th>
+		<th>Действия</th>
+		<tbody>
+{%for num, t in sortTeachers(teachers)%}
+		<tr>
+				<td>{{num+1}}</td>
+				<td>{{t.LastName}} {{t.firstName}} {{t.fatherName}}</td>
+				<td>{{t.username ?? "-"}}</td>
+				<td>{{t.students.count}}</td>
+				<td>{{t.addTime.dateFormat}}</td>
+			<td>
+{%if is_granted("APPOINT_TEACHER", t)%}
+			<a href="{{path("teacher_appoint", {"id": t.id})}}">Выбрать</a>
+{%endif%}
+
+{%if app.user.isUserTeacher(t)%}
+			<a href="{{path("teacher_disappoint")}}">Удалить</a>
+{%endif%}
+			</td>
+			</tr>
+			{%endfor%}
+		</tbody>
+	</tr>
+</thead>
+</table>
+{%endblock%}
+
+{%block javascripts%}
+{{parent()}}
+<script src="/js/jquery.datatables.min.js"></script>
+<script>
+$("table").DataTable({
+pageLength: 50,
+//order: [1, "asc"],
+lengthMenu: [25, 50, 100, 250],
+language: {    
+"decimal":        "",    "emptyTable":     "Нет учителей",    "info":           "Показано с _START_ по _END_ из _TOTAL_ учителей",    "infoEmpty":      "Показано с _START_ по _END_ из _TOTAL_ учителей",   "infoFiltered":   "(Отфильтровано из _MAX_ учителей)",    "infoPostFix":    "",    "thousands":      ",",    "lengthMenu":     "Показать _MENU_ учителей на странице",    "loadingRecords": "Идёт загрузка...",    "search":         "Найти учителя:",    "zeroRecords":    "Соответствующих записей не найдено",    
+"paginate": {        "first":      "В начало",        "last":       "В конец",        "next":       "Вперед",        "previous":   "Назад"    },
+    "aria": {        "sortAscending":  ": Нажмите, чтобы отсортировать по возрастанию",        "sortDescending": ": Нажмите, чтобы отсортировать по убыванию"    }
+}
+});
+</script>
+{%endblock%}

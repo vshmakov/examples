@@ -8,11 +8,11 @@
 <table>
 	<tr>
 		<td>Фамилия</td>
-		<td>{{u.lastName}}</td>
+		<td>{{u.lastName ?? "-"}}</td>
 	</tr>
 	<tr>
 		<td>Имя</td>
-		<td>{{u.firstName}}</td>
+		<td>{{u.firstName ?? "-"}}</td>
 	</tr>
 	<tr>
 		<td>Отчество</td>
@@ -20,7 +20,7 @@
 	</tr>
 	<tr>
 		<td>Логин</td>
-		<td>{{u.username ?? "-"}}</td>
+		<td>{{u.login ?: "-"?? "-"}}</td>
 	</tr>
 	{#
 	<tr>

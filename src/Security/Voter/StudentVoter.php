@@ -8,7 +8,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use App\Entity\User;
 use App\Service\UserLoader;
 
-class UserVoter extends Voter
+class StudentVoter extends Voter
 {
     use BaseTrait;
     private $ul;
@@ -22,19 +22,12 @@ class UserVoter extends Voter
 
     protected function supports($attribute, $subject)
     {
-        return             ($subject instanceof User or null === $subject) && $this->hasHandler($attribute);
+        return             $subject instanceof User && $subject->isStudent() && $this->hasHandler($attribute);
     }
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
     {
         //if ($this->ch->isGranted("ROLE_SUPER_ADMIN")) return true;
-        return $this->checkRight($attribute, $subject ?? $this->ul->getUser(), $token);
-    }
-
-    private function isAccountPaid()
-    {
-        $u = $this->subj;
-
-        return !$this->ul->isGuest();
+        return $this->checkRight($attribute, $subject, $token);
     }
 }

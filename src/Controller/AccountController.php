@@ -2,14 +2,13 @@
 
 namespace App\Controller;
 
+use App\Form\AccountType;
 use App\DT;
 use App\Repository\UserRepository;
 use App\Repository\TransferRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\UserLoader;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 
 /**
  * @Route("/account")
@@ -75,20 +74,8 @@ class AccountController extends MainController
     public function edit(Request $request)
     {
         $u = $this->u;
-
-        if (preg_match('#^\^#', $u->getUsername())) {
-            $u->setUsername('');
-        }
-        $form = $this->createFormBuilder($u)
-->add('username', null, ['label' => 'Логин'])
-->add('firstName', null, ['label' => 'Имя'])
-->add('fatherName', null, ['label' => 'Отчество'])
-->add('lastName', null, ['label' => 'Фамилия'])
-->add('isTeacher', CheckboxType::class, ['label' => 'Учитель', 'required' => false])
-->add('save', SubmitType::class, ['label' => 'Сохранить'])
-->getForm()
-;
-
+        $u->cleanSocialUsername();
+        $form = $this->createForm(AccountType::class, $u);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

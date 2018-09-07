@@ -23,11 +23,11 @@
 				<td>{{t.students.count}}</td>
 				<td>{{t.addTime.dateFormat}}</td>
 			<td>
-{%if is_granted("APPOINT_TEACHER", t)%}
+{%if is_granted("APPOINT", t)%}
 			<a href="{{path("teacher_appoint", {"id": t.id})}}">Выбрать</a>
 {%endif%}
 
-{%if app.user.isUserTeacher(t)%}
+{%if is_granted("DISAPPOINT", t)%}
 			<a href="{{path("teacher_disappoint")}}">Удалить</a>
 {%endif%}
 			</td>

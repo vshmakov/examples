@@ -135,15 +135,15 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
             $a1 = $e1->getAttempts()->last();
             $a2 = $e2->getAttempts()->last();
 
-            if ($a1) {
+            if (!$a1) {
                 return 1;
             }
 
-            if ($a2) {
+            if (!$a2) {
                 return -1;
             }
 
-            return timeSorter($a1->getAddTime(), $a2->getAddTime());
+            return -1 * addTimeSorter($a1, $a2);
         });
 
         return $st;

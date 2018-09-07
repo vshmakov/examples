@@ -87,7 +87,7 @@ class User implements UserInterface, GroupableInterface
      * )
      * @Assert\Length(
      * min = 3,
-     * minMessage = "Ваш логин должен содержать как минимум {{ limit }} символовlong",
+     * minMessage = "Ваш логин должен содержать как минимум {{ limit }} символа",
      * )
      */
     private $username;
@@ -425,16 +425,21 @@ class User implements UserInterface, GroupableInterface
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\NotBlank(message="Имя не должно быть пустым")
+     * @Assert\Length(
+     * min = 2,
+     * minMessage = "Ваше имя должно содержать как минимум {{ limit }} символа",
+     * )
      */
     private $firstName;
 
-    public function getFirstName(): ?string
-    {
-        return $this->isSocial() ? $this->firstName : $this->getUsername();
-    }
-
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\NotBlank(message="Фамилия не должна быть пустой")
+     * @Assert\Length(
+     * min = 2,
+     * minMessage = "Ваша фамилия должна содержать как минимум {{ limit }} символа",
+     * )
      */
     private $lastName;
 
@@ -468,6 +473,11 @@ class User implements UserInterface, GroupableInterface
      */
     private $teacher;
 
+    public function getFirstName(): ?string
+    {
+        return $this->firstName;
+    }
+
     public function setFirstName(?string $firstName): self
     {
         $this->firstName = $firstName;
@@ -489,7 +499,36 @@ class User implements UserInterface, GroupableInterface
 
     public function getLogin()
     {
-        return !$this->isSocial() ? $this->getUsername() : $this->getFirstName().' '.$this->getLastName();
+        return !$this->isSocialUsername() ? $this->getUsername() : null;
+    }
+
+    public function getFullName()
+    {
+        $fn = $this->getFirstName();
+        $ln = $this->getLastName();
+
+        return $fn.$ln ? $fn.' '.$ln : null;
+    }
+
+    public function getFFName()
+    {
+        return $this->getSomeName('%s %s', ['firstName', 'fatherName']);
+    }
+
+    private function getSomeName($f, $names)
+    {
+        $a = [];
+
+        foreach ($names as $n) {
+            $a[] = $this->$n;
+        }
+
+        return $a ? trim(sprintf(...array_merge([$f], $a))) : null;
+    }
+
+    public function getCallName()
+    {
+        return $this->getFullName() ?? $this->username;
     }
 
     public function isSocial(): bool
@@ -632,5 +671,24 @@ class User implements UserInterface, GroupableInterface
         }
 
         return new ArrayCollection($as);
+    }
+
+    public function isStudent()
+    {
+        return $this->hasTeacher();
+    }
+
+    public function cleanSocialUsername()
+    {
+        if ($this->isSocialUsername()) {
+            $this->username = '';
+        }
+
+        return $this;
+    }
+
+    public function isSocialUsername()
+    {
+        return preg_match('#^\^#', $this->username);
     }
 }

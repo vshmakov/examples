@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Security\UloginAuthenticator as UloginAuth;
 use   Psr\Container\ContainerInterface as Con;
 use App\Repository\TransferRepository;
+use App\Repository\AttemptRepository;
 use App\Repository\UserRepository;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -18,7 +19,7 @@ use App\Service\JsonLogger as L;
  */
 class ApiController extends Controller
 {
-    use BaseTrait;
+    use BaseTrait, ApiTrait;
 
     /**
      * @Route("/request/yandex", name="api_request_yandex", methods="POST")
@@ -94,6 +95,24 @@ class ApiController extends Controller
 
         return $this->redirectToRoute('api_ulogin_login', [
             'token' => $req->request->get('token'),
+        ]);
+    }
+
+    /**
+     *@Route("/attempt", name="api_attempt")
+     */
+    public function apiIndexTable(Request $req, AttemptRepository $attR)
+    {
+        $d = [];
+        $q = $req->query;
+        $s = $q->get('start');
+        $l = $q->get('length');
+
+        return $this->json([
+            'draw' => $q->get('draw'),
+            'recordsTotal' => $c = $attR->CountByCurrentUser(),
+            'recordsFiltered' => $c,
+            'data' => $this->processAttempts($attR->findAllByCurrentUserAndLimit($s, $l), $attR),
         ]);
     }
 }

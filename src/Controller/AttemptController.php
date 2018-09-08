@@ -31,7 +31,7 @@ class AttemptController extends MainController
     {
         return $this->render('attempt/index.html.twig', [
             'jsParams' => [
-                'api_attempt_index_table' => $this->generateUrl('api_attempt_index_table'),
+                'api_attempt_index_table' => $this->generateUrl('api_attempt'),
             ],
             'attempts' => $r->findAllByCurrentUser(),
             'attR' => $r,
@@ -142,52 +142,6 @@ class AttemptController extends MainController
             'profile' => $p,
             'form' => $this->createForm(ProfileType::class, $p)->createView(),
             'att' => $att->setER($attR),
-        ]);
-    }
-
-    /**
-     *@Route("/api/index-table", name="api_attempt_index_table")
-     */
-    public function apiIndexTable(Request $req, AttR $attR)
-    {
-        $d = [];
-        $q = $req->query;
-        $s = $q->get('start');
-        $l = $q->get('length');
-
-        foreach ($attR->findAllByCurrentUserAndLimit($s, $l) as $att) {
-            $ks = 'title addTime solvedTime solvedExamplesCount errorsCount rating finishTime';
-            $row = createNumArr(getKeysFromEntity($ks, $att->setER($attR)));
-
-            $row[0] = sprintf('<a href="%s">%s</a>', $this->generateUrl('attempt_show', ['id' => $att->getId()]), $row[0]);
-            $row[1] = ''.$row[1];
-            $row[2] = sprintf('%s из %s (%s сек/пример)', $row[2]->minSecFormat(), $att->getMaxTime()->minSecFormat(), $att->getAverSolveTime()->getTimestamp());
-            $row[3] = sprintf('%s из %s', $row[3], $att->getExamplesCount());
-            $o = $row[5];
-            $c = 'red';
-
-            if (3 == $o) {
-                $c = 'orange';
-            }
-
-            if (4 == $o) {
-                $c = 'yellow';
-            }
-
-            if (5 == $o) {
-                $c = 'green';
-            }
-            $row[5] = sprintf('<span style="background: %s;">%s</span>', $c, $o);
-
-            extract(makeVarKeys($row, 'r'));
-            $d[] = [$r0, $r1, "$r6", $r2, $r3, $r4, $r5];
-        }
-
-        return $this->json([
-            'draw' => $q->get('draw'),
-            'recordsTotal' => $c = $attR->CountByCurrentUser(),
-            'recordsFiltered' => $c,
-            'data' => $d,
         ]);
     }
 }

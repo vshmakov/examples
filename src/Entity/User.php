@@ -691,4 +691,14 @@ class User implements UserInterface, GroupableInterface
     {
         return preg_match('#^\^#', $this->username);
     }
+
+    public function getFLName()
+    {
+        return $this->getSomeName('%s %s', ['firstName', 'lastName']);
+    }
+
+    public function getLFName()
+    {
+        return $this->getSomeName('%s %s', ['lastName', 'firstName']);
+    }
 }

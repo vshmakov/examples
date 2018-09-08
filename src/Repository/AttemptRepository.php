@@ -222,4 +222,14 @@ $c ? round($this->getSolvedTime($att)->getTimestamp() / $c) : 0
     {
         return $this->getErrorsCount($att) + $att->getExamplesCount() - $this->getSolvedExamplesCount($att);
     }
+
+    public function findByUser($u)
+    {
+        return $this->q('select a from App:Attempt a
+join a.session s
+join s.user u
+where u = ?1')
+->setParameter(1, $u)
+->getResult();
+    }
 }

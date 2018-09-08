@@ -1,23 +1,23 @@
-{%extends 'main.html.twig'%}
+{%extends "main.html.twig"%}
 
-{%block title "Архив попыток"%}
+{%block title "Архив попыток ("~student.LFName~")"%}
 
 {%block main%}
-<div class="row">
 <h1>Архив попыток</h1>
 {{include("attempt/index_table.html.twig")}}
-</div>
+{{include("student/backlinks.html.twig")}}
 {%endblock%}
+
 
 {%block javascripts%}
 {{parent()}}
 <script src="/js/jquery.datatables.min.js"></script>
 <script>
 $("table").DataTable({
-ordering: false,
 searching: false,
-serverSide: true,
-ajax: P.api_attempt_index_table,
+sorting: false,
+data: {{data|reverse|json_encode|raw}},
+deferRender: true,
 pageLength: 50,
 language: {{include("attempt/language.json.twig")}}
 });

@@ -58,6 +58,7 @@
 $("table").DataTable({
 {%block dt_order%}order: [5, "desc"]{%endblock%}
 ,
+deferRender: true,
 pageLength: 50,
 });
 </script>

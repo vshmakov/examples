@@ -30,4 +30,14 @@ class StudentVoter extends Voter
         //if ($this->ch->isGranted("ROLE_SUPER_ADMIN")) return true;
         return $this->checkRight($attribute, $subject, $token);
     }
+
+    private function canShowAttempts()
+    {
+        return $this->subj->isUserTeacher($this->ul->getUser());
+    }
+
+    private function canShowExamples()
+    {
+        return $this->canShowAttempts();
+    }
 }

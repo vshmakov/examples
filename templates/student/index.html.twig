@@ -24,8 +24,8 @@
 					<td>{{s.username}}</td>
 {%set a=s.attempts.last%}
 					<td>{{a ? a.addTime : "-"}}</td>
-					<td>{{s.doneAttemptsCount}}</td>
-					<td>{{s.solvedExamplesCount}}</td>
+					<td><a href="{{path("student_attempts", {"id": s.id})}}">{{s.doneAttemptsCount}}</a></td>
+					<td><a href="{{path("student_examples", {"id": s.id})}}">{{s.solvedExamplesCount}}</a></td>
 				</tr>
 {%endfor%}
 			</tbody>

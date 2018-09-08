@@ -48,11 +48,16 @@ class TeacherController extends MainController
 
             return $this->redirectToRoute('account_index');
         } else {
-            $this->u->cleanSocialUsername();
-            $form = $this->createForm(AccountType::class, $this->u);
+            $u = clone $this->u;
+            $u->cleanSocialUsername();
+            $form = $this->createForm(AccountType::class, $u);
             $form->handleRequest($request);
 
             if ($form->isSubmitted() && $form->isValid()) {
+                $u = ($this->u);
+                $u->cleanSocialUsername();
+                $form = $this->createForm(AccountType::class, $u);
+                $form->handleRequest($request);
                 $this->em()->flush();
 
                 return $this->redirectToRoute('teacher_appoint', [

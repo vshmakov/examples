@@ -73,12 +73,17 @@ class AccountController extends MainController
      */
     public function edit(Request $request)
     {
-        $u = ($this->u);
+        $u = clone $this->u;
         $u->cleanSocialUsername();
         $form = $this->createForm(AccountType::class, $u);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $u = ($this->u);
+            $u->cleanSocialUsername();
+            $form = $this->createForm(AccountType::class, $u);
+            $form->handleRequest($request);
+
             $this->em()->flush();
 
             return $this->redirectToRoute('account_index');

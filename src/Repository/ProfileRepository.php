@@ -102,4 +102,15 @@ where p.description = :d and p.author = :a')
 
         return $d;
     }
+
+    public function findByCurrentUserTeacher()
+    {
+        $u = $this->ul->getUser();
+
+        if (!$u->hasTeacher()) {
+            return [];
+        }
+
+        return $this->findByAuthor($u->getTeacher());
+    }
 }

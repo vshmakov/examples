@@ -14,7 +14,7 @@ trait BaseTrait
         $m = $this->getHandlerName($p);
 
         if (!method_exists($this, $m)) {
-            throw new \Exception(sprintf('%s has not %s priv handler', self::class, $p));
+            throw new \Exception(sprintf('%s has not %s priv handler, attempted to find %s method', self::class, $p, $m));
         }
 
         return $this->hasHandler($p) ? $this->$m($o, $t) : false;
@@ -31,6 +31,10 @@ trait BaseTrait
 
         if ($this->hasPrefix('IS', $s)) {
             $p = '';
+        }
+
+        if ($this->hasPrefix('PRIV', $s)) {
+            $p = 'has';
         }
 
         return getMethodName($s, $p);

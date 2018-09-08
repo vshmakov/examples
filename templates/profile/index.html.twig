@@ -24,6 +24,9 @@
 {%endif%}
 
 {{t("Профили по умолчанию", public, pR)}}
+{%if user.hasTeacher%}
+{{t("Профили учителя", teacherProfiles, pR)}}
+{%endif%}
 {{t("Личные профили", profiles, pR)}}
 
 {%if is_granted("CREATE_PROFILE")%}
@@ -61,11 +64,7 @@ if (!P.canAppoint) r.attr("disabled", true);
 $("table").DataTable({
 pageLength: 25,
 //order: [1, "asc"],
-language: {    
-"decimal":        "",    "emptyTable":     "Нет профилей",    "info":           "Показано с _START_ по _END_ из _TOTAL_ строк",    "infoEmpty":      "Показано с _START_ по _END_ из _TOTAL_ строк",   "infoFiltered":   "(Отфильтровано из _MAX_ строк)",    "infoPostFix":    "",    "thousands":      ",",    "lengthMenu":     "Показать _MENU_ строк",    "loadingRecords": "Идёт загрузка...",    "search":         "Поиск:",    "zeroRecords":    "Соответствующих записей не найдено",    
-"paginate": {        "first":      "В начало",        "last":       "В конец",        "next":       "Вперед",        "previous":   "Назад"    },
-    "aria": {        "sortAscending":  ": Нажмите, чтобы отсортировать по возрастанию",        "sortDescending": ": Нажмите, чтобы отсортировать по убыванию"    }
-}
+language: {{include("profile/language.json.twig")}}
 });
 </script>
 {%endblock%}

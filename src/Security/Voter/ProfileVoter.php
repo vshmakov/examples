@@ -51,8 +51,10 @@ class ProfileVoter extends Voter
     private function canView()
     {
         $p = $this->subj;
+        $u = $this->ul->getUser();
+        $au = $p->getAuthor();
 
-        return $p->isPublic() or $this->ul->getUser() === $p->getAuthor();
+        return $p->isPublic() or $u === $au or $u->isUserTeacher($au);
     }
 
     private function canEdit($p)
@@ -67,7 +69,7 @@ class ProfileVoter extends Voter
 
     private function canAppoint($p)
     {
-        return $this->ch->isGranted('IS_ACCOUNT_PAID') && $this->canCreate($p) && $this->canView($p);
+        return $this->ch->isGranted('IS_ACCOUNT_PAID') && $this->canCreate($p) && $this->canView($p) && $this->ul->getUser()->getCurrentProfile() !== $this->subj;
     }
 
     private function canCopy()

@@ -23,11 +23,13 @@ class ProfileController extends MainController
     public function index(ProfileRepository $pR, UserLoader $ul, UserRepository $uR): Response
     {
         $profiles = $pR->findByCurrentAuthor();
+        $teacher = $pR->findByCurrentUserTeacher();
 
         return $this->render('profile/index.html.twig', [
             'public' => $pub = $pR->findByIsPublic(true),
+            'teacherProfiles' => $teacher,
             'profiles' => $profiles,
-            'canAppoint' => $can = $this->isGranted('APPOINT', array_merge($profiles, $pub)),
+            'canAppoint' => $can = $this->isGranted('PRIV_APPOINT_PROFILES'),
             'jsParams' => [
                 'current' => $uR->getCurrentProfile($ul->getUser())->getId(),
                 'canAppoint' => $can,

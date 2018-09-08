@@ -37,4 +37,9 @@ class UserVoter extends Voter
 
         return !$this->ul->isGuest();
     }
+
+    private function hasPrivAppointProfiles()
+    {
+        return $this->ch->isGranted('ROLE_USER', $this->subj);
+    }
 }

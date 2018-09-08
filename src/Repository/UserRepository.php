@@ -38,7 +38,7 @@ class UserRepository extends ServiceEntityRepository
             $em->flush();
         }
 
-        return $this->ch->isGranted('APPOINT', $p) ? $p : $pR->findOneBy(['description' => $testDesc, 'isPublic' => true]);
+        return $this->ch->isGranted('PRIV_APPOINT_PROFILES', $u) ? $p : $pR->findOneBy(['description' => $testDesc, 'isPublic' => true]);
     }
 
     public function getAttemptsCount($u)
@@ -140,7 +140,7 @@ where u = :u')
 
         foreach ($as as $a) {
             if ($attR->getSolvedExamplesCount($a) == $a->getSettings()->getExamplesCount()) {
-                $c++;
+                ++$c;
             }
         }
 

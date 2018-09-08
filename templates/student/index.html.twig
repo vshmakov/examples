@@ -13,6 +13,7 @@
 			<th>Время последней попытки</th>
 			<th>Количество завершенных попыток</th>
 			<th>Количество Правильно решенных примеров</th>
+			<th>Действия</th>
 		</tr>
 	</thead>
 			<tbody>
@@ -24,8 +25,12 @@
 					<td>{{s.username}}</td>
 {%set a=s.attempts.last%}
 					<td>{{a ? a.addTime : "-"}}</td>
-					<td><a href="{{path("student_attempts", {"id": s.id})}}">{{s.doneAttemptsCount}}</a></td>
-					<td><a href="{{path("student_examples", {"id": s.id})}}">{{s.solvedExamplesCount}}</a></td>
+					<td>				{{s.doneAttemptsCount}}</td>
+					<td>			{{s.solvedExamplesCount}}</td>
+					<td>
+					<a href="{{path("student_attempts", {"id": s.id})}}">Посмотреть список попыток</a>
+					<a href="{{path("student_examples", {"id": s.id})}}">Посмотреть список примеров</a>
+					</td>
 				</tr>
 {%endfor%}
 			</tbody>

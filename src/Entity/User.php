@@ -455,6 +455,11 @@ class User implements UserInterface, GroupableInterface
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\NotBlank(message="Отчество не должно быть пустым")
+     * @Assert\Length(
+     * min = 4,
+     * minMessage = "Ваше отчество должно содержать как минимум {{ limit }} символа",
+     * )
      */
     private $fatherName;
 

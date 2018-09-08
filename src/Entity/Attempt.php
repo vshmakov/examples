@@ -134,4 +134,9 @@ class Attempt
     {
         return $this->dts($this->getSettings()->getDuration());
     }
+
+    public function getUser()
+    {
+        return $this->getSession()->getUser();
+    }
 }

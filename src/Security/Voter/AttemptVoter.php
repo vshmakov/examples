@@ -70,11 +70,8 @@ or (0 == $att->getRemainedTime())) {
         }
         $ul = $this->ul;
         $u = $ul->getUser();
+        $au = $att->getSession()->getUser();
 
-        if ($u !== $att->getSession()->getUser()) {
-            return false;
-        }
-
-        return true;
+        return $u === $au or $au->isUserTeacher($u);
     }
 }

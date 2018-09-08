@@ -9,6 +9,7 @@ trait ApiTrait
     private function processAttempts($as)
     {
         $attR = $this->em()->getRepository(Attempt::class);
+        $d = [];
 
         foreach ($as
  as $att) {

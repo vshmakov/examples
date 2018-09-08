@@ -168,4 +168,9 @@ class Example
     {
         return sprintf('%s %s %s', $this->first, [1 => '+', '-', '*', ':'][$this->sign], $this->second);
     }
+
+    public function isAnswered()
+    {
+        return null !== $this->answer;
+    }
 }

@@ -115,4 +115,16 @@ where s.user = :u')
 ->setParameter('u', $u)
 ->getResult();
     }
+
+    public function getUserNumber($ex)
+    {
+        return $this->v(
+$this->q('select count(e) from App:Example e
+join e.attempt a
+join a.session s
+join s.user u
+where u = :u and e.addTime < :dt and (e.isRight != false or e.isRight is null)')
+->setParameters(['u' => $ex->getAttempt()->getSession()->getUser(), 'dt' => $ex->getAddTime()])
+) + 1;
+    }
 }

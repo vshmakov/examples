@@ -41,7 +41,10 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
 
     public function getFunctions()
     {
-        return [
+        $fs = [
+        ];
+
+        $r = [
             new TwigFunction('addTimeNumber', [$this, 'getAddTimeNumber']),
             new TwigFunction('sortByAddTime', [$this, 'sortByAddTime']),
             new TwigFunction('sortProfiles', [$this, 'sortProfiles']),
@@ -50,6 +53,12 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
             new TwigFunction('getIpInfo', '\App\Service\IpInformer::getInfoByIp'),
             new TwigFunction('fillIp', [$this, 'fillIp']),
         ];
+
+        foreach ($fs as $f) {
+            $r[] = new TwigFunction($f, [$this, $f]);
+        }
+
+        return $r;
     }
 
     public function getAddTimeNumber($v, array $ents)

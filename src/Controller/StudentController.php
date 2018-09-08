@@ -55,6 +55,8 @@ class StudentController extends MainController
         $this->denyAccessUnlessGranted('SHOW_EXAMPLES', $student);
 
         return $this->render('student/examples.html.twig', [
+            'student' => $student,
+            'examples' => $exR->findByUser($student),
         ]);
     }
 }

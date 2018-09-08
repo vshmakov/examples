@@ -1,0 +1,37 @@
+{%extends "main.html.twig"%}
+
+{%block title "Архив примеров ("~student.LFName~")"%}
+
+{%block main%}
+<h1>Архив примеров</h1>
+<table>
+	<thead>
+		<tr>
+			<th>№</th>
+			<th>Пример</th>
+			<th>Ответ</th>
+			<th>Правильно</th>
+			<th>Затраченное время</th>
+			<th>Время решения</th>
+			<th>Попытка</th>
+		</tr>	
+			</thead>
+			<tbody></tbody>
+		</table>
+{{include("student/backlinks.html.twig")}}
+{%endblock%}
+
+{%block javascripts%}
+{{parent()}}
+<script src="/js/jquery.datatables.min.js"></script>
+<script>
+$("table").DataTable({
+searching: false,
+sorting: false,
+data: {{processExamples(examples)|reverse|json_encode|raw}},
+deferRender: true,
+pageLength: 50,
+language: {{include("attempt/language.json.twig")}}
+});
+</script>
+{%endblock%}

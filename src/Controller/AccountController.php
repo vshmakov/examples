@@ -73,7 +73,7 @@ class AccountController extends MainController
      */
     public function edit(Request $request)
     {
-        $u = $this->u;
+        $u = ($this->u);
         $u->cleanSocialUsername();
         $form = $this->createForm(AccountType::class, $u);
         $form->handleRequest($request);

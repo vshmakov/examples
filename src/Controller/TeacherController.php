@@ -51,12 +51,14 @@ class TeacherController extends MainController
             $u = clone $this->u;
             $u->cleanSocialUsername();
             $form = $this->createForm(AccountType::class, $u);
+            $form->remove('isTeacher');
             $form->handleRequest($request);
 
             if ($form->isSubmitted() && $form->isValid()) {
                 $u = ($this->u);
                 $u->cleanSocialUsername();
                 $form = $this->createForm(AccountType::class, $u);
+                $form->remove('isTeacher');
                 $form->handleRequest($request);
                 $this->em()->flush();
 
@@ -68,7 +70,6 @@ class TeacherController extends MainController
             foreach ($errors as $er) {
                 $form->addError(new FormError($er->getMessage()));
             }
-            $form->remove('isTeacher');
 
             return $this->render('teacher/edit.html.twig', [
                 'form' => $form->createView(),

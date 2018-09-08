@@ -31,7 +31,7 @@ sorting: false,
 data: {{processExamples(examples)|reverse|json_encode|raw}},
 deferRender: true,
 pageLength: 50,
-language: {{include("attempt/language.json.twig")}}
+language: {{include("example/language.json.twig")}}
 });
 </script>
 {%endblock%}

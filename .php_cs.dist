@@ -1,6 +1,6 @@
 <?php
 
-$finder=require_once("fixerFinder.php");
+$finder=require_once(".php_cs_finder.dist");
 
 return PhpCsFixer\Config::create()
     ->setRules([

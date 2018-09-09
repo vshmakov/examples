@@ -2,6 +2,7 @@
 
 namespace App\EventSubscriber;
 
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -18,9 +19,11 @@ class ResponseSubscriber implements EventSubscriberInterface
     private $req;
     private $ul;
     private $ch;
+    private $session;
 
-    public function __construct(SessionRepository $sR, RequestStack $rs, UserLoader $ul, IpRepository $ipR, CH $ch)
+    public function __construct(SessionRepository $sR, RequestStack $rs, UserLoader $ul, IpRepository $ipR, CH $ch, SessionInterface $session)
     {
+        $this->session = $session;
         $this->sR = $sR;
         $this->ipR = $ipR;
         $this->req = $rs->getMasterRequest();
@@ -32,8 +35,9 @@ class ResponseSubscriber implements EventSubscriberInterface
     {
         $req = $this->req;
         $em = $this->sR->em();
+        $s = $this->sR->findOneByCurrentUser();
 
-        if ($req && $event->isMasterRequest() && $s = $this->sR->findOneByCurrentUser()) {
+        if ($req && $event->isMasterRequest() && $s && !$this->session->getFlashBag()->get('missResponseEvent', [])) {
             $uri = $req->getRequestUri();
             $rn = $req->attributes->get('_route', $uri);
 

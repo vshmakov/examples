@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -36,7 +37,7 @@ class TeacherController extends MainController
     /**
      *@Route("/appoint/{id}", name="teacher_appoint")
      */
-    public function appoint(User $teacher, ValidatorInterface $validator, Request $request)
+    public function appoint(User $teacher, ValidatorInterface $validator, Request $request, SessionInterface $session)
     {
         $errors = $validator->validate($this->u);
 
@@ -47,34 +48,31 @@ class TeacherController extends MainController
             }
 
             return $this->redirectToRoute('account_index');
-        } else {
-            $u = clone $this->u;
-            $u->cleanSocialUsername();
-            $form = $this->createForm(AccountType::class, $u);
-            $form->remove('isTeacher');
-            $form->handleRequest($request);
+        }
 
-            if ($form->isSubmitted() && $form->isValid()) {
-                $u = ($this->u);
-                $u->cleanSocialUsername();
-                $form = $this->createForm(AccountType::class, $u);
-                $form->remove('isTeacher');
-                $form->handleRequest($request);
-                $this->em()->flush();
+        $u = ($this->u);
+        $u->cleanSocialUsername();
+        $form = $this->createForm(AccountType::class, $u);
+        $form->remove('isTeacher');
+        $form->handleRequest($request);
 
-                return $this->redirectToRoute('teacher_appoint', [
-                    'id' => $teacher->getId(),
-                ]);
-            }
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->em()->flush();
 
-            foreach ($errors as $er) {
-                $form->addError(new FormError($er->getMessage()));
-            }
-
-            return $this->render('teacher/edit.html.twig', [
-                'form' => $form->createView(),
+            return $this->redirectToRoute('teacher_appoint', [
+                'id' => $teacher->getId(),
             ]);
         }
+
+        foreach ($errors as $er) {
+            $form->addError(new FormError($er->getMessage()));
+        }
+
+        $session->getFlashBag()->set('missResponseEvent', true);
+
+        return $this->render('teacher/edit.html.twig', [
+            'form' => $form->createView(),
+        ]);
     }
 
     /**

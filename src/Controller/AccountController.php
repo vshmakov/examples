@@ -7,6 +7,7 @@ use App\DT;
 use App\Repository\UserRepository;
 use App\Repository\TransferRepository;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\UserLoader;
 
@@ -71,7 +72,7 @@ class AccountController extends MainController
     /**
      *@Route("/edit", name="account_edit", methods="GET|POST")
      */
-    public function edit(Request $request)
+    public function edit(Request $request, SessionInterface $session)
     {
         $u = clone $this->u;
         $u->cleanSocialUsername();
@@ -79,15 +80,12 @@ class AccountController extends MainController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $u = ($this->u);
-            $u->cleanSocialUsername();
-            $form = $this->createForm(AccountType::class, $u);
-            $form->handleRequest($request);
-
             $this->em()->flush();
 
             return $this->redirectToRoute('account_index');
         }
+
+        $session->getFlashBag()->set('missResponseEvent', true);
 
         return $this->render('account/edit.html.twig', [
             'form' => $form->createView(),

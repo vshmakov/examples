@@ -1,0 +1,25 @@
+<?php
+
+require_once("vendor/autoload.php");
+
+use PhpCsFixer\Cache\Directory;
+
+$json=file_get_contents('.php_cs.cache');
+$cache=json_decode($json, true);
+//echo json_encode($cache, JSON_PRETTY_PRINT);
+
+$hashes=$cache['hashes'];
+$finder=require_once("fixerFinder.php");
+$dir=new Directory(__dir__);
+
+foreach ($finder as $f) {
+$rp=$dir->getRelativePathTo($f);
+$ch=$hashes[$rp];
+$h=crc32(file_get_contents($f)); 
+$eq=(int) ($h==$ch);
+
+//echo $f." ".$rp." ".$eq."\n";
+if (!$eq) {
+echo sprintf("Changed %s file\n", $rp);
+}
+}

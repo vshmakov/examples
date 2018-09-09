@@ -713,4 +713,9 @@ class User implements UserInterface, GroupableInterface
     {
         return $this->getSomeName('%s %s', ['lastName', 'firstName']);
     }
+
+    public function getDumpName()
+    {
+        return $this->getSomeName('%s %s %s', ['firstName', 'fatherName', 'lastName']) ?: $this->username;
+    }
 }

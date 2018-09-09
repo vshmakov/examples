@@ -11,7 +11,9 @@
                 <th>Id</th>
                 <th>Login</th>
                 <th>Username</th>
-                <th>email</th>
+                <th>Network</th>
+				<th>Network id</th>
+				<th>email</th>
                 <th>Registration time</th>
                 <th>Last visit time</th>
                 <th>Money</th>
@@ -29,9 +31,11 @@
         {% for user in users %}
             <tr>
                 <td>{{ user.setER(uR).id }}</td>
-                <td>{{ user.login}}</td>
-                <td>{{ user.username}}</td>
-                <td>{{ user.email}}</td>
+                <td>{{ user.dumpName}}</td>
+                <td>{{ user.username ?? "-"}}</td>
+                <td>{{user.network ?? "-"}}</td>
+				<td>{{user.networkId ?? "-"}}</td>
+				<td>{{ user.email}}</td>
                 <td>{{ user.addTime.dbFormat}}</td>
 {%set ls=user.sessions.last%}
                 <td>{{ ls ? ls.lastTime.dbFormat : "-"}}</td>

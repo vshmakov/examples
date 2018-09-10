@@ -60,32 +60,39 @@ class ProcessersExtension extends AbstractExtension
 
     public function processIps($ips)
     {
-        $d = [];
-
-        foreach ($ips as $ip) {
-            $pa = $this->getAccessor($ip);
-            $d[] = [
+        return $this->prepareData($ips, function ($pa) {
+            return [
                 $pa('id'),
                 $pa('ip'),
                 $pa('country'),
                 $pa('region'),
                 $pa('city'),
                 $pa('continent'),
-                $pa('addTime')->dbFormat(),
-                $this->r->link('ip_show', ['id' => $ip->getId()], 'show')
-                .$this->r->link('ip_edit', ['id' => $ip->getId()], 'edit'),
+                $pa('addTime.dbFormat'),
+                $this->r->link('ip_show', ['id' => $pa('id')], 'show')
+                .$this->r->link('ip_edit', ['id' => $pa('id')], 'edit'),
             ];
-        }
-
-        return $d;
+        });
     }
 
-    private function getAccessor($e)
+    private function prepareData(array $entityList, callable $callback)
     {
-        $pa = PropertyAccess::createPropertyAccessor();
+        $data = [];
 
-        return function ($p) use ($e, $pa) {
-            return $pa->getValue($e, $p) ?: '-';
+        foreach ($entityList as $entity) {
+            $propertyAccessor = $this->getPropertyAccessor($entity);
+            $data[] = $callback($propertyAccessor);
+        }
+
+        return $data;
+    }
+
+    private function getPropertyAccessor($entity)
+    {
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
+
+        return function ($property) use ($entity, $propertyAccessor) {
+            return $propertyAccessor->getValue($entity, $property) ?: '-';
         };
     }
 }

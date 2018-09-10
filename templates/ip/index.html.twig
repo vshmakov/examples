@@ -34,7 +34,7 @@
 <script>
 $("table").DataTable({
 pageLength: 50,
-order: [1, "desc"],
+order: [0, "desc"],
 lengthMenu: [25, 50, 100, 250],
 data: {{processIps(ips)|reverse|json_encode|raw}},
 deferRender: true,

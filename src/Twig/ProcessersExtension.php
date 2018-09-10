@@ -2,6 +2,7 @@
 
 namespace App\Twig;
 
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 use App\Service\Router;
@@ -55,5 +56,36 @@ class ProcessersExtension extends AbstractExtension
         }
 
         return $d;
+    }
+
+    public function processIps($ips)
+    {
+        $d = [];
+
+        foreach ($ips as $ip) {
+            $pa = $this->getAccessor($ip);
+            $d[] = [
+                $pa('id'),
+                $pa('ip'),
+                $pa('country'),
+                $pa('region'),
+                $pa('city'),
+                $pa('continent'),
+                $pa('addTime')->dbFormat(),
+                $this->r->link('ip_show', ['id' => $ip->getId()], 'show')
+                .$this->r->link('ip_edit', ['id' => $ip->getId()], 'edit'),
+            ];
+        }
+
+        return $d;
+    }
+
+    private function getAccessor($e)
+    {
+        $pa = PropertyAccess::createPropertyAccessor();
+
+        return function ($p) use ($e, $pa) {
+            return $pa->getValue($e, $p) ?: '-';
+        };
     }
 }

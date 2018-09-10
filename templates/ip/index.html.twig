@@ -21,26 +21,23 @@
         <tbody>
         {% for ip in ips %}
 {{fillIp(ip)}}
-            <tr>
-                <td>{{ ip.id }}</td>
-                <td>{{ ip.ip }}</td>
-                <td>{{ ip.country }}</td>
-                <td>{{ ip.region }}</td>
-                <td>{{ ip.city }}</td>
-                <td>{{ ip.continent}}</td>
-                <td>{{ ip.addTime ? ip.addTime|date('Y-m-d H:i:s') : '' }}</td>
-                <td>
-                    <a href="{{ path('ip_show', {'id': ip.id}) }}">show</a>
-                    <a href="{{ path('ip_edit', {'id': ip.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="7">no records found</td>
-            </tr>
         {% endfor %}
         </tbody>
     </table>
 
     <a href="{{ path('ip_new') }}">Create new</a>
 {% endblock %}
+
+{%block javascripts%}
+{{parent()}}
+<script src="/js/jquery.datatables.min.js"></script>
+<script>
+$("table").DataTable({
+pageLength: 50,
+order: [1, "desc"],
+lengthMenu: [25, 50, 100, 250],
+data: {{processIps(ips)|reverse|json_encode|raw}},
+deferRender: true,
+});
+</script>
+{%endblock%}

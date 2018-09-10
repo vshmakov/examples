@@ -12,7 +12,7 @@ use Doctrine\Common\Collections\Collection;
  */
 class Ip
 {
-    use BaseTrait;
+    use DTTrait;
 
     /**
      * @ORM\Id()
@@ -134,7 +134,7 @@ class Ip
 
     public function getAddTime(): ?\DateTimeInterface
     {
-        return $this->addTime;
+        return $this->dt($this->addTime);
     }
 
     public function setAddTime(\DateTimeInterface $addTime): self

@@ -29,9 +29,9 @@ class UserRepository extends ServiceEntityRepository
 
         if (!$p) {
             $p = $pR->getNewByCurrentUser()
-->setDescription($testDesc)
-->setIsPublic(true)
-->setAuthor($this->getGuest());
+                ->setDescription($testDesc)
+                ->setIsPublic(true)
+                ->setAuthor($this->getGuest());
 
             $em = $this->em();
             $em->persist($p);
@@ -47,7 +47,7 @@ class UserRepository extends ServiceEntityRepository
 join u.sessions s
 join s.attempts a
 where u = :u')
-->setParameter('u', $u));
+            ->setParameter('u', $u));
     }
 
     public function getExamplesCount($u)
@@ -57,7 +57,7 @@ join u.sessions s
 join s.attempts a
 join a.examples e
 where u = :u')
-->setParameter('u', $u));
+            ->setParameter('u', $u));
     }
 
     public function getProfilesCount($u)
@@ -65,7 +65,7 @@ where u = :u')
         return $this->v($this->q('select count(p) from App:User u
 join u.profiles p
 where u = :u')
-->setParameter('u', $u));
+            ->setParameter('u', $u));
     }
 
     public function getGuest()
@@ -79,8 +79,8 @@ where u = :u')
 
         if (!$u) {
             $u = $this->getNew()
-->setUsername($gl)
-->setUsernameCanonical($gl);
+                ->setUsername($gl)
+                ->setUsernameCanonical($gl);
 
             $em = $this->em();
             $em->persist($u);
@@ -93,7 +93,7 @@ where u = :u')
     private function getNew()
     {
         return (new User())
-->setEnabled(true);
+            ->setEnabled(true);
     }
 
     public function findOneByUloginCredentials($d)
@@ -112,13 +112,12 @@ where u = :u')
         }
 
         $u = $this->getNew()
-->setUsername($username)
-->setIsSocial(true)
-->setFirstName($first_name)
-->setLastName($last_name)
-->setNetwork($network)
-->setNetworkId($uid)
-;
+            ->setUsername($username)
+            ->setIsSocial(true)
+            ->setFirstName($first_name)
+            ->setLastName($last_name)
+            ->setNetwork($network)
+            ->setNetworkId($uid);
         $em = $this->em();
         $em->persist($u);
         $em->flush();
@@ -132,8 +131,8 @@ where u = :u')
 join a.session s
 join s.user u
 where u = :u')
-->setParameters(['u' => $u])
-->getResult();
+            ->setParameters(['u' => $u])
+            ->getResult();
 
         $attR = $this->er(Attempt::class);
         $c = 0;
@@ -150,12 +149,26 @@ where u = :u')
     public function getSolvedExamplesCount($u)
     {
         return $this->v(
-$this->q('select count(e) from App:Example e
+            $this->q('select count(e) from App:Example e
 join e.attempt a
 join a.session s
 join s.user u
 where u = :u and e.isRight = true')
-->setParameters(['u' => $u])
-);
+                ->setParameters(['u' => $u])
+        );
+    }
+
+    public function clearUsers(\DateTimeInterface $dt)
+    {
+        $entityManager = $this->getEntityManager();
+        $users = $entityManager->createQuery('select u from App:User u
+        where u.enabled = false and u.addTime < :dt')
+            ->setParameter('dt', \DT::createBySubDays(10))
+            ->getResult();
+
+        foreach ($users as $user) {
+            $entityManager->remove($user);
+        }
+        $entityManager->flush();
     }
 }

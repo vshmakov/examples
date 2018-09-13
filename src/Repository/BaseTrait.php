@@ -13,29 +13,34 @@ trait BaseTrait
 
     public function q($dql)
     {
+        return $this->createQuery($dql);
+    }
+
+    public function createQuery($dql)
+    {
         return $this->em()->createQuery($dql);
     }
 
-    public function v($q)
+    public function v($query)
     {
-        $r = ($q->setMaxResults(1)->getOneOrNullResult());
+        return $this->getValue($query);
+    }
 
-        if (!is_array($r)) {
-            return $r;
+    public function getValue($query)
+    {
+        $result = ($query->setMaxResults(1)->getOneOrNullResult());
+
+        if (!is_array($result)) {
+            return $result;
         }
 
-        foreach ($r as $v) {
-            return $v;
+        foreach ($result as $value) {
+            return $value;
         }
     }
 
-    private function qb()
+    private function getEntityRepository($class)
     {
-        return $this->createQueryBuilder();
-    }
-
-    private function er($cl)
-    {
-        return $this->em()->getRepository($cl);
+        return $this->getentityManager()->getRepository($class);
     }
 }

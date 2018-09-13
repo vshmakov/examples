@@ -8,23 +8,32 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use App\Repository\SessionRepository as SR;
-use App\Service\JsonLogger as JL;
-use App\Service\UserLoader as UL;
+use App\Repository\SessionRepository;
+use App\Repository\UserRepository;
+use App\Repository\VisitRepository;
+use App\Service\JsonLogger;
+use App\Service\UserLoader;
+use Doctrine\ORM\EntityManagerInterface;
 
 class CronCommand extends Command
 {
     protected static $defaultName = 'Cron';
-    private $sR;
-    private $l;
-    private $ul;
+    private $sessionRepository;
+    private $userRepository;
+    private $visitRepository;
+    private $logger;
+    private $userLoader;
+    private $entityManager;
 
-    public function __construct(SR $sR, JL $l, UL $ul)
+    public function __construct(SessionRepository $sessionRepository, JsonLogger $logger, UserLoader $userLoader, EntityManagerInterface $entityManager, UserRepository $userRepository, VisitRepository $visitRepository)
     {
         parent::__construct();
-        $this->sR = $sR;
-        $this->l = $l;
-        $this->ul = $ul;
+        $this->sessionRepository = $sessionRepository;
+        $this->logger = $logger;
+        $this->userLoader = $userLoader;
+        $this->entityManager = $entityManager;
+        $this->userRepository = $userRepository;
+        $this->visitRepository = $visitRepository;
     }
 
     protected function configure()
@@ -32,37 +41,20 @@ class CronCommand extends Command
         $this
             ->setDescription('Add a short description for your command')
             ->addArgument('arg1', InputArgument::OPTIONAL, 'Argument description')
-            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
-        ;
+            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
-        $this->ul->getGuest()->setIps([]);
+        $this->userLoader->getGuest()->setIps([]);
 
-        $i = function ($d = 7) {
-            return (new \DateTime())->sub(new \DateInterval("P{$d}D"));
-        };
-        $dt = $i();
-        $sR = $this->sR;
-        $sR->clearSessions($dt);
-        $em = $sR->em();
-        $vs = $em->createQuery('select v from App:Visit v
-where v.addTime < :dt')
-->setParameter('dt', $dt)
-->getResult();
+        $dt = \DT::crateBySubDays(7)();
+        $this->sessionRepository->clearSessions($dt);
+        $this->visitRepository->cleareVisits($dt);
+        $dt = \DT::createBySubDays(10);
+        $this->userRepository->clearNotEnabledUsers($dt);
 
-        $users = $em->createQuery('select u from App:User u
-where u.enabled = false and u.addTime < :dt')
-->setParameter('dt', $i(10))
-->getResult();
-
-        foreach (array_merge($vs, $users) as $v) {
-            $em->remove($v);
-        }
-
-        $em->flush();
         $io->success('Cron command executed');
     }
 }

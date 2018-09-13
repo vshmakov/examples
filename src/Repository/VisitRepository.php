@@ -34,7 +34,7 @@ class VisitRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
-    */
+     */
 
     /*
     public function findOneBySomeField($value): ?Visit
@@ -46,5 +46,19 @@ class VisitRepository extends ServiceEntityRepository
             ->getOneOrNullResult()
         ;
     }
-    */
+     */
+
+    public function cleareVisits(\DateTimeInterface $dt)
+    {
+        $entityManager = $this->getEntityManager();
+        $visits = $entityManager->createQuery('select v from App:Visit v
+where v.addTime < :dt')
+            ->setParameter('dt', $dt)
+            ->getResult();
+
+        foreach ($visits as $visit) {
+            $entityManager->remove($visit);
+        }
+        $entityManager->flush();
+    }
 }

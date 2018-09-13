@@ -13,6 +13,26 @@ class IndexControllerTest extends WebTestCase
         $client->request('POST', '/api/request/yandex');
 
         $this->assertEquals(400, $client->getResponse()->getStatusCode());
-        echo $client->getResponse()->getContent();
+    }
+
+    public function testAll()
+    {
+        $client = static::createClient();
+        $routes = [
+            200 => [
+                '/',
+                '/attempt',
+                '/profile',
+                '/login',
+                '/register/',
+            ],
+        ];
+
+        foreach ($routes as $status => $urlList) {
+            foreach ($urlList as $url) {
+                $client->request('GET', $url);
+            }
+            $this->assertEquals($status, $client->getResponse()->getStatusCode());
+        }
     }
 }

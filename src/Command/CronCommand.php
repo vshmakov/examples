@@ -47,8 +47,8 @@ class CronCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
-        $this->userLoader->getGuest()->setIps([]);
 
+        $this->userLoader->getGuest()->setIps([]);
         $dt = \DT::crateBySubDays(7)();
         $this->sessionRepository->clearSessions($dt);
         $this->visitRepository->cleareVisits($dt);

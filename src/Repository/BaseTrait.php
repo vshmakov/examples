@@ -18,7 +18,7 @@ trait BaseTrait
 
     public function createQuery($dql)
     {
-        return $this->em()->createQuery($dql);
+        return $this->getEntityManager()->createQuery($dql);
     }
 
     public function v($query)
@@ -42,5 +42,10 @@ trait BaseTrait
     private function getEntityRepository($class)
     {
         return $this->getentityManager()->getRepository($class);
+    }
+
+    private function er($class)
+    {
+        return $this->getEntityRepository($class);
     }
 }

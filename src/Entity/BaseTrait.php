@@ -6,11 +6,16 @@ trait BaseTrait
 {
     use \App\BaseTrait;
 
-    private $er;
+    private $entityRepository;
 
-    public function setER($er)
+    public function setER($entityRepository)
     {
-        $this->er = $er;
+        return $this->setEntityRepository($entityRepository);
+    }
+
+    public function setEntityRepository($entityRepository)
+    {
+        $this->entityRepository = $entityRepository;
 
         return $this;
     }
@@ -21,13 +26,13 @@ trait BaseTrait
             return $gs['ret'];
         }
         $m = entityGetter($v);
-        $er = $this->er;
+        $er = $this->entityRepository;
 
         if (!method_exists($er, $m)) {
             throw new \Exception(sprintf('Entity %s and %s repository does not contain %s getter', self::class, is_object($er) ? get_class($er) : 'empty', $v));
         }
 
-        return $this->er->$m($this);
+        return $er->$m($this);
     }
 
     private function getSetter($method, $p)

@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Form\AccountType;
-use App\DT;
 use App\Repository\UserRepository;
 use App\Repository\TransferRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,11 +15,12 @@ use App\Service\UserLoader;
  */
 class AccountController extends MainController
 {
-    private $u;
+    private $currentUser;
 
-    public function __construct(UserRepository $uR, UserLoader $ul)
+    public function __construct(UserRepository $userRepository, UserLoader $userLoader)
     {
-        $this->u = $ul->getUser()->setER($uR);
+        $this->currentUser = $userLoader->getUser()
+            ->setEntityRepository($userRepository);
     }
 
     /**
@@ -34,37 +34,36 @@ class AccountController extends MainController
     /**
      *@Route("/recharge", name="account_recharge")
      */
-    public function recharge(TransferRepository $tR)
+    public function recharge(TransferRepository $transferRepository)
     {
         return $this->render('account/Recharge.html.twig', [
-            't' => RECHARGE_TITLE,
-            'label' => $tR->findUnheldByCurrentUserOrNew()->getLabel(),
+            'label' => $transferRepository->findUnheldByCurrentUserOrNew()->getLabel(),
         ]);
     }
 
     /**
      *@Route("/pay", name="account_pay", methods="GET|POST")
      */
-    public function pay(Request $r)
+    public function pay(Request $request)
     {
-        $m = (int) $r->request->get('months');
-        $u = $this->u;
-        $remMon = $u->getMoney() - $m * PRICE;
+        $month = (int)$request->request->get('months');
+        $user = $this->currentUser;
+        $remaindMoney = $user->getMoney() - $month * PRICE;
 
-        if ($m && $remMon >= 0) {
-            $f = $u->getLimitTime();
+        if ($month && $remaindMoney >= 0) {
+            $limitTime = $user->getLimitTime();
 
-            if ($f->isPast()) {
-                $f = new DT();
+            if ($limitTime->isPast()) {
+                $limitTime = new \DT;
             }
-            $u->setLimitTime($f->add(new \DateInterval("P{$m}M")))
-->setMoney($remMon);
-            $this->em()->flush();
-            $m = 0;
+            $user->setLimitTime($limitTime->add(new \DateInterval("P{$month}M")))
+                ->setMoney($remaindMoney);
+            $this->getEntityManager()->flush();
+            $month = 0;
         }
 
         return $this->render('account/pay.html.twig', [
-            'm' => $m ?: '',
+            'm' => $month ? : '',
             'price' => PRICE,
         ]);
     }
@@ -74,13 +73,13 @@ class AccountController extends MainController
      */
     public function edit(Request $request, SessionInterface $session)
     {
-        $u = $this->u;
-        $u->cleanSocialUsername();
-        $form = $this->createForm(AccountType::class, $u);
+        $user = $this->currentUser;
+        $user->cleanSocialUsername();
+        $form = $this->createForm(AccountType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->em()->flush();
+            $this->getEntityManager()->flush();
 
             return $this->redirectToRoute('account_index');
         }

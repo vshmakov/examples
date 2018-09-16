@@ -62,7 +62,7 @@ function getArrByStr($string)
 
 function arr(string $string) : array
 {
-    $array = explode(' ', $s);
+    $array = explode(' ', $string);
 
     return $array;
 }

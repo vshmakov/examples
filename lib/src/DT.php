@@ -24,9 +24,9 @@ class DT extends DateTime
         return ($dt instanceof \DateTimeInterface) ? static::createFromTimestamp($dt->getTimestamp()) : null;
     }
 
-    public static function createBySub(DateInterval $dateInterval)
+    public static function createBySub(string $intervalString)
     {
-        return (new static())->sub(new \DateInterval($dateInterval));
+        return (new static())->sub(new \DateInterval($intervalString));
     }
 
     public static function createBySubDays($days)

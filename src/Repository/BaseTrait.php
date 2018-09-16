@@ -26,7 +26,12 @@ trait BaseTrait
         return $this->getValue($query);
     }
 
-    public function getValue($query)
+    private function getValue($query)
+    {
+        return self::getValueByQuery($query);
+    }
+
+    public static function getValueByQuery($query)
     {
         $result = ($query->setMaxResults(1)->getOneOrNullResult());
 

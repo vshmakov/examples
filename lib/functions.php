@@ -60,7 +60,7 @@ function getArrByStr($string)
     return arr($string);
 }
 
-function arr(string $string) : array
+function arr(string $string): array
 {
     $array = explode(' ', $string);
 
@@ -75,12 +75,12 @@ function getMethodName($s, $p = '')
         $s = ucfirst($s);
     }
 
-    return $p . $s;
+    return $p.$s;
 }
 
 function entityGetter($v)
 {
-    return preg_match('#^get[A-Z]#', $v) ? $v : 'get' . ucfirst($v);
+    return preg_match('#^get[A-Z]#', $v) ? $v : 'get'.ucfirst($v);
 }
 
 function getKeysFromEntity($s, $e)
@@ -97,7 +97,7 @@ function getKeysFromEntity($s, $e)
 
 function _log(...$attr)
 {
-    file_put_contents(__DIR__ . '/log.log', json_encode($attr));
+    file_put_contents(__DIR__.'/log.log', json_encode($attr));
 }
 
 function createNumArr($a)
@@ -139,7 +139,7 @@ function btwVal($min, $max, $v, $k = null)
 function makeVarKeys($a, $s = 'x')
 {
     foreach ($a as $k => $v) {
-        $a[$s . $k] = $v;
+        $a[$s.$k] = $v;
     }
 
     return $a;

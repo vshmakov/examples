@@ -46,7 +46,7 @@ class AccountController extends MainController
      */
     public function pay(Request $request)
     {
-        $month = (int)$request->request->get('months');
+        $month = (int) $request->request->get('months');
         $user = $this->currentUser;
         $remaindMoney = $user->getMoney() - $month * PRICE;
 
@@ -54,7 +54,7 @@ class AccountController extends MainController
             $limitTime = $user->getLimitTime();
 
             if ($limitTime->isPast()) {
-                $limitTime = new \DT;
+                $limitTime = new \DT();
             }
             $user->setLimitTime($limitTime->add(new \DateInterval("P{$month}M")))
                 ->setMoney($remaindMoney);
@@ -63,7 +63,7 @@ class AccountController extends MainController
         }
 
         return $this->render('account/pay.html.twig', [
-            'm' => $month ? : '',
+            'm' => $month ?: '',
             'price' => PRICE,
         ]);
     }

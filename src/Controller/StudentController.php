@@ -42,7 +42,7 @@ class StudentController extends MainController
         $this->denyAccessUnlessGranted('SHOW_ATTEMPTS', $student);
 
         return $this->render('student/attempts.html.twig', [
-            'attempts' => $attR->findByUser($student), 
+            'attempts' => $attR->findByUser($student),
             'student' => $student,
         ]);
     }

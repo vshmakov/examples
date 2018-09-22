@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Security\UloginAuthenticator;
 use App\Repository\TransferRepository;
-use App\Repository\AttemptRepository;
 use App\Repository\UserRepository;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -34,7 +33,7 @@ class ApiController extends Controller
         if ($user && 'true' != $unaccepted) {
             $user->addMoney($withdraw_amount);
             $transfer->setMoney($withdraw_amount)
-                ->setHeldTime(new \DateTime)
+                ->setHeldTime(new \DateTime())
                 ->setHeld(true);
             $this->getEntityManager()->flush();
             $statusCode = 200;

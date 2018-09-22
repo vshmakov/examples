@@ -47,8 +47,8 @@ class ProcessersExtension extends AbstractExtension
                 "$example",
                 $propertyAccessor('answer'),
                 $propertyAccessor('isRight', false) ? 'Да' : 'Нет',
-                $propertyAccessor('solvingTime.timestamp') ? : '-',
-                $propertyAccessor('addTime') . '',
+                $propertyAccessor('solvingTime.timestamp') ?: '-',
+                $propertyAccessor('addTime').'',
                 $this->router->link('attempt_show', ['id' => $attempt->getId()], $attempt->getTitle()),
             ];
         });
@@ -66,7 +66,7 @@ class ProcessersExtension extends AbstractExtension
                 $propertyAccessor('continent'),
                 $propertyAccessor('addTime.dbFormat'),
                 $this->router->link('ip_show', ['id' => $pa('id')], 'show')
-                    . $this->router->link('ip_edit', ['id' => $pa('id')], 'edit'),
+                    .$this->router->link('ip_edit', ['id' => $pa('id')], 'edit'),
             ];
         });
     }
@@ -80,25 +80,33 @@ class ProcessersExtension extends AbstractExtension
             switch ($rating) {
                 case 3:
                     $color = 'orange';
+
                     break;
+
                 case 4:
                     $color = 'yellow';
+
                     break;
+
                 case 5:
                     $color = 'green';
+
                     break;
+
                 default:
                     $color = 'red';
+
                     break;
             }
 
             return [
                 $this->router->link('attempt_show', ['id' => $propertyAccessor('id')], $propertyAccessor('title')),
-                $propertyAccessor('addTime') . '',
-                $propertyAccessor('finishTime') . '',
-                sprintf('%s из %s (%s сек/пример)', $propertyAccessor('solvingTime.minSecFormat'), $propertyAccessor('maxTime.minSecFormat'), $propertyAccessor('averSolveTime.timestamp')),
-                sprintf('%s из %s', $propertyAccessor('solvedExamplesCount'), $propertyAccessor('examplesCount')),
-                sprintf('<span style="background: %s;">%s</span>', $color, $rating)
+                $propertyAccessor('addTime').'',
+                $propertyAccessor('finishTime').'',
+                sprintf('%s из %s (%s сек/пример)', $propertyAccessor('solvedTime.minSecFormat'), $propertyAccessor('maxTime.minSecFormat'), $propertyAccessor('averSolveTime.timestamp')),
+                sprintf('%s из %s', $propertyAccessor('solvedExamplesCount', false), $propertyAccessor('examplesCount', false)),
+                $propertyAccessor('errorsCount', false),
+                sprintf('<span style="background: %s;">%s</span>', $color, $rating),
             ];
         });
     }
@@ -117,15 +125,18 @@ class ProcessersExtension extends AbstractExtension
 
     private function getPropertyAccessor($entity)
     {
-        $propertyAccessor = PropertyAccess::createPropertyAccessor();
+        $propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
+    ->enableMagicCall()
+    ->getPropertyAccessor();
 
-        return function ($property, $default = '-') use ($entity, $propertyAccessor) {
+        return function ($property, $defaultSign = '-') use ($entity, $propertyAccessor) {
             $value = $propertyAccessor->getValue($entity, $property);
-            if (false === $default) {
+
+            if (false === $defaultSign) {
                 $defaultSign = $value;
             }
 
-            return $value ? : $defaultSign;
+            return $value ?: $defaultSign;
         };
     }
 }

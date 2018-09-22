@@ -39,7 +39,7 @@ class TeacherController extends MainController
      */
     public function appoint(User $teacher, ValidatorInterface $validator, Request $request, SessionInterface $session)
     {
-        $errors = $validator->validate($this->u);
+        $errors = $validator->validate($this->u, null, ['account']);
 
         if (!count($errors)) {
             if ($this->isGranted('APPOINT', $teacher)) {

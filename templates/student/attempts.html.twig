@@ -16,7 +16,7 @@
 $("table").DataTable({
 searching: false,
 sorting: false,
-data: {{data|reverse|json_encode|raw}},
+data: {{processAttempts(attempts)|reverse|json_encode|raw}},
 deferRender: true,
 pageLength: 50,
 language: {{include("attempt/language.json.twig")}}

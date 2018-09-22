@@ -30,11 +30,7 @@ class AttemptController extends MainController
     public function index(AttemptRepository $attemptRepository)
     {
         return $this->render('attempt/index.html.twig', [
-            'jsParams' => [
-                'api_attempt_index_table' => $this->generateUrl('api_attempt'),
-            ],
             'attempts' => $attemptRepository->findAllByCurrentUser(),
-            'attR' => $attemptRepository,
         ]);
     }
 

@@ -16,8 +16,8 @@
 $("table").DataTable({
 ordering: false,
 searching: false,
-serverSide: true,
-ajax: P.api_attempt_index_table,
+data: {{processAttempts(attempts)|reverse|json_encode|raw}},
+deferRender: true,
 pageLength: 50,
 language: {{include("attempt/language.json.twig")}}
 });

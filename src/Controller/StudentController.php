@@ -14,7 +14,7 @@ use App\Entity\User;
  */
 class StudentController extends MainController
 {
-    use ApiTrait;
+    use BaseTrait;
 
     private $u;
 
@@ -42,7 +42,7 @@ class StudentController extends MainController
         $this->denyAccessUnlessGranted('SHOW_ATTEMPTS', $student);
 
         return $this->render('student/attempts.html.twig', [
-            'data' => $this->processAttempts($attR->findByUser($student), $attR),
+            'attempts' => $attR->findByUser($student), 
             'student' => $student,
         ]);
     }

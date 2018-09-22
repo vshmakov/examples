@@ -103,7 +103,7 @@ class ProcessersExtension extends AbstractExtension
                 $this->router->link('attempt_show', ['id' => $propertyAccessor('id')], $propertyAccessor('title')),
                 $propertyAccessor('addTime').'',
                 $propertyAccessor('finishTime').'',
-                sprintf('%s из %s (%s сек/пример)', $propertyAccessor('solvedTime.minSecFormat'), $propertyAccessor('maxTime.minSecFormat'), $propertyAccessor('averSolveTime.timestamp')),
+                $propertyAccessor('solvedExamplesCount', false) ? sprintf('%s из %s (%s сек/пример)', $propertyAccessor('solvedTime.minSecFormat'), $propertyAccessor('maxTime.minSecFormat'), $propertyAccessor('averSolveTime.timestamp')) : '-',
                 sprintf('%s из %s', $propertyAccessor('solvedExamplesCount', false), $propertyAccessor('examplesCount', false)),
                 $propertyAccessor('errorsCount', false),
                 sprintf('<span style="background: %s;">%s</span>', $color, $rating),

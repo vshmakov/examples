@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Inflector\Inflector;
+
 trait BaseTrait
 {
     use \App\BaseTrait;
@@ -20,37 +22,19 @@ trait BaseTrait
         return $this;
     }
 
-    public function __call($v, $p = [])
+    public function __call($method, $params = [])
     {
-        if ($gs = $this->getSetter($v, $p)) {
-            return $gs['ret'];
+        $entityRepository = $this->entityRepository;
+
+        if (!preg_match('#^get#', $method)) {
+            $method = "get_$method";
         }
-        $m = entityGetter($v);
-        $er = $this->entityRepository;
+        $getter = Inflector::camelize($method);
 
-        if (!method_exists($er, $m)) {
-            throw new \Exception(sprintf('Entity %s and %s repository does not contain %s getter', self::class, is_object($er) ? get_class($er) : 'empty', $v));
-        }
-
-        return $er->$m($this);
-    }
-
-    private function getSetter($method, $p)
-    {
-        foreach (['get', 'set'] as $action) {
-            if (preg_match("#^$action(.+)$#", $method, $arr)) {
-                $v = lcfirst($arr[1]);
-
-                if (isset($this->$v)) {
-                    if (!$g = 'get' == $action) {
-                        $this->$v = $p[0];
-                    }
-
-                    return ['ret' => $g ? $this->$v : $this];
-                }
-            }
+        if (!$entityRepository or !method_exists($entityRepository, $getter)) {
+            throw new \Exception(sprintf('Entity %s and %s repository does not contain %s getter', self::class, $entityRepository ? get_class($entityRepository) : 'empty', $method));
         }
 
-        return false;
+        return $entityRepository->$getter($this);
     }
 }

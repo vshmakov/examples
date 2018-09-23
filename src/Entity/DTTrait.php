@@ -2,8 +2,6 @@
 
 namespace App\Entity;
 
-use App\DT;
-
 trait DTTrait
 {
     use BaseTrait;
@@ -15,6 +13,6 @@ trait DTTrait
 
     private function initAddTime($var = 'addTime')
     {
-        $this->$var = new DT();
+        $this->$var = new \DateTime();
     }
 }

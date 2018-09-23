@@ -132,10 +132,11 @@ class ProfileController extends MainController
      */
     public function appoint(Profile $profile, UserLoader $userLoader)
     {
-        $this->denyAccessUnlessGranted('APPOINT', $profile);
-        $user = $userLoader->getUser();
-        $user->setProfile($profile);
-        $this->getEntityManager()->flush();
+        if ($this->isGranted('APPOINT', $profile)) {
+            $user = $userLoader->getUser();
+            $user->setProfile($profile);
+            $this->getEntityManager()->flush();
+        }
 
         return $this->redirectToRoute('profile_index');
     }
@@ -155,7 +156,7 @@ class ProfileController extends MainController
 
     private function saveAndRedirect(Profile $profile, $form, UserLoader $userLoader)
     {
-        $profile->normData();
+        $profile->normalize();
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($profile);
         $entityManager->flush();

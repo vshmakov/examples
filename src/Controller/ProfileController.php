@@ -10,11 +10,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\UserLoader;
 use App\Repository\UserRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 /**
  * @Route("/profile")
  */
-class ProfileController extends MainController
+class ProfileController extends Controller
 {
     /**
      * @Route("/", name="profile_index", methods="GET")

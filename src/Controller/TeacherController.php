@@ -11,26 +11,28 @@ use App\Repository\UserRepository;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\UserLoader;
 use App\Entity\User;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 /**
  * @Route("/teacher")
  */
-class TeacherController extends MainController
+class TeacherController extends Controller
 {
-    private $u;
+    private $currentUser;
 
-    public function __construct(UserRepository $uR, UserLoader $ul)
+    public function __construct(UserRepository $userRepository, UserLoader $userLoader)
     {
-        $this->u = $ul->getUser()->setER($uR);
+        $this->currentUser = $userLoader->getUser()
+            ->setEntityRepository($userRepository);
     }
 
     /**
      *@Route("/", name="teacher_index")
      */
-    public function index(UserRepository $uR)
+    public function index(UserRepository $userRepository)
     {
         return $this->render('teacher/index.html.twig', [
-            'teachers' => $uR->findByIsTeacher(true),
+            'teachers' => $userRepository->findByIsTeacher(true),
         ]);
     }
 
@@ -39,33 +41,33 @@ class TeacherController extends MainController
      */
     public function appoint(User $teacher, ValidatorInterface $validator, Request $request, SessionInterface $session)
     {
-        $errors = $validator->validate($this->u, null, ['account']);
+        $currentUser=$this->currentUser;
+        $errors = $validator->validate($currentUser, null, ['account']);
 
         if (!count($errors)) {
             if ($this->isGranted('APPOINT', $teacher)) {
-                $this->u->setTeacher($teacher);
-                $this->em()->flush();
+                $currentUser->setTeacher($teacher);
+                $this->getEntityManager()->flush();
             }
 
             return $this->redirectToRoute('account_index');
         }
 
-        $u = ($this->u);
-        $u->cleanSocialUsername();
-        $form = $this->createForm(AccountType::class, $u);
+                $currentUser->cleanSocialUsername();
+        $form = $this->createForm(AccountType::class, $currentUser);
         $form->remove('isTeacher');
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->em()->flush();
+            $this->getEntityManager()->flush();
 
             return $this->redirectToRoute('teacher_appoint', [
                 'id' => $teacher->getId(),
             ]);
         }
 
-        foreach ($errors as $er) {
-            $form->addError(new FormError($er->getMessage()));
+        foreach ($errors as $error) {
+            $form->addError(new FormError($error->getMessage()));
         }
 
         $session->getFlashBag()->set('missResponseEvent', true);
@@ -80,8 +82,8 @@ class TeacherController extends MainController
      */
     public function disappoint()
     {
-        $this->u->setTeacher(null);
-        $this->em()->flush();
+        $this->currentUser->setTeacher(null);
+        $this->getEntityManager()->flush();
 
         return $this->redirectToRoute('account_index');
     }

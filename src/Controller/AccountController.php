@@ -8,12 +8,13 @@ use App\Repository\TransferRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use App\Service\UserLoader;
 
 /**
  * @Route("/account")
  */
-class AccountController extends MainController
+class AccountController extends Controller
 {
     private $currentUser;
 

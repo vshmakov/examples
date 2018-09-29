@@ -34,7 +34,7 @@ where u.addTime > :dt',
         ];
 
         foreach ($queries as $key => $query) {
-            foreach ([1, 2, 3, 7, 14, 30, 60, 90] as $days) {
+            foreach ([1, 2, 3, 7, 14, 30, 60, 90, 180] as $days) {
                 $statistic[$days][$key] = IpRepository::getValueByQuery(
                     $entityManager->createQuery($query)
                         ->setParameter('dt', \DT::createBySubDays($days))

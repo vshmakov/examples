@@ -12,11 +12,8 @@ class IndexController extends Controller
     /**
      * @Route("/", name="homepage")
      */
-    public function index(\App\Service\UserLoader $ul, \App\Repository\UserRepository $uR, \Symfony\Component\DependencyInjection\ContainerInterface $con)
+    public function index()
     {
-        //dump($con);
-        return $this->render('index/index.html.twig', [
-            'controller_name' => 'IndexController',
-        ]);
+        return $this->render('index/index.html.twig');
     }
 }

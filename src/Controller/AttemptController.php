@@ -11,11 +11,12 @@ use App\Entity\Attempt;
 use App\Repository\AttemptRepository;
 use App\Repository\ExampleRepository;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 /**
  * @Route("/attempt")
  */
-class AttemptController extends MainController
+class AttemptController extends Controller
 {
     private $attemptRepository;
 

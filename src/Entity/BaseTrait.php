@@ -10,11 +10,6 @@ trait BaseTrait
 
     private $entityRepository;
 
-    public function setER($entityRepository)
-    {
-        return $this->setEntityRepository($entityRepository);
-    }
-
     public function setEntityRepository($entityRepository)
     {
         $this->entityRepository = $entityRepository;
@@ -29,6 +24,7 @@ trait BaseTrait
         if (!preg_match('#^get#', $method)) {
             $method = "get_$method";
         }
+        
         $getter = Inflector::camelize($method);
 
         if (!$entityRepository or !method_exists($entityRepository, $getter)) {

@@ -18,12 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
  */
 class AttemptController extends Controller
 {
-    private $attemptRepository;
-
-    public function __construct(AttemptRepository $attemptRepository)
-    {
-        $this->attemptRepository = $attemptRepository;
-    }
+    use BaseTrait;
 
     /**
      * @Route("/", name="attempt_index")
@@ -105,7 +100,7 @@ class AttemptController extends Controller
         }
 
         $example = $exampleRepository->findLastUnansweredByAttempt($attempt);
-        $answer = (float) $request->request->get('answer');
+        $answer = (float)$request->request->get('answer');
         $example->setAnswer($answer);
         $entityManager->flush();
 

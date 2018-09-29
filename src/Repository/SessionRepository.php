@@ -5,98 +5,100 @@ namespace App\Repository;
 use App\Service\SessionMarker;
 use App\Service\UserLoader;
 use App\Entity\Session;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class SessionRepository extends ServiceEntityRepository
 {
     use BaseTrait;
-    private $ul;
-    private $curUser;
-    private $sm;
+    private $userLoader;
+    private $currentUser;
+    private $sessionMarker;
 
-    public function __construct(RegistryInterface $registry, UserLoader $ul, SessionMarker $sm)
+    public function __construct(RegistryInterface $registry, UserLoader $userLoader, SessionMarker $sessionMarker)
     {
         parent::__construct($registry, Session::class);
-        $this->ul = $ul;
-        $this->curUser = $ul->getUser();
-        $this->sm = $sm;
+        $this->userLoader = $userLoader;
+        $this->currentUser = $userLoader->getUser();
+        $this->sessionMarker = $sessionMarker;
     }
 
     public function findOneByCurrentUser()
     {
-        return $this->findOneByUser($this->curUser);
+        return $this->findOneByUser($this->currentUser);
     }
 
-    public function findOneByUser($u)
+    public function findOneByUser(User $user)
     {
-        $sid = $this->sm->getKey();
+        $sid = $this->sessionMarker->getKey();
 
-        return $this->findOneByUserAndSid($u, $sid);
+        return $this->findOneByUserAndSid($user, $sid);
     }
 
     public function findOneByCurrentUserOrGetNew()
     {
-        return $this->findOneByUserOrGetNew($this->curUser);
+        return $this->findOneByUserOrGetNew($this->currentUser);
     }
 
-    public function findOneByUserOrGetNew($u)
+    public function findOneByUserOrGetNew(User $user)
     {
-        return  $this->findOneByUser($u) ?? $this->getNewByUserAndSid($u, $this->sm->getKey());
+        return $this->findOneByUser($user)
+            ?? $this->getNewByUserAndSid($user, $this->sessionMarker->getKey());
     }
 
-    public function findOneByUserAndSid($u, $sid)
+    public function findOneByUserAndSid(User $user, $sid)
     {
-        $p = ['user' => $u];
+        $where = ['user' => $user];
 
-        if ($u === $this->ul->getGuest()) {
-            $p += ['sid' => $sid];
+        if ($user === $this->userLoader->getGuest()) {
+            $where += ['sid' => $sid];
         }
 
-        return $this->findOneBy($p);
+        return $this->findOneBy($where);
     }
 
-    private function getNewByUserAndSid($u, $sid)
+    private function getNewByUserAndSid(User $user, $sid)
     {
-        if ($s = $this->findOneByUserAndSid($u, $sid)) {
-            return $s;
+        if ($session = $this->findOneByUserAndSid($user, $sid)) {
+            return $session;
         }
 
-        $s = (new Session())
-->setUser($u)
-->setSid(($this->ul->isGuest()) ? $sid : '');
-        $em = $this->em();
-        $em->persist($s);
-        $em->flush();
+        $session = (new Session)
+            ->setUser($user)
+            ->setSid(($this->userLoader->isGuest()) ? $sid : '');
 
-        return $s;
+        $entityManager = $this->getEntityManager();
+        $entityManager->persist($session);
+        $entityManager->flush();
+
+        return $session;
     }
 
-    public function clearSessions($dt)
+    public function clearSessions(\DateTimeInterface $dt)
     {
-        $s = $this->q('select s from App:Session s
+        $sessions = $this->createQuery('select s from App:Session s
 left join s.attempts a
 where a.id is null and s.lastTime < :dt')
-->setParameter('dt', $dt)
-->getResult();
-        $em = $this->em();
+            ->setParameter('dt', $dt)
+            ->getResult();
+        $entityManager = $this->getEntityManager();
 
-        foreach ($s as $i) {
-            $this->remove($i);
+        foreach ($sessions as $session) {
+            $this->remove($session);
         }
-
-        $em->flush();
     }
 
-    public function remove($s)
+    public function remove(Session $session)
     {
-        $em = $this->em();
+        $entityManager = $this->GetEntityManager();
 
-        foreach ($s->getVisits() as $v) {
-            $s->removeVisit($v);
-            $em->remove($v);
+        foreach ($session->getVisits() as $visit) {
+            $session->removeVisit($visit);
+            $entityManager->remove($visit);
         }
 
-        $em->remove($s);
+        $entityManager->remove($session);
+        $entityManager->flush();
     }
 }

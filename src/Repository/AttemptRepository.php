@@ -34,7 +34,7 @@ class AttemptRepository extends ServiceEntityRepository
     {
         $attempt = $this->findLastByCurrentUser();
 
-        return $this->authChecker->isGranted('SOLVE', $attempt)) ? $attempt : null;
+        return $this->authChecker->isGranted('SOLVE', $attempt) ? $attempt : null;
     }
 
     public function findLastByCurrentUser()

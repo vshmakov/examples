@@ -3,15 +3,14 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use App\DT;
-use App\Service\ExampleManager as ExMNG;
+use App\Service\ExampleManager;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ExampleRepository")
  */
 class Example
 {
-    use DTTrait;
+    use BaseTrait;
 
     /**
      * @ORM\Id()
@@ -66,98 +65,99 @@ class Example
         return $this->id;
     }
 
-    public function getAttempt(): ?Attempt
+    public function getAttempt() : ? Attempt
     {
         return $this->attempt;
     }
 
-    public function setAttempt(?Attempt $attempt): self
+    public function setAttempt(? Attempt $attempt) : self
     {
         $this->attempt = $attempt;
 
         return $this;
     }
 
-    public function getFirst(): ?float
+    public function getFirst() : ? float
     {
         return $this->first;
     }
 
-    public function setFirst(float $first): self
+    public function setFirst(float $first) : self
     {
         $this->first = $first;
 
         return $this;
     }
 
-    public function getSign(): ?int
+    public function getSign() : ? int
     {
         return $this->sign;
     }
 
-    public function setSign(int $sign): self
+    public function setSign(int $sign) : self
     {
         $this->sign = $sign;
 
         return $this;
     }
 
-    public function getSecond(): ?float
+    public function getSecond() : ? float
     {
         return $this->second;
     }
 
-    public function setSecond(float $second): self
+    public function setSecond(float $second) : self
     {
         $this->second = $second;
 
         return $this;
     }
 
-    public function getAnswer(): ?float
+    public function getAnswer() : ? float
     {
         return $this->answer;
     }
 
-    public function setAnswer(?float $answer): self
+    public function setAnswer(? float $answer) : self
     {
         $this->answer = $answer;
-        $this->setIsRight($answer === ExMng::solve($this->first, $this->second, $this->sign));
-        $this->setAnswerTime(new \DateTime());
+        $rightAnswer = ExampleManager::solve($this->first, $this->second, $this->sign);
+        $this->setIsRight($answer === $rightAnswer);
+        $this->setAnswerTime(new \DateTime);
 
         return $this;
     }
 
-    public function isRight(): ?bool
+    public function isRight() : ? bool
     {
         return $this->isRight;
     }
 
-    public function setIsRight(?bool $isRight): self
+    public function setIsRight(? bool $isRight) : self
     {
         $this->isRight = $isRight;
 
         return $this;
     }
 
-    public function getAddTime(): ?\DateTimeInterface
+    public function getAddTime() : ? \DateTimeInterface
     {
         return DT::createFromDT($this->addTime);
     }
 
-    public function setAddTime(\DateTimeInterface $addTime): self
+    public function setAddTime(\DateTimeInterface $addTime) : self
     {
         $this->addTime = $addTime;
 
         return $this;
     }
 
-    public function getAnswerTime(): ?\DateTimeInterface
+    public function getAnswerTime() : ? \DateTimeInterface
     {
         return DT::createFromDT($this->answerTime);
     }
 
-    public function setAnswerTime(\DateTimeInterface $answerTime): self
+    public function setAnswerTime(\DateTimeInterface $answerTime) : self
     {
         $this->answerTime = $answerTime;
 

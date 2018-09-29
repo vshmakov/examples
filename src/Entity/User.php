@@ -7,7 +7,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\UserInterface;
 use FOS\UserBundle\Model\GroupableInterface;
-use App\DT;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
@@ -18,7 +17,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  */
 class User implements UserInterface, GroupableInterface
 {
-    use DTTrait, BaseUserTrait;
+    use BaseTrait, BaseUserTrait;
 
     /**
      * @ORM\Id()

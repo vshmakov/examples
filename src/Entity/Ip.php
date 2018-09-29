@@ -12,7 +12,7 @@ use Doctrine\Common\Collections\Collection;
  */
 class Ip
 {
-    use DTTrait;
+    use BaseTrait;
 
     /**
      * @ORM\Id()

@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Session
 {
-    use DTTrait;
+    use BaseTrait;
 
     /**
      * @ORM\Id()

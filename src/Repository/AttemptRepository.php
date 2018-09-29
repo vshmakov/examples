@@ -2,234 +2,233 @@
 
 namespace App\Repository;
 
-use App\Service\ExampleManager as ExMng;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use App\Service\ExampleManager;
 use App\Service\UserLoader;
-use App\Service\AuthChecker as AuthCh;
+use App\Service\AuthChecker;
 use App\Entity\Attempt;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class AttemptRepository extends ServiceEntityRepository
 {
     use BaseTrait;
-    private $exR;
-    private $ul;
-    private $sR;
-    private $uR;
-    private $ch;
+    private $exampleRepository;
+    private $userLoader;
+    private $sessionRepository;
+    private $userRepository;
+    private $authChecker;
 
-    public function __construct(RegistryInterface $registry, ExampleRepository $exR, UserLoader $ul, SessionRepository $sR, UserRepository $uR, AuthCh $ch)
+    public function __construct(RegistryInterface $registry, ExampleRepository $exampleRepository, UserLoader $userLoader, SessionRepository $sessionRepository, UserRepository $userRepository, AuthChecker $authChecker)
     {
         parent::__construct($registry, Attempt::class);
-        $this->exR = $exR;
-        $this->ul = $ul;
-        $this->sR = $sR;
-        $this->uR = $uR;
-        $this->ch = $ch;
+        $this->exampleRepository = $exampleRepository;
+        $this->userLoader = $userLoader;
+        $this->sessionRepository = $sessionRepository;
+        $this->userRepository = $userRepository;
+        $this->authChecker = $authChecker;
     }
 
     public function findLastActualByCurrentUser()
     {
-        $att = $this->findLastByCurrentUser();
+        $attempt = $this->findLastByCurrentUser();
 
-        return ($this->ch->isGranted('SOLVE', $att)) ? $att : null;
+        return $this->authChecker->isGranted('SOLVE', $attempt)) ? $attempt : null;
     }
 
     public function findLastByCurrentUser()
     {
-        $ul = $this->ul;
-        $w = (!$ul->isGuest()) ? 's.user = :u' : 'a.session = :s';
-        $q = $this->q("select a from App:Attempt a
+        $userLoader = $this->userLoader;
+        $where = !$userLoader->isGuest() ? 's.user = :u' : 'a.session = :s';
+        $query = $this->createQuery("select a from App:Attempt a
 join a.session s
-where $w
+where $where
 order by a.addTime desc");
-        !$ul->isGuest() ? $q->setParameter('u', $ul->getUser()) : $q->setParameter('s', $this->sR->findOneByCurrentUserOrGetNew());
-        $att = $this->v($q);
+        $parameters = !$userLoader->isGuest() ? ['u' => $userLoader->getUser()] : ['s' => $this->sessionRepository->findOneByCurrentUserOrGetNew()];
+        $query->setParameters($parameters);
 
-        return $att;
+        return $this->getValue($query);
     }
 
-    public function getTitle($att)
+    public function getTitle(Attempt $attempt)
     {
-        return 'Попытка №'.$this->getNumber($att);
+        return 'Попытка №' . $this->getNumber($attempt);
     }
 
-    public function getNumber($att)
+    public function getNumber(Attempt $attempt)
     {
-        return $this->v(
-$this->q('select count(a) from App:Attempt a
+        return $this->getValue(
+            $this->createQuery('select count(a) from App:Attempt a
 join a.session s
 where s.user = :u and a.addTime <= :dt
-')->setParameters(['u' => $att->GetSession()->GetUser(), 'dt' => $att->getAddTime()])
-);
+')->setParameters(['u' => $attempt->GetSession()->GetUser(), 'dt' => $attempt->getAddTime()])
+        );
     }
 
-    public function getFinishTime($att)
+    public function getFinishTime(Attempt $attempt)
     {
-        return $this->dt($this->v(
-$this->q('select e.answerTime from App:Attempt a
+        return $this->dt($this->getValue(
+            $this->createQuery('select e.answerTime from App:Attempt a
 join a.examples e
 where a = :att and e.answerTime is not null
 order by e.answerTime desc
-')->setParameter('att', $att)
-)) ?: $att->getAddTime();
+')->setParameter('att', $attempt)
+        )) ? : $attempt->getAddTime();
     }
 
-    public function getSolvedExamplesCount($att)
+    public function getSolvedExamplesCount(Attempt $attempt)
     {
-        return $att->getSettings()->isDemanding() ? $this->v(
-$this->q('select count(e) from App:Attempt a
+        return $attempt->getSettings()->isDemanding() ? $this->getValue(
+            $this->createQuery('select count(e) from App:Attempt a
 join a.examples e
 where e.isRight = true and a = :a
-')->setParameters(['a' => $att])
-) : $this->getAnsweredExamplesCount($att);
+')->setParameters(['a' => $attempt])
+        ) : $this->getAnsweredExamplesCount($attempt);
     }
 
-    public function getAnsweredExamplesCount($att)
+    public function getAnsweredExamplesCount(Attempt $attempt)
     {
-        return $this->v(
-$this->q('select count(e) from App:Attempt a
+        return $this->getValue(
+            $this->createQuery('select count(e) from App:Attempt a
 join a.examples e
 where e.answer is not null and a = :a
-')->setParameters(['a' => $att])
-);
+')->setParameters(['a' => $attempt])
+        );
     }
 
-    public function getErrorsCount($att)
+    public function getErrorsCount(Attempt $attempt)
     {
-        return $this->exR->count([
-            'attempt' => $att,
+        return $this->exampleRepository->count([
+            'attempt' => $attempt,
             'isRight' => false,
         ]);
     }
 
-    public function getRating($att)
+    public function getRating(Attempt $attempt)
     {
-        return ExMng::rating($att->getExamplesCount(), $this->getRongExamplesCount($att));
+        return ExampleManager::rating($attempt->getExamplesCount(), $this->getRongExamplesCount($attempt));
     }
 
     public function countByCurrentUser()
     {
-        return $this->v($this->q('select count(a) from App:Attempt a
+        return $this->getValue(
+            $this->createQuery('select count(a) from App:Attempt a
 join a.session s
 join s.user u
 where u = :u')
-->setParameter('u', $this->ul->getUser()));
+                ->setParameter('u', $this->userLoader->getUser())
+        );
     }
 
     public function findAllByCurrentUser()
     {
-        return $this->q('select a from App:Attempt a
+        return $this->createQuery('select a from App:Attempt a
 join a.session s
 join s.user u
 where u = :u')
-->setParameter('u', $this->ul->getUser())
-->getResult();
+            ->setParameter('u', $this->userLoader->getUser())
+            ->getResult();
     }
 
     public function getNewByCurrentUser()
     {
-        $u = $this->ul->getUser()->setER($this->uR);
-        $att = (new Attempt())
-->setSession($this->sR->findOneByCurrentUserOrGetNew())
-->setSettings($u->getCurrentProfile()->getInstance());
-        $em = $this->em();
-        $em->persist($att);
-        $em->flush();
+        $user = $this->userLoader->getUser()
+            ->setEntityRepository($this->userRepository);
+        $attempt = (new Attempt)
+            ->setSession($this->sessionRepository->findOneByCurrentUserOrGetNew())
+            ->setSettings($user->getCurrentProfile()->getInstance());
 
-        return $att;
+        $entityManager = $this->getEntityManager();
+        $entityManager->persist($attempt);
+        $entityManager->flush();
+
+        return $attempt;
     }
 
-    public function hasPreviousExample($att)
+    public function hasPreviousExample(Attempt $attempt)
     {
-        return (bool) $this->exR->findLastByAttempt($att);
+        return (bool)$this->exampleRepository->findLastByAttempt($attempt);
     }
 
-    public function getData($att)
+    public function getData(Attempt $attempt)
     {
-        $exR = $this->exR;
+        $exampleRepository = $this->exampleRepository;
 
-        if (!$ex = $exR->findLastUnansweredByAttempt($att)) {
+        if (!$example = $exampleRepository->findLastUnansweredByAttempt($attempt)) {
             return false;
         }
-        $ex->setER($exR);
-        $att->setEr($this);
+        $example->setEntityRepository($exampleRepository);
+        $attempt->setEntityRepository($this);
 
         return [
             'ex' => [
-                'num' => $ex->getNumber(),
-                'str' => "$ex",
+                'num' => $example->getNumber(),
+                'str' => "$example",
             ],
-            'errors' => $att->getErrorsCount(),
-            'exRem' => $att->getRemainedExamplesCount(),
-            'limTime' => $att->getLimitTime()->getTimestamp(),
+            'errors' => $attempt->getErrorsCount(),
+            'exRem' => $attempt->getRemainedExamplesCount(),
+            'limTime' => $attempt->getLimitTime()->getTimestamp(),
         ];
     }
 
-    public function getRemainedExamplesCount($att)
+    public function getRemainedExamplesCount(Attempt $attempt)
     {
-        $c = $att->getSettings()->getExamplesCount() - $this->getSolvedExamplesCount($att);
+        $count = $attempt->getSettings()->getExamplesCount() - $this->getSolvedExamplesCount($attempt);
 
-        return $c > 0 ? $c : 0;
+        return $count > 0 ? $count : 0;
     }
 
-    public function getRemainedTime($att)
+    public function getRemainedTime(Attempt $attempt)
     {
-        $t = $att->getLimitTime()->getTimestamp() - time();
+        $remainedTime = $attempt->getLimitTime()->getTimestamp() - time();
 
-        return $t > 0 ? $t : 0;
+        return $remainedTime > 0 ? $remainedTime : 0;
     }
 
-    public function getAllData($att)
+    public function getAllData(Attempt $attempt)
     {
-        $d = $att->setER($this)->getData();
+        $data = $attempt->setEntityRepository($this)->getData();
+        $propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
+            ->enableMagicCall()
+            ->getPropertyAccessor();
 
-        foreach (strToArr('title number finishTime solvedExamplesCount answeredExamplesCount errorsCount rating') as $k) {
-            $d[$k] = $att->__call($k);
+
+        foreach (arr('title number finishTime solvedExamplesCount answeredExamplesCount errorsCount rating') as $property) {
+            $data[$property] = $propertyAccessor->getValue($attempt, $property);
         }
 
-        return $d;
+        return $data;
     }
 
-    public function findAllByCurrentUserAndLimit($s, $l)
+    public function getSolvedTime(Attempt $attempt)
     {
-        return $this->q('select a from App:Attempt a
-join a.session s
-join s.user u
-where u = :u
-order by a.addTime desc')
-->setParameters(['u' => $this->ul->getUser()])
-->setFirstResult($s)
-->setMaxResults($l)
-->getResult();
+        return $this->dts(
+            $this->getFinishTime($attempt)->getTimestamp() - $attempt->getAddTime()->getTimestamp()
+        );
     }
 
-    public function getSolvedTime($att)
+    public function getAverSolveTime(Attempt $attempt)
     {
-        return $this->dts($this->getFinishTime($att)->getTimestamp() - $att->getAddTime()->getTimestamp());
-    }
-
-    public function getAverSolveTime($att)
-    {
-        $c = $this->getSolvedExamplesCount($att);
+        $count = $this->getSolvedExamplesCount($attempt);
 
         return $this->dts(
-$c ? round($this->getSolvedTime($att)->getTimestamp() / $c) : 0
-);
+            $count ? round($this->getSolvedTime($attempt)->getTimestamp() / $count) : 0
+        );
     }
 
-    public function getRongExamplesCount($att)
+    public function getRongExamplesCount(Attempt $attempt)
     {
-        return $this->getErrorsCount($att) + $att->getExamplesCount() - $this->getSolvedExamplesCount($att);
+        return $this->getErrorsCount($attempt) + $attempt->getExamplesCount() - $this->getSolvedExamplesCount($attempt);
     }
 
-    public function findByUser($u)
+    public function findByUser(User $user)
     {
-        return $this->q('select a from App:Attempt a
+        return $this->createQuery('select a from App:Attempt a
 join a.session s
 join s.user u
 where u = ?1')
-->setParameter(1, $u)
-->getResult();
+            ->setParameter(1, $user)
+            ->getResult();
     }
 }

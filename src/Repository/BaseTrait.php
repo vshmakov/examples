@@ -6,24 +6,9 @@ trait BaseTrait
 {
     use \App\BaseTrait;
 
-    public function em()
-    {
-        return $this->getEntityManager();
-    }
-
-    public function q($dql)
-    {
-        return $this->createQuery($dql);
-    }
-
     public function createQuery($dql)
     {
         return $this->getEntityManager()->createQuery($dql);
-    }
-
-    public function v($query)
-    {
-        return $this->getValue($query);
     }
 
     private function getValue($query)
@@ -47,10 +32,5 @@ trait BaseTrait
     private function getEntityRepository($class)
     {
         return $this->getentityManager()->getRepository($class);
-    }
-
-    private function er($class)
-    {
-        return $this->getEntityRepository($class);
     }
 }

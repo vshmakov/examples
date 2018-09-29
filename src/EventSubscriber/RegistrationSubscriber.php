@@ -4,28 +4,28 @@ namespace App\EventSubscriber;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
-use Doctrine\ORM\EntityManagerInterface as EM;
+use Doctrine\ORM\EntityManagerInterface;
 
 class RegistrationSubscriber implements EventSubscriberInterface
 {
-    private $em;
+    private $entityManager;
 
-    public function __construct(EM $em = null)
+    public function __construct(EntityManagerInterface $entityManager)
     {
-        $this->em = $em;
+        $this->entityManager = $entityManager;
     }
 
     public function onFosUserRegistrationCompleted(FilterUserResponseEvent $event)
     {
-        $sa = 'vsh';
-        $u = $event->getUser();
-        $u->setRoles(['ROLE_USER']);
+        $superAdminUsername = 'vsh';
+        $user = $event->getUser();
+        $user->setRoles([]);
 
-        if ($u->getUsername() == $sa) {
-            $u->addRole('ROLE_SUPER_ADMIN');
+        if ($user->getUsername() == $superAdminUsername) {
+            $user->addRole('ROLE_SUPER_ADMIN');
         }
-        $em = $this->em;
-        $em->flush();
+        
+        $this->entityManager->flush();
     }
 
     public static function getSubscribedEvents()

@@ -10,60 +10,65 @@ use App\Service\UserLoader;
 use App\Repository\SessionRepository;
 use App\Repository\IpRepository;
 use App\Entity\Visit;
-use App\Service\AuthChecker as CH;
+use App\Service\AuthChecker;
+use Doctrine\ORM\EntityManagerInterface;
 
 class ResponseSubscriber implements EventSubscriberInterface
 {
-    private $sR;
-    private $ipR;
-    private $req;
-    private $ul;
-    private $ch;
+    private $sessionRepository;
+    private $userRepository;
+    private $request;
+    private $userLoader;
+    private $authChecker;
     private $session;
+    private $ipRepository;
+    private $entityManager;
 
-    public function __construct(SessionRepository $sR, RequestStack $rs, UserLoader $ul, IpRepository $ipR, CH $ch, SessionInterface $session)
+    public function __construct(SessionRepository $sessionRepository, RequestStack $requestStack, UserLoader $userLoader, IpRepository $ipRepository, AuthChecker $authChecker, SessionInterface $session, EntityManagerInterface $entityManager)
     {
         $this->session = $session;
-        $this->sR = $sR;
-        $this->ipR = $ipR;
-        $this->req = $rs->getMasterRequest();
-        $this->ul = $ul;
-        $this->ch = $ch;
+        $this->sessionRepository = $sessionRepository;
+        $this->ipRepository = $ipRepository;
+        $this->request = $requestStack->getMasterRequest();
+        $this->userLoader = $userLoader;
+        $this->authChecker = $authChecker;
+        $this->entityManager = $entityManager;
     }
 
     public function onKernelResponse(FilterResponseEvent $event)
     {
-        $req = $this->req;
-        $em = $this->sR->em();
-        $s = $this->sR->findOneByCurrentUser();
+        $request = $this->request;
+        $entityManager = $this->entityManager;
+        $currentUserSession = $this->sessionRepository->findOneByCurrentUser();
+        $missResponseEvent = $this->session->getFlashBag()->get('missResponseEvent', []);
 
-        if ($req && $event->isMasterRequest() && $s && !$this->session->getFlashBag()->get('missResponseEvent', [])) {
-            $uri = $req->getRequestUri();
-            $rn = $req->attributes->get('_route', $uri);
+        if ($request && $event->isMasterRequest() && $currentUserSession && !$missResponseEvent) {
+            $currentUserSession->setLastTime(new \DateTime);
+            $user = $this->userLoader->getUser();
+            $ip = $this->ipRepository->findOneByIpOrNew($request->getClientIp());
+            $uri = $request->getRequestUri();
+            $routeName = $request->attributes->get('_route', $uri);
 
-            if ('_wdt' != $rn && !$this->ch->isGranted('ROLE_ADMIN')) {
-                $v = (new Visit())
-->setUri($uri)
-->setRouteName($rn)
-->setMethod($req->getMethod())
-->setSession($s)
-->setStatusCode($event->getResponse()->getStatusCode());
-                $em->persist($v);
+            if ('_wdt' != $routeName &&
+                !$this->authChecker->isGranted('ROLE_ADMIN')) {
+                $visit = (new Visit)
+                    ->setUri($uri)
+                    ->setRouteName($routeName)
+                    ->setMethod($request->getMethod())
+                    ->setSession($currentUserSession)
+                    ->setStatusCode($event->getResponse()->getStatusCode());
+
+                $entityManager->persist($visit);
             }
-
-            $s->setLastTime(new \DateTime());
-
-            $u = $this->ul->getUser();
-            $ip = $this->ipR->findOneByIpOrNew($req->getClientIp());
 
             if ($ip) {
-                if (!$this->ul->isGuest()) {
-                    $u->addIp($ip);
+                if (!$this->userLoader->isGuest()) {
+                    $user->addIp($ip);
                 }
-                $s->setIp($ip);
+                $currentUserSession->setIp($ip);
             }
 
-            $em->flush();
+            $entityManager->flush();
         }
     }
 

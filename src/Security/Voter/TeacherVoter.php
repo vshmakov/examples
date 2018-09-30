@@ -14,7 +14,7 @@ class TeacherVoter extends Voter
     private $userLoader;
     private $authChecker;
 
-    public function __construct(UserLoader $ul, AuthChecker $authChecker)
+    public function __construct(UserLoader $userLoader, AuthChecker $authChecker)
     {
         $this->userLoader = $userLoader;
         $this->authChecker = $authChecker;

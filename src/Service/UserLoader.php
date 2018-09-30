@@ -14,11 +14,9 @@ class UserLoader
     public function __construct(UserRepository $userRepository, TokenStorageInterface $tokenStorage)
     {
         $this->userRepository = $userRepository;
-
-        try {
-            $this->user = $tokenStorage->getToken()->getUser();
-        } catch (\Exception $exception) {
-        }
+if ($token = $tokenStorage->getToken()) {
+            $this->user = $token->getUser();
+}
     }
 
     public function getUser()

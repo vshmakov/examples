@@ -8,7 +8,7 @@ trait BaseTrait
 {
     protected function prepareFunctions($functions)
     {
-        array_map(
+        return array_map(
             function ($function) {
                 return new TwigFunction($function, [$this, $function]);
             },

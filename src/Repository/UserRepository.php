@@ -114,7 +114,7 @@ where u = :u')
     {
         extract($credentials);
 
-        if ($user = $this->findOneByUloginCredentials($d)) {
+        if ($user = $this->findOneByUloginCredentials($credentials)) {
             return $user;
         }
 

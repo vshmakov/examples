@@ -26,7 +26,7 @@ class SessionMarker
             $session->set($key, $value);
         }
 
-        $sid = $s->get($key);
+        $sid = $session->get($key);
 
         return $sid;
     }

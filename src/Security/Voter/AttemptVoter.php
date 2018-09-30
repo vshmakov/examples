@@ -23,7 +23,7 @@ class AttemptVoter extends Voter
     public function __construct(UserLoader $userLoader, SessionRepository $sessionRepository, AttemptRepository $attemptRepository, ExampleRepository $exampleRepository, AuthChecker $authChecker)
     {
         $this->userLoader = $userLoader;
-        $this->sem_release = $sessionRepository;
+        $this->sessionRepository = $sessionRepository;
         $this->attemptRepository = $attemptRepository;
         $this->exampleRepository = $exampleRepository;
         $this->authChecker = $authChecker;
@@ -36,7 +36,7 @@ class AttemptVoter extends Voter
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
     {
-        return $this->checkRight($attribute, $subject->setEntityRepository($this->attR), $token);
+        return $this->checkRight($attribute, $subject->setEntityRepository($this->attemptRepository), $token);
     }
 
     private function canSolve()

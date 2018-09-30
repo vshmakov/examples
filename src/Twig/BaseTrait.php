@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Twig;
 
 use Twig\TwigFunction;
@@ -6,10 +7,12 @@ use Twig\TwigFunction;
 trait BaseTrait
 {
     protected function prepareFunctions($functions)
-        {
-array_map($functions,
-function ($function) {
-return new TwigFunction($function, [$this, $function]);
-});
+    {
+        array_map(
+            function ($function) {
+                return new TwigFunction($function, [$this, $function]);
+            },
+            $functions
+        );
     }
 }

@@ -2,7 +2,6 @@
 
 namespace App\Security;
 
-use   Psr\Container\ContainerInterface as Con;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -10,17 +9,15 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
-use App\Repository\UserRepository as UR;
+use App\Repository\UserRepository;
 
 class UloginAuthenticator extends AbstractGuardAuthenticator
 {
-    private $con;
-    private $uR;
+    private $userRepository;
 
-    public function __construct(Con $con, UR $uR)
+    public function __construct(UserRepository $userRepository)
     {
-        $this->con = $con;
-        $this->uR = $uR;
+        $this->userRepository = $userRepository;
     }
 
     public function supports(Request $request)
@@ -31,32 +28,36 @@ class UloginAuthenticator extends AbstractGuardAuthenticator
     public function getCredentials(Request $request)
     {
         try {
-            $r = $request->request;
-            $token = $r->get(
-    'token',
-$request->query->get('token')
-);
-            $s = file_get_contents('http://ulogin.ru/token.php?token='.$token.'&host='.$_SERVER['HTTP_HOST']);
-            $d = json_decode($s, true);
-            $d += [
+            $token = $request->request->get(
+                'token',
+                $request->query->get('token')
+            );
+            $json = file_get_contents(sprintf(
+                'http://ulogin.ru/token.php?token=%s&host=%s',
+                $token,
+                $request->server->get('HTTP_HOST')
+            );
+
+            $credentials = json_decode($json, true);
+            $credentials += [
                 'token' => $token,
-                'username' => '^'.$d['network'].'-'.$d['uid'],
+                'username' => '^' . $credentials['network'] . '-' . $credentials['uid'],
             ];
 
-            return $d;
-        } catch (\Exception $ex) {
+            return $credentials;
+        } catch (\Exception $exception) {
             return [];
         }
     }
 
-    public function getUser($d, UserProviderInterface $p)
+    public function getUser($credentials, UserProviderInterface $userProvider)
     {
-        return $d ? $this->uR->findOneByUloginCredentials($d) : null;
+        return $credentials ? $this->userRepository->findOneByUloginCredentials($credentials) : null;
     }
 
-    public function checkCredentials($d, UserInterface $user = null)
+    public function checkCredentials($credentials, UserInterface $user = null)
     {
-        return (bool) $d;
+        return (bool)$credentials;
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)

@@ -2,8 +2,8 @@
 
 namespace App\Security\Voter;
 
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use App\Repository\ExampleRepository as ExR;
+use App\Service\AuthChecker;
+use App\Repository\ExampleRepository;
 use App\Repository\AttemptRepository;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
@@ -14,19 +14,19 @@ use App\Repository\SessionRepository;
 class AttemptVoter extends Voter
 {
     use BaseTrait;
-    private $ul;
-    private $sR;
-    private $attR;
-    private $exR;
-    private $ch;
+    private $userLoader;
+    private $sessionRepository;
+    private $attemptRepository;
+    private $exampleRepository;
+    private $authChecker;
 
-    public function __construct(UserLoader $ul, SessionRepository $sR, AttemptRepository $attR, ExR $exR, AuthorizationCheckerInterface $ch)
+    public function __construct(UserLoader $userLoader SessionRepository $sessionRepository, AttemptRepository $attemptRepository, ExampleRepository $exampleRepository, AuthChecker $authChecker)
     {
-        $this->ul = $ul;
-        $this->sR = $sR;
-        $this->attR = $attR;
-        $this->exR = $exR;
-        $this->ch = $ch;
+        $this->userLoader = $userLoader;
+        $this->sem_release = $sessionRepository;
+        $this->attemptRepository = $attemptRepository;
+        $this->exampleRepository = $exampleRepository;
+        $this->authChecker = $authChecker;
     }
 
     protected function supports($attribute, $subject)
@@ -36,42 +36,47 @@ class AttemptVoter extends Voter
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
     {
-        return $this->checkRight($attribute, $subject->setER($this->attR), $token);
+        return $this->checkRight($attribute, $subject->setEntityRepository($this->attR), $token);
     }
 
-    private function canSolve($att)
+    private function canSolve()
     {
-        if (!$this->canView($att)) {
+        $attempt = $this->subject;
+        if (!$this->canView()) {
             return false;
         }
-        $ul = $this->ul;
-        $u = $ul->getUser();
 
-        if (($ul->isGuest() && $att->getSession() !== $this->sR->findOneByCurrentUser())
-or (0 == $att->getRemainedExamplesCount())
-or (0 == $att->getRemainedTime())) {
+        $userLoader = $this->userLoader;
+        $user = $userLoader->getUser();
+
+        if (($userLoader->isGuest() && $attempt->getSession() !== $this->sessionRepository->findOneByCurrentUser())
+            or (0 == $attempt->getRemainedExamplesCount())
+            or (0 == $attempt->getRemainedTime())) {
             return false;
         }
 
         return true;
     }
 
-    private function canAnswer($att)
+    private function canAnswer()
     {
-        $ex = $this->exR->findLastUnansweredByAttempt($att);
+        $attempt = $this->subject;
+        $example = $this->exampleRepository->findLastUnansweredByAttempt($attempt);
 
-        return $this->canSolve($att) && $ex;
+        return $this->canSolve() && $example;
     }
 
-    private function canView($att)
+    private function canView()
     {
-        if ($this->ch->isGranted('ROLE_ADMIN')) {
+        if ($this->authChecker->isGranted('ROLE_ADMIN')) {
             return true;
         }
-        $ul = $this->ul;
-        $u = $ul->getUser();
-        $au = $att->getSession()->getUser();
 
-        return $u === $au or $au->isUserTeacher($u);
+        $attempt=$this->subject;
+        $userLoader = $this->userLoader;
+        $user = $userLoader->getUser();
+        $author = $attempt->getSession()->getUser();
+
+        return $user === $author or $author->isUserTeacher($user);
     }
 }

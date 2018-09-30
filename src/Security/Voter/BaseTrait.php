@@ -2,72 +2,73 @@
 
 namespace App\Security\Voter;
 
+use Doctrine\Common\Inflector\Inflector;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 trait BaseTrait
 {
-    private $subj;
+    private $subject;
 
-    private function checkRight($p, $o, $t)
+    protected function checkRight($attribute, $subject, TokenInterface $token)
     {
-        $this->subj = $o;
-        $m = $this->getHandlerName($p);
+        $this->subject = $subject;
+        $handlerName = $this->getHandlerName($attribute);
 
-        if (!method_exists($this, $m)) {
-            throw new \Exception(sprintf('%s has not %s priv handler, attempted to find %s method', self::class, $p, $m));
+        if (!method_exists($this, $handlerName)) {
+            throw new \Exception(sprintf('%s has not %s priv handler, attempted to find %s method', self::class, $attribute, $handlerName));
         }
 
-        return $this->hasHandler($p) ? $this->$m($o, $t) : false;
+        return $this->$handlerName();
     }
 
-    private function hasPrefix($p, $s)
+    private function hasPrefix($prefix, $attribute)
     {
-        return preg_match("#^{$p}_#", $s);
+        return preg_match("#^{$prefix}_#", $attribute);
     }
 
-    private function getHandlerName($s)
+    private function getHandlerName($attribute)
     {
-        $p = 'can';
+        $prefix = 'can';
 
-        if ($this->hasPrefix('IS', $s)) {
-            $p = '';
+        if ($this->hasPrefix('IS', $attribute)) {
+            $prefix = '';
         }
 
-        if ($this->hasPrefix('PRIV', $s)) {
-            $p = 'has';
+        if ($this->hasPrefix('PRIV', $attribute)) {
+            $prefix = 'has';
         }
 
-        return getMethodName($s, $p);
+        return Inflector::camelize($prefix.'_'.$attribute);
     }
 
-    private function hasHandler($s)
+    private function hasHandler($attribute)
     {
-        return method_exists($this, $this->getHandlerName($s));
+        return method_exists($this, $this->getHandlerName($attribute));
     }
 
-    private function supportsArr(string $attribute, array $arr): bool
+    private function supportsArr(string $attribute, array $subjects) : bool
     {
-        return $this->checkArr($arr, [$this, 'supports'], (function ($s) use ($attribute) {
-            return [$attribute, $s];
+        return $this->checkArr($subjects, [$this, 'supports'], (function ($supports) use ($attribute) {
+            return [$attribute, $supports];
         }));
     }
 
-    private function voteOnArr($attribute, array $subject, TokenInterface $token)
+    private function voteOnArr($attribute, array $subjects, TokenInterface $token)
     {
-        return $this->checkArr($subject, [$this, 'voteOnAttribute'], function ($s) use ($attribute, $token) {
-            return [$attribute, $s, $token];
+        return $this->checkArr($subjects, [$this, 'voteOnAttribute'], function ($subjects) use ($attribute, $token) {
+            return [$attribute, $subjects, $token];
         });
     }
 
-    private function checkArr(array $arr, callable $ch, callable $attr)
+    private function checkArr(array $arr, callable $checker, callable $attr)
     {
         $key = !empty($arr);
 
         foreach ($arr as $k => $v) {
             $key = $key && call_user_func_array(
-    $ch,
-call_user_func($attr, $v)
-);
+                $checker,
+                call_user_func($attr, $v)
+            );
 
             if (!$key) {
                 return false;

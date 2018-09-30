@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Code
 {
-    use DTTrait;
+    use BaseTrait;
 
     /**
      * @ORM\Id()

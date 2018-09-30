@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use SymfonyApp\Service\AuthChecker;
+use App\Service\AuthChecker;
 use App\Entity\User;
 use App\Entity\Profile;
 use App\Entity\Attempt;

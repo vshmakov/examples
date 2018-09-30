@@ -87,6 +87,8 @@ where a.id is null and s.lastTime < :dt')
         foreach ($sessions as $session) {
             $this->remove($session);
         }
+
+        return count($sessions);
     }
 
     public function remove(Session $session)

@@ -36,7 +36,7 @@ class UloginAuthenticator extends AbstractGuardAuthenticator
                 'http://ulogin.ru/token.php?token=%s&host=%s',
                 $token,
                 $request->server->get('HTTP_HOST')
-            );
+            ));
 
             $credentials = json_decode($json, true);
             $credentials += [

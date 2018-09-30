@@ -38,7 +38,7 @@ trait BaseTrait
             $prefix = 'has';
         }
 
-        return Inflector::camelize($prefix.'_'.$attribute);
+        return Inflector::camelize($prefix . '_' . $attribute);
     }
 
     private function hasHandler($attribute)
@@ -48,33 +48,31 @@ trait BaseTrait
 
     private function supportsArr(string $attribute, array $subjects) : bool
     {
-        return $this->checkArr($subjects, [$this, 'supports'], (function ($supports) use ($attribute) {
-            return [$attribute, $supports];
-        }));
+        return array_reduce(
+            $subjects,
+            function ($supports) use ($attribute) {
+                if (!$supports) {
+                    return false;
+                }
+
+                return $this->supports($attribute, $subject);
+            },
+            !empty($subjects)
+        );
     }
 
     private function voteOnArr($attribute, array $subjects, TokenInterface $token)
     {
-        return $this->checkArr($subjects, [$this, 'voteOnAttribute'], function ($subjects) use ($attribute, $token) {
-            return [$attribute, $subjects, $token];
-        });
-    }
+        return array_reduce(
+            $subjects,
+            function ($vote, $subject) use ($attribute, $token) {
+                if (!$vote) {
+                    return false;
+                }
 
-    private function checkArr(array $arr, callable $checker, callable $attr)
-    {
-        $key = !empty($arr);
-
-        foreach ($arr as $k => $v) {
-            $key = $key && call_user_func_array(
-                $checker,
-                call_user_func($attr, $v)
-            );
-
-            if (!$key) {
-                return false;
-            }
-        }
-
-        return $key;
+                return $this->voteOnAttribute($attribute, $subject, $token);
+            },
+            !empty($subjects)
+        );
     }
 }

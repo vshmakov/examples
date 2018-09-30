@@ -20,7 +20,7 @@ class AttemptVoter extends Voter
     private $exampleRepository;
     private $authChecker;
 
-    public function __construct(UserLoader $userLoader SessionRepository $sessionRepository, AttemptRepository $attemptRepository, ExampleRepository $exampleRepository, AuthChecker $authChecker)
+    public function __construct(UserLoader $userLoader, SessionRepository $sessionRepository, AttemptRepository $attemptRepository, ExampleRepository $exampleRepository, AuthChecker $authChecker)
     {
         $this->userLoader = $userLoader;
         $this->sem_release = $sessionRepository;

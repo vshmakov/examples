@@ -2,7 +2,7 @@
 
 namespace App\Security\Voter;
 
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use App\Service\AuthChecker;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use App\Entity\Profile;
@@ -11,18 +11,18 @@ use App\Service\UserLoader;
 class ProfileVoter extends Voter
 {
     use BaseTrait;
-    private $ul;
-    private $ch;
+    private $userLoader;
+    private $authChecker;
 
-    public function __construct(UserLoader $ul, AuthorizationCheckerInterface $ch)
+    public function __construct(UserLoader $userLoader, AuthChecker $authChecker)
     {
-        $this->ul = $ul;
-        $this->ch = $ch;
+        $this->userLoader = $userLoader;
+        $this->authChecker = $authChecker;
     }
 
     protected function supports($attribute, $subject)
     {
-        return             !is_array($subject) ? ($subject instanceof Profile or null === $subject && $this->hasHandler($attribute)) : $this->supportsArr($attribute, $subject);
+        return !is_array($subject) ? ($subject instanceof Profile or null === $subject && $this->hasHandler($attribute)) : $this->supportsArr($attribute, $subject);
     }
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
@@ -31,7 +31,7 @@ class ProfileVoter extends Voter
             return $this->voteOnArr($attribute, $subject, $token);
         }
 
-        if ($this->ch->isGranted('ROLE_SUPER_ADMIN')) {
+        if ($this->authChecker->isGranted('ROLE_SUPER_ADMIN')) {
             return true;
         }
 
@@ -45,31 +45,33 @@ class ProfileVoter extends Voter
 
     private function canCreate()
     {
-        return !$this->ul->isGuest();
+        return !$this->userLoader->isGuest();
     }
 
     private function canView()
     {
-        $p = $this->subj;
-        $u = $this->ul->getUser();
-        $au = $p->getAuthor();
+        $profile = $this->subject;
+        $user = $this->userLoader->getUser();
+        $author = $profile->getAuthor();
 
-        return $p->isPublic() or $u === $au or $u->isUserTeacher($au);
+        return $profile->isPublic() or $user === $author or $user->isUserTeacher($author);
     }
 
-    private function canEdit($p)
+    private function canEdit()
     {
-        return $this->canCreate() && $this->ul->getUser() === $p->getAuthor() && !$p->isPublic();
+        return $this->canCreate() && $this->userLoader->getUser() === $profile->getAuthor() && !$profile->isPublic();
     }
 
-    private function canDelete($p)
+    private function canDelete()
     {
-        return $this->canEdit($p);
+        return $this->canEdit();
     }
 
-    private function canAppoint($p)
+    private function canAppoint()
     {
-        return $this->ch->isGranted('IS_ACCOUNT_PAID') && $this->canCreate($p) && $this->canView($p) && $this->ul->getUser()->getCurrentProfile() !== $this->subj;
+        return $this->authChecker->isGranted('IS_ACCOUNT_PAID')
+            && $this->canCreate() && $this->canView()
+            && $this->userLoader->getUser()->getCurrentProfile() !== $this->subject;
     }
 
     private function canCopy()

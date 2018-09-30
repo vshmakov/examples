@@ -44,7 +44,7 @@ class Attempt
     public function __construct()
     {
         $this->examples = new ArrayCollection();
-        $this->initAddTime();
+$this->addTime=new \DateTime;
     }
 
     public function getId()

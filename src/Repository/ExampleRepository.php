@@ -63,7 +63,7 @@ where e.attempt = :a and e.isRight = false and e.addTime <= :dt')
 
         return $this->getValue(
             $this->createQuery("select count(e) from App:Example e
-where e.attempt = :a and e.addTime < :dt $wh")
+where e.attempt = :a and e.addTime < :dt $where")
                 ->setParameters([
                     'a' => $example->getAttempt(),
                     'dt' => $example->getAddTime()

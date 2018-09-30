@@ -10,6 +10,10 @@ trait BaseTrait
 
     private $entityRepository;
 
+public function setER($entityRepository) {
+return $this->setEntityRepository($entityRepository);
+}
+
     public function setEntityRepository($entityRepository)
     {
         $this->entityRepository = $entityRepository;

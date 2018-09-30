@@ -309,7 +309,7 @@ class User implements UserInterface, GroupableInterface
     {
         $d = $this->getLimitTime()->getTimestamp() - time();
 
-        return DT::createFromTimestamp($d > 0 ? $d : 0);
+        return $this->dts($d > 0 ? $d : 0);
     }
 
     /**

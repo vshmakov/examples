@@ -2,7 +2,7 @@
 
 namespace App\Security\Voter;
 
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use App\Service\AuthChecker;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use App\Entity\User;
@@ -12,12 +12,12 @@ class UserVoter extends Voter
 {
     use BaseTrait;
     private $ul;
-    private $ch;
+    private $authChecker;
 
-    public function __construct(UserLoader $ul, AuthorizationCheckerInterface $ch)
+    public function __construct(UserLoader $ul, AuthChecker $authChecker)
     {
         $this->ul = $ul;
-        $this->ch = $ch;
+        $this->authChecker = $authChecker;
     }
 
     protected function supports($attribute, $subject)
@@ -27,19 +27,18 @@ class UserVoter extends Voter
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
     {
-        //if ($this->ch->isGranted("ROLE_SUPER_ADMIN")) return true;
         return $this->checkRight($attribute, $subject ?? $this->ul->getUser(), $token);
     }
 
     private function isAccountPaid()
     {
-        $u = $this->subj;
+        $u = $this->subject;
 
         return !$this->ul->isGuest();
     }
 
     private function hasPrivAppointProfiles()
     {
-        return $this->ch->isGranted('ROLE_USER', $this->subj);
+        return $this->authChecker->isGranted('ROLE_USER', $this->subject);
     }
 }

@@ -60,6 +60,10 @@ class Example
      */
     private $answerTime;
 
+public function __construct() {
+$this->addTime=new \DateTime;
+}
+
     public function getId()
     {
         return $this->id;
@@ -142,7 +146,7 @@ class Example
 
     public function getAddTime() : ? \DateTimeInterface
     {
-        return DT::createFromDT($this->addTime);
+        return $this->dt($this->addTime);
     }
 
     public function setAddTime(\DateTimeInterface $addTime) : self
@@ -154,7 +158,7 @@ class Example
 
     public function getAnswerTime() : ? \DateTimeInterface
     {
-        return DT::createFromDT($this->answerTime);
+        return $this->dt($this->answerTime);
     }
 
     public function setAnswerTime(\DateTimeInterface $answerTime) : self

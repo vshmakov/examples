@@ -11,6 +11,7 @@ use App\Repository\ExampleRepository;
 
 class ProcessersExtension extends AbstractExtension
 {
+    use BaseTrait;
     private $exampleRepository;
     private $attemptRepository;
     private $router;
@@ -24,15 +25,14 @@ class ProcessersExtension extends AbstractExtension
 
     public function getFunctions()
     {
-        $functions = [];
-
-        foreach ((get_class_methods($this)) as $method) {
-            if ((preg_match('#^process#', $method))) {
-                $functions[] = new TwigFunction($method, [$this, $method]);
-            }
-        }
-
-        return $functions;
+        return $this->prepareFunctions(
+            array_filter(
+                get_class_methods($this),
+                function ($method) {
+                    return (bool) preg_match('#^process#', $method);
+                }
+            )
+        );
     }
 
     public function processExamples($examples)
@@ -47,8 +47,8 @@ class ProcessersExtension extends AbstractExtension
                 "$example",
                 $propertyAccessor('answer'),
                 $propertyAccessor('isRight', false) ? 'Да' : 'Нет',
-                $propertyAccessor('solvingTime.timestamp') ?: '-',
-                $propertyAccessor('addTime').'',
+                $propertyAccessor('solvingTime.timestamp') ? : '-',
+                $propertyAccessor('addTime') . '',
                 $this->router->link('attempt_show', ['id' => $attempt->getId()], $attempt->getTitle()),
             ];
         });
@@ -66,7 +66,7 @@ class ProcessersExtension extends AbstractExtension
                 $propertyAccessor('continent'),
                 $propertyAccessor('addTime.dbFormat'),
                 $this->router->link('ip_show', ['id' => $pa('id')], 'show')
-                    .$this->router->link('ip_edit', ['id' => $pa('id')], 'edit'),
+                    . $this->router->link('ip_edit', ['id' => $pa('id')], 'edit'),
             ];
         });
     }
@@ -101,8 +101,8 @@ class ProcessersExtension extends AbstractExtension
 
             return [
                 $this->router->link('attempt_show', ['id' => $propertyAccessor('id')], $propertyAccessor('title')),
-                $propertyAccessor('addTime').'',
-                $propertyAccessor('finishTime').'',
+                $propertyAccessor('addTime') . '',
+                $propertyAccessor('finishTime') . '',
                 $propertyAccessor('solvedExamplesCount', false) ? sprintf('%s из %s (%s сек/пример)', $propertyAccessor('solvedTime.minSecFormat'), $propertyAccessor('maxTime.minSecFormat'), $propertyAccessor('averSolveTime.timestamp')) : '-',
                 sprintf('%s из %s', $propertyAccessor('solvedExamplesCount', false), $propertyAccessor('examplesCount', false)),
                 $propertyAccessor('errorsCount', false),
@@ -126,8 +126,8 @@ class ProcessersExtension extends AbstractExtension
     private function getPropertyAccessor($entity)
     {
         $propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
-    ->enableMagicCall()
-    ->getPropertyAccessor();
+            ->enableMagicCall()
+            ->getPropertyAccessor();
 
         return function ($property, $defaultSign = '-') use ($entity, $propertyAccessor) {
             $value = $propertyAccessor->getValue($entity, $property);
@@ -136,7 +136,7 @@ class ProcessersExtension extends AbstractExtension
                 $defaultSign = $value;
             }
 
-            return $value ?: $defaultSign;
+            return $value ? : $defaultSign;
         };
     }
 }

@@ -13,6 +13,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 
 class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsInterface
 {
+    use BaseTrait;
     private $userLoader;
     private $globals = [];
     private $entityManager;

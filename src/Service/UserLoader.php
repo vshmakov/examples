@@ -2,7 +2,6 @@
 
 namespace App\Service;
 
-use Doctrine\ORM\EntityManagerInterface as EM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use App\Repository\UserRepository;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -10,16 +9,15 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 class UserLoader
 {
     private $user;
-    private $uR;
+    private $userRepository;
     private $em;
-
-    public function __construct(UserRepository $uR, EM $em, TokenStorageInterface $ts)
+    public function __construct(UserRepository $userRepository, TokenStorageInterface $tokenStorage)
     {
-        $this->uR = $uR;
-        $this->em = $em;
+        $this->userRepository = $userRepository;
 
-        if ($tk = $ts->getToken()) {
-            $this->user = $tk->getUser();
+        try {
+            $this->user = $tokenStorage->getToken()->getUser();
+        } catch (\Exception $exception) {
         }
     }
 
@@ -35,6 +33,6 @@ class UserLoader
 
     public function getGuest()
     {
-        return $this->uR->getGuest();
+        return $this->userRepository->getGuest();
     }
 }

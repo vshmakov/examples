@@ -2,23 +2,23 @@
 
 namespace App\Service;
 
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface as CH;
-use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException as Exc;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 
 class AuthChecker
 {
-    private $ch;
+    private $authorizationChecker;
 
-    public function __construct(CH $ch)
+    public function __construct(AuthorizationCheckerInterface $authorizationChecker)
     {
-        $this->ch = $ch;
+        $this->authorizationChecker = $authorizationChecker;
     }
 
-    public function isGranted(...$p)
+    public function isGranted(...$parameters)
     {
         try {
-            return $this->ch->isGranted(...$p);
-        } catch (Exc $ex) {
+            return $this->authorizationChecker->isGranted(...$parameters);
+        } catch (AuthenticationCredentialsNotFoundException $exception) {
             return false;
         }
     }

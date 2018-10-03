@@ -99,7 +99,7 @@ where u = :u')
 
     private function getNew()
     {
-        return (new User)
+        return (new User())
             ->setEnabled(true);
     }
 
@@ -165,7 +165,7 @@ where u = :u and e.isRight = true')
         );
     }
 
-    public function clearUsers(\DateTimeInterface $dt)
+    public function clearNotEnabledUsers(\DateTimeInterface $dt)
     {
         $entityManager = $this->getEntityManager();
         $users = $entityManager->createQuery('select u from App:User u

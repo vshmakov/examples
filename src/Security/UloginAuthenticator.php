@@ -41,7 +41,7 @@ class UloginAuthenticator extends AbstractGuardAuthenticator
             $credentials = json_decode($json, true);
             $credentials += [
                 'token' => $token,
-                'username' => '^' . $credentials['network'] . '-' . $credentials['uid'],
+                'username' => '^'.$credentials['network'].'-'.$credentials['uid'],
             ];
 
             return $credentials;
@@ -57,7 +57,7 @@ class UloginAuthenticator extends AbstractGuardAuthenticator
 
     public function checkCredentials($credentials, UserInterface $user = null)
     {
-        return (bool)$credentials;
+        return (bool) $credentials;
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)

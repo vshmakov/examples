@@ -27,7 +27,7 @@ class StudentVoter extends Voter
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
     {
-                return $this->checkRight($attribute, $subject, $token);
+        return $this->checkRight($attribute, $subject, $token);
     }
 
     private function canShowAttempts()

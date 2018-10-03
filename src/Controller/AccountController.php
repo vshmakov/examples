@@ -16,7 +16,7 @@ use App\Service\UserLoader;
  */
 class AccountController extends Controller
 {
-use BaseTrait;
+    use BaseTrait;
     private $currentUser;
 
     public function __construct(UserRepository $userRepository, UserLoader $userLoader)

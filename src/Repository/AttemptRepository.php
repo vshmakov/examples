@@ -53,7 +53,7 @@ order by a.addTime desc");
 
     public function getTitle(Attempt $attempt)
     {
-        return 'Попытка №' . $this->getNumber($attempt);
+        return 'Попытка №'.$this->getNumber($attempt);
     }
 
     public function getNumber(Attempt $attempt)
@@ -74,7 +74,7 @@ join a.examples e
 where a = :att and e.answerTime is not null
 order by e.answerTime desc
 ')->setParameter('att', $attempt)
-        )) ? : $attempt->getAddTime();
+        )) ?: $attempt->getAddTime();
     }
 
     public function getSolvedExamplesCount(Attempt $attempt)
@@ -135,7 +135,7 @@ where u = :u')
     {
         $user = $this->userLoader->getUser()
             ->setEntityRepository($this->userRepository);
-        $attempt = (new Attempt)
+        $attempt = (new Attempt())
             ->setSession($this->sessionRepository->findOneByCurrentUserOrGetNew())
             ->setSettings($user->getCurrentProfile()->getInstance());
 
@@ -148,7 +148,7 @@ where u = :u')
 
     public function hasPreviousExample(Attempt $attempt)
     {
-        return (bool)$this->exampleRepository->findLastByAttempt($attempt);
+        return (bool) $this->exampleRepository->findLastByAttempt($attempt);
     }
 
     public function getData(Attempt $attempt)
@@ -192,7 +192,6 @@ where u = :u')
         $propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
             ->enableMagicCall()
             ->getPropertyAccessor();
-
 
         foreach (arr('title number finishTime solvedExamplesCount answeredExamplesCount errorsCount rating') as $property) {
             $data[$property] = $propertyAccessor->getValue($attempt, $property);

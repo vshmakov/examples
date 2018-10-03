@@ -2,7 +2,6 @@
 
 namespace App\Repository;
 
-
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use App\Service\ExampleManager;
@@ -66,7 +65,7 @@ where e.attempt = :a and e.isRight = false and e.addTime <= :dt')
 where e.attempt = :a and e.addTime < :dt $where")
                 ->setParameters([
                     'a' => $example->getAttempt(),
-                    'dt' => $example->getAddTime()
+                    'dt' => $example->getAddTime(),
                 ])
         ) + 1;
     }
@@ -78,12 +77,12 @@ where e.attempt = :a and e.addTime < :dt $where")
 
     public function getNew(Attempt $attempt)
     {
-        $example = (new Example)
+        $example = (new Example())
             ->setAttempt($attempt);
-        
-            $lastExample = $this->findLastByAttempt($attempt);
 
-            if ($attempt->getSettings()->isDemanding() && $lastExample && !$lastExample->isRight()) {
+        $lastExample = $this->findLastByAttempt($attempt);
+
+        if ($attempt->getSettings()->isDemanding() && $lastExample && !$lastExample->isRight()) {
             $example->setFirst($lastExample->getFirst())
                 ->setSecond($lastExample->getSecond())
                 ->setSign($lastExample->getSign());
@@ -98,7 +97,7 @@ join s.user u
 where u = :u and a.addTime > :dt')
                 ->setParameters([
                     'u' => $this->userLoader->getUser(),
-                    'dt' => (new \DateTime)->sub(new \DateInterval('P3D'))
+                    'dt' => (new \DateTime())->sub(new \DateInterval('P3D')),
                 ])
                 ->getResult();
 
@@ -126,7 +125,7 @@ where e.attempt = :att and e.addTime < :dt
 order by e.addTime desc')
                     ->setParameters([
                         'dt' => $example->getAddTime(),
-                        'att' => $example->getAttempt()
+                        'att' => $example->getAttempt(),
                     ])
             );
             $previousTime = $previousExample ? $previousExample->getAnswerTime() : $example->getAttempt()->getAddTime();
@@ -156,7 +155,7 @@ join s.user u
 where u = :u and e.addTime < :dt and (e.isRight != false or e.isRight is null)')
                 ->setParameters([
                     'u' => $example->getAttempt()->getSession()->getUser(),
-                    'dt' => $example->getAddTime()
+                    'dt' => $example->getAddTime(),
                 ])
         ) + 1;
     }

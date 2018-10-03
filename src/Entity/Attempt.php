@@ -44,7 +44,7 @@ class Attempt
     public function __construct()
     {
         $this->examples = new ArrayCollection();
-$this->addTime=new \DateTime;
+        $this->addTime = new \DateTime();
     }
 
     public function getId()
@@ -55,12 +55,12 @@ $this->addTime=new \DateTime;
     /**
      * @return Collection|Example[]
      */
-    public function getExamples() : Collection
+    public function getExamples(): Collection
     {
         return $this->examples;
     }
 
-    public function addExample(Example $example) : self
+    public function addExample(Example $example): self
     {
         if (!$this->examples->contains($example)) {
             $this->examples[] = $example;
@@ -70,7 +70,7 @@ $this->addTime=new \DateTime;
         return $this;
     }
 
-    public function removeExample(Example $example) : self
+    public function removeExample(Example $example): self
     {
         if ($this->examples->contains($example)) {
             $this->examples->removeElement($example);
@@ -83,12 +83,12 @@ $this->addTime=new \DateTime;
         return $this;
     }
 
-    public function getAddTime() : ? \DateTimeInterface
+    public function getAddTime(): ? \DateTimeInterface
     {
         return $this->dt($this->addTime);
     }
 
-    public function setAddTime(\DateTimeInterface $addTime) : self
+    public function setAddTime(\DateTimeInterface $addTime): self
     {
         $this->addTime = $addTime;
 
@@ -100,19 +100,19 @@ $this->addTime=new \DateTime;
         return $this->settings;
     }
 
-    public function setSettings($settings) : self
+    public function setSettings($settings): self
     {
         $this->settings = $settings;
 
         return $this;
     }
 
-    public function getSession() : ? Session
+    public function getSession(): ? Session
     {
         return $this->session;
     }
 
-    public function setSession(? Session $session) : self
+    public function setSession(? Session $session): self
     {
         $this->session = $session;
 

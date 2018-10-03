@@ -42,6 +42,7 @@ class AttemptVoter extends Voter
     private function canSolve()
     {
         $attempt = $this->subject;
+
         if (!$this->canView()) {
             return false;
         }
@@ -72,7 +73,7 @@ class AttemptVoter extends Voter
             return true;
         }
 
-        $attempt=$this->subject;
+        $attempt = $this->subject;
         $userLoader = $this->userLoader;
         $user = $userLoader->getUser();
         $author = $attempt->getSession()->getUser();

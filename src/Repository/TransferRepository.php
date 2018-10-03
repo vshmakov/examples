@@ -27,7 +27,7 @@ class TransferRepository extends ServiceEntityRepository
 
     public function getNewByCurrentUser()
     {
-        $transfer = (new Transfer)
+        $transfer = (new Transfer())
             ->setUser($this->userLoader->getUser())
             ->setLabel(randStr(32));
         $entityManager = $this->getEntityManager();

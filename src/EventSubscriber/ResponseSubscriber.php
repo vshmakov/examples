@@ -43,7 +43,7 @@ class ResponseSubscriber implements EventSubscriberInterface
         $missResponseEvent = $this->session->getFlashBag()->get('missResponseEvent', []);
 
         if ($request && $event->isMasterRequest() && $currentUserSession && !$missResponseEvent) {
-            $currentUserSession->setLastTime(new \DateTime);
+            $currentUserSession->setLastTime(new \DateTime());
             $user = $this->userLoader->getUser();
             $ip = $this->ipRepository->findOneByIpOrNew($request->getClientIp());
             $uri = $request->getRequestUri();
@@ -51,7 +51,7 @@ class ResponseSubscriber implements EventSubscriberInterface
 
             if ('_wdt' != $routeName &&
                 !$this->authChecker->isGranted('ROLE_ADMIN')) {
-                $visit = (new Visit)
+                $visit = (new Visit())
                     ->setUri($uri)
                     ->setRouteName($routeName)
                     ->setMethod($request->getMethod())

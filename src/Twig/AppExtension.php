@@ -4,12 +4,10 @@ namespace App\Twig;
 
 use Psr\Container\ContainerInterface;
 use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
 use App\Service\UserLoader;
 use App\Repository\AttemptRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 
 class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsInterface
 {
@@ -22,7 +20,7 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
 
     public function __construct(UserLoader $userLoader, AttemptRepository $attemptRepository, UserRepository $userRepository, EntityManagerInterface $entityManager, ContainerInterface $container)
     {
-        $hasActualAttempt = (bool)$attemptRepository->findLastActualByCurrentUser();
+        $hasActualAttempt = (bool) $attemptRepository->findLastActualByCurrentUser();
         $user = $userLoader->getUser()->setEntityRepository($userRepository);
 
         $this->entityManager = $entityManager;

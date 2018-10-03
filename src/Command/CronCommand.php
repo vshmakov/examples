@@ -48,13 +48,18 @@ class CronCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $this->userLoader->getGuest()->setIps([]);
-        $dt = \DT::crateBySubDays(7)();
-        $this->sessionRepository->clearSessions($dt);
-        $this->visitRepository->cleareVisits($dt);
+        $dt = \DT::createBySubDays(7);
+        $removedSessionsCount = $this->sessionRepository->clearSessions($dt);
+        $removedVisitsCount = $this->visitRepository->cleareVisits($dt);
         $dt = \DT::createBySubDays(10);
-        $this->userRepository->clearNotEnabledUsers($dt);
+        $removedUsersCount = $this->userRepository->clearNotEnabledUsers($dt);
 
-        $io->success('Cron command executed');
+        $io->success(sprintf(
+            "Cron command executed\n
+            Removed %s users, %s sessions and %s visits",
+            $removedUsersCount,
+            $removedSessionsCount,
+            $removedVisitsCount
+        ));
     }
 }

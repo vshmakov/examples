@@ -18,7 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
  */
 class TeacherController extends Controller
 {
-use BaseTrait;
+    use BaseTrait;
     private $currentUser;
 
     public function __construct(UserRepository $userRepository, UserLoader $userLoader)
@@ -42,7 +42,7 @@ use BaseTrait;
      */
     public function appoint(User $teacher, ValidatorInterface $validator, Request $request, SessionInterface $session)
     {
-        $currentUser=$this->currentUser;
+        $currentUser = $this->currentUser;
         $errors = $validator->validate($currentUser, null, ['account']);
 
         if (!count($errors)) {
@@ -54,7 +54,7 @@ use BaseTrait;
             return $this->redirectToRoute('account_index');
         }
 
-                $currentUser->cleanSocialUsername();
+        $currentUser->cleanSocialUsername();
         $form = $this->createForm(AccountType::class, $currentUser);
         $form->remove('isTeacher');
         $form->handleRequest($request);

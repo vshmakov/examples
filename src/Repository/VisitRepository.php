@@ -8,12 +8,14 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class VisitRepository extends ServiceEntityRepository
 {
+    use BaseTrait;
+
     public function __construct(RegistryInterface $registry)
     {
         parent::__construct($registry, Visit::class);
     }
 
-public function cleareVisits(\DateTimeInterface $dt)
+    public function cleareVisits(\DateTimeInterface $dt)
     {
         $entityManager = $this->getEntityManager();
         $visits = $this->createQuery('select v from App:Visit v

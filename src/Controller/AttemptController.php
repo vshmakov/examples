@@ -100,7 +100,7 @@ class AttemptController extends Controller
         }
 
         $example = $exampleRepository->findLastUnansweredByAttempt($attempt);
-        $answer = (float)$request->request->get('answer');
+        $answer = (float) $request->request->get('answer');
         $example->setAnswer($answer);
         $entityManager->flush();
 

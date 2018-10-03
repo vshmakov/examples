@@ -190,7 +190,7 @@ class User implements UserInterface, GroupableInterface
         return $this->id;
     }
 
-    public function getAddTime(): ?\DateTimeInterface
+    public function getAddTime(): ? \DateTimeInterface
     {
         return $this->dt($this->addTime);
     }
@@ -264,24 +264,24 @@ class User implements UserInterface, GroupableInterface
         return $this;
     }
 
-    public function getProfile(): ?Profile
+    public function getProfile(): ? Profile
     {
         return $this->profile;
     }
 
-    public function setProfile(?Profile $profile): self
+    public function setProfile(? Profile $profile): self
     {
         $this->profile = $profile;
 
         return $this;
     }
 
-    public function getAllMoney(): ?int
+    public function getAllMoney(): ? int
     {
         return $this->allMoney;
     }
 
-    public function getMoney(): ?int
+    public function getMoney(): ? int
     {
         return $this->money;
     }
@@ -293,7 +293,7 @@ class User implements UserInterface, GroupableInterface
         return $this;
     }
 
-    public function getLimitTime(): ?\DateTimeInterface
+    public function getLimitTime(): ? \DateTimeInterface
     {
         return $this->dt($this->limitTime);
     }
@@ -388,6 +388,13 @@ class User implements UserInterface, GroupableInterface
         return $this;
     }
 
+    public function setIps(array $ips): self
+    {
+        $this->ips = $ips;
+
+        return $this;
+    }
+
     /**
      * @return Collection|Transfer[]
      */
@@ -477,24 +484,24 @@ class User implements UserInterface, GroupableInterface
      */
     private $teacher;
 
-    public function getFirstName(): ?string
+    public function getFirstName(): ? string
     {
         return $this->firstName;
     }
 
-    public function setFirstName(?string $firstName): self
+    public function setFirstName(? string $firstName): self
     {
         $this->firstName = $firstName;
 
         return $this;
     }
 
-    public function getLastName(): ?string
+    public function getLastName(): ? string
     {
         return $this->lastName;
     }
 
-    public function setLastName(?string $lastName): self
+    public function setLastName(? string $lastName): self
     {
         $this->lastName = $lastName;
 
@@ -561,7 +568,7 @@ class User implements UserInterface, GroupableInterface
     public function getUsername() {
     return $this->username ?? $this->getFirstName()." ".$this->getLastName();
     }
-    */
+     */
 
     public function setUsername($u)
     {
@@ -570,48 +577,48 @@ class User implements UserInterface, GroupableInterface
         return $this->setUsernameCanonical($u);
     }
 
-    public function getNetwork(): ?string
+    public function getNetwork(): ? string
     {
         return $this->network;
     }
 
-    public function setNetwork(?string $network): self
+    public function setNetwork(? string $network): self
     {
         $this->network = $network;
 
         return $this;
     }
 
-    public function getNetworkId(): ?string
+    public function getNetworkId(): ? string
     {
         return $this->networkId;
     }
 
-    public function setNetworkId(?string $networkId): self
+    public function setNetworkId(? string $networkId): self
     {
         $this->networkId = $networkId;
 
         return $this;
     }
 
-    public function getFatherName(): ?string
+    public function getFatherName(): ? string
     {
         return $this->fatherName;
     }
 
-    public function setFatherName(?string $fatherName): self
+    public function setFatherName(? string $fatherName): self
     {
         $this->fatherName = $fatherName;
 
         return $this;
     }
 
-    public function isTeacher(): ?bool
+    public function isTeacher(): ? bool
     {
         return (bool) $this->isTeacher;
     }
 
-    public function setIsTeacher(?bool $isTeacher): self
+    public function setIsTeacher(? bool $isTeacher): self
     {
         $this->isTeacher = $isTeacher;
 
@@ -654,7 +661,7 @@ class User implements UserInterface, GroupableInterface
         return $this->teacher;
     }
 
-    public function setTeacher(?User $teacher): self
+    public function setTeacher(? User $teacher): self
     {
         $this->teacher = $teacher;
 

@@ -11,12 +11,14 @@ class UserLoader
     private $user;
     private $userRepository;
     private $em;
+
     public function __construct(UserRepository $userRepository, TokenStorageInterface $tokenStorage)
     {
         $this->userRepository = $userRepository;
-if ($token = $tokenStorage->getToken()) {
+
+        if ($token = $tokenStorage->getToken()) {
             $this->user = $token->getUser();
-}
+        }
     }
 
     public function getUser()

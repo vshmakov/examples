@@ -23,6 +23,7 @@ class IpRepository extends ServiceEntityRepository
         }
 
         $entity = $this->findOneByIp($ip);
+
         if (!$entity) {
             $entity = (new Ip())->setIp($ip);
             $entityManager = $this->getEntityManager();
@@ -35,6 +36,6 @@ class IpRepository extends ServiceEntityRepository
 
     public function findOneByIpOrNew($ip)
     {
-                return $this->hasOrCreateByIp($ip);
+        return $this->hasOrCreateByIp($ip);
     }
 }

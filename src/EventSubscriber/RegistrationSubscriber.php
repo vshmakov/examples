@@ -24,7 +24,7 @@ class RegistrationSubscriber implements EventSubscriberInterface
         if ($user->getUsername() == $superAdminUsername) {
             $user->addRole('ROLE_SUPER_ADMIN');
         }
-        
+
         $this->entityManager->flush();
     }
 

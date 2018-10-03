@@ -26,7 +26,7 @@ trait BaseTrait
         return method_exists($this, $this->getHandlerName($attribute));
     }
 
-    protected function supportsArr(string $attribute, array $subjects) : bool
+    protected function supportsArr(string $attribute, array $subjects): bool
     {
         return array_reduce(
             $subjects,
@@ -73,6 +73,6 @@ trait BaseTrait
             $prefix = 'has';
         }
 
-        return Inflector::camelize($prefix . '_' . $attribute);
+        return Inflector::camelize($prefix.'_'.$attribute);
     }
 }

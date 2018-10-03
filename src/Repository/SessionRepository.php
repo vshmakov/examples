@@ -64,7 +64,7 @@ class SessionRepository extends ServiceEntityRepository
             return $session;
         }
 
-        $session = (new Session)
+        $session = (new Session())
             ->setUser($user)
             ->setSid(($this->userLoader->isGuest()) ? $sid : '');
 

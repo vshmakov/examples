@@ -59,7 +59,8 @@ class ProfileVoter extends Voter
 
     private function canEdit()
     {
-$profile=$this->subject;
+        $profile = $this->subject;
+
         return $this->canCreate() && $this->userLoader->getUser() === $profile->getAuthor() && !$profile->isPublic();
     }
 

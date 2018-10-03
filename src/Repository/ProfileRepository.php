@@ -54,7 +54,7 @@ where p.isPublic = true
 
     public function getTitle(Profile $profile)
     {
-        return $profile->getDescription() ? : 'Профиль №' . $this->getNumber($profile);
+        return $profile->getDescription() ?: 'Профиль №'.$this->getNumber($profile);
     }
 
     public function countByCurrentAuthor()
@@ -69,19 +69,18 @@ where p.isPublic = true
 where p.author =:a and p.id <= :id')
                 ->setParameters([
                     'a' => $profile->getAuthor(),
-                    'id' => $p->getId()
+                    'id' => $p->getId(),
                 ])
         ) : $this->countByCurrentAuthor() + 1;
     }
 
     public function getNewByCurrentUser()
     {
-        $profile = (new Profile);
+        $profile = (new Profile());
 
         return $profile->SetDescription($this->getTitle($profile))
             ->setAuthor($this->userLoader->getUser());
     }
-
 
     public function findByCurrentUserTeacher()
     {

@@ -11,7 +11,7 @@ class IpInformer
 
         if (!isset($ips[$ip])) {
             if ($isIp) {
-                $json = file_get_contents('http://api.db-ip.com/v2/free/' . urlencode($ip));
+                $json = file_get_contents('http://api.db-ip.com/v2/free/'.urlencode($ip));
             }
 
             $answer = $isIp ? json_decode($json, true) : ['errorCode' => 'IsNotIp'];
@@ -21,13 +21,13 @@ class IpInformer
                 $info[$property] = $answer[$property] ?? null;
             }
 
-            $info['error'] = (bool)$info['errorCode'];
-            $ips[$ip] = $info + (array)$answer;
+            $info['error'] = (bool) $info['errorCode'];
+            $ips[$ip] = $info + (array) $answer;
         }
 
         return $ips[$ip];
     }
-    
+
     public static function isIp($ip)
     {
         return preg_match("#^(\d{1,3}\.?){4}$#", $ip);

@@ -4,7 +4,6 @@ namespace App\Twig;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
 use App\Service\Router;
 use App\Repository\AttemptRepository;
 use App\Repository\ExampleRepository;
@@ -47,8 +46,8 @@ class ProcessersExtension extends AbstractExtension
                 "$example",
                 $propertyAccessor('answer'),
                 $propertyAccessor('isRight', false) ? 'Да' : 'Нет',
-                $propertyAccessor('solvingTime.timestamp') ? : '-',
-                $propertyAccessor('addTime') . '',
+                $propertyAccessor('solvingTime.timestamp') ?: '-',
+                $propertyAccessor('addTime').'',
                 $this->router->link('attempt_show', ['id' => $attempt->getId()], $attempt->getTitle()),
             ];
         });
@@ -66,7 +65,7 @@ class ProcessersExtension extends AbstractExtension
                 $propertyAccessor('continent'),
                 $propertyAccessor('addTime.dbFormat'),
                 $this->router->link('ip_show', ['id' => $pa('id')], 'show')
-                    . $this->router->link('ip_edit', ['id' => $pa('id')], 'edit'),
+                    .$this->router->link('ip_edit', ['id' => $pa('id')], 'edit'),
             ];
         });
     }
@@ -101,8 +100,8 @@ class ProcessersExtension extends AbstractExtension
 
             return [
                 $this->router->link('attempt_show', ['id' => $propertyAccessor('id')], $propertyAccessor('title')),
-                $propertyAccessor('addTime') . '',
-                $propertyAccessor('finishTime') . '',
+                $propertyAccessor('addTime').'',
+                $propertyAccessor('finishTime').'',
                 $propertyAccessor('solvedExamplesCount', false) ? sprintf('%s из %s (%s сек/пример)', $propertyAccessor('solvedTime.minSecFormat'), $propertyAccessor('maxTime.minSecFormat'), $propertyAccessor('averSolveTime.timestamp')) : '-',
                 sprintf('%s из %s', $propertyAccessor('solvedExamplesCount', false), $propertyAccessor('examplesCount', false)),
                 $propertyAccessor('errorsCount', false),
@@ -136,7 +135,7 @@ class ProcessersExtension extends AbstractExtension
                 $defaultSign = $value;
             }
 
-            return $value ? : $defaultSign;
+            return $value ?: $defaultSign;
         };
     }
 }

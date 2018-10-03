@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Session
 {
-    use DTTrait;
+    use BaseTrait;
 
     /**
      * @ORM\Id()
@@ -59,7 +59,7 @@ class Session
     public function __construct()
     {
         $this->attempts = new ArrayCollection();
-        $this->initAddTime();
+        $this->addTime = new \DateTime();
         $this->lastTime = new \DateTime();
         $this->visits = new ArrayCollection();
     }

@@ -6,36 +6,31 @@ trait BaseTrait
 {
     use \App\BaseTrait;
 
-    public function em()
+    protected function createQuery($dql)
     {
-        return $this->getEntityManager();
+        return $this->getEntityManager()->createQuery($dql);
     }
 
-    public function q($dql)
+    protected function getValue($query)
     {
-        return $this->em()->createQuery($dql);
+        return self::getValueByQuery($query);
     }
 
-    public function v($q)
+    public static function getValueByQuery($query)
     {
-        $r = ($q->setMaxResults(1)->getOneOrNullResult());
+        $result = ($query->setMaxResults(1)->getOneOrNullResult());
 
-        if (!is_array($r)) {
-            return $r;
+        if (!is_array($result)) {
+            return $result;
         }
 
-        foreach ($r as $v) {
-            return $v;
+        foreach ($result as $value) {
+            return $value;
         }
     }
 
-    private function qb()
+    protected function getEntityRepository($class)
     {
-        return $this->createQueryBuilder();
-    }
-
-    private function er($cl)
-    {
-        return $this->em()->getRepository($cl);
+        return $this->getentityManager()->getRepository($class);
     }
 }

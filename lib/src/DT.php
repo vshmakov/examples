@@ -2,9 +2,9 @@
 
 class DT extends DateTime
 {
-    public static function createFromFormat($f, $s, $o = null)
+    public static function createFromFormat($format, $string, $o = null)
     {
-        $dt = \DateTime::createFromFormat($f, $s);
+        $dt = \DateTime::createFromFormat($format, $string);
 
         return ($dt && $dt->getTimestamp() > 0) ? static::createFromDT($dt) : false;
     }
@@ -14,9 +14,9 @@ class DT extends DateTime
         return static::createFromTimestamp(0);
     }
 
-    public function createFromDbFormat($s)
+    public function createFromDbFormat($string)
     {
-        return static::createFromFormat('Y-m-d H:i:s', $s);
+        return static::createFromFormat('Y-m-d H:i:s', $string);
     }
 
     public static function createFromDT($dt)
@@ -24,19 +24,19 @@ class DT extends DateTime
         return ($dt instanceof \DateTimeInterface) ? static::createFromTimestamp($dt->getTimestamp()) : null;
     }
 
-    public static function createBySub($i)
+    public static function createBySub(string $intervalString)
     {
-        return (new static())->sub(new \DateInterval($i));
+        return (new static())->sub(new \DateInterval($intervalString));
     }
 
-    public static function createBySubD($d)
+    public static function createBySubDays($days)
     {
-        return self::createBySub("P{$d}D");
+        return self::createBySub("P{$days}D");
     }
 
-    public static function createByAdd($i)
+    public static function createByAdd(DateInterval $dateInterval)
     {
-        return (new static())->add(new \DateInterval($i));
+        return (new static())->add(new \DateInterval($dateInterval));
     }
 
     public static function createFromTimestamp($time)
@@ -66,12 +66,12 @@ class DT extends DateTime
         return $this->format('d.m.Y');
     }
 
-    public function setDayS()
+    public function setStartDay()
     {
         return $this->setTime(0, 0);
     }
 
-    public function setDayF()
+    public function setFinishDay()
     {
         return $this->setTime(23, 59, 59);
     }
@@ -86,7 +86,7 @@ class DT extends DateTime
         return round($this->getTimestamp() / DAY);
     }
 
-    public function isPast()
+    public function isPast(): bool
     {
         return $this->getTimestamp() < time();
     }
@@ -124,9 +124,9 @@ class DT extends DateTime
         return $this->getTimeStamp() % MIN;
     }
 
-    public function diff($dt, $abs = null)
+    public function diff($dt, $absolute = null)
     {
-        return DTI::createFromDTI(parent::diff($dt, $abs));
+        return DTI::createFromDTI(parent::diff($dt, $absolute));
     }
 
     public function getRoundTimestamp()

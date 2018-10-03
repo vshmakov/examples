@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use App\Service\AuthChecker;
 use App\Entity\User;
 use App\Entity\Profile;
 use App\Entity\Attempt;
@@ -13,149 +13,171 @@ class UserRepository extends ServiceEntityRepository
 {
     use BaseTrait;
     const GUEST_LOGIN = '__guest';
-    private $ch;
+    private $authChecker;
 
-    public function __construct(RegistryInterface $registry, AuthorizationCheckerInterface $ch)
+    public function __construct(RegistryInterface $registry, AuthChecker $authChecker)
     {
         parent::__construct($registry, User::class);
-        $this->ch = $ch;
+        $this->authChecker = $authChecker;
     }
 
-    public function getCurrentProfile($u)
+    public function getCurrentProfile(User $user)
     {
-        $pR = $this->er(Profile::class);
-        $p = $u->getProfile() ?? $pR->findOneByAuthor($u) ?? $pR->findOnePublic();
-        $testDesc = 'Тестовый профиль';
+        $profileRepository = $this->getEntityRepository(Profile::class);
+        $profile = $user->getProfile() ?? $profileRepository->findOneByAuthor($user) ?? $profileRepository->findOnePublic();
+        $testProfileDescription = 'Тестовый профиль';
 
-        if (!$p) {
-            $p = $pR->getNewByCurrentUser()
-->setDescription($testDesc)
-->setIsPublic(true)
-->setAuthor($this->getGuest());
+        if (!$profile) {
+            $profile = $profileRepository->getNewByCurrentUser()
+                ->setDescription($testProfileDescription)
+                ->setIsPublic(true)
+                ->setAuthor($this->getGuest());
 
-            $em = $this->em();
-            $em->persist($p);
-            $em->flush();
+            $entityManager = $this->getEntityManager();
+            $entityManager->persist($profile);
+            $entityManager->flush();
         }
 
-        return $this->ch->isGranted('PRIV_APPOINT_PROFILES', $u) ? $p : $pR->findOneBy(['description' => $testDesc, 'isPublic' => true]);
+        return $this->authChecker->isGranted('PRIV_APPOINT_PROFILES', $user) ? $profile
+            : $profileRepository->findOneBy(['description' => $testProfileDescription, 'isPublic' => true]);
     }
 
-    public function getAttemptsCount($u)
+    public function getAttemptsCount(User $user)
     {
-        return $this->v($this->q('select count(a) from App:User u
+        return $this->getValue(
+            $this->createQuery('select count(a) from App:User u
 join u.sessions s
 join s.attempts a
 where u = :u')
-->setParameter('u', $u));
+                ->setParameter('u', $user)
+        );
     }
 
-    public function getExamplesCount($u)
+    public function getExamplesCount(User $user)
     {
-        return $this->v($this->q('select count(e) from App:User u
+        return $this->getValue(
+            $this->createQuery('select count(e) from App:User u
 join u.sessions s
 join s.attempts a
 join a.examples e
 where u = :u')
-->setParameter('u', $u));
+                ->setParameter('u', $user)
+        );
     }
 
-    public function getProfilesCount($u)
+    public function getProfilesCount(User $user)
     {
-        return $this->v($this->q('select count(p) from App:User u
+        return $this->getValue(
+            $this->createQuery('select count(p) from App:User u
 join u.profiles p
 where u = :u')
-->setParameter('u', $u));
+                ->setParameter('u', $user)
+        );
     }
 
     public function getGuest()
     {
-        static $u = false;
-        $gl = self::GUEST_LOGIN;
+        static $user = false;
+        $guestLogin = self::GUEST_LOGIN;
 
-        if (false === $u) {
-            $u = $this->findOneByUsername($gl);
+        if (false === $user) {
+            $user = $this->findOneByUsername($guestLogin);
         }
 
-        if (!$u) {
-            $u = $this->getNew()
-->setUsername($gl)
-->setUsernameCanonical($gl);
+        if (!$user) {
+            $user = $this->getNew()
+                ->setUsername($guestLogin)
+                ->setUsernameCanonical($guestLogin);
 
-            $em = $this->em();
-            $em->persist($u);
-            $em->flush();
+            $entityManager = $this->getEntityManager();
+            $entityManager->persist($user);
+            $entityManager->flush();
         }
 
-        return $u;
+        return $user;
     }
 
     private function getNew()
     {
         return (new User())
-->setEnabled(true);
+            ->setEnabled(true);
     }
 
-    public function findOneByUloginCredentials($d)
+    public function findOneByUloginCredentials($credentials)
     {
-        extract($d);
+        extract($credentials);
 
         return $this->findOneBy(['network' => $network, 'networkId' => $uid]);
     }
 
-    public function findOneByUloginCredentialsOrNew($d)
+    public function findOneByUloginCredentialsOrNew($credentials)
     {
-        extract($d);
+        extract($credentials);
 
-        if ($u = $this->findOneByUloginCredentials($d)) {
-            return $u;
+        if ($user = $this->findOneByUloginCredentials($credentials)) {
+            return $user;
         }
 
-        $u = $this->getNew()
-->setUsername($username)
-->setIsSocial(true)
-->setFirstName($first_name)
-->setLastName($last_name)
-->setNetwork($network)
-->setNetworkId($uid)
-;
-        $em = $this->em();
-        $em->persist($u);
-        $em->flush();
+        $user = $this->getNew()
+            ->setUsername($username)
+            ->setIsSocial(true)
+            ->setFirstName($first_name)
+            ->setLastName($last_name)
+            ->setNetwork($network)
+            ->setNetworkId($uid);
+        $entityManager = $this->getEntityManager();
+        $entityManager->persist($user);
+        $entityManager->flush();
 
-        return $u;
+        return $user;
     }
 
-    public function getDoneAttemptsCount($u)
+    public function getDoneAttemptsCount(User $user)
     {
-        $as = $this->q('select a from App:Attempt a
+        $attempts = $this->createQuery('select a from App:Attempt a
 join a.session s
 join s.user u
 where u = :u')
-->setParameters(['u' => $u])
-->getResult();
+            ->setParameters(['u' => $user])
+            ->getResult();
 
-        $attR = $this->er(Attempt::class);
-        $c = 0;
+        $attemptRepository = $this->getEntityRepository(Attempt::class);
+        $count = 0;
 
-        foreach ($as as $a) {
-            if ($attR->getSolvedExamplesCount($a) == $a->getSettings()->getExamplesCount()) {
-                ++$c;
+        foreach ($attempts as $attempt) {
+            if ($attemptRepository->getSolvedExamplesCount($attempt) == $attempt->getSettings()->getExamplesCount()) {
+                ++$count;
             }
         }
 
-        return $c;
+        return $count;
     }
 
-    public function getSolvedExamplesCount($u)
+    public function getSolvedExamplesCount(User $user)
     {
-        return $this->v(
-$this->q('select count(e) from App:Example e
+        return $this->getValue(
+            $this->createQuery('select count(e) from App:Example e
 join e.attempt a
 join a.session s
 join s.user u
 where u = :u and e.isRight = true')
-->setParameters(['u' => $u])
-);
+                ->setParameters(['u' => $user])
+        );
+    }
+
+    public function clearNotEnabledUsers(\DateTimeInterface $dt)
+    {
+        $entityManager = $this->getEntityManager();
+        $users = $entityManager->createQuery('select u from App:User u
+        where u.enabled = false and u.addTime < :dt')
+            ->setParameter('dt', \DT::createBySubDays(10))
+            ->getResult();
+
+        foreach ($users as $user) {
+            $entityManager->remove($user);
+        }
+        $entityManager->flush();
+
+        return count($users);
     }
 }

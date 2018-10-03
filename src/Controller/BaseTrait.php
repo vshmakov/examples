@@ -4,7 +4,7 @@ namespace App\Controller;
 
 trait BaseTrait
 {
-    protected function em()
+    protected function getEntityManager()
     {
         return $this->getDoctrine()->getManager();
     }

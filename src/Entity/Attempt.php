@@ -5,14 +5,13 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use App\DT;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\AttemptRepository")
  */
 class Attempt
 {
-    use DTTrait;
+    use BaseTrait;
 
     /**
      * @ORM\Id()
@@ -45,7 +44,7 @@ class Attempt
     public function __construct()
     {
         $this->examples = new ArrayCollection();
-        $this->initAddTime();
+        $this->addTime = new \DateTime();
     }
 
     public function getId()
@@ -84,7 +83,7 @@ class Attempt
         return $this;
     }
 
-    public function getAddTime(): ?\DateTimeInterface
+    public function getAddTime(): ? \DateTimeInterface
     {
         return $this->dt($this->addTime);
     }
@@ -108,12 +107,12 @@ class Attempt
         return $this;
     }
 
-    public function getSession(): ?Session
+    public function getSession(): ? Session
     {
         return $this->session;
     }
 
-    public function setSession(?Session $session): self
+    public function setSession(? Session $session): self
     {
         $this->session = $session;
 
@@ -127,7 +126,7 @@ class Attempt
 
     public function getLimitTime()
     {
-        return DT::createFromTimestamp($this->getAddTime()->getTimestamp() + $this->getSettings()->getDuration());
+        return $this->dts($this->getAddTime()->getTimestamp() + $this->getSettings()->getDuration());
     }
 
     public function getMaxTime()

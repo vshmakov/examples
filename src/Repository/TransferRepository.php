@@ -11,28 +11,29 @@ class TransferRepository extends ServiceEntityRepository
 {
     use BaseTrait;
 
-    private $ul;
+    private $userLoader;
 
-    public function __construct(RegistryInterface $registry, UserLoader $ul)
+    public function __construct(RegistryInterface $registry, UserLoader $userLoader)
     {
         parent::__construct($registry, Transfer::class);
-        $this->ul = $ul;
+        $this->userLoader = $userLoader;
     }
 
     public function findUnheldByCurrentUserOrNew()
     {
-        return $this->findOneBy(['held' => false, 'user' => $this->ul->getUser()]) ?? $this->getNewByCurrentUser();
+        return $this->findOneBy(['held' => false, 'user' => $this->userLoader->getUser()])
+            ?? $this->getNewByCurrentUser();
     }
 
     public function getNewByCurrentUser()
     {
-        $e = (new Transfer())
-->setUser($this->ul->getUser())
-->setLabel(randStr(32));
-        $em = $this->em();
-        $em->persist($e);
-        $em->flush();
+        $transfer = (new Transfer())
+            ->setUser($this->userLoader->getUser())
+            ->setLabel(randStr(32));
+        $entityManager = $this->getEntityManager();
+        $entityManager->persist($transfer);
+        $entityManager->flush();
 
-        return $e;
+        return $transfer;
     }
 }

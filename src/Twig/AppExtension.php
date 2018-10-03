@@ -2,109 +2,99 @@
 
 namespace App\Twig;
 
+use Psr\Container\ContainerInterface;
 use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
-use App\Service\UserLoader as UL;
-use App\Repository\AttemptRepository as AttR;
-use App\Repository\UserRepository as UR;
-use   Doctrine\ORM\EntityManagerInterface as EM;
-use   Psr\Container\ContainerInterface as Con;
-use   Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface as ConP;
+use App\Service\UserLoader;
+use App\Repository\AttemptRepository;
+use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
 
 class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsInterface
 {
-    private $ul;
-    private $gl = [];
-    private $em;
+    use BaseTrait;
+    private $userLoader;
+    private $globals = [];
+    private $entityManager;
+    private $attemptRepository;
+    private $userRepository;
 
-    public function __construct(UL $ul, AttR $attR, UR $uR, EM $em, Con $con, ConP $conP)
+    public function __construct(UserLoader $userLoader, AttemptRepository $attemptRepository, UserRepository $userRepository, EntityManagerInterface $entityManager, ContainerInterface $container)
     {
-        $hasAtt = (bool) $attR->findLastActualByCurrentUser();
+        $hasActualAttempt = (bool) $attemptRepository->findLastActualByCurrentUser();
+        $user = $userLoader->getUser()->setEntityRepository($userRepository);
 
-        $this->em = $em;
-        $this->ul = $ul;
-        $this->gl = [
-            'user' => $u = $ul->getUser()->setER($uR),
-            'hasActualAttempt' => $hasAtt,
+        $this->entityManager = $entityManager;
+        $this->userLoader = $userLoader;
+        $this->globals = [
+            'user' => $user,
+            'hasActualAttempt' => $hasActualAttempt,
             'PRICE' => PRICE,
-            'app_name' => $con->getParameter('app_name'),
-            'vk_app_id' => $con->getParameter('vk_app_id'),
-            'isGuest' => $ul->isGuest(),
+            'app_name' => $container->getParameter('app_name'),
+            'isGuest' => $userLoader->isGuest(),
             'FEEDBACK_EMAIL' => 'post@exmasters.ru',
         ];
     }
 
     public function getGlobals()
     {
-        return $this->gl;
+        return $this->globals;
     }
 
     public function getFunctions()
     {
-        $fs = [
-        ];
-
-        $r = [
-            new TwigFunction('addTimeNumber', [$this, 'getAddTimeNumber']),
-            new TwigFunction('sortByAddTime', [$this, 'sortByAddTime']),
-            new TwigFunction('sortProfiles', [$this, 'sortProfiles']),
-            new TwigFunction('sortTeachers', [$this, 'sortTeachers']),
-            new TwigFunction('sortStudents', [$this, 'sortStudents']),
-            new TwigFunction('getIpInfo', '\App\Service\IpInformer::getInfoByIp'),
-            new TwigFunction('fillIp', [$this, 'fillIp']),
-        ];
-
-        foreach ($fs as $f) {
-            $r[] = new TwigFunction($f, [$this, $f]);
-        }
-
-        return $r;
+        return $this->prepareFunctions([
+            'addTimeNumber',
+            'sortByAddTime',
+            'sortProfiles',
+            'sortTeachers',
+            'sortStudents',
+            'fillIp',
+        ]);
     }
 
-    public function getAddTimeNumber($v, array $ents)
+    public function addTimeNumber($entity, array $entityList)
     {
-        $dt = $v->getAddTime();
-        $n = count($ents);
+        $addTime = $entity->getAddTime();
 
-        foreach ($ents as $e) {
-            if ($dt->getTimestamp() < $e->getAddTime()->getTimestamp()) {
-                --$n;
-            }
-        }
-
-        return $n;
+        return array_reduce(
+            $entityList,
+            function ($number, $entity) use ($addTime) {
+                return $addTime->getTimestamp() < $entity->getAddTime()->getTimestamp() ? --$number : $number;
+            },
+            count($entityList)
+        );
     }
 
-    public function sortByAddTime($ents)
+    public function sortByAddTime($entityList)
     {
-        usort($ents, [$this, 'addTimeSorter']);
+        usort($entityList, [$this, 'addTimeSorter']);
 
-        return $ents;
+        return $entityList;
     }
 
-    public function sortProfiles($ps)
+    public function sortProfiles($profiles)
     {
-        $cp = $this->ul->getUser()->getCurrentProfile();
-        usort($ps, function ($e1, $e2) use ($cp) {
-            if ($cp === $e1) {
-                return  -1;
+        $currentProfile = $this->userLoader->getUser()->getCurrentProfile();
+        usort($profiles, function ($e1, $e2) use ($currentProfile) {
+            if ($currentProfile === $e1) {
+                return -1;
             }
 
-            if ($cp === $e2) {
-                return  1;
+            if ($currentProfile === $e2) {
+                return 1;
             }
 
             return $this->addTimeSorter($e1, $e2);
         });
 
-        return $ps;
+        return $profiles;
     }
 
     public function fillIp($ip)
     {
         if ($ip->getCity() && !$ip->getContinent()) {
             $ip->setIp($ip->getIp());
-            $this->em->flush();
+            $this->entityManager->flush();
         }
     }
 
@@ -113,15 +103,15 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
         return addTimeSorter($e1, $e2);
     }
 
-    public function sortTeachers($ts)
+    public function sortTeachers($teachers)
     {
-        $u = $this->ul->getUser();
-        usort($ts, function ($e1, $e2) use ($u) {
-            if ($u->isUserTeacher($e1)) {
+        $user = $this->userLoader->getUser();
+        usort($teachers, function ($e1, $e2) use ($user) {
+            if ($user->isUserTeacher($e1)) {
                 return -1;
             }
 
-            if ($u->isUserTeacher($e2)) {
+            if ($user->isUserTeacher($e2)) {
                 return 1;
             }
 
@@ -135,12 +125,12 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
             return $this->addTimeSorter($e1, $e2);
         });
 
-        return $ts;
+        return $teachers;
     }
 
-    public function sortStudents($st)
+    public function sortStudents($students)
     {
-        usort($st, function ($e1, $e2) {
+        usort($students, function ($e1, $e2) {
             $a1 = $e1->getAttempts()->last();
             $a2 = $e2->getAttempts()->last();
 
@@ -155,6 +145,6 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
             return -1 * addTimeSorter($a1, $a2);
         });
 
-        return $st;
+        return $students;
     }
 }

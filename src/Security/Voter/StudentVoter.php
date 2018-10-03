@@ -2,7 +2,7 @@
 
 namespace App\Security\Voter;
 
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use App\Service\AuthChecker;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use App\Entity\User;
@@ -11,13 +11,13 @@ use App\Service\UserLoader;
 class StudentVoter extends Voter
 {
     use BaseTrait;
-    private $ul;
-    private $ch;
+    private $userLoader;
+    private $authChecker;
 
-    public function __construct(UserLoader $ul, AuthorizationCheckerInterface $ch)
+    public function __construct(UserLoader $userLoader, AuthChecker $authChecker)
     {
-        $this->ul = $ul;
-        $this->ch = $ch;
+        $this->userLoader = $userLoader;
+        $this->authChecker = $authChecker;
     }
 
     protected function supports($attribute, $subject)
@@ -27,13 +27,12 @@ class StudentVoter extends Voter
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
     {
-        //if ($this->ch->isGranted("ROLE_SUPER_ADMIN")) return true;
         return $this->checkRight($attribute, $subject, $token);
     }
 
     private function canShowAttempts()
     {
-        return $this->subj->isUserTeacher($this->ul->getUser());
+        return $this->subject->isUserTeacher($this->userLoader->getUser());
     }
 
     private function canShowExamples()

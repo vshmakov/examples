@@ -2,19 +2,23 @@
 
 namespace App\Service;
 
-use   Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class Router
 {
-    private $r;
+    private $urlGenerator;
 
-    public function __construct(UrlGeneratorInterface $r)
+    public function __construct(UrlGeneratorInterface $urlGenerator)
     {
-        $this->r = $r;
+        $this->urlGenerator = $urlGenerator;
     }
 
-    public function link($r, $p, $t)
+    public function link($routeName, $parameters, $title)
     {
-        return sprintf('<a href="%s">%s</a>', $this->r->generate($r, $p), $t);
+        return sprintf(
+            '<a href="%s">%s</a>',
+            $this->urlGenerator->generate($routeName, $parameters),
+            $title
+        );
     }
 }

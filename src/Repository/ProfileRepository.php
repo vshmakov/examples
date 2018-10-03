@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Profile;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use App\Service\UserLoader;
@@ -10,107 +11,85 @@ use App\Service\UserLoader;
 class ProfileRepository extends ServiceEntityRepository
 {
     use BaseTrait;
-    private $ul;
+    private $userLoader;
 
-    public function __construct(RegistryInterface $registry, UserLoader $ul)
+    public function __construct(RegistryInterface $registry, UserLoader $userLoader)
     {
         parent::__construct($registry, Profile::class);
-        $this->ul = $ul;
+        $this->userLoader = $userLoader;
     }
 
-    public function findOneByAuthor($u)
+    public function findOneByAuthor(User $user)
     {
-        return $this->v(
-    $this->q('select p from App:Profile p
-where p.author = :u
-')->setParameter('u', $u)
-);
+        return $this->getValue(
+            $this->createQuery('select p from App:Profile p
+where p.author = :u')
+                ->setParameter('u', $user)
+        );
     }
 
-    public function findOneByUser($u)
+    public function findOneByUser(User $user)
     {
-        return $this->v(
-    $this->q('select p from App:Profile p
+        return $this->getValue(
+            $this->createQuery('select p from App:Profile p
 join p.users u
 where u = :u
-')->setParameter('u', $u)
-);
+')->setParameter('u', $user)
+        );
     }
 
     public function findOnePublic()
     {
-        return $this->v(
-    $this->q('select p from App:Profile p
+        return $this->getValue(
+            $this->createQuery('select p from App:Profile p
 where p.isPublic = true
 ')
-);
+        );
     }
 
     public function findByCurrentAuthor()
     {
-        return $this->findByAuthor($this->ul->getUser());
+        return $this->findByAuthor($this->userLoader->getUser());
     }
 
-    public function getTitle($p)
+    public function getTitle(Profile $profile)
     {
-        return $p->getDescription() ?: 'Профиль №'.$this->getNumber($p);
+        return $profile->getDescription() ?: 'Профиль №'.$this->getNumber($profile);
     }
 
     public function countByCurrentAuthor()
     {
-        return $this->count(['author' => $this->ul->getUser()]);
+        return $this->count(['author' => $this->userLoader->getUser()]);
     }
 
-    public function getNumber($p)
+    public function getNumber(Profile $profile)
     {
-        return ($p->getId()) ? $this->v(
-    $this->q('select count(p) from App:Profile p
+        return ($profile->getId()) ? $this->getValue(
+            $this->createQuery('select count(p) from App:Profile p
 where p.author =:a and p.id <= :id')
-->setParameters(['a' => $p->getAuthor(), 'id' => $p->getId()])
-) : $this->countByCurrentAuthor() + 1;
+                ->setParameters([
+                    'a' => $profile->getAuthor(),
+                    'id' => $p->getId(),
+                ])
+        ) : $this->countByCurrentAuthor() + 1;
     }
 
     public function getNewByCurrentUser()
     {
-        $p = (new Profile());
+        $profile = (new Profile());
 
-        return $p->SetDescription($this->getTitle($p))
-->setAuthor($this->ul->getUser());
-    }
-
-    public function getCopyingDescriptionByCurrentUser($p)
-    {
-        $i = 0;
-
-        while (true) {
-            $d = $p->getDescription();
-
-            if ($i) {
-                $d .= " ($i)";
-            }
-            $c = $this->v(
-    $this->q('select count(p) from App:Profile p
-where p.description = :d and p.author = :a')
-->setParameters(['d' => $d, 'a' => $this->ul->getUser()])
-);
-
-            if (!$c) {
-                break;
-            }
-            ++$i;
-        }
-
-        return $d;
+        return $profile->SetDescription($this->getTitle($profile))
+            ->setAuthor($this->userLoader->getUser());
     }
 
     public function findByCurrentUserTeacher()
     {
-        $u = $this->ul->getUser();
+        $user = $this->userLoader->getUser();
 
-        if (!$u->hasTeacher()) {
+        if (!$user->hasTeacher()) {
             return [];
         }
 
-        return $this->findByAuthor($u->getTeacher());
+        return $this->findByAuthor($user->getTeacher());
     }
 }

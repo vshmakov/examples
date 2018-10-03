@@ -2,8 +2,6 @@
 
 namespace App\Service;
 
-use Goutte\Client;
-
 class IpInformer
 {
     public static function getInfoByIp($ip)
@@ -16,25 +14,18 @@ class IpInformer
                 $json = file_get_contents('http://api.db-ip.com/v2/free/'.urlencode($ip));
             }
 
-            $an = $isIp ? json_decode($json, true) : ['errorCode' => 'IsNotIp'];
-            $r = [];
+            $answer = $isIp ? json_decode($json, true) : ['errorCode' => 'IsNotIp'];
+            $info = [];
 
-            foreach (getArrByStr('errorCode ipAddress continentCode continentName countryCode countryName stateProv city') as $k) {
-                $r[$k] = $an[$k] ?? null;
+            foreach (arr('errorCode ipAddress continentCode continentName countryCode countryName stateProv city') as $property) {
+                $info[$property] = $answer[$property] ?? null;
             }
 
-            $r['error'] = (bool) $r['errorCode'];
-            $ips[$ip] = $r + (array) $an;
+            $info['error'] = (bool) $info['errorCode'];
+            $ips[$ip] = $info + (array) $answer;
         }
 
         return $ips[$ip];
-    }
-
-    private static function getClient()
-    {
-        static $c;
-
-        return $c ?? $c = new Client();
     }
 
     public static function isIp($ip)

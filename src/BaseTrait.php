@@ -6,11 +6,11 @@ trait BaseTrait
 {
     private function dt($dt)
     {
-        return DT::createFromDT($dt);
+        return \DT::createFromDT($dt);
     }
 
-    private function dts($s)
+    private function dts($seconds)
     {
-        return DT::createFromTimestamp($s);
+        return \DT::createFromTimestamp($seconds);
     }
 }

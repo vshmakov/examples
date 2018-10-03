@@ -55,11 +55,16 @@ function getArrByKeies($arr, $ka)
     return $res;
 }
 
-function getArrByStr($s)
+function getArrByStr($string)
 {
-    $a = explode(' ', $s);
+    return arr($string);
+}
 
-    return $a;
+function arr(string $string): array
+{
+    $array = explode(' ', $string);
+
+    return $array;
 }
 
 function getMethodName($s, $p = '')

@@ -47,13 +47,13 @@
         "sort-packages": true
     },
     "autoload": {
-"files": [
-"lib/constants.php",
-"lib/functions.php"
-],
+        "files": [
+            "lib/constants.php",
+            "lib/functions.php"
+        ],
         "psr-0": {
-"DT": "lib/src/"
-},
+            "DT": "lib/src/"
+        },
         "psr-4": {
             "App\\": "src/"
         }

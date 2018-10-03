@@ -9,16 +9,16 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ResettingSubscriber implements EventSubscriberInterface
 {
-    private $ug;
+    private $uurlGenerator;
 
-    public function __construct(UrlGeneratorInterface $ug)
+    public function __construct(UrlGeneratorInterface $uurlGenerator)
     {
-        $this->ug = $ug;
+        $this->uurlGenerator = $uurlGenerator;
     }
 
     public function onFosUserResettingResetSuccess(FormEvent $event)
     {
-        $url = $this->ug->generate('homepage');
+        $url = $this->uurlGenerator->generate('homepage');
         $event->setResponse(new RedirectResponse($url));
     }
 

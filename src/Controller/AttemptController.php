@@ -5,83 +5,76 @@ namespace App\Controller;
 use App\Form\ProfileType;
 use App\Repository\ProfileRepository;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Doctrine\ORM\EntityManagerInterface as EM;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Attempt;
-use App\Repository\AttemptRepository as AttR;
-use App\Repository\ExampleRepository as ExR;
+use App\Repository\AttemptRepository;
+use App\Repository\ExampleRepository;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 /**
  * @Route("/attempt")
  */
-class AttemptController extends MainController
+class AttemptController extends Controller
 {
-    private $attR;
-
-    public function __construct(AttR $attR)
-    {
-        $this->attR = $attR;
-    }
+    use BaseTrait;
 
     /**
      * @Route("/", name="attempt_index")
      */
-    public function index(AttR $r)
+    public function index(AttemptRepository $attemptRepository)
     {
         return $this->render('attempt/index.html.twig', [
-            'jsParams' => [
-                'api_attempt_index_table' => $this->generateUrl('api_attempt'),
-            ],
-            'attempts' => $r->findAllByCurrentUser(),
-            'attR' => $r,
+            'attempts' => $attemptRepository->findAllByCurrentUser(),
         ]);
     }
 
     /**
      *@Route("/{id}/show", name="attempt_show", requirements={"id": "\d+"})
      */
-    public function show(Attempt $att, ExR $exR, AttR $attR)
+    public function show(Attempt $attempt, ExampleRepository $exampleRepository, AttemptRepository $attemptRepository)
     {
-        $this->denyAccessUnlessGranted('VIEW', $att);
+        $this->denyAccessUnlessGranted('VIEW', $attempt);
 
         return $this->render('attempt/show.html.twig', [
-            'att' => $att->setER($attR),
-            'examples' => $exR->findByAttempt($att),
-            'exR' => $exR,
+            'att' => $attempt->setEntityRepository($attemptRepository),
+            'examples' => $exampleRepository->findByAttempt($attempt),
+            'exR' => $exampleRepository,
         ]);
     }
 
     /**
      *@Route("/{id}", name="attempt_solve", requirements={"id": "\d+"})
      */
-    public function solve(Attempt $att, ExR $exR, AttR $attR, \Symfony\Component\HttpFoundation\Session\Session $s)
+    public function solve(Attempt $attempt, ExampleRepository $exampleRepository, AttemptRepository $attemptRepository)
     {
-        if (!$this->isGranted('SOLVE', $att)) {
-            if ($this->isGranted('VIEW', $att)) {
-                return $this->redirectToRoute('attempt_show', ['id' => $att->getId()]);
+        if (!$this->isGranted('SOLVE', $attempt)) {
+            if ($this->isGranted('VIEW', $attempt)) {
+                return $this->redirectToRoute('attempt_show', ['id' => $attempt->getId()]);
             } else {
                 throw new AccessDeniedException();
             }
         }
-        $exR->findLastUnansweredByAttemptOrGetNew($att);
+
+        $exampleRepository->findLastUnansweredByAttemptOrGetNew($attempt);
 
         return $this->render('attempt/solve.html.twig', [
             'jsParams' => [
-                'attData' => $att->setER($attR)->getData(),
-                'attempt_answer' => $this->generateUrl('attempt_answer', ['id' => $att->getId()]),
+                'attData' => $attempt->setEntityRepository($attemptRepository)->getData(),
+                'attempt_answer' => $this->generateUrl('attempt_answer', ['id' => $attempt->getId()]),
             ],
-            'att' => $att,
+            'att' => $attempt,
         ]);
     }
 
     /**
      *@Route("/last", name="attempt_last")
      */
-    public function last(AttR $attR)
+    public function last(AttemptRepository $attemptRepository)
     {
-        if ($att = $attR->findLastActualByCurrentUser()) {
-            return $this->redirectToRoute('attempt_solve', ['id' => $att->getId()]);
+        if ($attempt = $attemptRepository->findLastActualByCurrentUser()) {
+            return $this->redirectToRoute('attempt_solve', ['id' => $attempt->getId()]);
         }
 
         return $this->redirectToRoute('attempt_index');
@@ -90,58 +83,55 @@ class AttemptController extends MainController
     /**
      *@Route("/new", name="attempt_new")
      */
-    public function new(AttR $attR)
+    public function new(AttemptRepository $attemptRepository)
     {
-        return $this->redirectToRoute('attempt_solve', ['id' => $attR->getNewByCurrentUser()->getId()]);
+        return $this->redirectToRoute('attempt_solve', [
+            'id' => $attemptRepository->getNewByCurrentUser()->getId(),
+        ]);
     }
 
     /**
      *@Route("/{id}/answer", name="attempt_answer", methods="POST")
      */
-    public function answer(Attempt $att, Request $request, ExR $exR, EM $em, AttR $attR)
+    public function answer(Attempt $attempt, Request $request, ExampleRepository $exampleRepository, EntityManagerInterface $entityManager, AttemptRepository $attemptRepository)
     {
-        if (!$this->isGranted('ANSWER', $att)) {
+        if (!$this->isGranted('ANSWER', $attempt)) {
             return $this->json(['finish' => true]);
         }
 
-        $ex = $exR->findLastUnansweredByAttempt($att);
-        $an = (float) $request->request->get('answer');
-        $ex->setAnswer($an);
-        $em->flush();
+        $example = $exampleRepository->findLastUnansweredByAttempt($attempt);
+        $answer = (float) $request->request->get('answer');
+        $example->setAnswer($answer);
+        $entityManager->flush();
 
-        $finish = !$this->isGranted('SOLVE', $att);
+        $finish = !$this->isGranted('SOLVE', $attempt);
 
         if (!$finish) {
-            $exR->getNew($att);
+            $exampleRepository->getNew($attempt);
         }
 
         return $this->json([
-            'isRight' => $ex->isRight(),
+            'isRight' => $example->isRight(),
             'finish' => $finish,
-            'attData' => $att->setER($attR)->getData(),
+            'attData' => $attempt->setEntityRepository($attemptRepository)->getData(),
         ]);
-    }
-
-    private function getDataByAtt($att)
-    {
-        return [];
     }
 
     /**
      *@Route("/{id}/profile", name="attempt_profile")
      */
-    public function profile(Attempt $att, ProfileRepository $pR, AttR $attR)
+    public function profile(Attempt $attempt, ProfileRepository $profileRepository, AttemptRepository $attemptRepository)
     {
-        $this->denyAccessUnlessGranted('VIEW', $att);
-        $p = $att->getSettings()->setER($pR);
+        $this->denyAccessUnlessGranted('VIEW', $attempt);
+        $profile = $attempt->getSettings()->setEntityRepository($profileRepository);
 
         return $this->render('attempt/profile.html.twig', [
             'jsParams' => [
                 'canEdit' => false,
             ],
-            'profile' => $p,
-            'form' => $this->createForm(ProfileType::class, $p)->createView(),
-            'att' => $att->setER($attR),
+            'profile' => $profile,
+            'form' => $this->createForm(ProfileType::class, $profile)->createView(),
+            'att' => $attempt->setEntityRepository($attemptRepository),
         ]);
     }
 }

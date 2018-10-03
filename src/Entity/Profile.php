@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Profile
 {
-    use DTTrait;
+    use BaseTrait;
 
     /**
      * @ORM\Id()
@@ -204,8 +204,8 @@ class Profile
     public function __construct()
     {
         $this->users = new ArrayCollection();
-        $this->initAddTime();
-        $this->normData();
+        $this->addTime = new \DateTime();
+        $this->normalize();
     }
 
     public function getId()
@@ -352,7 +352,7 @@ class Profile
         return $this;
     }
 
-    private function normPerc()
+    private function normalizePercents()
     {
         $pKeies = ['addPerc', 'subPerc', 'multPerc', 'divPerc'];
         $p = [];
@@ -413,9 +413,9 @@ class Profile
 
     public function getData()
     {
-        $this->normData();
+        $this->normalize();
         $d = [];
-        $f = getArrByStr('duration examplesCount addFMin addFMax addSMin addSMax addMin addMax subFMin subFMax subSMin subSMax subMin subMax multFMin multFMax multSMin multSMax multMin multMax divFMin divFMax divSMin divSMax divMin divMax addPerc subPerc multPerc divPerc');
+        $f = arr('duration examplesCount addFMin addFMax addSMin addSMax addMin addMax subFMin subFMax subSMin subSMax subMin subMax multFMin multFMax multSMin multSMax multMin multMax divFMin divFMax divSMin divSMax divMin divMax addPerc subPerc multPerc divPerc');
 
         foreach ($this as $k => $v) {
             if (in_array($k, $f)) {
@@ -448,12 +448,17 @@ class Profile
         $this->id = null;
         $this->author = null;
         $this->isPublic = false;
-        $this->initAddTime();
+        $this->addTime = new \DateTime();
     }
 
     public function normData()
     {
-        $this->normPerc();
+        return $this->normalize();
+    }
+
+    public function normalize()
+    {
+        $this->normalizePercents();
 
         foreach (['add', 'sub', 'mult', 'div'] as $k) {
             foreach (['F', 'S'] as $n) {
@@ -496,6 +501,18 @@ class Profile
                 }
             }
         }
+
+        return $this;
+    }
+
+    public function __get($property)
+    {
+        return $this->$property;
+    }
+
+    public function __set($property, $value)
+    {
+        $this->$property = $value;
 
         return $this;
     }

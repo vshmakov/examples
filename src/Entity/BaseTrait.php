@@ -2,62 +2,40 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Inflector\Inflector;
+
 trait BaseTrait
 {
     use \App\BaseTrait;
 
-    private $er;
+    private $entityRepository;
 
-    public function setER($er)
+    public function setER($entityRepository)
     {
-        $this->er = $er;
+        return $this->setEntityRepository($entityRepository);
+    }
+
+    public function setEntityRepository($entityRepository)
+    {
+        $this->entityRepository = $entityRepository;
 
         return $this;
     }
 
-    public function __call($v, $p = [])
+    public function __call($method, $params = [])
     {
-        if ($gs = $this->getSetter($v, $p)) {
-            return $gs['ret'];
-        }
-        $m = entityGetter($v);
-        $er = $this->er;
+        $entityRepository = $this->entityRepository;
 
-        if (!method_exists($er, $m)) {
-            throw new \Exception(sprintf('Entity %s and %s repository does not contain %s getter', self::class, is_object($er) ? get_class($er) : 'empty', $v));
+        if (!preg_match('#^get#', $method)) {
+            $method = "get_$method";
         }
 
-        return $this->er->$m($this);
-    }
+        $getter = Inflector::camelize($method);
 
-    private function getSetter($method, $p)
-    {
-        foreach (['get', 'set'] as $action) {
-            if (preg_match("#^$action(.+)$#", $method, $arr)) {
-                $v = lcfirst($arr[1]);
-
-                if (isset($this->$v)) {
-                    if (!$g = 'get' == $action) {
-                        $this->$v = $p[0];
-                    }
-
-                    return ['ret' => $g ? $this->$v : $this];
-                }
-            }
+        if (!$entityRepository or !method_exists($entityRepository, $getter)) {
+            throw new \Exception(sprintf('Entity %s and %s repository does not contain %s getter', self::class, $entityRepository ? get_class($entityRepository) : 'empty', $method));
         }
 
-        return false;
-    }
-
-    public function __get($v)
-    {
-        return $this->$v;
-    }
-
-    public function __set($v, $p)
-    {
-        $this->$v = $p;
-
-        return $this;
+        return $entityRepository->$getter($this);
     }
 }

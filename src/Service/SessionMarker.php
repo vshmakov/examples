@@ -7,34 +7,27 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class SessionMarker
 {
-    private $s;
-    private $req;
+    private $session;
+    private $request;
 
-    public function __construct(SessionInterface $s, RequestStack $rs)
+    public function __construct(SessionInterface $session, RequestStack $requestStack)
     {
-        $this->s = $s;
-        $this->req = $rs->getMasterRequest();
+        $this->session = $session;
+        $this->request = $requestStack->getMasterRequest();
     }
 
     public function getKey()
     {
-        $val = $this->req ? $this->req->getClientIp() : $this->getRand();
-
-        $s = $this->s;
+        $value = $this->request ? $this->request->getClientIp() : '';
+        $session = $this->session;
         $key = 'VISIT_KEY';
 
-        if (!$s->has($key)) {
-            $s->set($key, $val);
+        if (!$session->has($key)) {
+            $session->set($key, $value);
         }
-        $sid = $s->get($key);
+
+        $sid = $session->get($key);
 
         return $sid;
-    }
-
-    private function getRand()
-    {
-        $rand = substr(base64_encode(random_bytes(32)), 0, 32);
-
-        return $rand;
     }
 }

@@ -18,6 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
  */
 class TeacherController extends Controller
 {
+use BaseTrait;
     private $currentUser;
 
     public function __construct(UserRepository $userRepository, UserLoader $userLoader)
@@ -37,7 +38,7 @@ class TeacherController extends Controller
     }
 
     /**
-     *@Route("/appoint/{id}", name="teacher_appoint")
+     *@Route("/{id}/appoint", name="teacher_appoint")
      */
     public function appoint(User $teacher, ValidatorInterface $validator, Request $request, SessionInterface $session)
     {

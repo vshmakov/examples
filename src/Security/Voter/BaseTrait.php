@@ -7,7 +7,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 trait BaseTrait
 {
-    private $subject;
+    protected $subject;
 
     protected function checkRight($attribute, $subject, TokenInterface $token)
     {
@@ -19,6 +19,41 @@ trait BaseTrait
         }
 
         return $this->$handlerName();
+    }
+
+    protected function hasHandler($attribute)
+    {
+        return method_exists($this, $this->getHandlerName($attribute));
+    }
+
+    protected function supportsArr(string $attribute, array $subjects) : bool
+    {
+        return array_reduce(
+            $subjects,
+            function ($supports, $subject) use ($attribute) {
+                if (!$supports) {
+                    return false;
+                }
+
+                return $this->supports($attribute, $subject);
+            },
+            !empty($subjects)
+        );
+    }
+
+    protected function voteOnArr($attribute, array $subjects, TokenInterface $token)
+    {
+        return array_reduce(
+            $subjects,
+            function ($vote, $subject) use ($attribute, $token) {
+                if (!$vote) {
+                    return false;
+                }
+
+                return $this->voteOnAttribute($attribute, $subject, $token);
+            },
+            !empty($subjects)
+        );
     }
 
     private function hasPrefix($prefix, $attribute)
@@ -39,40 +74,5 @@ trait BaseTrait
         }
 
         return Inflector::camelize($prefix . '_' . $attribute);
-    }
-
-    private function hasHandler($attribute)
-    {
-        return method_exists($this, $this->getHandlerName($attribute));
-    }
-
-    private function supportsArr(string $attribute, array $subjects) : bool
-    {
-        return array_reduce(
-            $subjects,
-            function ($supports) use ($attribute) {
-                if (!$supports) {
-                    return false;
-                }
-
-                return $this->supports($attribute, $subject);
-            },
-            !empty($subjects)
-        );
-    }
-
-    private function voteOnArr($attribute, array $subjects, TokenInterface $token)
-    {
-        return array_reduce(
-            $subjects,
-            function ($vote, $subject) use ($attribute, $token) {
-                if (!$vote) {
-                    return false;
-                }
-
-                return $this->voteOnAttribute($attribute, $subject, $token);
-            },
-            !empty($subjects)
-        );
     }
 }

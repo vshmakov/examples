@@ -11,30 +11,28 @@ use App\Service\UserLoader;
 class UserVoter extends Voter
 {
     use BaseTrait;
-    private $ul;
+    private $userLoader;
     private $authChecker;
 
-    public function __construct(UserLoader $ul, AuthChecker $authChecker)
+    public function __construct(UserLoader $userLoader, AuthChecker $authChecker)
     {
-        $this->ul = $ul;
+        $this->userLoader = $userLoader;
         $this->authChecker = $authChecker;
     }
 
     protected function supports($attribute, $subject)
     {
-        return             ($subject instanceof User or null === $subject) && $this->hasHandler($attribute);
+        return ($subject instanceof User or null === $subject) && $this->hasHandler($attribute);
     }
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
     {
-        return $this->checkRight($attribute, $subject ?? $this->ul->getUser(), $token);
+        return $this->checkRight($attribute, $subject ?? $this->userLoader->getUser(), $token);
     }
 
     private function isAccountPaid()
     {
-        $u = $this->subject;
-
-        return !$this->ul->isGuest();
+        return !$this->userLoader->isGuest();
     }
 
     private function hasPrivAppointProfiles()

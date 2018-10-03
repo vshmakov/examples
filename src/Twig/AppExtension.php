@@ -54,7 +54,7 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
         ]);
     }
 
-    public function getAddTimeNumber($entity, array $entityList)
+    public function addTimeNumber($entity, array $entityList)
     {
         $addTime = $entity->getAddTime();
 
@@ -108,7 +108,7 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
     public function sortTeachers($teachers)
     {
         $user = $this->userLoader->getUser();
-        usort($ts, function ($e1, $e2) use ($user) {
+        usort($teachers, function ($e1, $e2) use ($user) {
             if ($user->isUserTeacher($e1)) {
                 return -1;
             }

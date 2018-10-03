@@ -16,7 +16,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 class StudentController extends Controller
 {
     use BaseTrait;
-
     private $currentUser;
 
     public function __construct(UserRepository $userRepository, UserLoader $userLoader)

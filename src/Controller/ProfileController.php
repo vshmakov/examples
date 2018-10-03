@@ -17,6 +17,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
  */
 class ProfileController extends Controller
 {
+use BaseTrait;
+
     /**
      * @Route("/", name="profile_index", methods="GET")
      */

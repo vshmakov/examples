@@ -59,7 +59,7 @@ class Session
     public function __construct()
     {
         $this->attempts = new ArrayCollection();
-        $this->initAddTime();
+        $this->addTime=new \DateTime;
         $this->lastTime = new \DateTime();
         $this->visits = new ArrayCollection();
     }

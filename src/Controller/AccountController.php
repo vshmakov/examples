@@ -86,7 +86,7 @@ class AccountController extends Controller
             return $this->redirectToRoute('account_index');
         }
 
-        $session->getFlashBag()->set('missResponseEvent', true);
+        $this->missResponseEvent();
 
         return $this->render('account/edit.html.twig', [
             'form' => $form->createView(),

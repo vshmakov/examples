@@ -14,6 +14,11 @@ class UserType extends AbstractType
         $builder
 ->add('username')
 ->add('email')
+->add('firstName')
+->add('fatherName')
+->add('lastName')
+->add('network')
+->add('networkId')
 ->add('roles')
 ->add('money')
 ->add('limitTime')
@@ -27,6 +32,10 @@ class UserType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => User::class,
+            'validation_groups' => [
+                'abc',
+                //'admin'
+            ],
         ]);
     }
 }

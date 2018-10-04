@@ -27,7 +27,7 @@ class AccountType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => User::class,
-            'validation_groups' => ['account'],
+            'validation_groups' => ['Default', 'account'],
         ]);
     }
 }

@@ -67,8 +67,10 @@ class TeacherController extends Controller
             ]);
         }
 
-        foreach ($errors as $error) {
-            $form->addError(new FormError($error->getMessage()));
+        if (!$form->isSubmitted()) {
+            foreach ($errors as $error) {
+                $form->addError(new FormError($error->getMessage()));
+            }
         }
 
         $session->getFlashBag()->set('missResponseEvent', true);

@@ -18,6 +18,8 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class UserController extends Controller
 {
+    use BaseTrait;
+
     /**
      * @Route("/", name="user_index", methods="GET")
      */
@@ -68,10 +70,14 @@ class UserController extends Controller
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $this->getDoctrine()->getManager()->flush();
 
-            return $this->redirectToRoute('user_edit', ['id' => $user->getId()]);
+                return $this->redirectToRoute('user_edit', ['id' => $user->getId()]);
+            }
+
+            $this->missResponseEvent();
         }
 
         return $this->render('user/edit.html.twig', [

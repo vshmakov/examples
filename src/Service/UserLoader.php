@@ -10,15 +10,13 @@ class UserLoader
 {
     private $user;
     private $userRepository;
-    private $em;
+    private $tokenStorage;
 
     public function __construct(UserRepository $userRepository, TokenStorageInterface $tokenStorage)
     {
         $this->userRepository = $userRepository;
-
-        if ($token = $tokenStorage->getToken()) {
-            $this->user = $token->getUser();
-        }
+        $this->tokenStorage = $tokenStorage;
+        $this->user = $this->getUserFromToken();
     }
 
     public function getUser()
@@ -34,5 +32,14 @@ class UserLoader
     public function getGuest()
     {
         return $this->userRepository->getGuest();
+    }
+
+    private function getUserFromToken()
+    {
+        if ($token = $this->tokenStorage->getToken()) {
+            return  $token->getUser();
+        }
+
+        return null;
     }
 }

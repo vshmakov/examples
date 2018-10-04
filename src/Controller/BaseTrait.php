@@ -8,4 +8,9 @@ trait BaseTrait
     {
         return $this->getDoctrine()->getManager();
     }
+
+    protected function missResponseEvent()
+    {
+        $this->addFlash('missResponseEvent', 'yes');
+    }
 }

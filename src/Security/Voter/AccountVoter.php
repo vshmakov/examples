@@ -8,7 +8,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use App\Entity\User;
 use App\Service\UserLoader;
 
-class UserVoter extends Voter
+class AccountVoter extends Voter
 {
     use BaseTrait;
     private $userLoader;
@@ -22,27 +22,18 @@ class UserVoter extends Voter
 
     protected function supports($attribute, $subject)
     {
-        return ($subject instanceof User or null === $subject) && $this->hasHandler($attribute);
+        return $subject instanceof User && $subject->isStudent() && $this->hasHandler($attribute);
     }
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
     {
-        return $this->checkRight($attribute, $subject ?? $this->userLoader->getUser(), $token);
+        return $this->checkRight($attribute, $subject, $token);
     }
 
-    private function isAccountPaid()
+    private function canEditAccount()
     {
-        return !$this->userLoader->isGuest();
-    }
+        $authChecker = $this->authChecker;
 
-    private function hasPrivAppointProfiles()
-    {
-        return $this->authChecker->isGranted('ROLE_USER', $this->subject);
+        return $authChecker->isGranted('ROLE_USER') && !$authChecker->isGranted('ROLE_CHILD');
     }
-
-    private function canCreateChildren()
-    {
-return !$this->authChecker->isGranted('ROLE_CHILD');
-    }
-    
 }

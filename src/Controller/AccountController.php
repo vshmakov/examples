@@ -48,7 +48,7 @@ class AccountController extends Controller
      */
     public function pay(Request $request)
     {
-        $month = (int) $request->request->get('months');
+        $month = (int)$request->request->get('months');
         $user = $this->currentUser;
         $remaindMoney = $user->getMoney() - $month * PRICE;
 
@@ -65,7 +65,7 @@ class AccountController extends Controller
         }
 
         return $this->render('account/pay.html.twig', [
-            'm' => $month ?: '',
+            'm' => $month ? : '',
             'price' => PRICE,
         ]);
     }
@@ -75,13 +75,13 @@ class AccountController extends Controller
      */
     public function edit(Request $request, SessionInterface $session)
     {
-        $this->denyAccessIfGranted('ROLE_CHILD', null, 'Вы не можете редактировать профиль');
+        $this->denyAccessUnlessGranted('EDIT_ACCOUNT');
         $user = $this->currentUser;
         $user->cleanSocialUsername();
         $form = $this->createForm(AccountType::class, $user);
-       
 
-        
+
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

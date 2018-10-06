@@ -42,7 +42,7 @@ class TeacherController extends Controller
      */
     public function appoint(User $teacher, ValidatorInterface $validator, Request $request, SessionInterface $session)
     {
-        $this->denyAccessIfGranted('ROLE_CHILD', null, 'Вы не можете выбирать учителя');
+        $this->denyAccessUnlessGranted('APPOINT_TEACHER', $teacher);
         $currentUser = $this->currentUser;
         $errors = $validator->validate($currentUser, null, ['account']);
 
@@ -86,7 +86,7 @@ class TeacherController extends Controller
      */
     public function disappoint()
     {
-        $this->denyAccessIfGranted('ROLE_CHILD', null, 'Вы не можете выбирать учителя');
+        $this->denyAccessUnlessGranted('DISAPPOINT_TEACHER');
         $this->currentUser->setTeacher(null);
         $this->getEntityManager()->flush();
 

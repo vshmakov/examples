@@ -30,8 +30,19 @@ class ChildVoter extends Voter
         return $this->checkRight($attribute, $subject, $token);
     }
 
-    private function canChildLogin()
+    private function canLoginAsChild()
     {
         return $this->subject->isParent($this->userLoader->getUser());
+    }
+
+    private function canEditChild()
+    {
+        return $this->canLoginAsChild()();
+    }
+
+    private function canCreateChild()
+    {
+        $authChecker = $this->authChecker;
+        return $authChecker->isGranted('ROLE_USER') && !$authChecker->isGranted('ROLE_CHILD');
     }
 }

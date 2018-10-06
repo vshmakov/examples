@@ -33,9 +33,15 @@
             <td>
                 <a href="{{path("student_attempts", {"id": student.id})}}">Посмотреть список попыток</a>
                 <a href="{{path("student_examples", {"id": student.id})}}">Посмотреть список примеров</a>
-            {% if is_granted("CHILD_LOGIN", student) %}
-            <a href="{{path("child_login", {"id": student.id})}}" role="button" onclick="confirm('Вы уверены, что хотите зарегистрироваться как {{ student.username }}?')">Войти как ученик</a>
-            {% endif %}
+
+                {% if is_granted('EDIT_CHILD', student) %}
+                <a href="{{path("child_edit", {"id": student.id })}}">Редактировать</a>
+                {% endif %}
+
+                {% if is_granted("LOGIN_AS_CHILD", student) %}
+                <a href="{{path("child_login", {"id": student.id})}}" role="button" onclick="confirm('Вы уверены, что хотите зарегистрироваться как {{ student.username }}?')">Войти
+                    как ученик</a>
+                {% endif %}
             </td>
         </tr>
         {% endfor %}

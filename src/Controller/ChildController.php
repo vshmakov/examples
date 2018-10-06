@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Form\StudentType;
+use App\Form\ChildType;
 use App\Repository\UserRepository;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\UserLoader;
@@ -25,17 +25,36 @@ class ChildController extends Controller
     }
 
     /**
+     *@Route("/{id}/edit", name="child_edit")
+     */
+    public function edit(User $child, Request $request)
+    {
+        $this->denyAccessUnlessGranted('EDIT_CHILD', $child);
+        $form = $this->createForm(ChildType::class, $child);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager = $this->getEntityManager();
+            $entityManager->flush();
+
+            return $this->redirectToRoute("student_index");
+        }
+
+        return $this->render("child/edit.html.twig", [
+            "form" => $form->createView()
+        ]);
+    }
+
+    /**
      *@Route("/new", name="child_new")
      */
     public function new(Request $request, UserRepository $userRepository)
     {
-        if ($this->isGranted('ROLE_CHILD')) {
-            $this->denyAccess("Вы не можете создавать учеников");
-        }
-
+        $this->denyAccessUnlessGranted('CREATE_CHILD');
         $currentUser = $this->currentUser;
         $child = $userRepository->getNew()
             ->setParent($currentUser)
+            ->setTeacher($currentUser)
             ->addRole('ROLE_CHILD');
 
         $i = 0;
@@ -45,7 +64,7 @@ class ChildController extends Controller
         } while ($userRepository->countByUsername($username));
 
         $child->setUsername($username);
-        $form = $this->createForm(StudentType::class, $child, ['validation_groups' => ['Default']])
+        $form = $this->createForm(ChildType::class, $child)
             ->remove('fatherName');
         $form->handleRequest($request);
         $entityManager = $this->getEntityManager();
@@ -67,7 +86,7 @@ class ChildController extends Controller
      */
     public function login(User $child)
     {
-        $this->denyAccessUnlessGranted('CHILD_LOGIN', $child);
+        $this->denyAccessUnlessGranted('LOGIN_AS_CHILD', $child);
         $this->addFlash('login', true);
 
         return $this->redirectToRoute('api_login', [

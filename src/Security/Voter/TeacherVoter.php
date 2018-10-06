@@ -34,12 +34,20 @@ class TeacherVoter extends Voter
     {
         $teacher = $this->subject;
 
-        return !$this->userLoader->isGuest()
+    return $this->canDisappointTeachers()
+            && !$this->userLoader->isGuest()
             && !$this->userLoader->getUser()->isUserTeacher($teacher);
     }
 
     private function canDisappoint()
     {
         return $this->userLoader->getUser()->isUserTeacher($this->subject);
+    }
+
+    private function canDisappointTeachers()
+    {
+        $authChecker = $this->authChecker;
+
+        return $authChecker->isGranted('ROLE_USER') && !$authChecker->isGranted('ROLE_CHILD');
     }
 }

@@ -9,17 +9,9 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
-use App\Repository\UserRepository;
 
 class LoginAuthenticator extends AbstractGuardAuthenticator
 {
-    private $userRepository;
-
-    public function __construct(UserRepository $userRepository)
-    {
-        $this->userRepository = $userRepository;
-    }
-
     public function supports(Request $request)
     {
         return $request->hasSession() && $request->getSession()->getFlashBag()->get('login');
@@ -34,7 +26,7 @@ class LoginAuthenticator extends AbstractGuardAuthenticator
 
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
-        return $this->userRepository->find($credentials['userId']);
+        return $userProvider->loadUserByUsername($credentials['userId']);
     }
 
     public function checkCredentials($credentials, UserInterface $user = null)
@@ -44,7 +36,7 @@ class LoginAuthenticator extends AbstractGuardAuthenticator
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
-                return new RedirectResponse('/login');
+        return new RedirectResponse('/login');
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)

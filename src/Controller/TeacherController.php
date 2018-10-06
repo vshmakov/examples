@@ -73,7 +73,7 @@ class TeacherController extends Controller
             }
         }
 
-        $session->getFlashBag()->set('missResponseEvent', true);
+        $this->missResponseEvent();
 
         return $this->render('teacher/edit.html.twig', [
             'form' => $form->createView(),

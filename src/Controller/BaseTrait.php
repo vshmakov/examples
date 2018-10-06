@@ -11,6 +11,6 @@ trait BaseTrait
 
     protected function missResponseEvent()
     {
-        $this->addFlash('missResponseEvent', 'yes');
+        $this->addFlash('missResponseEvent', true);
     }
 }

@@ -1,0 +1,12 @@
+{% extends "main.html.twig" %}
+
+{% block title "Создать ученика" %}
+
+{% block main %}
+<h1>Создать ученика</h1>
+{{ form_start(form) }}
+{{ form_widget(form) }}
+{{ form_end(form) }}
+
+<p><a href="{{path("student_index")}}">Вернуться к списку учеников</a></p>
+{% endblock %}

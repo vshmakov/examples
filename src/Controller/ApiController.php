@@ -8,6 +8,7 @@ use App\Repository\UserRepository;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use App\Entity\User;
 
 /**
  * @Route("/api")
@@ -65,5 +66,13 @@ class ApiController extends Controller
         return $this->redirectToRoute('api_ulogin_login', [
             'token' => $request->request->get('token'),
         ]);
+    }
+
+    /**
+     * @Route("{id}/login", name="api_login", methods="GET")
+     */
+    public function login(User $user)
+    {
+        throw new \Exception('api_login action must not be called');
     }
 }

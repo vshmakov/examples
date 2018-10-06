@@ -781,4 +781,9 @@ class User implements UserInterface, GroupableInterface
 
         return $this;
     }
+
+    public function isParent($parent) : bool
+    {
+        return $this->parent === $parent;
+    }
 }

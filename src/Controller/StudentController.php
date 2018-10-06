@@ -29,9 +29,12 @@ class StudentController extends Controller
      */
     public function index(UserRepository $userRepository)
     {
+        $currentUser = $this->currentUser;
+
         return $this->render('student/index.html.twig', [
-            'students' => $this->currentUser->getStudents()->getValues(),
-            'uR' => $userRepository,
+            'students' => $currentUser->getStudents()->getValues(),
+            'children' => $currentUser->getChildren()->getValues(),
+            'userRepository' => $userRepository,
         ]);
     }
 
@@ -60,4 +63,4 @@ class StudentController extends Controller
             'examples' => $exampleRepository->findByUser($student),
         ]);
     }
-}
+    }

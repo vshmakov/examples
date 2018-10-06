@@ -1,0 +1,44 @@
+{% macro index_table(title, students, userRepository) %}
+<h1>{{title}}</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>№</th>
+            <th>Фамилия / Имя</th>
+            <th>Логин</th>
+            <th>Время последней попытки</th>
+            <th>Количество завершенных попыток</th>
+            <th>Количество Правильно решенных примеров</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for number, student in sortStudents(students) %}
+        {%set student = student.setEntityRepository(userRepository)%}
+        <tr>
+            <td>{{number+1}}</td>
+            <td>
+                {{student.lastName}}
+                {{student.firstName}}
+            </td>
+            <td>{{student.username}}</td>
+            {%set attempt = student.attempts.last%}
+            <td>{{attempt ? attempt.addTime : "-"}}</td>
+            <td>
+                {{student.doneAttemptsCount}}</td>
+            <td>
+                {{student.solvedExamplesCount}}
+            </td>
+            <td>
+                <a href="{{path("student_attempts", {"id": student.id})}}">Посмотреть список попыток</a>
+                <a href="{{path("student_examples", {"id": student.id})}}">Посмотреть список примеров</a>
+            {% if is_granted("CHILD_LOGIN", student) %}
+            <a href="{{path("child_login", {"id": student.id})}}" role="button" onclick="confirm('Вы уверены, что хотите зарегистрироваться как {{ student.username }}?')">Войти как ученик</a>
+            {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endmacro %}

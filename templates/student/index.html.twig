@@ -1,55 +1,56 @@
-{%extends "main.html.twig"%}
+{% extends "main.html.twig" %}
 
-{%block title "Список учеников"%}
+{% block title %}
+Список учеников
+{% endblock %}
 
-{%block main%}
-<h1>Список учеников</h1>
-<table>
-	<thead>
-		<tr>
-			<th>№</th>
-			<th>Фамилия / Имя</th>
-			<th>Логин</th>
-			<th>Время последней попытки</th>
-			<th>Количество завершенных попыток</th>
-			<th>Количество Правильно решенных примеров</th>
-			<th>Действия</th>
-		</tr>
-	</thead>
-			<tbody>
-{%for num, s in sortStudents(students)%}
-{%set s=s.setER(uR)%}
-				<tr>
-					<td>{{num+1}}</td>
-					<td>{{s.lastName}} {{s.firstName}}</td>
-					<td>{{s.username}}</td>
-{%set a=s.attempts.last%}
-					<td>{{a ? a.addTime : "-"}}</td>
-					<td>				{{s.doneAttemptsCount}}</td>
-					<td>			{{s.solvedExamplesCount}}</td>
-					<td>
-					<a href="{{path("student_attempts", {"id": s.id})}}">Посмотреть список попыток</a>
-					<a href="{{path("student_examples", {"id": s.id})}}">Посмотреть список примеров</a>
-					</td>
-				</tr>
-{%endfor%}
-			</tbody>
-</table>
-{%endblock%}
+{% block main %}
+{% from "student/index_table.html.twig" import index_table as table %}
 
-{%block javascripts%}
-{{parent()}}
+{{ table("Список учеников", students, userRepository) }}
+
+{% if  children %} %}
+{{ table("Созданные ученики", children, userRepository) }}
+{% endif %}
+
+<p>
+<a href="{{path("child_new")}}" role="button" class="="btn">Создать нового ученика</a>
+</p>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
 <script src="/js/jquery.datatables.min.js"></script>
 <script>
-$("table").DataTable({
-pageLength: 50,
-//order: [1, "asc"],
-lengthMenu: [25, 50, 100, 250],
-language: {    
-"decimal":        "",    "emptyTable":     "Учеников пока нет",    "info":           "Показано с _START_ по _END_ из _TOTAL_ учеников",    "infoEmpty":      "Показано с _START_ по _END_ из _TOTAL_ учеников",   "infoFiltered":   "(Отфильтровано из _MAX_ учеников)",    "infoPostFix":    "",    "thousands":      ",",    "lengthMenu":     "Показать _MENU_ учеников на странице",    "loadingRecords": "Идёт загрузка...",    "search":         "Найти ученика:",    "zeroRecords":    "Соответствующих записей не найдено",    
-"paginate": {        "first":      "В начало",        "last":       "В конец",        "next":       "Вперед",        "previous":   "Назад"    },
-    "aria": {        "sortAscending":  ": Нажмите, чтобы отсортировать по возрастанию",        "sortDescending": ": Нажмите, чтобы отсортировать по убыванию"    }
-}
-});
+    $("table").DataTable({
+        pageLength: 50,
+        //order: [1, "asc"],
+        lengthMenu: [
+            25, 50, 100, 250
+        ],
+        language: {
+            "decimal": "",
+            "emptyTable": "Учеников пока нет",
+            "info": "Показано с _START_ по _END_ из _TOTAL_ учеников",
+            "infoEmpty": "Показано с _START_ по _END_ из _TOTAL_ учеников",
+            "infoFiltered": "(Отфильтровано из _MAX_ учеников)",
+            "infoPostFix": "",
+            "thousands": ",",
+            "lengthMenu": "Показать _MENU_ учеников на странице",
+            "loadingRecords": "Идёт загрузка...",
+            "search": "Найти ученика:",
+            "zeroRecords": "Соответствующих записей не найдено",
+            "paginate": {
+                "first": "В начало",
+                "last": "В конец",
+                "next": "Вперед",
+                "previous": "Назад"
+            },
+            "aria": {
+                "sortAscending": ": Нажмите, чтобы отсортировать по возрастанию",
+                "sortDescending": ": Нажмите, чтобы отсортировать по убыванию"
+            }
+        }
+    });
 </script>
-{%endblock%}
+{% endblock %}

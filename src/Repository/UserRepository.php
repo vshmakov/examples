@@ -118,8 +118,15 @@ where u = :u')
             return $user;
         }
 
+        $uniqUsername = $username;
+        $i = 1;
+        while ($this->countByUsername($uniqUsername)) {
+            $uniqUsername = sprintf('%s-%s', $uniqUsername, $i);
+            $i++;
+        }
+        
         $user = $this->getNew()
-            ->setUsername($username)
+            ->setUsername($uniqUsername)
             ->setIsSocial(true)
             ->setFirstName($first_name)
             ->setLastName($last_name)

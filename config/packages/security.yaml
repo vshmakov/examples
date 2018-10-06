@@ -8,24 +8,22 @@ security:
         ROLE_SUPER_ADMIN: ROLE_ADMIN
 
     providers:
-        ulogin:
+        login:
             entity:
                 class: App\Entity\User
-                property: username
+                property: id
         fos_userbundle:
             id: fos_user.user_provider.username_email
         in_memory: { memory: ~ }
 
     firewalls:
-
-        ulogin:
-            pattern: ^/api/ulogin/login
-            #stateless: true
+        login:
+            pattern: ^/api/login
             context: main
             guard:
-                provider: ulogin
+                provider: login
                 authenticators:
-                    - App\Security\UloginAuthenticator
+                    - App\Security\LoginAuthenticator
             logout:       true
             anonymous:    true
             remember_me:
@@ -33,7 +31,7 @@ security:
                 lifetime: 604800 # 1 week in seconds
                 path:     /
                 always_remember_me: true
-                user_provider: fos_userbundle
+                user_provider: login
 
         main:
             pattern: ^/

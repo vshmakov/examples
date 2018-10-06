@@ -97,7 +97,7 @@ where u = :u')
         return $user;
     }
 
-    private function getNew()
+    public function getNew()
     {
         return (new User())
             ->setEnabled(true);

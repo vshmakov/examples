@@ -30,7 +30,7 @@ class ChildController extends Controller
     public function new(Request $request, UserRepository $userRepository)
     {
         $currentUser = $this->currentUser;
-        $child = (new User)
+        $child = $userRepository->getNew()
             ->setParent($currentUser);
 
         $i = 0;
@@ -66,7 +66,7 @@ class ChildController extends Controller
         $this->addFlash('login', true);
 
         return $this->redirectToRoute('api_login', [
-            'id' => $child->getId()
+            'user_id' => $child->getId()
         ]);
     }
 }

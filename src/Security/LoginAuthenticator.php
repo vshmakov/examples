@@ -11,7 +11,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 use App\Repository\UserRepository;
 
-class UloginAuthenticator extends AbstractGuardAuthenticator
+class LoginAuthenticator extends AbstractGuardAuthenticator
 {
     private $userRepository;
 
@@ -22,47 +22,29 @@ class UloginAuthenticator extends AbstractGuardAuthenticator
 
     public function supports(Request $request)
     {
-        return 'api_ulogin_login' == $request->attributes->get('_route');
+        return $request->hasSession() && $request->getSession()->getFlashBag()->get('login');
     }
 
     public function getCredentials(Request $request)
     {
-        try {
-            $token = $request->request->get(
-                'token',
-                $request->query->get('token')
-            );
-            $json = file_get_contents(sprintf(
-                'http://ulogin.ru/token.php?token=%s&host=%s',
-                $token,
-                $request->server->get('HTTP_HOST')
-            ));
-
-            $credentials = json_decode($json, true);
-            $credentials += [
-                'token' => $token,
-                'username' => '^'.$credentials['network'].'-'.$credentials['uid'],
-            ];
-
-            return $credentials;
-        } catch (\Exception $exception) {
-            return [];
-        }
+        return [
+            'userId' => $request->query->get('user_id'),
+        ];
     }
 
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
-        return $credentials ? $this->userRepository->findOneByUloginCredentials($credentials) : null;
+        return $this->userRepository->find($credentials['userId']);
     }
 
     public function checkCredentials($credentials, UserInterface $user = null)
     {
-        return (bool) $credentials;
+        return true;
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
-        return new RedirectResponse('/login');
+                return new RedirectResponse('/login');
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)

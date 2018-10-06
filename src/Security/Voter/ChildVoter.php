@@ -32,6 +32,6 @@ class ChildVoter extends Voter
 
     private function canChildLogin()
     {
-        return dump($this->subject->isParent($this->userLoader->getUser()));
+        return $this->subject->isParent($this->userLoader->getUser());
     }
 }

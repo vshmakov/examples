@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Security\UloginAuthenticator;
 use App\Repository\TransferRepository;
 use App\Repository\UserRepository;
 use Symfony\Component\Routing\Annotation\Route;
@@ -45,34 +44,41 @@ class ApiController extends Controller
     }
 
     /**
-     * @Route("/ulogin/login", name="api_ulogin_login")
-     */
-    public function ulogin(Request $request)
-    {
-        throw new \Exception('Ulogin login method must not be opened');
-    }
-
-    /**
      * @Route("/ulogin/register", name="api_ulogin_register", methods="POST")
      */
-    public function uloginRegister(Request $request, UloginAuthenticator $uloginAuthenticator, UserRepository $userRepository)
+    public function uloginRegister(Request $request, UserRepository $userRepository)
     {
-        $credentials = $uloginAuthenticator->getCredentials($request);
+        $token = $request->request->get('token');
+        $json = file_get_contents(sprintf(
+            'http://ulogin.ru/token.php?token=%s&host=%s',
+            $token,
+            $request->server->get('HTTP_HOST')
+        ));
 
-        if ($uloginAuthenticator->checkCredentials($credentials)) {
-            $userRepository->findOneByUloginCredentialsOrNew($credentials);
+        $credentials = json_decode($json, true);
+
+        if ($credentials) {
+            $credentials += [
+                'token' => $token,
+                'username' => '^' . $credentials['network'] . '-' . $credentials['uid'],
+            ];
+        } else {
+            $this->denyAccessUnlessGranted(null);
         }
 
-        return $this->redirectToRoute('api_ulogin_login', [
-            'token' => $request->request->get('token'),
+        $user = $userRepository->findOneByUloginCredentialsOrNew($credentials);
+        $this->addFlash('login', true);
+
+        return $this->redirectToRoute('api_login', [
+            'user_id' => $user->getId(),
         ]);
     }
 
     /**
-     * @Route("{id}/login", name="api_login", methods="GET")
+     * @Route("/login", name="api_login", methods="GET")
      */
-    public function login(User $user)
+    public function login()
     {
-        throw new \Exception('api_login action must not be called');
+        //$this->denyAccessUnlessGranted(null);
     }
 }

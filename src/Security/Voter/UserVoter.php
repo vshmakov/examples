@@ -39,4 +39,9 @@ class UserVoter extends Voter
     {
         return $this->authChecker->isGranted('ROLE_USER', $this->subject);
     }
+
+    private function canCreateChildren()
+    {
+return !$this->authChecker->isGranted('ROLE_CHILD');
+    }
 }

@@ -75,9 +75,13 @@ class AccountController extends Controller
      */
     public function edit(Request $request, SessionInterface $session)
     {
+        $this->denyAccessIfGranted('ROLE_CHILD', null, 'Вы не можете редактировать профиль');
         $user = $this->currentUser;
         $user->cleanSocialUsername();
         $form = $this->createForm(AccountType::class, $user);
+       
+
+        
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

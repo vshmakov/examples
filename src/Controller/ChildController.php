@@ -29,9 +29,14 @@ class ChildController extends Controller
      */
     public function new(Request $request, UserRepository $userRepository)
     {
+        if ($this->isGranted('ROLE_CHILD')) {
+            $this->denyAccess("Вы не можете создавать учеников");
+        }
+
         $currentUser = $this->currentUser;
         $child = $userRepository->getNew()
-            ->setParent($currentUser);
+            ->setParent($currentUser)
+            ->addRole('ROLE_CHILD');
 
         $i = 0;
         do {

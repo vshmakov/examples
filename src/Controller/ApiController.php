@@ -66,16 +66,15 @@ class ApiController extends Controller
         }
 
         $user = $userRepository->findOneByUloginCredentialsOrNew($credentials);
-        $this->addFlash('login', true);
+        $this->addFlash('login', $user->getId());
 
-        return $this->redirectToRoute('api_login', [
-            'user_id' => $user->getId(),
-        ]);
+        return $this->redirectToRoute('api_login');
     }
 
     /**
      * @Route("/login", name="api_login", methods="GET")
-     */
+Added logout confirming     */
+
     public function login()
     {
         //$this->denyAccessUnlessGranted(null);

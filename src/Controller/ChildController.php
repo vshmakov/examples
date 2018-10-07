@@ -89,10 +89,8 @@ class ChildController extends Controller
     public function login(User $child)
     {
         $this->denyAccessUnlessGranted('LOGIN_AS_CHILD', $child);
-        $this->addFlash('login', true);
+        $this->addFlash('login', $child->getId());
 
-        return $this->redirectToRoute('api_login', [
-            'user_id' => $child->getId(),
-        ]);
+        return $this->redirectToRoute('api_login');
     }
 }

@@ -14,13 +14,13 @@ class LoginAuthenticator extends AbstractGuardAuthenticator
 {
     public function supports(Request $request)
     {
-        return $request->hasSession() && $request->getSession()->getFlashBag()->get('login');
+        return $request->hasSession() && $request->getSession()->getFlashBag()->has('login');
     }
 
     public function getCredentials(Request $request)
     {
         return [
-            'userId' => $request->query->get('user_id'),
+            'userId' => $request->getSession()->getFlashBag()->get('login')[0] ?? null,
         ];
     }
 

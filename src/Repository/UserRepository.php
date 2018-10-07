@@ -120,11 +120,12 @@ where u = :u')
 
         $uniqUsername = $username;
         $i = 1;
+
         while ($this->countByUsername($uniqUsername)) {
             $uniqUsername = sprintf('%s-%s', $uniqUsername, $i);
-            $i++;
+            ++$i;
         }
-        
+
         $user = $this->getNew()
             ->setUsername($uniqUsername)
             ->setIsSocial(true)

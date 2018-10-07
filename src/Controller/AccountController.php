@@ -10,7 +10,6 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use App\Service\UserLoader;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
 /**
  * @Route("/account")
@@ -49,7 +48,7 @@ class AccountController extends Controller
      */
     public function pay(Request $request)
     {
-        $month = (int)$request->request->get('months');
+        $month = (int) $request->request->get('months');
         $user = $this->currentUser;
         $remaindMoney = $user->getMoney() - $month * PRICE;
 
@@ -66,7 +65,7 @@ class AccountController extends Controller
         }
 
         return $this->render('account/pay.html.twig', [
-            'm' => $month ? : '',
+            'm' => $month ?: '',
             'price' => PRICE,
         ]);
     }

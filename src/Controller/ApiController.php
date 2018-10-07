@@ -7,7 +7,6 @@ use App\Repository\UserRepository;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
-use App\Entity\User;
 
 /**
  * @Route("/api")
@@ -60,7 +59,7 @@ class ApiController extends Controller
         if ($credentials) {
             $credentials += [
                 'token' => $token,
-                'username' => '^' . $credentials['network'] . '-' . $credentials['uid'],
+                'username' => '^'.$credentials['network'].'-'.$credentials['uid'],
             ];
         } else {
             $this->denyAccessUnlessGranted(null);

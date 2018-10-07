@@ -65,4 +65,4 @@ class StudentController extends Controller
             'examples' => $exampleRepository->findByUser($student),
         ]);
     }
-    }
+}

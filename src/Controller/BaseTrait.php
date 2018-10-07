@@ -16,14 +16,15 @@ trait BaseTrait
         $this->addFlash('missResponseEvent', true);
     }
 
-    protected function denyAccess($message=null)
+    protected function denyAccess($message = null)
     {
         throw new AccessDeniedException($message);
     }
 
-    protected function denyAccessIfGranted($attribute, $subject, $message) {
-if ($this->isGranted($attribute, $subject)) {
-$this->denyAccess($message);
-}
+    protected function denyAccessIfGranted($attribute, $subject, $message)
+    {
+        if ($this->isGranted($attribute, $subject)) {
+            $this->denyAccess($message);
+        }
     }
 }

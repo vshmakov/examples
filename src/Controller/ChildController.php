@@ -31,19 +31,19 @@ class ChildController extends Controller
     {
         $this->denyAccessUnlessGranted('EDIT_CHILD', $child);
         $form = $this->createForm(ChildType::class, $child);
-                $form->handleRequest($request);
+        $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $this->getEntityManager();
             $entityManager->flush();
 
-            return $this->redirectToRoute("student_index");
+            return $this->redirectToRoute('student_index');
         }
 
         $this->missResponseEvent();
-        
-        return $this->render("child/edit.html.twig", [
-            "form" => $form->createView()
+
+        return $this->render('child/edit.html.twig', [
+            'form' => $form->createView(),
         ]);
     }
 
@@ -60,25 +60,26 @@ class ChildController extends Controller
             ->addRole('ROLE_CHILD');
 
         $i = 0;
+
         do {
-            $i++;
+            ++$i;
             $username = sprintf('%s-%s', $currentUser->getUsername(), $i);
         } while ($userRepository->countByUsername($username));
 
         $child->setUsername($username);
         $form = $this->createForm(ChildType::class, $child);
-                        $form->handleRequest($request);
+        $form->handleRequest($request);
         $entityManager = $this->getEntityManager();
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($child);
             $entityManager->flush();
 
-            return $this->redirectToRoute("student_index");
+            return $this->redirectToRoute('student_index');
         }
 
-        return $this->render("child/new.html.twig", [
-            "form" => $form->createView(),
+        return $this->render('child/new.html.twig', [
+            'form' => $form->createView(),
         ]);
     }
 
@@ -91,7 +92,7 @@ class ChildController extends Controller
         $this->addFlash('login', true);
 
         return $this->redirectToRoute('api_login', [
-            'user_id' => $child->getId()
+            'user_id' => $child->getId(),
         ]);
     }
 }

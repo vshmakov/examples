@@ -5,7 +5,6 @@ namespace App\Security\Voter;
 use App\Service\AuthChecker;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
-use App\Entity\User;
 use App\Service\UserLoader;
 
 class TeacherVoter extends Voter
@@ -22,7 +21,7 @@ class TeacherVoter extends Voter
 
     protected function supports($attribute, $subject)
     {
-                return $this->supportsUser($attribute, $subject)
+        return $this->supportsUser($attribute, $subject)
             && (null === $subject || $subject->isTeacher());
     }
 

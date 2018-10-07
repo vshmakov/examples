@@ -191,12 +191,12 @@ class User implements UserInterface, GroupableInterface
         return $this->id;
     }
 
-    public function getAddTime() : ? \DateTimeInterface
+    public function getAddTime(): ? \DateTimeInterface
     {
         return $this->dt($this->addTime);
     }
 
-    public function setAddTime(\DateTimeInterface $addTime) : self
+    public function setAddTime(\DateTimeInterface $addTime): self
     {
         $this->addTime = $addTime;
 
@@ -206,12 +206,12 @@ class User implements UserInterface, GroupableInterface
     /**
      * @return Collection|Session[]
      */
-    public function getSessions() : Collection
+    public function getSessions(): Collection
     {
         return $this->sessions;
     }
 
-    public function addSession(Session $session) : self
+    public function addSession(Session $session): self
     {
         if (!$this->sessions->contains($session)) {
             $this->sessions[] = $session;
@@ -221,7 +221,7 @@ class User implements UserInterface, GroupableInterface
         return $this;
     }
 
-    public function removeSession(Session $session) : self
+    public function removeSession(Session $session): self
     {
         if ($this->sessions->contains($session)) {
             $this->sessions->removeElement($session);
@@ -237,12 +237,12 @@ class User implements UserInterface, GroupableInterface
     /**
      * @return Collection|Profile[]
      */
-    public function getProfiles() : Collection
+    public function getProfiles(): Collection
     {
         return $this->profiles;
     }
 
-    public function addProfile(Profile $profile) : self
+    public function addProfile(Profile $profile): self
     {
         if (!$this->profiles->contains($profile)) {
             $this->profiles[] = $profile;
@@ -252,7 +252,7 @@ class User implements UserInterface, GroupableInterface
         return $this;
     }
 
-    public function removeProfile(Profile $profile) : self
+    public function removeProfile(Profile $profile): self
     {
         if ($this->profiles->contains($profile)) {
             $this->profiles->removeElement($profile);
@@ -265,41 +265,41 @@ class User implements UserInterface, GroupableInterface
         return $this;
     }
 
-    public function getProfile() : ? Profile
+    public function getProfile(): ? Profile
     {
         return $this->profile;
     }
 
-    public function setProfile(? Profile $profile) : self
+    public function setProfile(? Profile $profile): self
     {
         $this->profile = $profile;
 
         return $this;
     }
 
-    public function getAllMoney() : ? int
+    public function getAllMoney(): ? int
     {
         return $this->allMoney;
     }
 
-    public function getMoney() : ? int
+    public function getMoney(): ? int
     {
         return $this->money;
     }
 
-    public function setMoney(int $money) : self
+    public function setMoney(int $money): self
     {
         $this->money = $money;
 
         return $this;
     }
 
-    public function getLimitTime() : ? \DateTimeInterface
+    public function getLimitTime(): ? \DateTimeInterface
     {
         return $this->dt($this->limitTime);
     }
 
-    public function setLimitTime(\DateTimeInterface $limitTime) : self
+    public function setLimitTime(\DateTimeInterface $limitTime): self
     {
         $this->limitTime = $limitTime;
 
@@ -316,12 +316,12 @@ class User implements UserInterface, GroupableInterface
     /**
      * @return Collection|Code[]
      */
-    public function getCodes() : Collection
+    public function getCodes(): Collection
     {
         return $this->codes;
     }
 
-    public function addCode(Code $code) : self
+    public function addCode(Code $code): self
     {
         if (!$this->codes->contains($code)) {
             $this->codes[] = $code;
@@ -331,7 +331,7 @@ class User implements UserInterface, GroupableInterface
         return $this;
     }
 
-    public function removeCode(Code $code) : self
+    public function removeCode(Code $code): self
     {
         if ($this->codes->contains($code)) {
             $this->codes->removeElement($code);
@@ -354,12 +354,12 @@ class User implements UserInterface, GroupableInterface
     /**
      * @return Collection|Ip[]
      */
-    public function getIps() : Collection
+    public function getIps(): Collection
     {
         return $this->ips;
     }
 
-    public function addIp(Ip $ip) : self
+    public function addIp(Ip $ip): self
     {
         if (!$this->ips->contains($ip) && $ip->isValid()) {
             $con = false;
@@ -380,7 +380,7 @@ class User implements UserInterface, GroupableInterface
         return $this;
     }
 
-    public function removeIp(Ip $ip) : self
+    public function removeIp(Ip $ip): self
     {
         if ($this->ips->contains($ip)) {
             $this->ips->removeElement($ip);
@@ -389,7 +389,7 @@ class User implements UserInterface, GroupableInterface
         return $this;
     }
 
-    public function setIps(array $ips) : self
+    public function setIps(array $ips): self
     {
         $this->ips = $ips;
 
@@ -399,12 +399,12 @@ class User implements UserInterface, GroupableInterface
     /**
      * @return Collection|Transfer[]
      */
-    public function getTransfers() : Collection
+    public function getTransfers(): Collection
     {
         return $this->transfers;
     }
 
-    public function addTransfer(Transfer $transfer) : self
+    public function addTransfer(Transfer $transfer): self
     {
         if (!$this->transfers->contains($transfer)) {
             $this->transfers[] = $transfer;
@@ -414,7 +414,7 @@ class User implements UserInterface, GroupableInterface
         return $this;
     }
 
-    public function removeTransfer(Transfer $transfer) : self
+    public function removeTransfer(Transfer $transfer): self
     {
         if ($this->transfers->contains($transfer)) {
             $this->transfers->removeElement($transfer);
@@ -495,24 +495,24 @@ class User implements UserInterface, GroupableInterface
      */
     private $children;
 
-    public function getFirstName() : ? string
+    public function getFirstName(): ? string
     {
         return $this->firstName;
     }
 
-    public function setFirstName(? string $firstName) : self
+    public function setFirstName(? string $firstName): self
     {
         $this->firstName = $firstName;
 
         return $this;
     }
 
-    public function getLastName() : ? string
+    public function getLastName(): ? string
     {
         return $this->lastName;
     }
 
-    public function setLastName(? string $lastName) : self
+    public function setLastName(? string $lastName): self
     {
         $this->lastName = $lastName;
 
@@ -529,7 +529,7 @@ class User implements UserInterface, GroupableInterface
         $fn = $this->getFirstName();
         $ln = $this->getLastName();
 
-        return $fn . $ln ? $fn . ' ' . $ln : null;
+        return $fn.$ln ? $fn.' '.$ln : null;
     }
 
     public function getFFName()
@@ -553,17 +553,17 @@ class User implements UserInterface, GroupableInterface
         return ($this->isTeacher() or $this->hasStudents()) ? $this->getFFName() : $this->existsName();
     }
 
-    public function hasStudents() : bool
+    public function hasStudents(): bool
     {
-        return (bool)$this->getStudents()->count();
+        return (bool) $this->getStudents()->count();
     }
 
     public function existsName()
     {
-        return $this->firstName ? : $this->username;
+        return $this->firstName ?: $this->username;
     }
 
-    public function isSocial() : bool
+    public function isSocial(): bool
     {
         return $this->isSocial ?? false;
     }
@@ -588,48 +588,48 @@ class User implements UserInterface, GroupableInterface
         return $this->setUsernameCanonical($u);
     }
 
-    public function getNetwork() : ? string
+    public function getNetwork(): ? string
     {
         return $this->network;
     }
 
-    public function setNetwork(? string $network) : self
+    public function setNetwork(? string $network): self
     {
         $this->network = $network;
 
         return $this;
     }
 
-    public function getNetworkId() : ? string
+    public function getNetworkId(): ? string
     {
         return $this->networkId;
     }
 
-    public function setNetworkId(? string $networkId) : self
+    public function setNetworkId(? string $networkId): self
     {
         $this->networkId = $networkId;
 
         return $this;
     }
 
-    public function getFatherName() : ? string
+    public function getFatherName(): ? string
     {
         return $this->fatherName;
     }
 
-    public function setFatherName(? string $fatherName) : self
+    public function setFatherName(? string $fatherName): self
     {
         $this->fatherName = $fatherName;
 
         return $this;
     }
 
-    public function isTeacher() : ? bool
+    public function isTeacher(): ? bool
     {
-        return (bool)$this->isTeacher;
+        return (bool) $this->isTeacher;
     }
 
-    public function setIsTeacher(? bool $isTeacher) : self
+    public function setIsTeacher(? bool $isTeacher): self
     {
         $this->isTeacher = $isTeacher;
 
@@ -639,12 +639,12 @@ class User implements UserInterface, GroupableInterface
     /**
      * @return Collection|User[]
      */
-    public function getStudents() : Collection
+    public function getStudents(): Collection
     {
         return $this->students;
     }
 
-    public function addStudent(User $student) : self
+    public function addStudent(User $student): self
     {
         if (!$this->students->contains($student)) {
             $this->students[] = $student;
@@ -654,7 +654,7 @@ class User implements UserInterface, GroupableInterface
         return $this;
     }
 
-    public function removeStudent(User $student) : self
+    public function removeStudent(User $student): self
     {
         if ($this->students->contains($student)) {
             $this->students->removeElement($student);
@@ -672,7 +672,7 @@ class User implements UserInterface, GroupableInterface
         return $this->teacher;
     }
 
-    public function setTeacher(? User $teacher) : self
+    public function setTeacher(? User $teacher): self
     {
         $this->teacher = $teacher;
 
@@ -681,7 +681,7 @@ class User implements UserInterface, GroupableInterface
 
     public function hasTeacher()
     {
-        return (bool)$this->teacher;
+        return (bool) $this->teacher;
     }
 
     public function isUserTeacher(User $teacher)
@@ -691,7 +691,7 @@ class User implements UserInterface, GroupableInterface
 
     public function fio()
     {
-        return $this->lastName . ' ' . $this->firstName . ' ' . $this->fatherName;
+        return $this->lastName.' '.$this->firstName.' '.$this->fatherName;
     }
 
     public function getAttempts()
@@ -736,18 +736,18 @@ class User implements UserInterface, GroupableInterface
 
     public function getDumpName()
     {
-        return $this->getSomeName('%s %s %s', ['firstName', 'fatherName', 'lastName']) ? : $this->username;
+        return $this->getSomeName('%s %s %s', ['firstName', 'fatherName', 'lastName']) ?: $this->username;
     }
 
     /**
      * @return Collection|User[]
      */
-    public function getChildren() : Collection
+    public function getChildren(): Collection
     {
         return $this->children;
     }
 
-    public function addChild(User $child) : self
+    public function addChild(User $child): self
     {
         if (!$this->children->contains($child)) {
             $this->children[] = $child;
@@ -757,7 +757,7 @@ class User implements UserInterface, GroupableInterface
         return $this;
     }
 
-    public function removeChild(User $child) : self
+    public function removeChild(User $child): self
     {
         if ($this->children->contains($child)) {
             $this->children->removeElement($child);
@@ -775,14 +775,14 @@ class User implements UserInterface, GroupableInterface
         return $this->parent;
     }
 
-    public function setParent(? User $parent) : self
+    public function setParent(? User $parent): self
     {
         $this->parent = $parent;
 
         return $this;
     }
 
-    public function isParent($parent) : bool
+    public function isParent($parent): bool
     {
         return $this->parent === $parent;
     }
@@ -798,12 +798,12 @@ class User implements UserInterface, GroupableInterface
 
                 return $realStudents;
             },
-            new ArrayCollection
+            new ArrayCollection()
         );
     }
 
-    public function hasParent() : bool
+    public function hasParent(): bool
     {
-        return (bool)$this->parent;
+        return (bool) $this->parent;
     }
 }

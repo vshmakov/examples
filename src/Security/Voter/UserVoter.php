@@ -42,7 +42,6 @@ class UserVoter extends Voter
 
     private function canCreateChildren()
     {
-return !$this->authChecker->isGranted('ROLE_CHILD');
+        return !$this->authChecker->isGranted('ROLE_CHILD');
     }
-    
 }

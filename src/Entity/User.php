@@ -553,7 +553,7 @@ class User implements UserInterface, GroupableInterface
         return ($this->isTeacher() or $this->hasStudents()) ? $this->getFFName() : $this->existsName();
     }
 
-    public function hasStudents(): bool
+    public function hasStudents() : bool
     {
         return (bool)$this->getStudents()->count();
     }
@@ -785,5 +785,20 @@ class User implements UserInterface, GroupableInterface
     public function isParent($parent) : bool
     {
         return $this->parent === $parent;
+    }
+
+    public function getRealStudents()
+    {
+        return array_reduce(
+            $this->getStudents()->getValues(),
+            function ($realStudents, $student) {
+                if (!$this->children->contains($student)) {
+                    $realStudents[] = $student;
+                }
+
+                return $realStudents;
+            },
+            new ArrayCollection
+        );
     }
 }

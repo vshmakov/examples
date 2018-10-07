@@ -39,7 +39,7 @@
                 {% endif %}
 
                 {% if is_granted("LOGIN_AS_CHILD", student) %}
-                <a href="{{path("child_login", {"id": student.id})}}" role="button" onclick="confirm('Вы уверены, что хотите зарегистрироваться как {{ student.username }}?')">Войти
+                <a href="{{path("child_login", {"id": student.id})}}" role="button" onclick="return confirm('Вы уверены, что хотите зарегистрироваться как {{ student.username }}?')">Войти
                     как ученик</a>
                 {% endif %}
             </td>

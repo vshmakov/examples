@@ -8,6 +8,7 @@
 {% from "student/index_table.html.twig" import index_table as table %}
 
 {{ table("Список учеников", students, userRepository) }}
+{{ table("Список созданных учеников", children, userRepository) }}
 
 <p>
 <a href="{{path("child_new")}}" role="button" class="="btn">Создать нового ученика</a>

@@ -34,7 +34,7 @@ class StudentController extends Controller
         $currentUser = $this->currentUser;
 
         return $this->render('student/index.html.twig', [
-            'students' => $currentUser->getStudents()->getValues(),
+            'students' => $currentUser->getRealStudents()->getValues(),
             'children' => $currentUser->getChildren()->getValues(),
             'userRepository' => $userRepository,
         ]);

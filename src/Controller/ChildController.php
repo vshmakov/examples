@@ -31,7 +31,7 @@ class ChildController extends Controller
     {
         $this->denyAccessUnlessGranted('EDIT_CHILD', $child);
         $form = $this->createForm(ChildType::class, $child);
-        $form->handleRequest($request);
+                $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $this->getEntityManager();
@@ -40,6 +40,8 @@ class ChildController extends Controller
             return $this->redirectToRoute("student_index");
         }
 
+        $this->missResponseEvent();
+        
         return $this->render("child/edit.html.twig", [
             "form" => $form->createView()
         ]);
@@ -64,9 +66,8 @@ class ChildController extends Controller
         } while ($userRepository->countByUsername($username));
 
         $child->setUsername($username);
-        $form = $this->createForm(ChildType::class, $child)
-            ->remove('fatherName');
-        $form->handleRequest($request);
+        $form = $this->createForm(ChildType::class, $child);
+                        $form->handleRequest($request);
         $entityManager = $this->getEntityManager();
 
         if ($form->isSubmitted() && $form->isValid()) {

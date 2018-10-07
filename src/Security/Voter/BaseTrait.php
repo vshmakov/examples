@@ -9,6 +9,10 @@ trait BaseTrait
 {
     protected $subject;
 
+    protected function supportsUser($attribute, $subject)
+    {
+        return (($subject instanceof User) or null === $subject) && $this->hasHandler($attribute);
+    }
     protected function checkRight($attribute, $subject, TokenInterface $token)
     {
         $this->subject = $subject;
@@ -26,7 +30,7 @@ trait BaseTrait
         return method_exists($this, $this->getHandlerName($attribute));
     }
 
-    protected function supportsArr(string $attribute, array $subjects): bool
+    protected function supportsArr(string $attribute, array $subjects) : bool
     {
         return array_reduce(
             $subjects,
@@ -73,6 +77,6 @@ trait BaseTrait
             $prefix = 'has';
         }
 
-        return Inflector::camelize($prefix.'_'.$attribute);
+        return Inflector::camelize($prefix . '_' . $attribute);
     }
 }

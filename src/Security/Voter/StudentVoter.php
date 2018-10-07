@@ -22,7 +22,7 @@ class StudentVoter extends Voter
 
     protected function supports($attribute, $subject)
     {
-        return             $subject instanceof User && $subject->isStudent() && $this->hasHandler($attribute);
+        return $this->supportsUser($attribute, $subject);
     }
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
@@ -38,5 +38,12 @@ class StudentVoter extends Voter
     private function canShowExamples()
     {
         return $this->canShowAttempts();
+    }
+
+    private function canShowStudents()
+    {
+        $user = $this->userLoader->getUser();
+
+        return $user->isTeacher() or $user->hasStudents();
     }
 }

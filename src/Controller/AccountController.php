@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use App\Service\UserLoader;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
 /**
  * @Route("/account")
@@ -79,9 +80,6 @@ class AccountController extends Controller
         $user = $this->currentUser;
         $user->cleanSocialUsername();
         $form = $this->createForm(AccountType::class, $user);
-
-
-
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

@@ -12,9 +12,11 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Service\UserLoader;
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
 /**
  * @Route("/teacher")
+ * @Security("is_granted('SHOW_TEACHERS')")
  */
 class TeacherController extends Controller
 {

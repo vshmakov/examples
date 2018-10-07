@@ -22,7 +22,7 @@ class TeacherVoter extends Voter
 
     protected function supports($attribute, $subject)
     {
-        return $subject instanceof User && $subject->isTeacher() && $this->hasHandler($attribute);
+        return $this->supportsUser($attribute, $subject);
     }
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
@@ -34,7 +34,7 @@ class TeacherVoter extends Voter
     {
         $teacher = $this->subject;
 
-    return $this->canDisappointTeachers()
+        return $this->canDisappointTeachers()
             && !$this->userLoader->isGuest()
             && !$this->userLoader->getUser()->isUserTeacher($teacher);
     }
@@ -45,6 +45,11 @@ class TeacherVoter extends Voter
     }
 
     private function canDisappointTeachers()
+    {
+        return $this->canShowTeachers();
+    }
+
+    private function canShowTeachers()
     {
         $authChecker = $this->authChecker;
 

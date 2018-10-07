@@ -62,10 +62,12 @@
               aria-haspopup="true" aria-expanded="false">Аккаунт</a>
             <div class="dropdown-menu">
               <a class="dropdown-item" href="{{path("account_index")}}">Просмотреть профиль</a>
-              {% if app.user.isTeacher or app.user.students.count %}
+              {% if is_granted('SHOW_STUDENTS') %}
               <a class="dropdown-item" href="{{path("student_index")}}">Ученики</a>
               {%endif%}
+              {% if is_granted('SHOW_TEACHERS') %}
               <a class="dropdown-item" href="{{path("teacher_index")}}">Выбрать учителя</a>
+              {% endif %}
 
               {#
               <a class="dropdown-item" href="{{path("account_recharge")}}">Пополнить счёт <em>({{user.money}} рублей)</em></a>

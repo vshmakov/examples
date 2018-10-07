@@ -25,7 +25,7 @@
 	{#
 	<tr>
 		<td>Электронная почта</td>
-		<td>{{u.email  ?? "-"}}</td>
+		<td>{{u.email ?? "-"}}</td>
 	</tr>
 	#}
 	<tr>
@@ -38,16 +38,21 @@
 		<td>{{u.students.count}}</td>
 	</tr>
 	{%endif%}
-{%if u.hasTeacher%}
+	{%if u.hasTeacher%}
 	<tr>
 		<td>Выбранный учитель</td>
 		<td>{{u.teacher ? u.teacher.fio : '-'}}</td>
 	</tr>
-{%endif%}
+	{%endif%}
 </table>
 
 <div>
-<a href="{{path("account_edit")}}">Редактировать профиль</a>
-<a href="{{path("teacher_index")}}">Выбрать учителя</a>
+	{% if is_granted('EDIT_ACCOUNT') %}
+	<a href="{{path("account_edit")}}">Редактировать профиль</a>
+	{% endif %}
+
+	{% if is_granted('SHOW_TEACHERS') %}
+	<a href="{{path("teacher_index")}}">Выбрать учителя</a>
+	{% endif %}
 </div>
 {%endblock%}

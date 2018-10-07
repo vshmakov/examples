@@ -553,7 +553,7 @@ class User implements UserInterface, GroupableInterface
         return ($this->isTeacher() or $this->hasStudents()) ? $this->getFFName() : $this->existsName();
     }
 
-    public function hasStudents()
+    public function hasStudents(): bool
     {
         return (bool)$this->getStudents()->count();
     }

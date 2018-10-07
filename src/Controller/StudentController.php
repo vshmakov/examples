@@ -9,9 +9,11 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Service\UserLoader;
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
 /**
  * @Route("/student")
+ * @Security("is_granted('SHOW_STUDENTS')")
  */
 class StudentController extends Controller
 {

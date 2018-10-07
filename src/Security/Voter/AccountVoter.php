@@ -22,7 +22,7 @@ class AccountVoter extends Voter
 
     protected function supports($attribute, $subject)
     {
-        return $subject instanceof User && $subject->isStudent() && $this->hasHandler($attribute);
+        return $this->supportsUser($attribute, $subject);
     }
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)

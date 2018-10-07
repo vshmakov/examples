@@ -22,7 +22,8 @@ class TeacherVoter extends Voter
 
     protected function supports($attribute, $subject)
     {
-        return $this->supportsUser($attribute, $subject);
+                return $this->supportsUser($attribute, $subject)
+            && (null === $subject || $subject->isTeacher());
     }
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)

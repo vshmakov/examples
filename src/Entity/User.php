@@ -801,4 +801,9 @@ class User implements UserInterface, GroupableInterface
             new ArrayCollection
         );
     }
+
+    public function hasParent() : bool
+    {
+        return (bool)$this->parent;
+    }
 }

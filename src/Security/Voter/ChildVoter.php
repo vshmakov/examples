@@ -22,7 +22,8 @@ class ChildVoter extends Voter
 
     protected function supports($attribute, $subject)
     {
-        return $this->supportsUser($attribute, $subject);
+        return $this->supportsUser($attribute, $subject)
+            && (null === $subject || $subject->hasParent());
     }
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
@@ -32,7 +33,7 @@ class ChildVoter extends Voter
 
     private function canLoginAsChild()
     {
-        return dump($this->subject->isParent($this->userLoader->getUser()));
+        return $this->subject->isParent($this->userLoader->getUser());
     }
 
     private function canEditChild()

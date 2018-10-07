@@ -20,7 +20,7 @@
 				<td>{{num+1}}</td>
 				<td>{{t.LastName}} {{t.firstName}} {{t.fatherName}}</td>
 				<td>{{t.username ?? "-"}}</td>
-				<td>{{t.students.count}}</td>
+				<td>{{t.realStudents.count}}</td>
 				<td>{{t.addTime.dateFormat}}</td>
 			<td>
 {%if is_granted("APPOINT", t)%}

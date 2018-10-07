@@ -51,6 +51,10 @@
 	<a href="{{path("account_edit")}}">Редактировать профиль</a>
 	{% endif %}
 
+	{% if is_granted('SHOW_STUDENTS') %}
+	<a href="{{path("student_index")}}">Список учеников</a>
+	{% endif %}
+
 	{% if is_granted('SHOW_TEACHERS') %}
 	<a href="{{path("teacher_index")}}">Выбрать учителя</a>
 	{% endif %}

@@ -44,7 +44,7 @@ class TeacherController extends Controller
      */
     public function appoint(User $teacher, ValidatorInterface $validator, Request $request, SessionInterface $session)
     {
-        $this->denyAccessUnlessGranted('APPOINT_TEACHER', $teacher);
+        $this->denyAccessUnlessGranted('APPOINT', $teacher);
         $currentUser = $this->currentUser;
         $errors = $validator->validate($currentUser, null, ['account']);
 
@@ -88,7 +88,7 @@ class TeacherController extends Controller
      */
     public function disappoint()
     {
-        $this->denyAccessUnlessGranted('DISAPPOINT_TEACHER');
+        $this->denyAccessUnlessGranted('DISAPPOINT_TEACHERS');
         $this->currentUser->setTeacher(null);
         $this->getEntityManager()->flush();
 

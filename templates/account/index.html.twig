@@ -38,7 +38,7 @@
 		<td>{{u.students.count}}</td>
 	</tr>
 	{%endif%}
-	{%if u.hasTeacher%}
+	{%if u.hasTeacher %}
 	<tr>
 		<td>Выбранный учитель</td>
 		<td>{{u.teacher ? u.teacher.fio : '-'}}</td>

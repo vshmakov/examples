@@ -42,7 +42,7 @@
       <div class="collapse navbar-collapse" id="navbarColor01">
         <ul class="navbar-nav mr-auto">
           {%macro item(r, t)%}
-          <li class="nav-item {#active#}">
+          <li class="nav-item">
             <a class="nav-link" href="{{path(r)}}">{{t}} {#<span class="sr-only">(current)</span>#}</a>
           </li>
           {%endmacro%}
@@ -96,7 +96,9 @@
             </div>
           </li>
           {%endif%}
-          {{item("fos_user_security_logout", "Выход")}}
+          <li class="nav-item">
+            <a onclick="return confirm('Вы действительно хотите выйти?')"             class="nav-link" href="{{path("fos_user_security_logout")}}">Выход</a>
+          </li>
           {%else%}
           {{item("fos_user_security_login", "Вход")}}
           {{item("fos_user_registration_register", "Регистрация")}}

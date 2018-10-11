@@ -20,6 +20,7 @@ class IpController extends Controller
      */
     public function index(IpRepository $ipRepository): Response
     {
+throw new \Exception("MyTestException");
         return $this->render('ip/index.html.twig', ['ips' => $ipRepository->findAll()]);
     }
 

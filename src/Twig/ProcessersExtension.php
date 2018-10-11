@@ -64,8 +64,8 @@ class ProcessersExtension extends AbstractExtension
                 $propertyAccessor('city'),
                 $propertyAccessor('continent'),
                 $propertyAccessor('addTime.dbFormat'),
-                $this->router->link('ip_show', ['id' => $pa('id')], 'show')
-                    .$this->router->link('ip_edit', ['id' => $pa('id')], 'edit'),
+                $this->router->link('ip_show', ['id' => $propertyAccessor('id')], 'show')
+                    .$this->router->link('ip_edit', ['id' => $propertyAccessor('id')], 'edit'),
             ];
         });
     }
@@ -79,22 +79,18 @@ class ProcessersExtension extends AbstractExtension
             switch ($rating) {
                 case 3:
                     $color = 'orange';
-
                     break;
 
                 case 4:
                     $color = 'yellow';
-
                     break;
 
                 case 5:
                     $color = 'green';
-
                     break;
 
                 default:
                     $color = 'red';
-
                     break;
             }
 

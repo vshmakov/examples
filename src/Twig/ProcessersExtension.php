@@ -49,6 +49,7 @@ class ProcessersExtension extends AbstractExtension
                 $propertyAccessor('solvingTime.timestamp') ?: '-',
                 $propertyAccessor('addTime').'',
                 $this->router->link('attempt_show', ['id' => $attempt->getId()], $attempt->getTitle()),
+                $this->router->link('attempt_profile', ['id' => $attempt->getId()], $attempt->getSettings()->getDescription()),
             ];
         });
     }

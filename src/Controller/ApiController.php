@@ -62,7 +62,7 @@ class ApiController extends Controller
                 'username' => '^'.$credentials['network'].'-'.$credentials['uid'],
             ];
         } else {
-            $this->denyAccessUnlessGranted(null);
+            $this->denyAccess();
         }
 
         $user = $userRepository->findOneByUloginCredentialsOrNew($credentials);
@@ -73,10 +73,9 @@ class ApiController extends Controller
 
     /**
      * @Route("/login", name="api_login", methods="GET")
-Added logout confirming     */
-
+     */
     public function login()
     {
-        //$this->denyAccessUnlessGranted(null);
+        $this->denyAccess();
     }
 }

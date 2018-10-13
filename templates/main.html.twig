@@ -109,7 +109,11 @@
     {%endblock nav%}
 
     <main class="main row">
-      {%block main ""%}
+      {% block main %}{% endblock %}
+
+<p>
+{% block bottom_links %}{% endblock %}
+</p>
     </main>
 
     {%block guest_auth%}

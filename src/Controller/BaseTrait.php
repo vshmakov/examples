@@ -2,8 +2,6 @@
 
 namespace App\Controller;
 
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-
 trait BaseTrait
 {
     protected function getEntityManager()
@@ -16,15 +14,8 @@ trait BaseTrait
         $this->addFlash('missResponseEvent', true);
     }
 
-    protected function denyAccess($message = null)
+    protected function denyAccess(...$parameters)
     {
-        throw new AccessDeniedException($message);
-    }
-
-    protected function denyAccessIfGranted($attribute, $subject, $message)
-    {
-        if ($this->isGranted($attribute, $subject)) {
-            $this->denyAccess($message);
-        }
+        throw $this->createAccessDenyedException(...$parameters);
     }
 }

@@ -1,15 +1,13 @@
-{%extends "main.html.twig"%}
+{% extends "student/base.html.twig" %}
 
 {%block title "Архив попыток ("~student.LFName~")"%}
 
-{%block main%}
+{% block main %}
 <h1>Архив попыток</h1>
-{{include("attempt/index_table.html.twig")}}
-{{include("student/backlinks.html.twig")}}
-{%endblock%}
+{{ include("attempt/index_table.html.twig") }}
+{% endblock %}
 
-
-{%block javascripts%}
+{% block javascripts %}
 {{parent()}}
 <script src="/js/jquery.datatables.min.js"></script>
 <script>
@@ -22,4 +20,4 @@ pageLength: 50,
 language: {{include("attempt/language.json.twig")}}
 });
 </script>
-{%endblock%}
+{% endblock %}

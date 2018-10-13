@@ -25,16 +25,18 @@ where i.addTime > :dt',
 join v.session s
 join s.ip i
 where v.addTime > :dt and i.addTime > :dt',
+
             'attempts' => 'select count(a) from App:Attempt a
 join a.session s
 join s.ip i
 where a.addTime > :dt and i.addTime > :dt',
+
             'users' => 'select count(u) from App:User u
-where u.addTime > :dt',
+where u.addTime > :dt and u.enabled = true',
         ];
 
         foreach ($queries as $key => $query) {
-            foreach ([1, 2, 3, 7, 14, 30, 60, 90, 180] as $days) {
+            foreach ([1, 3, 7, 14, 30, 60, 90, 180] as $days) {
                 $statistic[$days][$key] = IpRepository::getValueByQuery(
                     $entityManager->createQuery($query)
                         ->setParameter('dt', \DT::createBySubDays($days))

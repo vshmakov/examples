@@ -95,7 +95,7 @@ class AttemptController extends Controller
      */
     public function answer(Attempt $attempt, Request $request, ExampleRepository $exampleRepository, EntityManagerInterface $entityManager, AttemptRepository $attemptRepository)
     {
-$showAttemptUrl=['targetUrl' => $this->generateUrl('attempt_show', ['id'=>$attempt->getId()])];
+        $showAttemptUrl = ['targetUrl' => $this->generateUrl('attempt_show', ['id' => $attempt->getId()])];
 
         if (!$this->isGranted('ANSWER', $attempt)) {
             return $this->json(['finish' => true] + $showAttemptUrl);

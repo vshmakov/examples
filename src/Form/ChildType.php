@@ -19,7 +19,7 @@ class ChildType extends StudentType
     {
         $resolver->setDefaults([
             'data_class' => User::class,
-            'validation_groups' => ['Default'],
+            'validation_groups' => ['Default', 'child'],
         ]);
     }
 }

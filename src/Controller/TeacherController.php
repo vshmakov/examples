@@ -6,7 +6,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use App\Form\AccountType;
+use App\Form\ChildType;
 use App\Repository\UserRepository;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\UserLoader;
@@ -46,7 +46,7 @@ class TeacherController extends Controller
     {
         $this->denyAccessUnlessGranted('APPOINT', $teacher);
         $currentUser = $this->currentUser;
-        $errors = $validator->validate($currentUser, null, ['account']);
+        $errors = $validator->validate($currentUser, null, ['child']);
 
         if (!count($errors)) {
             if ($this->isGranted('APPOINT', $teacher)) {
@@ -58,7 +58,7 @@ class TeacherController extends Controller
         }
 
         $currentUser->cleanSocialUsername();
-        $form = $this->createForm(AccountType::class, $currentUser);
+        $form = $this->createForm(ChildType::class, $currentUser);
         $form->remove('isTeacher');
         $form->handleRequest($request);
 

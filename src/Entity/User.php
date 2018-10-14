@@ -429,22 +429,22 @@ class User implements UserInterface, GroupableInterface
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Assert\NotBlank(message="Имя не должно быть пустым", groups={"account"})
+     * @Assert\NotBlank(message="Имя не должно быть пустым", groups={"account", "child"})
      * @Assert\Length(
      * min = 2,
      * minMessage = "Ваше имя должно содержать как минимум {{ limit }} символа",
-     *groups={"account"}
+     *groups={"account", "child"}
      * )
      */
     private $firstName;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Assert\NotBlank(message="Фамилия не должна быть пустой", groups={"account"})
+     * @Assert\NotBlank(message="Фамилия не должна быть пустой", groups={"account", "child"})
      * @Assert\Length(
      * min = 2,
      * minMessage = "Ваша фамилия должна содержать как минимум {{ limit }} символа",
-     * groups={"account"}
+     * groups={"account", "child"}
      * )
      */
     private $lastName;

@@ -44,7 +44,7 @@ class ProcessersExtension extends AbstractExtension
             return [
                 $propertyAccessor('userNumber'),
                 "$example",
-                $propertyAccessor('answer'),
+                $propertyAccessor('answer', false) ?? '-',
                 $propertyAccessor('isRight', false) ? 'Да' : 'Нет',
                 $propertyAccessor('solvingTime.timestamp') ?: '-',
                 $propertyAccessor('addTime').'',

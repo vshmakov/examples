@@ -26,7 +26,7 @@
         {% for session in sessions %}
             <tr>
                 <td>{{ session.id }}</td>
-                <td>{{ session.user.login}}</td>
+                <td>{{ session.user.dumpName?: session.user.username}}</td>
                 <td><a href="{{path("session_visits", {"id": session.id})}}">{{ session.visits.count}}</a></td>
                 <td>{{ session.attempts.count}}</td>
                 <td>{{ session.addTime ? session.addTime.dbFormat : "" }}</td>

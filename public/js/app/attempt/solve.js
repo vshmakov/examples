@@ -27,8 +27,8 @@ this.submitButton.html('Пожалуйста, подождите...');
 
 answer:function (event) {
 event.preventDefault();
-this.disableForm();
 if (!this.inp.val()) return;
+this.disableForm();
 $.post(P.attempt_answer, {answer:this.inp.val()}, this.getResult.bind(this));
 },
 

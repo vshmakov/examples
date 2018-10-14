@@ -2,6 +2,7 @@
 
 h.createObj({
 constructor: function () {
+this.disableForm();
 var self=this;
 $.each(["num", "exRem", "str", "errors"], function () {
 self[this]=$("#"+this);
@@ -12,15 +13,27 @@ this.form.submit(this.answer.bind(this));
 
 form: $('form'),
 inp: $('form input[type=text]'),
+submitButton: $('form [type=submit]'),
+
+enableForm: function () {
+$(this.inp).add(this.submitButton).attr('disabled', false);
+this.submitButton.html('Ответить');
+},
+
+disableForm: function () {
+$(this.inp).add(this.submitButton).attr('disabled', true);
+this.submitButton.html('Пожалуйста, подождите...');
+},
 
 answer:function (event) {
 event.preventDefault();
+this.disableForm();
 if (!this.inp.val()) return;
 $.post(P.attempt_answer, {answer:this.inp.val()}, this.getResult.bind(this));
 },
 
 getResult: function (data) {
-if (data.finish === true) return location.reload();
+if (data.finish === true) return location.href=data.targetUrl;
 this.setData(data.attData);
 },
 
@@ -35,8 +48,9 @@ for (var k in o) {
 this[k].html(o[k]);
 }
 
-this.inp.val('')
-.focus().click().select();
+this.inp.val('');
+this.enableForm();
+this.inp.focus().click().select();
 },
 
 timer: h.createObj({

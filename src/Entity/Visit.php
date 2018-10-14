@@ -9,6 +9,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Visit
 {
+    use BaseTrait;
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -59,7 +61,7 @@ class Visit
 
     public function getAddTime(): ?\DateTimeInterface
     {
-        return $this->addTime;
+        return $this->dt($this->addTime);
     }
 
     public function setAddTime(\DateTimeInterface $addTime): self

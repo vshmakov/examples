@@ -1,4 +1,4 @@
-{% extends 'example/index.html.twig' %}
+{% extends 'base.html.twig' %}
 
 {% block title %}Visit index{% endblock %}
 
@@ -23,35 +23,32 @@
             </tr>
         </thead>
         <tbody>
-        {% for visit in visits %}
-            <tr>
-                <td>{{ visit.id }}</td>
-                <td>{{ visit.session.user.login}}</td>
-                <td>{{ visit.routeName}}</td>
-                <td>{{ visit.method}}</td>
-                <td>{{ visit.statusCode}}</td>
-                <td><a href="{{visit.uri}}">{{ visit.uri }}</a></td>
-                <td>{{ visit.addTime ? visit.addTime|date('Y-m-d H:i:s') : '' }}</td>
-                <td><a href="{{path("session_show", {"id": visit.session.id})}}">{{ visit.session.id}}</td>
-{%set ip=visit.session.ip%}
-                <td>{{ ip and ip.country ? ip.country : "-"}}</td>
-                <td>{{ ip and ip.region ? ip.region :  "-"}}</td>
-                <td>{{ ip and ip.city ? ip.city : "-"}}</td>
-                <td>
-                    <a href="{{ path('session_visits', {'id': visit.session.id}) }}">Visits of session ({{visit.session.visits.count}})</a>
+{#                    <a href="{{ path('session_visits', {'id': visit.session.id}) }}">Visits of session ({{visit.session.visits.count}})</a>
                     <a href="{{ path('visit_show', {'id': visit.id}) }}">show</a>
                     <a href="{{ path('visit_edit', {'id': visit.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
+#}
             <tr>
                 <td colspan="4">no records found</td>
             </tr>
-        {% endfor %}
-        </tbody>
+       </tbody>
     </table>
 
 {%block back_link%}
     <a href="{{ path('visit_new') }}">Create new</a>
 {%endblock%}
+{% endblock %}
+
+
+{% block javascripts %}
+{{ parent() }}
+<script src="/js/jquery.datatables.min.js"></script>
+<script>
+$("table").DataTable({
+searching: false,
+sorting: false,
+data: {{processVisits(visits)|reverse|json_encode|raw}},
+deferRender: true,
+pageLength: 50,
+});
+</script>
 {% endblock %}

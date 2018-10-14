@@ -13,11 +13,16 @@ class Router
         $this->urlGenerator = $urlGenerator;
     }
 
-    public function link($routeName, $parameters, $title)
+    public function linkToRoute($routeName, $parameters, $title)
+    {
+        return $this->link($this->urlGenerator->generate($routeName, $parameters), $title);
+    }
+
+    public function link($uri, $title)
     {
         return sprintf(
             '<a href="%s">%s</a>',
-            $this->urlGenerator->generate($routeName, $parameters),
+$uri,
             $title
         );
     }

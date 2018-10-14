@@ -34,7 +34,29 @@ class ProcessersExtension extends AbstractExtension
         );
     }
 
-    public function processExamples($examples)
+    public function processVisits(array $visits): array
+    {
+        return $this->prepareData($visits, function ($propertyAccessor) {
+            $uri = $propertyAccessor('uri');
+
+            return [
+                $propertyAccessor('id'),
+                $propertyAccessor('session.user.dumpName'),
+                $propertyAccessor('routeName'),
+                $propertyAccessor('method'),
+                $propertyAccessor('statusCode'),
+                $this->router->link($uri, $uri),
+                $propertyAccessor('addTime.dbFormat'),
+                $propertyAccessor('session.id'),
+                $propertyAccessor('session.ip.country'),
+                $propertyAccessor('session.ip.region'),
+                $propertyAccessor('session.ip.city'),
+                $this->router->linkToRoute('session_visits', ['id' => $propertyAccessor('session.id')], sprintf('Visits of session (%s)', $propertyAccessor('session.visits.count'))),
+            ];
+        });
+    }
+
+    public function processExamples(array $examples): array
     {
         return $this->prepareData($examples, function ($propertyAccessor, $example) {
             $example->setEntityRepository($this->exampleRepository);
@@ -48,13 +70,13 @@ class ProcessersExtension extends AbstractExtension
                 $propertyAccessor('isRight', false) ? 'Да' : 'Нет',
                 $propertyAccessor('solvingTime.timestamp') ?: '-',
                 $propertyAccessor('addTime').'',
-                $this->router->link('attempt_show', ['id' => $attempt->getId()], $attempt->getTitle()),
-                $this->router->link('attempt_profile', ['id' => $attempt->getId()], $attempt->getSettings()->getDescription()),
+                $this->router->linkToRoute('attempt_show', ['id' => $attempt->getId()], $attempt->getTitle()),
+                $this->router->linkToRoute('attempt_profile', ['id' => $attempt->getId()], $attempt->getSettings()->getDescription()),
             ];
         });
     }
 
-    public function processIps($ips)
+    public function processIps(array $ips): array
     {
         return $this->prepareData($ips, function ($propertyAccessor) {
             return [
@@ -65,13 +87,13 @@ class ProcessersExtension extends AbstractExtension
                 $propertyAccessor('city'),
                 $propertyAccessor('continent'),
                 $propertyAccessor('addTime.dbFormat'),
-                $this->router->link('ip_show', ['id' => $propertyAccessor('id')], 'show')
-                    .$this->router->link('ip_edit', ['id' => $propertyAccessor('id')], 'edit'),
+                $this->router->linkToRoute('ip_show', ['id' => $propertyAccessor('id')], 'show')
+                    .$this->router->linkToRoute('ip_edit', ['id' => $propertyAccessor('id')], 'edit'),
             ];
         });
     }
 
-    public function processAttempts($attempts)
+    public function processAttempts(array $attempts): array
     {
         return $this->prepareData($attempts, function ($propertyAccessor, $attempt) {
             $attempt->setEntityRepository($this->attemptRepository);
@@ -100,10 +122,10 @@ class ProcessersExtension extends AbstractExtension
             }
 
             return [
-                $this->router->link('attempt_show', ['id' => $propertyAccessor('id')], $propertyAccessor('title')),
+                $this->router->linkToRoute('attempt_show', ['id' => $propertyAccessor('id')], $propertyAccessor('title')),
                 $propertyAccessor('addTime').'',
                 $propertyAccessor('finishTime').'',
-                $this->router->link('attempt_profile', ['id' => $propertyAccessor('id')], $propertyAccessor('settings.description')),
+                $this->router->linkToRoute('attempt_profile', ['id' => $propertyAccessor('id')], $propertyAccessor('settings.description')),
                 $propertyAccessor('solvedExamplesCount', false) ? sprintf('%s из %s (%s сек/пример)', $propertyAccessor('solvedTime.minSecFormat'), $propertyAccessor('maxTime.minSecFormat'), $propertyAccessor('averSolveTime.timestamp')) : '-',
                 sprintf('%s из %s', $propertyAccessor('solvedExamplesCount', false), $propertyAccessor('examplesCount', false)),
                 $propertyAccessor('errorsCount', false),

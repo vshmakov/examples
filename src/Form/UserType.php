@@ -32,10 +32,9 @@ class UserType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => User::class,
-            'validation_groups' => [
-                'abc',
-                //'admin'
-            ],
+            'required' => false,
+            'attr' => ['novalidate' => 'novalidate'],
+            'validation_groups' => false,
         ]);
     }
 }

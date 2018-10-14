@@ -46,9 +46,6 @@ class ResponseSubscriber implements EventSubscriberInterface
         $missResponseEvent = $this->session->getFlashBag()->get('missResponseEvent', []);
 
         if ($request && $event->isMasterRequest() && $currentUserSession && !$missResponseEvent) {
-            $response = $event->getResponse();
-            $response->headers->set('Symfony-Debug-Toolbar-Replace', 1);
-
             $currentUserSession->setLastTime(new \DateTime());
             $user = $this->userLoader->getUser();
             $ip = $this->ipRepository->findOneByIpOrNew($request->getClientIp());

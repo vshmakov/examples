@@ -141,11 +141,10 @@
   <script src="/js/bootstrap.min.js"></script>
   <script src="/js/custom.js"></script>
   <script>
-    var d = {
-      {
-        user.remainedTime.roundUpDays
-      }
-    };
+$('form input').each(function () {
+$(this).attr('pattern', '.*');
+});
+    var d = {{user.remainedTime.roundUpDays}};
     c = d == 0 ? "red" : d <= 3 ? "orange" : d <= 7 ? "yellow" : "green";
     //$(".account-button").css("background", c);
   </script>

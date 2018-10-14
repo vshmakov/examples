@@ -15,7 +15,7 @@
 <li>Секунд/пример: {{att.averSolveTime.timestamp}}</li>
 <li>Ошибок: {{att.errorsCount}}</li>
 	<li>Оценка: {{att.rating}}</li>
-	<li><a href="{{path("attempt_profile", {"id": att.id})}}">Посмотреть настройки этой попытки</a></li>
+	<li>Настройки попытки: <a href="{{path("attempt_profile", {"id": att.id})}}">{{ att.settings.description }}</a></li>
 </ul>
 </div>
 

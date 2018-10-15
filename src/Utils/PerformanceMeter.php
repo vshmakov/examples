@@ -63,7 +63,7 @@ class PerformanceMeter
             function ($result, $momentsList)  {
                 $key = $this->data->key ();
 
-                $result[] = [
+                $result[$key] = [
                     'calledCount' => $momentsList->count(),
                     'totalExecutionTime' => (int)array_reduce(
                         $momentsList->toArray(),

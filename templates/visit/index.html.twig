@@ -44,7 +44,6 @@
 <script src="/js/jquery.datatables.min.js"></script>
 <script>
 $("table").DataTable({
-searching: false,
 sorting: false,
 data: {{processVisits(visits)|reverse|json_encode|raw}},
 deferRender: true,

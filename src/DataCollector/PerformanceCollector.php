@@ -17,7 +17,6 @@ class PerformanceCollector extends DataCollector
         $this->performanceMeter = $performanceMeter;
     }
 
-
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
         $this->data = $this->performanceMeter->getData();
@@ -26,6 +25,33 @@ class PerformanceCollector extends DataCollector
     public function reset()
     {
         $this->data = array();
+    }
+
+    public function getCalledCount() : int
+    {
+        return array_reduce(
+            $this->data,
+            function ($count, $element) {
+                return $count + $element['calledCount'];
+            },
+            0
+        );
+    }
+
+    public function getTotalExecutionTime() : int
+    {
+        return array_reduce(
+            $this->data,
+            function ($totalExecutionTime, $element) {
+                return $totalExecutionTime + $element['totalExecutionTime'];
+            },
+            0
+        );
+    }
+
+    public function getData() : array
+    {
+        return $this->data;
     }
 
     public function getName()

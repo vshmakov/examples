@@ -1,0 +1,40 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}
+    {% set text %}
+        <div class="sf-toolbar-info-piece">
+            <b>Performance meter</b>
+            <span>{{ collector.calledCount}} in {{collector.totalExecutionTime}}</span>
+        </div>
+    {% endset %}
+
+    {% set icon %}
+        <svg xmlns="www.w3.org/2000/svg"> ... </svg>
+        <span class="sf-toolbar-value">{{ text }}</span>
+    {% endset %}
+
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: true}) }}
+{% endblock %}
+
+{% block panel %}
+ <h1>Performance meter</h1>
+
+<table>
+<tr>
+<th>Key</th>
+<th>Count of called times</th>
+<th>Total execution time</th>
+</tr>
+{% for key, item in collector.data %}
+<tr>
+<td>{{ key }}</td>
+<td>{{ item.calledCount }}</td>
+<td>{{ item.totalExecutionTime }}</td>
+</tr>
+{% else %}
+<tr>
+<td colspan="3">There is no performance meters in the page</td>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}

@@ -3,26 +3,28 @@
 namespace App\Utils;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Psr\Container\ContainerInterface;
 
 class PerformanceMeter
 {
     private $data;
     private $isDevelopmentEnvironment;
 
-    public function __construct()
+    public function __construct(ContainerInterface $container)
     {
-        $this->data = new ArrayCollection;
-        $this->isDevelopmentEnvironment = true;
+        $this->data = new ArrayCollection();
+        $environment = $container->getParameter('app_env');
+        $this->isDevelopmentEnvironment = 'dev' == $environment;
     }
 
-    public function start(string $key) : self
+    public function start(string $key): self
     {
         if (!$this->isDevelopmentEnvironment) {
             return $this;
         }
 
         if (!$this->data->offsetExists($key)) {
-            $this->data->set($key, new ArrayCollection);
+            $this->data->set($key, new ArrayCollection());
         }
 
         $moments = new ArrayCollection(['start' => $this->getTime()]);
@@ -32,7 +34,7 @@ class PerformanceMeter
         return $this;
     }
 
-    public function finish(string $key) : self
+    public function finish(string $key): self
     {
         if (!$this->isDevelopmentEnvironment) {
             return $this;
@@ -51,21 +53,18 @@ class PerformanceMeter
         $moments->set('finish', $this->getTime());
 
         return $this;
-
     }
 
-
-
-    public function getData() : array
+    public function getData(): array
     {
-        return array_reduce(
+        $result = array_reduce(
             $this->data->toArray(),
-            function ($result, $momentsList)  {
-                $key = $this->data->key ();
+            function ($result, $momentsList) {
+                $key = $this->data->indexOf($momentsList);
 
                 $result[$key] = [
                     'calledCount' => $momentsList->count(),
-                    'totalExecutionTime' => (int)array_reduce(
+                    'totalExecutionTime' => (int) array_reduce(
                         $momentsList->toArray(),
                         function ($totalExecutionTime, $moments) use ($key) {
                             if (!$moments->offsetExists('finish')) {
@@ -78,17 +77,19 @@ class PerformanceMeter
                             return $totalExecutionTime + ($moments->get('finish') - $moments->get('start')) * 1000;
                         },
                         0
-                    )
+                    ),
                 ];
 
                 return $result;
             },
             []
         );
+
+        return $result;
     }
 
     private function getTime()
     {
-        return time() + microtime();
+        return (float) time() + (float) microtime();
     }
 }

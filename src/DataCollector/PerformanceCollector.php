@@ -24,10 +24,10 @@ class PerformanceCollector extends DataCollector
 
     public function reset()
     {
-        $this->data = array();
+        $this->data = [];
     }
 
-    public function getCalledCount() : int
+    public function getCalledCount(): int
     {
         return array_reduce(
             $this->data,
@@ -38,7 +38,7 @@ class PerformanceCollector extends DataCollector
         );
     }
 
-    public function getTotalExecutionTime() : int
+    public function getTotalExecutionTime(): int
     {
         return array_reduce(
             $this->data,
@@ -49,7 +49,7 @@ class PerformanceCollector extends DataCollector
         );
     }
 
-    public function getData() : array
+    public function getData(): array
     {
         return $this->data;
     }

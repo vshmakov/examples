@@ -7,6 +7,7 @@ use Twig\Extension\AbstractExtension;
 use App\Service\Router;
 use App\Repository\AttemptRepository;
 use App\Repository\ExampleRepository;
+use App\Utils\PerformanceMeter;
 
 class ProcessersExtension extends AbstractExtension
 {
@@ -14,12 +15,14 @@ class ProcessersExtension extends AbstractExtension
     private $exampleRepository;
     private $attemptRepository;
     private $router;
+    private $performanceMeter;
 
-    public function __construct(ExampleRepository $exampleRepository, AttemptRepository $attemptRepository, Router $router)
+    public function __construct(ExampleRepository $exampleRepository, AttemptRepository $attemptRepository, Router $router, PerformanceMeter $performanceMeter)
     {
         $this->exampleRepository = $exampleRepository;
         $this->attemptRepository = $attemptRepository;
         $this->router = $router;
+        $this->performanceMeter = $performanceMeter;
     }
 
     public function getFunctions()
@@ -37,9 +40,10 @@ class ProcessersExtension extends AbstractExtension
     public function processVisits(array $visits): array
     {
         return $this->prepareData($visits, function ($propertyAccessor) {
+            $this->performanceMeter->start('processers_extension.process_visits');
             $uri = $propertyAccessor('uri');
 
-            return [
+            $result = [
                 $propertyAccessor('id'),
                 $propertyAccessor('session.user.dumpName'),
                 $propertyAccessor('routeName'),
@@ -53,6 +57,10 @@ class ProcessersExtension extends AbstractExtension
                 $propertyAccessor('session.ip.city'),
                 $this->router->linkToRoute('session_visits', ['id' => $propertyAccessor('session.id')], sprintf('Visits of session (%s)', $propertyAccessor('session.visits.count'))),
             ];
+
+            $this->performanceMeter->finish('processers_extension.process_visits');
+
+            return $result;
         });
     }
 
@@ -136,12 +144,16 @@ class ProcessersExtension extends AbstractExtension
 
     private function prepareData(array $entityList, callable $callback)
     {
+        $this->performanceMeter->start('processers_extension.prepare_data');
+
         $data = [];
 
         foreach ($entityList as $key => $entity) {
             $propertyAccessor = $this->getPropertyAccessor($entity);
             $data[] = $callback($propertyAccessor, $entity, $key, $entityList);
         }
+
+        $this->performanceMeter->finish('processers_extension.prepare_data');
 
         return $data;
     }

@@ -5,66 +5,81 @@
 <h1>Регистрация</h1>
 
 <div class="auth-form register-form">
-{{ form_start(form, {'method': 'post', 'action': path('fos_user_registration_register'), 'attr': {'class': 'fos_user_registration_register'}}) }}
-<table>
-<tr>
-<td>Логин</td>
-<td>
-<div class="error">{{form_errors(form.username)}}</div>
-{{form_widget(form.username)}}
-</td>
-</tr>
-<tr>
-<td>
-Электронная почта<br>
-<small>
-<em>
-На неё будет выслано письмо<br>
-Для подтверждения регистрации
-</em>
-</small>
-</td>
-<td>
-<div class="error">{{form_errors(form.email)}}</div>
-{{form_widget(form.email)}}
-</td>
-</tr>
-<tr>
-<td>Пароль</td>
-<td>
-<div class="error">{{form_errors(form.plainPassword.first)}}</div>
-{{form_widget(form.plainPassword.first)}}
-</td>
-</tr>
-<tr>
-<td>Повторите пароль</td>
-<td>
-<div class="error">{{form_errors(form.plainPassword.second)}}</div>
-{{form_widget(form.plainPassword.second)}}
-</td>
-</tr>
-</table>
-{{form_widget(form)}}
+    {{ form_start(form, {'method': 'post', 'action': path('fos_user_registration_register'), 'attr': {'class':
+    'fos_user_registration_register'}}) }}
+    <table>
+        <tr>
+            <td>Логин</td>
+            <td>
+                <div class="error">{{form_errors(form.username)}}</div>
+                {{form_widget(form.username)}}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Электронная почта<br>
+            </td>
+            <td>
+                <div class="error">{{form_errors(form.email)}}</div>
+                {{form_widget(form.email)}}
+            </td>
+        </tr>
+        <tr>
+            <td>Пароль</td>
+            <td>
+                <div class="error">{{form_errors(form.plainPassword.first)}}</div>
+                {{form_widget(form.plainPassword.first)}}
+            </td>
+        </tr>
+        <tr>
+            <td>Повторите пароль</td>
+            <td>
+                <div class="error">{{form_errors(form.plainPassword.second)}}</div>
+                {{form_widget(form.plainPassword.second)}}
+            </td>
+        </tr>
+    </table>
+    {{form_widget(form)}}
 
     <div>
         <input type="submit" class="btn  " value="{{ 'registration.submit'|trans }}" />
     </div>
-{{ form_end(form) }}
+    {{ form_end(form) }}
 </div>
 
+{% block bottom_links %}
 <div class="auth-links">
-<a href="{{path("fos_user_security_login")}}">Вход</a>
+    <a href="{{path("fos_user_security_login")}}">Вход</a>
 </div>
+{% endblock %}}
 
+<div>
+    <h1>Как зарегистрироваться?</h1>
+    <p>
+        <b></b>
+        Воспользуйтесь регистрацией при помощи широкого списка социальных сетей
+        </b>>
+    </p>
+    
+    <p>Если вы хотите зарегистрироваться  с помощью электронной почты, проделайте следующие действия.</p>
+    <ol>
+        <li>Введите придуманный вами логин, свою электронную почту и, дважды, пароль в форму регистрации.</li>
+        <li>Логин должен начинаться с буквы, заканчиваться буквой или цифрой  и может содержать только строчные латинские символы, цифры, а также ._-</li>
+        <li>После нажатия кнопки "Зарегистрироваться" вы должны оказаться на странице подтверждения регистрации, где будет указано, что на введенный вами адрес электронной почты было выслано письмо подтверждения регистрации.</li>
+        <li>Войдите в  ящик указанной вами электронной почты, откройте пришедшее письмо подтверждения регистрации и перейдите по указанной ссылке.</li>
+        <li>Вы создали свой аккаунт на нашем сервисе. Приятного пользования!</li>
+    </ol>
+</div>
 <h3>Не пришло письмо подтверждения регистрации?</h3>
 <ol>
-<li>Подождите в течение 5 минут, а затем проверьте папку "Спам" вашего почтового ящика.</li>
-<li>Воспользуйтесь <a href="{{path("fos_user_resetting_request")}}">сбросом пароля</a> для подтверждения вашей почты.</li>
-{%set email=FEEDBACK_EMAIL%}
-<li>Напишите нам по адресу <a href="mailto:{{email}}">{{email}}</a>. Мы активируем ваш аккаунт вручную в самое короткое время!</li>
+    <li>Подождите в течение 5 минут, а затем проверьте папку "Спам" вашего почтового ящика.</li>
+    <li>Воспользуйтесь <a href="{{path("fos_user_resetting_request")}}">сбросом пароля</a> для подтверждения вашей
+        почты.</li>
+    {%set email=FEEDBACK_EMAIL%}
+    <li>Напишите нам по адресу <a href="mailto:{{email}}">{{email}}</a>. Мы активируем ваш аккаунт вручную в самое
+        короткое время!</li>
 </ol>
 
 <p>
-<b>Спасибо, что выбрали наш сервис!</b>
+    <b>Спасибо, что выбрали наш сервис!</b>
 </p>
-

@@ -44,4 +44,9 @@ class UserVoter extends Voter
     {
         return !$this->authChecker->isGranted('ROLE_CHILD');
     }
+
+    private function canLogin()
+    {
+        return $this->authChecker->isGranted('ROLE_SUPER_ADMIN');
+    }
 }

@@ -3,67 +3,68 @@
 {% block title %}User index{% endblock %}
 
 {% block body %}
-    <h1>User index</h1>
+<h1>User index</h1>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Login</th>
-                <th>Username</th>
-                <th>Network</th>
-				<th>Network id</th>
-				<th>email</th>
-                <th>Registration time</th>
-                <th>Last visit time</th>
-                <th>Money</th>
-                <th>All money</th>
-                <th>Limit time</th>
-                <th>Attempts</th>
-                <th>Examples</th>
-                <th>Profiles</th>
-                <th>Enabled</th>
-                <th>Ip collection</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Login</th>
+            <th>Username</th>
+            <th>Network</th>
+            <th>Network id</th>
+            <th>email</th>
+            <th>Registration time</th>
+            <th>Last visit time</th>
+            <th>Money</th>
+            <th>All money</th>
+            <th>Limit time</th>
+            <th>Attempts</th>
+            <th>Examples</th>
+            <th>Profiles</th>
+            <th>Enabled</th>
+            <th>Ip collection</th>
+            <th>actions</th>
+        </tr>
+    </thead>
+    <tbody>
         {% for user in users %}
-            <tr>
-                <td>{{ user.setER(uR).id }}</td>
-                <td>{{ user.dumpName}}</td>
-                <td>{{ user.username ?? "-"}}</td>
-                <td>{{user.network ?? "-"}}</td>
-				<td>{{user.networkId ?? "-"}}</td>
-				<td>{{ user.email}}</td>
-                <td>{{ user.addTime.dbFormat}}</td>
-{%set ls=user.sessions.last%}
-                <td>{{ ls ? ls.lastTime.dbFormat : "-"}}</td>
-                <td>{{ user.money}}</td>
-                <td>{{ user.allMoney}}</td>
-                <td>{{ user.limitTime.dbFormat}}</td>
-                <td>{{ user.attemptsCount}}</td>
-                <td><a href="{{path("user_examples", {"id": user.id})}}">{{ user.examplesCount}}</a></td>
-                <td>{{ user.profilesCount}}</td>
-                <td>{{ user.enabled ? "Yes" : "No"}}</td>
-                <td>
-<ol>
-{%for ip in user.ips%}
-<li>{{ip.country}} - {{ip.region}} - {{ip.city}} - {{ip}}</li>
-{%endfor%}
-</ol>
-</td>
-                <td>
-                    <a href="{{ path('user_sessions', {'id': user.id}) }}">Sessions ({{user.sessions.count}})</a>
-                    <a href="{{ path('user_edit', {'id': user.id}) }}">edit</a>
-{{include("user/_delete_form.html.twig")}}
-                </td>
-            </tr>
+        <tr>
+            <td>{{ user.setER(uR).id }}</td>
+            <td>{{ user.dumpName}}</td>
+            <td>{{ user.username ?? "-"}}</td>
+            <td>{{user.network ?? "-"}}</td>
+            <td>{{user.networkId ?? "-"}}</td>
+            <td>{{ user.email}}</td>
+            <td>{{ user.addTime.dbFormat}}</td>
+            {%set ls=user.sessions.last%}
+            <td>{{ ls ? ls.lastTime.dbFormat : "-"}}</td>
+            <td>{{ user.money}}</td>
+            <td>{{ user.allMoney}}</td>
+            <td>{{ user.limitTime.dbFormat}}</td>
+            <td>{{ user.attemptsCount}}</td>
+            <td><a href="{{path("user_examples", {"id": user.id})}}">{{ user.examplesCount}}</a></td>
+            <td>{{ user.profilesCount}}</td>
+            <td>{{ user.enabled ? "Yes" : "No"}}</td>
+            <td>
+                <ol>
+                    {%for ip in user.ips%}
+                    <li>{{ip.country}} - {{ip.region}} - {{ip.city}} - {{ip}}</li>
+                    {%endfor%}
+                </ol>
+            </td>
+            <td>
+                <a href="{{ path('user_sessions', {'id': user.id}) }}">Sessions ({{user.sessions.count}})</a>
+                <a href="{{ path('user_edit', {'id': user.id}) }}">edit</a>
+                <a onclick="return confirm('Do you really want to login as {{ user.username }} user?')" href="{{ path('user_login', {'id': user.id}) }}"" role="button">Login as user</a>
+                {{include("user/_delete_form.html.twig")}}
+            </td>
+        </tr>
         {% endfor %}
-        </tbody>
-    </table>
+    </tbody>
+</table>
 
-    <a href="{{ path('user_new') }}">Create new</a>
+<a href="{{ path('user_new') }}">Create new</a>
 {% endblock %}
 
 
@@ -71,9 +72,9 @@
 {{parent()}}
 <script src="/js/jquery.datatables.min.js"></script>
 <script>
-$("table").DataTable({
-order: [7, "desc"],
-pageLength: 50,
-});
+    $("table").DataTable({
+        order: [7, "desc"],
+        pageLength: 50,
+    });
 </script>
 {%endblock%}

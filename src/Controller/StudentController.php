@@ -37,6 +37,9 @@ class StudentController extends Controller
             'students' => $currentUser->getRealStudents()->getValues(),
             'children' => $currentUser->getChildren()->getValues(),
             'userRepository' => $userRepository,
+            'DTSubDays' => function (int $day) : \DateTimeInterface {
+                return \DT::createBySubDays($day);
+            },
         ]);
     }
 

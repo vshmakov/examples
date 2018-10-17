@@ -140,14 +140,30 @@ where u = :u')
         return $user;
     }
 
-    public function getDoneAttemptsCount(User $user)
+    public function getDoneAttemptsCount(User $user, \DateTimeInterface $dt = null) : int
     {
-        $attempts = $this->createQuery('select a from App:Attempt a
+        static $attemptsList = [];
+
+        $userId = $user->getId();
+
+        if (isset($attemptsList[$userId])) {
+            $attempts = $attemptsList[$userId];
+        } else {
+            $attempts = $this->createQuery('select a from App:Attempt a
 join a.session s
 join s.user u
 where u = :u')
-            ->setParameters(['u' => $user])
-            ->getResult();
+                ->setParameters(['u' => $user])
+                ->getResult();
+
+            $attemptsList[$userId] = $attempts;
+        }
+
+        if ($dt) {
+            $attempts = array_filter($attempts, function (Attempt $attempt) use ($dt) : bool {
+                return $attempt->getAddTime()->getTimestamp() > $dt->getTimestamp();
+            });
+        }
 
         $attemptRepository = $this->getEntityRepository(Attempt::class);
         $count = 0;
@@ -161,15 +177,23 @@ where u = :u')
         return $count;
     }
 
-    public function getSolvedExamplesCount(User $user)
+    public function getSolvedExamplesCount(User $user, \DateTimeInterface $dt = null) : int
     {
+        $andWhere = '';
+        $parameters = ['u' => $user];
+
+        if ($dt) {
+            $andWhere = ' and e.addTime > :dt';
+                $parameters += ['dt' => $dt];
+        }
+
         return $this->getValue(
-            $this->createQuery('select count(e) from App:Example e
+            $this->createQuery("select count(e) from App:Example e
 join e.attempt a
 join a.session s
 join s.user u
-where u = :u and e.isRight = true')
-                ->setParameters(['u' => $user])
+where u = :u and e.isRight = true $andWhere")
+                ->setParameters($parameters)
         );
     }
 

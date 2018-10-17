@@ -20,7 +20,7 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
 
     public function __construct(UserLoader $userLoader, AttemptRepository $attemptRepository, UserRepository $userRepository, EntityManagerInterface $entityManager, ContainerInterface $container)
     {
-        $hasActualAttempt = (bool) $attemptRepository->findLastActualByCurrentUser();
+        $hasActualAttempt = (bool)$attemptRepository->findLastActualByCurrentUser();
         $user = $userLoader->getUser()->setEntityRepository($userRepository);
 
         $this->entityManager = $entityManager;
@@ -43,6 +43,7 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
     public function getFunctions()
     {
         return $this->prepareFunctions([
+            'dt',
             'addTimeNumber',
             'sortByAddTime',
             'sortProfiles',
@@ -50,6 +51,14 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
             'sortStudents',
             'fillIp',
         ]);
+    }
+
+    public function dt(string $staticMethod, ...$parameters)
+    {
+        return call_user_func_array(sprintf(
+            '\DT::%s',
+            $staticMethod
+        ), $parameters);
     }
 
     public function addTimeNumber($entity, array $entityList)

@@ -26,7 +26,7 @@ trait BaseTrait
     {
         $entityRepository = $this->entityRepository;
 
-        if (!preg_match('#^get#', $method)) {
+        if (!preg_match('#^(get|has)#', $method)) {
             $method = "get_$method";
         }
 

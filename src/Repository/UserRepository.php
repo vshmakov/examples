@@ -184,7 +184,7 @@ where u = :u')
 
         if ($dt) {
             $andWhere = ' and e.addTime > :dt';
-                $parameters += ['dt' => $dt];
+            $parameters += ['dt' => $dt];
         }
 
         return $this->getValue(
@@ -211,5 +211,17 @@ where u = :u and e.isRight = true $andWhere")
         $entityManager->flush();
 
         return count($users);
+    }
+
+    public function hasExamples(User $user) : bool
+    {
+return $this->getValue(
+$this->createQuery('select count(e) from App:Example e
+join e.attempt a
+join a.session s
+join s.user u
+where u = :user')
+->setParameters(['user'=>$user])
+);
     }
 }

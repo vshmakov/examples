@@ -8,6 +8,7 @@ use App\Entity\Session;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use App\Utils\Cache\LocalCache;
 
 class SessionRepository extends ServiceEntityRepository
 {
@@ -15,13 +16,15 @@ class SessionRepository extends ServiceEntityRepository
     private $userLoader;
     private $currentUser;
     private $sessionMarker;
+    private $localCache;
 
-    public function __construct(RegistryInterface $registry, UserLoader $userLoader, SessionMarker $sessionMarker)
+    public function __construct(RegistryInterface $registry, UserLoader $userLoader, SessionMarker $sessionMarker, LocalCache $localCache)
     {
         parent::__construct($registry, Session::class);
         $this->userLoader = $userLoader;
         $this->currentUser = $userLoader->getUser();
         $this->sessionMarker = $sessionMarker;
+        $this->localCache = $localCache;
     }
 
     public function findOneByCurrentUser()
@@ -33,7 +36,9 @@ class SessionRepository extends ServiceEntityRepository
     {
         $sid = $this->sessionMarker->getKey();
 
-        return $this->findOneByUserAndSid($user, $sid);
+        $this->localCache->get(['users[%s, sid=%s].session', $user, $sid], function () use ($user, $sid) {
+            return $this->findOneByUserAndSid($user, $sid);
+        });
     }
 
     public function findOneByCurrentUserOrGetNew()
@@ -64,15 +69,16 @@ class SessionRepository extends ServiceEntityRepository
             return $session;
         }
 
+        $sid = $this->userLoader->isGuest() ? $sid : '';
         $session = (new Session())
             ->setUser($user)
-            ->setSid(($this->userLoader->isGuest()) ? $sid : '');
+            ->setSid($sid);
 
         $entityManager = $this->getEntityManager();
         $entityManager->persist($session);
         $entityManager->flush();
 
-        return $session;
+        return $this->localCache->set(['users[%s, sid=%s].session', $user, $sid], $session);
     }
 
     public function clearSessions(\DateTimeInterface $dt)

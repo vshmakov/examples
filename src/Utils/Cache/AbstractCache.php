@@ -23,7 +23,7 @@ abstract class AbstractCache
 
     public function set($key, $value)
     {
-        $this->storage->set($key, $value);
+        $this->storage->set($this->processKey($key), $value);
 
         return $value;
     }
@@ -37,7 +37,7 @@ abstract class AbstractCache
         });
         $format = [array_shift(($parameters))];
         $sprintfParameters = array_reduce($parameters, function ($parameters, $object) use ($propertyAccessor) : array {
-            $parameters[] = $propertyAccessor->getValue($object, 'id');
+            $parameters[] = \is_object($object) ? $propertyAccessor->getValue($object, 'id') : '' . $object;
 
             return $parameters;
         }, $format);

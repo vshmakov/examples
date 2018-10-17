@@ -9,18 +9,21 @@ use App\Service\UserLoader;
 use App\Entity\Example;
 use App\Entity\Attempt;
 use App\Entity\User;
+use App\Utils\Cache\GlobalCache;
 
 class ExampleRepository extends ServiceEntityRepository
 {
     use BaseTrait;
     private $exampleManager;
     private $userLoader;
+    private $globalCache;
 
-    public function __construct(RegistryInterface $registry, ExampleManager $exampleManager, UserLoader $userLoader)
+    public function __construct(RegistryInterface $registry, ExampleManager $exampleManager, UserLoader $userLoader, GlobalCache $globalCache)
     {
         parent::__construct($registry, Example::class);
         $this->exampleManager = $exampleManager;
         $this->userLoader = $userLoader;
+        $this->globalCache = $globalCache;
     }
 
     public function findLastUnansweredByAttempt(Attempt $attempt)
@@ -116,9 +119,8 @@ where u = :u and a.addTime > :dt')
 
     public function getSolvingTime(Example $example)
     {
-        $solvingTime = null;
-
-        if ($example->getAnswerTime()) {
+        $solvingTime = !$example->isAnswered() ? null
+            : $this->globalCache->get(['examples[%s].solvingTime', $example], function () use ($example) {
             $previousExample = $this->getValue(
                 $this->createQuery('select e from App:Example e
 where e.attempt = :att and e.addTime < :dt
@@ -129,8 +131,9 @@ order by e.addTime desc')
                     ])
             );
             $previousTime = $previousExample ? $previousExample->getAnswerTime() : $example->getAttempt()->getAddTime();
-            $solvingTime = $example->getAnswerTime()->getTimestamp() - $previousTime->getTimestamp();
-        }
+
+            return $example->getAnswerTime()->getTimestamp() - $previousTime->getTimestamp();
+        });
 
         return $this->dts($solvingTime);
     }

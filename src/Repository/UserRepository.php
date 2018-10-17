@@ -8,17 +8,20 @@ use App\Entity\Profile;
 use App\Entity\Attempt;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use App\Utils\CacheMaster;
 
 class UserRepository extends ServiceEntityRepository
 {
     use BaseTrait;
     const GUEST_LOGIN = '__guest';
     private $authChecker;
+    private $cacheMaster;
 
-    public function __construct(RegistryInterface $registry, AuthChecker $authChecker)
+    public function __construct(RegistryInterface $registry, AuthChecker $authChecker, CacheMaster $cacheMaster)
     {
         parent::__construct($registry, User::class);
         $this->authChecker = $authChecker;
+        $this->cacheMaster = $cacheMaster;
     }
 
     public function getCurrentProfile(User $user)
@@ -142,22 +145,15 @@ where u = :u')
 
     public function getDoneAttemptsCount(User $user, \DateTimeInterface $dt = null) : int
     {
-        static $attemptsList = [];
-
-        $userId = $user->getId();
-
-        if (isset($attemptsList[$userId])) {
-            $attempts = $attemptsList[$userId];
-        } else {
-            $attempts = $this->createQuery('select a from App:Attempt a
+        $cacheMaster = $this->cacheMaster;
+        $attempts = $cacheMaster->get(['users[%s].attempts', $user], function () use ($user) : array {
+            return $this->createQuery('select a from App:Attempt a
 join a.session s
 join s.user u
 where u = :u')
                 ->setParameters(['u' => $user])
                 ->getResult();
-
-            $attemptsList[$userId] = $attempts;
-        }
+        });
 
         if ($dt) {
             $attempts = array_filter($attempts, function (Attempt $attempt) use ($dt) : bool {
@@ -169,7 +165,11 @@ where u = :u')
         $count = 0;
 
         foreach ($attempts as $attempt) {
-            if ($attemptRepository->getSolvedExamplesCount($attempt) == $attempt->getSettings()->getExamplesCount()) {
+            $isAttemptDone = $cacheMaster->get(['attempts[%s].isDone', $attempt], function () use ($attempt, $attemptRepository) : bool {
+                return $attemptRepository->getSolvedExamplesCount($attempt) == $attempt->getSettings()->getExamplesCount();
+            });
+
+            if ($isAttemptDone) {
                 ++$count;
             }
         }
@@ -215,13 +215,15 @@ where u = :u and e.isRight = true $andWhere")
 
     public function hasExamples(User $user) : bool
     {
-return $this->getValue(
-$this->createQuery('select count(e) from App:Example e
+        return $this->cacheMaster->get(['users[%s].hasExamples', $user], function () use ($user) : bool {
+            return $this->getValue(
+                $this->createQuery('select count(e) from App:Example e
 join e.attempt a
 join a.session s
 join s.user u
 where u = :user')
-->setParameters(['user'=>$user])
-);
+                    ->setParameters(['user' => $user])
+            );
+        });
     }
 }

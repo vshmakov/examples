@@ -8,20 +8,20 @@ use App\Entity\Profile;
 use App\Entity\Attempt;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
-use App\Utils\CacheMaster;
+use App\Utils\Cache\LocalCache;
 
 class UserRepository extends ServiceEntityRepository
 {
     use BaseTrait;
     const GUEST_LOGIN = '__guest';
     private $authChecker;
-    private $cacheMaster;
+    private $localCache;
 
-    public function __construct(RegistryInterface $registry, AuthChecker $authChecker, CacheMaster $cacheMaster)
+    public function __construct(RegistryInterface $registry, AuthChecker $authChecker, LocalCache $localCache)
     {
         parent::__construct($registry, User::class);
         $this->authChecker = $authChecker;
-        $this->cacheMaster = $cacheMaster;
+        $this->localCache = $localCache;
     }
 
     public function getCurrentProfile(User $user)
@@ -145,8 +145,8 @@ where u = :u')
 
     public function getDoneAttemptsCount(User $user, \DateTimeInterface $dt = null) : int
     {
-        $cacheMaster = $this->cacheMaster;
-        $attempts = $cacheMaster->get(['users[%s].attempts', $user], function () use ($user) : array {
+        $localCache = $this->localCache;
+        $attempts = $localCache->get(['users[%s].attempts', $user], function () use ($user) : array {
             return $this->createQuery('select a from App:Attempt a
 join a.session s
 join s.user u
@@ -165,7 +165,7 @@ where u = :u')
         $count = 0;
 
         foreach ($attempts as $attempt) {
-            $isAttemptDone = $cacheMaster->get(['attempts[%s].isDone', $attempt], function () use ($attempt, $attemptRepository) : bool {
+            $isAttemptDone = $localCache->get(['attempts[%s].isDone', $attempt], function () use ($attempt, $attemptRepository) : bool {
                 return $attemptRepository->getSolvedExamplesCount($attempt) == $attempt->getSettings()->getExamplesCount();
             });
 
@@ -215,7 +215,7 @@ where u = :u and e.isRight = true $andWhere")
 
     public function hasExamples(User $user) : bool
     {
-        return $this->cacheMaster->get(['users[%s].hasExamples', $user], function () use ($user) : bool {
+        return $this->localCache->get(['users[%s].hasExamples', $user], function () use ($user) : bool {
             return $this->getValue(
                 $this->createQuery('select count(e) from App:Example e
 join e.attempt a

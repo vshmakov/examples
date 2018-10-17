@@ -1,38 +1,29 @@
 <?php
 
-namespace App\Utils;
+namespace App\Utils\Cache;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class CacheMaster
+abstract class AbstractCache
 {
-    private static $cache;
+    protected $storage;
 
-    public function __construct()
+    public function get($key, callable $callback)
     {
-        self::initCache();
-    }
+        $key = $this->processKey($key);
 
-    private static function initCache()
-    {
-        if (!self::$cache) {
-            self::$cache = new ArrayCollection;
-        }
-    }
-
-    public function get($key, callable $callback = null)
-    {
-        if (is_array($key)) {
-            $key = $this->generateKey(...$key);
+        if ($this->has($key)) {
+            return $this->storage->get($key);
         }
 
-            return self::$cache->get($key) ?? $this->set($key, $callback());
+        return $this->set($key, $callback());
     }
 
-    public function set(string $key, $value)
+    abstract public function has($key) : bool;
+
+    public function set($key, $value)
     {
-        self::$cache->set($key, $value);
+        $this->storage->set($key, $value);
 
         return $value;
     }
@@ -52,5 +43,10 @@ class CacheMaster
         }, $format);
 
         return sprintf(...$sprintfParameters);
+    }
+
+    protected function processKey($key) : string
+    {
+        return is_array($key) ? $this->generateKey(...$key) : $key;
     }
 }

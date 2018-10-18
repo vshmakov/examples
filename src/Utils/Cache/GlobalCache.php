@@ -11,8 +11,8 @@ class GlobalCache extends AbstractCache
         $this->storage = $simpleCache;
     }
 
-    public function has($key) : bool
+    public function has($key): bool
     {
-        return $this->storage->has($this->processKey($key));
+        return $this->works ? $this->storage->has($this->processKey($key)) : false;
     }
 }

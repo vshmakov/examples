@@ -7,6 +7,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 abstract class AbstractCache
 {
     protected $storage;
+    protected $works = false;
 
     public function get($key, callable $callback)
     {
@@ -19,16 +20,18 @@ abstract class AbstractCache
         return $this->set($key, $callback());
     }
 
-    abstract public function has($key) : bool;
+    abstract public function has($key): bool;
 
     public function set($key, $value)
     {
-        $this->storage->set($this->processKey($key), $value);
+        if ($this->works) {
+            $this->storage->set($this->processKey($key), $value);
+        }
 
         return $value;
     }
 
-    public function generateKey(...$parameters) : string
+    public function generateKey(...$parameters): string
     {
         $propertyAccessor = $this->get('cache_master.generate_key.property_accessor', function () {
             return PropertyAccess::createPropertyAccessorBuilder()
@@ -36,8 +39,8 @@ abstract class AbstractCache
                 ->getPropertyAccessor();
         });
         $format = [array_shift(($parameters))];
-        $sprintfParameters = array_reduce($parameters, function ($parameters, $object) use ($propertyAccessor) : array {
-            $parameters[] = \is_object($object) ? $propertyAccessor->getValue($object, 'id') : '' . $object;
+        $sprintfParameters = array_reduce($parameters, function ($parameters, $object) use ($propertyAccessor): array {
+            $parameters[] = \is_object($object) ? $propertyAccessor->getValue($object, 'id') : ''.$object;
 
             return $parameters;
         }, $format);
@@ -45,7 +48,7 @@ abstract class AbstractCache
         return sprintf(...$sprintfParameters);
     }
 
-    protected function processKey($key) : string
+    protected function processKey($key): string
     {
         return is_array($key) ? $this->generateKey(...$key) : $key;
     }

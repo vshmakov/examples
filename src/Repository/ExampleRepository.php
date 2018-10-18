@@ -121,7 +121,7 @@ where u = :u and a.addTime > :dt')
     {
         $solvingTime = !$example->isAnswered() ? null
             : $this->globalCache->get(['examples[%s].solvingTime', $example], function () use ($example) {
-            $previousExample = $this->getValue(
+                $previousExample = $this->getValue(
                 $this->createQuery('select e from App:Example e
 where e.attempt = :att and e.addTime < :dt
 order by e.addTime desc')
@@ -130,10 +130,10 @@ order by e.addTime desc')
                         'att' => $example->getAttempt(),
                     ])
             );
-            $previousTime = $previousExample ? $previousExample->getAnswerTime() : $example->getAttempt()->getAddTime();
+                $previousTime = $previousExample ? $previousExample->getAnswerTime() : $example->getAttempt()->getAddTime();
 
-            return $example->getAnswerTime()->getTimestamp() - $previousTime->getTimestamp();
-        });
+                return $example->getAnswerTime()->getTimestamp() - $previousTime->getTimestamp();
+            });
 
         return $this->dts($solvingTime);
     }

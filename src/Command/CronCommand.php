@@ -50,6 +50,7 @@ class CronCommand extends Command
 
         $dt = \DT::createBySubDays(7);
         $removedSessionsCount = $this->sessionRepository->clearSessions($dt);
+        $dt = \DT::createBySubDays(2);
         $removedVisitsCount = $this->visitRepository->cleareVisits($dt);
         $dt = \DT::createBySubDays(10);
         $removedUsersCount = $this->userRepository->clearNotEnabledUsers($dt);

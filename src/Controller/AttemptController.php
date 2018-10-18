@@ -53,7 +53,7 @@ class AttemptController extends Controller
             if ($this->isGranted('VIEW', $attempt)) {
                 return $this->redirectToRoute('attempt_show', ['id' => $attempt->getId()]);
             } else {
-                throw new AccessDeniedException();
+                throw $this->createAccessDenyedException();
             }
         }
 
@@ -63,6 +63,7 @@ class AttemptController extends Controller
             'jsParams' => [
                 'attData' => $attempt->setEntityRepository($attemptRepository)->getData(),
                 'attempt_answer' => $this->generateUrl('attempt_answer', ['id' => $attempt->getId()]),
+                'showAttemptUrl' => $this->generateUrl('attempt_show', ['id' => $attempt->getId()]),
             ],
             'att' => $attempt,
         ]);
@@ -102,7 +103,7 @@ class AttemptController extends Controller
         }
 
         $example = $exampleRepository->findLastUnansweredByAttempt($attempt);
-        $answer = (float) $request->request->get('answer');
+        $answer = (float)$request->request->get('answer');
         $example->setAnswer($answer);
         $entityManager->flush();
 
@@ -117,7 +118,7 @@ class AttemptController extends Controller
             'finish' => $finish,
             'attData' => $attempt->setEntityRepository($attemptRepository)->getData(),
         ]
- + $showAttemptUrl);
+            + $showAttemptUrl);
     }
 
     /**

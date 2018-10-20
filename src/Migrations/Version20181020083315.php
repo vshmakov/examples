@@ -43,13 +43,21 @@ final class Version20181020083315 extends AbstractMigration implements Container
             $settings = new Settings();
             Settings::copySettings($profileInstance, $settings);
             $entityManager->persist($settings);
-            $attemptsSettings[$row['id']] = $settings;
+            $entityManager->flush();
+            $queries[] = sprintf('update attempt set settings_id = %d where id = %d', $settings->getId(), $row['id']);
         }
-        
-        $this->abortIf(true, 'Test reason');
-        $this->addSql('ALTER TABLE attempt ADD settings_id INT NOT NULL, DROP settings');
+
+        //$this->abortIf(true);
+        $this->addSql('ALTER TABLE attempt ADD settings_id INT NOT NULL DEFAULT 1 , DROP settings');
         $this->addSql('ALTER TABLE attempt ADD CONSTRAINT FK_18EC026659949888 FOREIGN KEY (settings_id) REFERENCES settings (id)');
+
+        foreach ($queries as $query) {
+            $this->addSql($query);
+        }
+
         $this->addSql('CREATE UNIQUE INDEX UNIQ_18EC026659949888 ON attempt (settings_id)');
+
+       $entityManager->flush();
     }
 
     public function down(Schema $schema) : void

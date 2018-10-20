@@ -56,7 +56,7 @@ class Profile extends ProfileBase
         return $this;
     }
 
-    public function isPublic() : ? bool
+    public function isPublic() : bool
     {
         return $this->isPublic;
     }

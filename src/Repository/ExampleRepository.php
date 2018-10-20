@@ -90,7 +90,7 @@ where e.attempt = :a and e.addTime < :dt $where")
                 ->setSecond($lastExample->getSecond())
                 ->setSign($lastExample->getSign());
         } else {
-            ($settings = $attempt->getSettings()->getData());
+            ($settings = $attempt->getSettings()->getSettings());
             $exampleManager = $this->exampleManager;
             $sign = $exampleManager->getRandSign($settings);
             $previousExamples = $this->createQuery('select e from App:Example e

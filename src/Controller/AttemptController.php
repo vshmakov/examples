@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Form\ProfileType;
+use App\Form\SettingsType;
 use App\Repository\ProfileRepository;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Doctrine\ORM\EntityManagerInterface;
@@ -134,7 +134,7 @@ class AttemptController extends Controller
                 'canEdit' => false,
             ],
             'profile' => $profile,
-            'form' => $this->createForm(ProfileType::class, $profile)->createView(),
+            'form' => $this->createForm(SettingsType::class, $profile)->createView(),
             'att' => $attempt->setEntityRepository($attemptRepository),
         ]);
     }

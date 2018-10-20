@@ -7,6 +7,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 
 class ProfileType extends AbstractType
 {
@@ -28,7 +29,7 @@ class ProfileType extends AbstractType
             ->add('subPerc')
             ->add('multPerc')
             ->add('divPerc')
-->add('isDemanding')
+->add('isDemanding', CheckboxType::class, ['required' => false])
 ;
 
         foreach (['add', 'sub', 'mult', 'div'] as $k) {

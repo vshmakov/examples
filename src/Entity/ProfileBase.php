@@ -316,7 +316,7 @@ abstract class ProfileBase
 
     public function getSettings()
     {
-        $propertyAccessor = self::createPropertyAccessor()();
+        $propertyAccessor = self::createPropertyAccessor();
 
         return array_reduce(
             self::getSettingsFields(),
@@ -329,7 +329,7 @@ abstract class ProfileBase
         );
     }
 
-    public function isDemanding() : ? bool
+    public function isDemanding() : bool
     {
         return $this->isDemanding;
     }

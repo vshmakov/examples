@@ -29,7 +29,6 @@ class SettingsRepository extends ServiceEntityRepository
 
         $entityManager = $this->getEntityManager();
         $entityManager->persist($settings);
-        dd($settings);
         $entityManager->flush();
 
         return $settings;

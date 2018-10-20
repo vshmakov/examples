@@ -369,7 +369,7 @@ abstract class ProfileBase
                 $propertyAccessor->setValue(
                     $target,
                     $property,
-                    $propertyAccessor->getValue($property, $source)
+                    $propertyAccessor->getValue($source, $property)
                 );
 
                 return $target;
@@ -381,11 +381,12 @@ abstract class ProfileBase
     protected static function createPropertyAccessor()
     {
         return PropertyAccess::createPropertyAccessorBuilder()
+            ->enableExceptionOnInvalidIndex()
             ->getPropertyAccessor();
     }
 
     private static function getSettingsFields() : array
     {
-        return arr('duration examplesCount addFMin addFMax addSMin addSMax addMin addMax subFMin subFMax subSMin subSMax subMin subMax multFMin multFMax multSMin multSMax multMin multMax divFMin divFMax divSMin divSMax divMin divMax addPerc subPerc multPerc divPerc');
+        return arr('duration examplesCount addFMin addFMax addSMin addSMax addMin addMax subFMin subFMax subSMin subSMax subMin subMax multFMin multFMax multSMin multSMax multMin multMax divFMin divFMax divSMin divSMax divMin divMax addPerc subPerc multPerc divPerc description');
     }
 }

@@ -18,7 +18,7 @@ class Profile extends ProfileBase
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      */
-    private $id;
+    protected  $id;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="profiles")

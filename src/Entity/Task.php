@@ -11,6 +11,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Task
 {
+use BaseTrait;
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -43,12 +45,18 @@ class Task
     /**
      * @ORM\Column(type="smallint")
      */
-    private $timesCount;
+    private $timesCount=3;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $addTime;
 
     public function __construct()
     {
         $this->contractors = new ArrayCollection();
         $this->attempts = new ArrayCollection();
+$this->addTime=new \DateTime();
     }
 
     public function getId(): ?int
@@ -145,6 +153,18 @@ class Task
     public function setTimesCount(int $timesCount): self
     {
         $this->timesCount = $timesCount;
+
+        return $this;
+    }
+
+    public function getAddTime(): ?\DateTimeInterface
+    {
+        return $this->dt($this->addTime);
+    }
+
+    public function setAddTime(\DateTimeInterface $addTime): self
+    {
+        $this->addTime = $addTime;
 
         return $this;
     }

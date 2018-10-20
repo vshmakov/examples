@@ -43,6 +43,11 @@ class Attempt
      */
     private $settings;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Task", inversedBy="attempts")
+     */
+    private $task;
+
     public function __construct()
     {
         $this->examples = new ArrayCollection();
@@ -139,6 +144,18 @@ class Attempt
     public function setSettings(Settings $settings): self
     {
         $this->settings = $settings;
+
+        return $this;
+    }
+
+    public function getTask(): ?Task
+    {
+        return $this->task;
+    }
+
+    public function setTask(?Task $task): self
+    {
+        $this->task = $task;
 
         return $this;
     }

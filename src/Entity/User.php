@@ -184,6 +184,8 @@ class User implements UserInterface, GroupableInterface
         $this->transfers = new ArrayCollection();
         $this->students = new ArrayCollection();
         $this->children = new ArrayCollection();
+        $this->tasks = new ArrayCollection();
+        $this->homework = new ArrayCollection();
     }
 
     public function getId()
@@ -494,6 +496,16 @@ class User implements UserInterface, GroupableInterface
      * @ORM\OneToMany(targetEntity="App\Entity\User", mappedBy="parent")
      */
     private $children;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Task", mappedBy="author", orphanRemoval=true)
+     */
+    private $tasks;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Task", mappedBy="contractors")
+     */
+    private $homework;
 
     public function getFirstName(): ? string
     {
@@ -807,5 +819,64 @@ class User implements UserInterface, GroupableInterface
     public function hasParent(): bool
     {
         return (bool) $this->parent;
+    }
+
+    /**
+     * @return Collection|Task[]
+     */
+    public function getTasks(): Collection
+    {
+        return $this->tasks;
+    }
+
+    public function addTask(Task $task): self
+    {
+        if (!$this->tasks->contains($task)) {
+            $this->tasks[] = $task;
+            $task->setAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTask(Task $task): self
+    {
+        if ($this->tasks->contains($task)) {
+            $this->tasks->removeElement($task);
+            // set the owning side to null (unless already changed)
+            if ($task->getAuthor() === $this) {
+                $task->setAuthor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Task[]
+     */
+    public function getHomework(): Collection
+    {
+        return $this->homework;
+    }
+
+    public function addHomework(Task $homework): self
+    {
+        if (!$this->homework->contains($homework)) {
+            $this->homework[] = $homework;
+            $homework->addContractor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeHomework(Task $homework): self
+    {
+        if ($this->homework->contains($homework)) {
+            $this->homework->removeElement($homework);
+            $homework->removeContractor($this);
+        }
+
+        return $this;
     }
 }

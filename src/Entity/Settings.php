@@ -23,6 +23,11 @@ class Settings extends ProfileBase
      */
     private $attempt;
 
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Task", mappedBy="settings", cascade={"persist", "remove"})
+     */
+    private $task;
+
     public function getAttempt(): ?Attempt
     {
         return $this->attempt;
@@ -35,6 +40,23 @@ class Settings extends ProfileBase
         // set the owning side of the relation if necessary
         if ($this !== $attempt->getSettings()) {
             $attempt->setSettings($this);
+        }
+
+        return $this;
+    }
+
+    public function getTask(): ?Task
+    {
+        return $this->task;
+    }
+
+    public function setTask(Task $task): self
+    {
+        $this->task = $task;
+
+        // set the owning side of the relation if necessary
+        if ($this !== $task->getSettings()) {
+            $task->setSettings($this);
         }
 
         return $this;

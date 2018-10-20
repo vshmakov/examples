@@ -20,7 +20,7 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
 
     public function __construct(UserLoader $userLoader, AttemptRepository $attemptRepository, UserRepository $userRepository, EntityManagerInterface $entityManager, ContainerInterface $container)
     {
-        $hasActualAttempt = (bool) false; //$attemptRepository->findLastActualByCurrentUser();
+        $hasActualAttempt = (bool) $attemptRepository->findLastActualByCurrentUser();
         $user = $userLoader->getUser()->setEntityRepository($userRepository);
 
         $this->entityManager = $entityManager;

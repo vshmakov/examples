@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ProfileRepository")
  */
-class Profile
+class Profile extends ProfileBase
 {
     use BaseTrait;
 
@@ -27,296 +27,43 @@ class Profile
     private $author;
 
     /**
-     * @ORM\Column(type="datetime")
-     */
-    private $addTime;
-
-    /**
      * @ORM\Column(type="boolean")
      */
     private $isPublic = false;
-
-    /**
-     * @ORM\Column(type="smallint")
-     */
-    private $duration = 180;
-
-    /**
-     * @ORM\Column(type="smallint")
-     */
-    private $examplesCount = 5;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $addFMin = 0;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $addFMax = 3;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $addSMin = 0;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $addSMax = 3;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $addMin = -1;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $addMax = -1;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $subFMin = 0;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $subFMax = 5;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $subSMin = 0;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $subSMax = 5;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $subMin = 0;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $subMax = 1000;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $multFMin = 0;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $multFMax = 3;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $multSMin = 0;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $multSMax = 3;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $multMin = -1;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $multMax = -1;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $divFMin = 0;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $divFMax = 6;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $divSMin = 1;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $divSMax = 6;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $divMin = -1;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $divMax = -1;
-
-    /**
-     * @ORM\Column(type="smallint")
-     */
-    private $addPerc = 25;
-
-    /**
-     * @ORM\Column(type="smallint")
-     */
-    private $subPerc = 25;
-
-    /**
-     * @ORM\Column(type="smallint")
-     */
-    private $multPerc = 25;
-
-    /**
-     * @ORM\Column(type="smallint")
-     */
-    private $divPerc = 25;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\User", mappedBy="profile")
      */
     private $users;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $description;
-
-    /**
-     * @ORM\Column(type="boolean")
-     */
-    private $isDemanding = true;
 
     public function __construct()
     {
+        parent::__construct();
         $this->users = new ArrayCollection();
-        $this->addTime = new \DateTime();
         $this->normalize();
     }
 
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    public function getAuthor(): ?User
+    public function getAuthor() : ? User
     {
         return $this->author;
     }
 
-    public function setAuthor(?User $author): self
+    public function setAuthor(? User $author) : self
     {
         $this->author = $author;
 
         return $this;
     }
 
-    public function getAddTime(): ?\DateTimeInterface
-    {
-        return $this->dt($this->addTime);
-    }
-
-    public function setAddTime(\DateTimeInterface $addTime): self
-    {
-        $this->addTime = $addTime;
-
-        return $this;
-    }
-
-    public function isPublic(): ?bool
+    public function isPublic() : ? bool
     {
         return $this->isPublic;
     }
 
-    public function setIsPublic(bool $isPublic): self
+    public function setIsPublic(bool $isPublic) : self
     {
         $this->isPublic = $isPublic;
-
-        return $this;
-    }
-
-    public function getDuration(): ?int
-    {
-        return $this->duration;
-    }
-
-    public function setDuration(int $duration): self
-    {
-        $this->duration = btwVal(30, HOUR - 1, $duration);
-
-        return $this;
-    }
-
-    public function getExamplesCount(): ?int
-    {
-        return $this->examplesCount;
-    }
-
-    public function setExamplesCount(int $examplesCount): self
-    {
-        $this->examplesCount = btwVal(3, 150, $examplesCount);
-
-        return $this;
-    }
-
-    public function getAddPerc(): ?int
-    {
-        return $this->addPerc;
-    }
-
-    public function setAddPerc(int $addPerc): self
-    {
-        $this->addPerc = $addPerc;
-
-        return $this;
-    }
-
-    public function getSubPerc(): ?int
-    {
-        return $this->subPerc;
-    }
-
-    public function setSubPerc(int $subPerc): self
-    {
-        $this->subPerc = $subPerc;
-
-        return $this;
-    }
-
-    public function getMultPerc(): ?int
-    {
-        return $this->multPerc;
-    }
-
-    public function setMultPerc(int $multPerc): self
-    {
-        $this->multPerc = $multPerc;
-
-        return $this;
-    }
-
-    public function getDivPerc(): ?int
-    {
-        return $this->divPerc;
-    }
-
-    public function setDivPerc(int $divPerc): self
-    {
-        $this->divPerc = $divPerc;
 
         return $this;
     }
@@ -324,12 +71,12 @@ class Profile
     /**
      * @return Collection|User[]
      */
-    public function getUsers(): Collection
+    public function getUsers() : Collection
     {
         return $this->users;
     }
 
-    public function addUser(User $user): self
+    public function addUser(User $user) : self
     {
         if (!$this->users->contains($user)) {
             $this->users[] = $user;
@@ -339,7 +86,7 @@ class Profile
         return $this;
     }
 
-    public function removeUser(User $user): self
+    public function removeUser(User $user) : self
     {
         if ($this->users->contains($user)) {
             $this->users->removeElement($user);
@@ -354,21 +101,22 @@ class Profile
 
     private function normalizePercents()
     {
-        $pKeies = ['addPerc', 'subPerc', 'multPerc', 'divPerc'];
-        $p = [];
+        $percentKeys = ['addPerc', 'subPerc', 'multPerc', 'divPerc'];
+        $percents = [];
+        $propertyAccessor = self::createPropertyAccessor();
 
-        foreach ($pKeies as $k) {
-            $p[$k] = $this->$k;
+        foreach ($percentKeys as $property) {
+            $percents[$property] = $propertyAccessor->getValue($this, $property);
         }
 
-        foreach (normPerc($p) as $k => $v) {
-            $this->$k = $v;
+        foreach (normPerc($percents) as $property => $value) {
+            $propertyAccessor->setValue($this, $property, $value);
         }
 
         return $this;
     }
 
-    public function getMinutes(): int
+    public function getMinutes() : int
     {
         return $this->duration / MIN;
     }
@@ -381,7 +129,7 @@ class Profile
         return $this;
     }
 
-    public function getSeconds(): int
+    public function getSeconds() : int
     {
         return $this->duration % MIN;
     }
@@ -394,12 +142,12 @@ class Profile
         return $this;
     }
 
-    public function getDescription(): ?string
+    public function getDescription() : ? string
     {
         return $this->description;
     }
 
-    public function setDescription(string $description): self
+    public function setDescription(string $description) : self
     {
         $this->description = $description;
 
@@ -408,7 +156,7 @@ class Profile
 
     public function __toString()
     {
-        return $this->getDescription().' - '.$this->getAuthor()->getUsername();
+        return $this->getDescription() . ' - ' . $this->getAuthor()->getUsername();
     }
 
     public function getData()
@@ -426,12 +174,12 @@ class Profile
         return $d;
     }
 
-    public function isDemanding(): ?bool
+    public function isDemanding() : ? bool
     {
         return $this->isDemanding;
     }
 
-    public function setIsDemanding(bool $isDemanding): self
+    public function setIsDemanding(bool $isDemanding) : self
     {
         $this->isDemanding = $isDemanding;
 
@@ -462,8 +210,8 @@ class Profile
 
         foreach (['add', 'sub', 'mult', 'div'] as $k) {
             foreach (['F', 'S'] as $n) {
-                $min = $k.$n.'Min';
-                $max = $k.$n.'Max';
+                $min = $k . $n . 'Min';
+                $max = $k . $n . 'Max';
                 $this->$max = minVal($this->$min, $this->$max);
             }
         }
@@ -496,8 +244,8 @@ class Profile
         foreach (['add', 'sub', 'mult', 'div'] as $k) {
             foreach (['F', 'S', ''] as $n) {
                 foreach (['Min', 'Max'] as $m) {
-                    $v = $k.$n.$m;
-                    $this->$v = (int) $this->$v;
+                    $v = $k . $n . $m;
+                    $this->$v = (int)$this->$v;
                 }
             }
         }

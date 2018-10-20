@@ -5,13 +5,13 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /** @ORM\MappedSuperclass */
 abstract class ProfileBase
 {
     use BaseTrait;
 
-    
     /**
      * @ORM\Column(type="datetime")
      */
@@ -314,18 +314,19 @@ abstract class ProfileBase
         return $this->getDescription() . ' - ' . $this->getAuthor()->getUsername();
     }
 
-    public function getData()
+    public function getSettings()
     {
-        $d = [];
-        $f = arr('duration examplesCount addFMin addFMax addSMin addSMax addMin addMax subFMin subFMax subSMin subSMax subMin subMax multFMin multFMax multSMin multSMax multMin multMax divFMin divFMax divSMin divSMax divMin divMax addPerc subPerc multPerc divPerc');
+        $propertyAccessor = self::createPropertyAccessor()();
 
-        foreach ($this as $k => $v) {
-            if (in_array($k, $f)) {
-                $d[$k] = $v;
-            }
-        }
+        return array_reduce(
+            self::getSettingsFields(),
+            function ($settings, $property) use ($propertyAccessor) : array {
+                $settings[$property] = $propertyAccessor->getValue($this, $property);
 
-        return $d;
+                return $settings;
+            },
+            []
+        );
     }
 
     public function isDemanding() : ? bool
@@ -337,11 +338,6 @@ abstract class ProfileBase
     {
         $this->isDemanding = $isDemanding;
 
-        return $this;
-    }
-
-    public function getInstance()
-    {
         return $this;
     }
 
@@ -361,5 +357,35 @@ abstract class ProfileBase
         $this->$property = $value;
 
         return $this;
+    }
+
+    public static function copySettings(self $source, self $target) : self
+    {
+        $propertyAccessor = self::createPropertyAccessor();
+
+        return array_reduce(
+            self::getSettingsFields(),
+            function ($target, $property) use ($source, $propertyAccessor) : self {
+                $propertyAccessor->setValue(
+                    $target,
+                    $property,
+                    $propertyAccessor->getValue($property, $source)
+                );
+
+                return $target;
+            },
+            $target
+        );
+    }
+
+    protected static function createPropertyAccessor()
+    {
+        return PropertyAccess::createPropertyAccessorBuilder()
+            ->getPropertyAccessor();
+    }
+
+    private static function getSettingsFields() : array
+    {
+        return arr('duration examplesCount addFMin addFMax addSMin addSMax addMin addMax subFMin subFMax subSMin subSMax subMin subMax multFMin multFMax multSMin multSMax multMin multMax divFMin divFMax divSMin divSMax divMin divMax addPerc subPerc multPerc divPerc');
     }
 }

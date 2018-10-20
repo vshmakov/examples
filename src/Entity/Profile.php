@@ -147,61 +147,20 @@ class Profile extends ProfileBase
         return $this->description;
     }
 
-    public function setDescription(string $description) : self
+    public function getSettings() : array
     {
-        $this->description = $description;
 
-        return $this;
-    }
 
-    public function __toString()
-    {
-        return $this->getDescription() . ' - ' . $this->getAuthor()->getUsername();
-    }
-
-    public function getData()
-    {
         $this->normalize();
-        $d = [];
-        $f = arr('duration examplesCount addFMin addFMax addSMin addSMax addMin addMax subFMin subFMax subSMin subSMax subMin subMax multFMin multFMax multSMin multSMax multMin multMax divFMin divFMax divSMin divSMax divMin divMax addPerc subPerc multPerc divPerc');
 
-        foreach ($this as $k => $v) {
-            if (in_array($k, $f)) {
-                $d[$k] = $v;
-            }
-        }
-
-        return $d;
-    }
-
-    public function isDemanding() : ? bool
-    {
-        return $this->isDemanding;
-    }
-
-    public function setIsDemanding(bool $isDemanding) : self
-    {
-        $this->isDemanding = $isDemanding;
-
-        return $this;
-    }
-
-    public function getInstance()
-    {
-        return $this;
+        return parent::getSettings();
     }
 
     public function __clone()
     {
-        $this->id = null;
+        parent::__clone();
         $this->author = null;
         $this->isPublic = false;
-        $this->addTime = new \DateTime();
-    }
-
-    public function normData()
-    {
-        return $this->normalize();
     }
 
     public function normalize()
@@ -249,18 +208,6 @@ class Profile extends ProfileBase
                 }
             }
         }
-
-        return $this;
-    }
-
-    public function __get($property)
-    {
-        return $this->$property;
-    }
-
-    public function __set($property, $value)
-    {
-        $this->$property = $value;
 
         return $this;
     }

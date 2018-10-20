@@ -8,6 +8,8 @@ use App\Service\UserLoader;
 use App\Service\AuthChecker;
 use App\Entity\Attempt;
 use App\Entity\User;
+use App\Entity\Session;
+use App\Entity\Settings;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -53,7 +55,7 @@ order by a.addTime desc");
 
     public function getTitle(Attempt $attempt)
     {
-        return 'Попытка №'.$this->getNumber($attempt);
+        return 'Попытка №' . $this->getNumber($attempt);
     }
 
     public function getNumber(Attempt $attempt)
@@ -74,7 +76,7 @@ join a.examples e
 where a = :att and e.answerTime is not null
 order by e.answerTime desc
 ')->setParameter('att', $attempt)
-        )) ?: $attempt->getAddTime();
+        )) ? : $attempt->getAddTime();
     }
 
     public function getSolvedExamplesCount(Attempt $attempt)
@@ -131,13 +133,11 @@ where u = :u')
             ->getResult();
     }
 
-    public function getNewByCurrentUser()
+    public function getNewByCurrentUser() : Attempt
     {
-        $user = $this->userLoader->getUser()
-            ->setEntityRepository($this->userRepository);
         $attempt = (new Attempt())
-            ->setSession($this->sessionRepository->findOneByCurrentUserOrGetNew())
-            ->setSettings($user->getCurrentProfile()->getInstance());
+            ->setSession($this->getEntityRepository(Session::class)->findOneByCurrentUserOrGetNew())
+            ->setSettings($this->getEntityRepository(Settings::class)->getNewByCurrentUser());
 
         $entityManager = $this->getEntityManager();
         $entityManager->persist($attempt);
@@ -148,7 +148,7 @@ where u = :u')
 
     public function hasPreviousExample(Attempt $attempt)
     {
-        return (bool) $this->exampleRepository->findLastByAttempt($attempt);
+        return (bool)$this->exampleRepository->findLastByAttempt($attempt);
     }
 
     public function getData(Attempt $attempt)

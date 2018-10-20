@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Task
 {
-use BaseTrait;
+    use BaseTrait;
 
     /**
      * @ORM\Id()
@@ -45,31 +45,36 @@ use BaseTrait;
     /**
      * @ORM\Column(type="smallint")
      */
-    private $timesCount=3;
+    private $timesCount = 3;
 
     /**
      * @ORM\Column(type="datetime")
      */
     private $addTime;
 
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $limitTime;
+
     public function __construct()
     {
         $this->contractors = new ArrayCollection();
         $this->attempts = new ArrayCollection();
-$this->addTime=new \DateTime();
+        $this->addTime = new \DateTime();
     }
 
-    public function getId(): ?int
+    public function getId() : ? int
     {
         return $this->id;
     }
 
-    public function getAuthor(): ?User
+    public function getAuthor() : ? User
     {
         return $this->author;
     }
 
-    public function setAuthor(?User $author): self
+    public function setAuthor(? User $author) : self
     {
         $this->author = $author;
 
@@ -79,12 +84,12 @@ $this->addTime=new \DateTime();
     /**
      * @return Collection|User[]
      */
-    public function getContractors(): Collection
+    public function getContractors() : Collection
     {
         return $this->contractors;
     }
 
-    public function addContractor(User $contractor): self
+    public function addContractor(User $contractor) : self
     {
         if (!$this->contractors->contains($contractor)) {
             $this->contractors[] = $contractor;
@@ -93,7 +98,7 @@ $this->addTime=new \DateTime();
         return $this;
     }
 
-    public function removeContractor(User $contractor): self
+    public function removeContractor(User $contractor) : self
     {
         if ($this->contractors->contains($contractor)) {
             $this->contractors->removeElement($contractor);
@@ -102,12 +107,19 @@ $this->addTime=new \DateTime();
         return $this;
     }
 
-    public function getSettings(): ?Settings
+    public function setContractors(Collection $contractors) : self
+    {
+        $this->contractors = $contractors;
+
+        return $this;
+    }
+
+    public function getSettings() : ? Settings
     {
         return $this->settings;
     }
 
-    public function setSettings(Settings $settings): self
+    public function setSettings(Settings $settings) : self
     {
         $this->settings = $settings;
 
@@ -117,12 +129,12 @@ $this->addTime=new \DateTime();
     /**
      * @return Collection|Attempt[]
      */
-    public function getAttempts(): Collection
+    public function getAttempts() : Collection
     {
         return $this->attempts;
     }
 
-    public function addAttempt(Attempt $attempt): self
+    public function addAttempt(Attempt $attempt) : self
     {
         if (!$this->attempts->contains($attempt)) {
             $this->attempts[] = $attempt;
@@ -132,7 +144,7 @@ $this->addTime=new \DateTime();
         return $this;
     }
 
-    public function removeAttempt(Attempt $attempt): self
+    public function removeAttempt(Attempt $attempt) : self
     {
         if ($this->attempts->contains($attempt)) {
             $this->attempts->removeElement($attempt);
@@ -145,26 +157,38 @@ $this->addTime=new \DateTime();
         return $this;
     }
 
-    public function getTimesCount(): ?int
+    public function getTimesCount() : ? int
     {
         return $this->timesCount;
     }
 
-    public function setTimesCount(int $timesCount): self
+    public function setTimesCount(int $timesCount) : self
     {
         $this->timesCount = $timesCount;
 
         return $this;
     }
 
-    public function getAddTime(): ?\DateTimeInterface
+    public function getAddTime() : ? \DateTimeInterface
     {
         return $this->dt($this->addTime);
     }
 
-    public function setAddTime(\DateTimeInterface $addTime): self
+    public function setAddTime(\DateTimeInterface $addTime) : self
     {
         $this->addTime = $addTime;
+
+        return $this;
+    }
+
+    public function getLimitTime() : ? \DateTimeInterface
+    {
+        return $this->limitTime;
+    }
+
+    public function setLimitTime(\DateTimeInterface $limitTime) : self
+    {
+        $this->limitTime = $limitTime;
 
         return $this;
     }

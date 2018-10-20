@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /** @ORM\MappedSuperclass */
-abstract class ProfileBase
+abstract class BaseProfile
 {
     use BaseTrait;
 
@@ -311,7 +311,7 @@ abstract class ProfileBase
 
     public function __toString()
     {
-        return $this->getDescription() . ' - ' . $this->getAuthor()->getUsername();
+        return $this->getDescription();
     }
 
     public function getSettings()

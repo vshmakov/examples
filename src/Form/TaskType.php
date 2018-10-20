@@ -12,11 +12,8 @@ class TaskType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('timesCount')
-            ->add('author')
-            ->add('contractors')
-            ->add('settings')
-        ;
+            ->add('timesCount', null, ['label' => 'Количество повторений'])
+            ->add('limitTime', null, ['label' => 'Время окончания задания']);
     }
 
     public function configureOptions(OptionsResolver $resolver)

@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass="App\Repository\SettingsRepository")
  */
-class Settings extends ProfileBase
+class Settings extends BaseProfile
 {
     /**
      * @ORM\Id()

@@ -65,6 +65,9 @@
               {% if is_granted('SHOW_STUDENTS') %}
               <a class="dropdown-item" href="{{path("student_index")}}">Ученики</a>
               {%endif%}
+              {% if is_granted('SHOW_TASKS') %}
+              <a class="dropdown-item" href="{{path("task_index")}}">Задания</a>
+              {% endif %}
               {% if is_granted('SHOW_TEACHERS') %}
               <a class="dropdown-item" href="{{path("teacher_index")}}">Выбрать учителя</a>
               {% endif %}

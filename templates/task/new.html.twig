@@ -1,11 +1,13 @@
-{% extends 'base.html.twig' %}
+{% extends 'main.html.twig' %}
 
-{% block title %}New Task{% endblock %}
+{% block title %}Создать задание{% endblock %}
 
-{% block body %}
-    <h1>Create new Task</h1>
+{% block main %}
+<h1>Создать задание</h1>
 
-    {{ include('task/_form.html.twig') }}
+{{ include('task/_form.html.twig') }}
 
-    <a href="{{ path('task_index') }}">back to list</a>
+{% block bottom_links %}
+<a href="{{ path('task_index') }}">Вернуться к списку заданий</a>
+{% endblock %}
 {% endblock %}

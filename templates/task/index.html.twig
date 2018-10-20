@@ -1,35 +1,39 @@
-{% extends 'base.html.twig' %}
+{% extends 'main.html.twig' %}
 
-{% block title %}Task index{% endblock %}
+{% block title %}Задания{% endblock %}
 
-{% block body %}
-    <h1>Task index</h1>
+{% block main %}
+<h1>Задания</h1>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>TimesCount</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for task in tasks %}
-            <tr>
-                <td>{{ task.id }}</td>
-                <td>{{ task.timesCount }}</td>
-                <td>
-                    <a href="{{ path('task_show', {'id': task.id}) }}">show</a>
-                    <a href="{{ path('task_edit', {'id': task.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="3">no records found</td>
-            </tr>
+<table class="table">
+    <thead>
+        <tr>
+            <th>№</th>
+            <th>Профиль настроек</th>
+            <th>Количество повторений</th>
+            <th>Время создания</th>
+            <th>Время окончания</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for number, task in tasks %}
+        {% set task = task.setEntityRepository(taskRepository) %}
+        <tr>
+            <td>{{ number+1 }}</td>
+            <td> <a href="{{ path('settings_show', {'id': task.id}) }}">{{ task.settings.description }}</a></td>
+            <td>{{ task.timesCount }}</td>
+            <td>{{ task.addTime }}</td>
+            <td>{{ task.limitTime }}</td>
+            <td>
+                <a href="{{ path('task_show', {'id': task.id}) }}">Просмотреть</a>
+                <a href="{{ path('task_edit', {'id': task.id}) }}">Редактировать</a>
+                {{ include ('task/_delete_form.html.twig') }}
+            </td>
+        </tr>
         {% endfor %}
-        </tbody>
-    </table>
+    </tbody>
+</table>
 
-    <a href="{{ path('task_new') }}">Create new</a>
+<a href="{{ path('task_new') }}" role="button" class="btn">Создать задание</a>
 {% endblock %}

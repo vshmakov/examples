@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ProfileRepository")
  */
-class Profile extends ProfileBase
+class Profile extends BaseProfile
 {
     use BaseTrait;
 
@@ -18,7 +18,7 @@ class Profile extends ProfileBase
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      */
-    protected  $id;
+    protected $id;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="profiles")
@@ -142,7 +142,7 @@ class Profile extends ProfileBase
         return $this;
     }
 
-        public function getSettings() : array
+    public function getSettings() : array
     {
         $this->normalize();
 
@@ -203,5 +203,10 @@ class Profile extends ProfileBase
         }
 
         return $this;
+    }
+
+    public function __toString()
+    {
+        return parent::__toString() . ' - ' . $this->getAuthor()->getUsername();
     }
 }

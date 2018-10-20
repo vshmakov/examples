@@ -6,8 +6,9 @@ use App\Service\AuthChecker;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use App\Service\UserLoader;
+use App\Entity\Task;
 
-class TeacherVoter extends Voter
+class TaskVoter extends Voter
 {
     use BaseTrait;
     private $userLoader;
@@ -21,8 +22,7 @@ class TeacherVoter extends Voter
 
     protected function supports($attribute, $subject)
     {
-        return $this->supportsUser($attribute, $subject)
-            && (null === $subject || $subject->isTeacher());
+        return (($subject instanceof Task) or null === $subject) && $this->hasHandler($attribute);
     }
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
@@ -30,30 +30,11 @@ class TeacherVoter extends Voter
         return $this->checkRight($attribute, $subject, $token);
     }
 
-    private function canAppoint()
-    {
-        $teacher = $this->subject;
-
-        return $this->canDisappointTeachers()
-            && !$this->userLoader->isGuest()
-            && !$this->userLoader->getUser()->isUserTeacher($teacher);
-    }
-
-    private function canDisappoint()
-    {
-        return $this->userLoader->getUser()->isUserTeacher($this->subject);
-    }
-
-    private function canDisappointTeachers()
-    {
-        return $this->canShowTeachers();
-    }
-
-    private function canShowTeachers()
+    private function canShowTasks() : bool
     {
         $authChecker = $this->authChecker;
 
         return $authChecker->isGranted('ROLE_USER') && !$authChecker->isGranted('ROLE_CHILD')
-        && !$this->userLoader->getUser()->isTeacher();
+            && $this->userLoader->getUser()->isTeacher();
     }
 }

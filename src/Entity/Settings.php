@@ -18,4 +18,25 @@ class Settings extends ProfileBase
      */
     protected $id;
 
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Attempt", mappedBy="settings", cascade={"persist", "remove"})
+     */
+    private $attempt;
+
+    public function getAttempt(): ?Attempt
+    {
+        return $this->attempt;
+    }
+
+    public function setAttempt(Attempt $attempt): self
+    {
+        $this->attempt = $attempt;
+
+        // set the owning side of the relation if necessary
+        if ($this !== $attempt->getSettings()) {
+            $attempt->setSettings($this);
+        }
+
+        return $this;
+    }
 }

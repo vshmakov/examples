@@ -366,7 +366,7 @@ abstract class ProfileBase
         return array_reduce(
             self::getSettingsFields(),
             function ($target, $property) use ($source, $propertyAccessor) : self {
-                $propertyAccessor->setValue(
+                                $propertyAccessor->setValue(
                     $target,
                     $property,
                     $propertyAccessor->getValue($source, $property)

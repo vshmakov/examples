@@ -30,16 +30,18 @@ class Attempt
      */
     private $addTime;
 
-    /**
-     * @ORM\Column(type="object")
-     */
-    private $settings;
-
+    
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Session", inversedBy="attempts")
      * @ORM\JoinColumn(nullable=false)
      */
     private $session;
+
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Settings", inversedBy="attempts", cascade={"persist", "remove"})
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $settings;
 
     public function __construct()
     {
@@ -95,17 +97,7 @@ class Attempt
         return $this;
     }
 
-    public function getSettings()
-    {
-        return $this->settings;
-    }
-
-    public function setSettings($settings): self
-    {
-        $this->settings = $settings;
-
-        return $this;
-    }
+    
 
     public function getSession(): ? Session
     {
@@ -137,5 +129,17 @@ class Attempt
     public function getUser()
     {
         return $this->getSession()->getUser();
+    }
+
+    public function getSettings(): ?Settings
+    {
+        return $this->settings;
+    }
+
+    public function setSettings(Settings $settings): self
+    {
+        $this->settings = $settings;
+
+        return $this;
     }
 }

@@ -142,15 +142,8 @@ class Profile extends ProfileBase
         return $this;
     }
 
-    public function getDescription() : ? string
+        public function getSettings() : array
     {
-        return $this->description;
-    }
-
-    public function getSettings() : array
-    {
-
-
         $this->normalize();
 
         return parent::getSettings();

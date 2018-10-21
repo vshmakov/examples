@@ -2,21 +2,24 @@
 
 namespace App\Repository;
 
+use Doctrine\ORM\Query;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+
 trait BaseTrait
 {
     use \App\BaseTrait;
 
-    protected function createQuery($dql)
+    protected function createQuery(string $dql) : Query
     {
         return $this->getEntityManager()->createQuery($dql);
     }
 
-    protected function getValue($query)
+    protected function getValue(Query $query)
     {
         return self::getValueByQuery($query);
     }
 
-    public static function getValueByQuery($query)
+    public static function getValueByQuery(Query $query)
     {
         $result = ($query->setMaxResults(1)->getOneOrNullResult());
 
@@ -29,7 +32,7 @@ trait BaseTrait
         }
     }
 
-    protected function getEntityRepository($class)
+    protected function getEntityRepository(string $class) : ServiceEntityRepository
     {
         return $this->getentityManager()->getRepository($class);
     }

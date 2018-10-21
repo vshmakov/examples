@@ -166,7 +166,7 @@ where u = :u')
 
         foreach ($attempts as $attempt) {
             $isAttemptDone = $localCache->get(['attempts[%s].isDone', $attempt], function () use ($attempt, $attemptRepository): bool {
-                return $attemptRepository->getSolvedExamplesCount($attempt) == $attempt->getSettings()->getExamplesCount();
+                return $attemptRepository->isDone($attempt);
             });
 
             if ($isAttemptDone) {

@@ -11,9 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Profile extends BaseProfile
 {
-    use BaseTrait;
-
-    /**
+        /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")

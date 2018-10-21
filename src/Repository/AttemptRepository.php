@@ -230,4 +230,9 @@ where u = ?1')
             ->setParameter(1, $user)
             ->getResult();
     }
+
+    public function isDone(Attempt $attempt) : bool
+    {
+        return $this->getSolvedExamplesCount($attempt) == $attempt->getSettings()->getExamplesCount();
+    }
 }

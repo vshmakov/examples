@@ -3,48 +3,44 @@
 namespace App\Repository;
 
 use App\Entity\Task;
+use App\Entity\Attempt;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-/**
- * @method Task|null find($id, $lockMode = null, $lockVersion = null)
- * @method Task|null findOneBy(array $criteria, array $orderBy = null)
- * @method Task[]    findAll()
- * @method Task[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- */
 class TaskRepository extends ServiceEntityRepository
 {
+    use BaseTrait;
+
     public function __construct(RegistryInterface $registry)
     {
         parent::__construct($registry, Task::class);
     }
 
-//    /**
-//     * @return Task[] Returns an array of Task objects
-//     */
-    /*
-    public function findByExampleField($value)
+    public function getFinishedUsersCount(Task $task) : int
     {
-        return $this->createQueryBuilder('t')
-            ->andWhere('t.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('t.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+        $finishedUsersCount = 0;
+        $attemptRepository = $this->getEntityRepository(Attempt::class);
 
-    /*
-    public function findOneBySomeField($value): ?Task
-    {
-        return $this->createQueryBuilder('t')
-            ->andWhere('t.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        foreach ($task->getContractors()->toArray() as $user) {
+            $userAttempts = $this->createQuery('select a from App:Attempt a
+            join a.session s
+where a.task = :task and s.user = :user')
+                ->setParameters(['task' => $task, 'user' => $user])
+                ->getResult();
+
+            $outstandingAttemptsCount = array_reduce($userAttempts, function (int $outstandingAttemptsCount, Attempt $attempt) use ($attemptRepository) : int {
+                if ($attemptRepository->isDone($attempt)) {
+                    --$outstandingAttemptsCount;
+                }
+
+                return $outstandingAttemptsCount;
+            }, $task->getTimesCount());
+
+            if ($outstandingAttemptsCount == 0) {
+                ++$finishedUsersCount;
+            }
+        }
+
+        return $finishedUsersCount;
     }
-    */
 }

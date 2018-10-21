@@ -13,6 +13,7 @@
             <th>Количество повторений</th>
             <th>Время создания</th>
             <th>Время окончания</th>
+            <th>Выполнило учеников</th>
             <th>Действия</th>
         </tr>
     </thead>
@@ -25,6 +26,7 @@
             <td>{{ task.timesCount }}</td>
             <td>{{ task.addTime }}</td>
             <td>{{ task.limitTime }}</td>
+            <td>{{ task.finishedUsersCount }} из {{ task.contractors.count }}</td>
             <td>
                 <a href="{{ path('task_show', {'id': task.id}) }}">Просмотреть</a>
                 <a href="{{ path('task_edit', {'id': task.id}) }}">Редактировать</a>

@@ -3,19 +3,19 @@
 namespace App\Entity;
 
 use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 trait BaseTrait
 {
     use \App\BaseTrait;
-
     private $entityRepository;
 
-    public function setER($entityRepository)
+    public function setER(ServiceEntityRepository $entityRepository) : self
     {
         return $this->setEntityRepository($entityRepository);
     }
 
-    public function setEntityRepository($entityRepository)
+    public function setEntityRepository(ServiceEntityRepository $entityRepository) : self
     {
         $this->entityRepository = $entityRepository;
 
@@ -26,7 +26,7 @@ trait BaseTrait
     {
         $entityRepository = $this->entityRepository;
 
-        if (!preg_match('#^(get|has)#', $method)) {
+        if (!preg_match('#^(get|has|is)#', $method)) {
             $method = "get_$method";
         }
 

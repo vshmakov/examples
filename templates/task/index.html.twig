@@ -17,7 +17,7 @@
         </tr>
     </thead>
     <tbody>
-        {% for number, task in tasks %}
+        {% for number, task in sortByDateTime(tasks, 'limitTime')|reverse %}
         {% set task = task.setEntityRepository(taskRepository) %}
         <tr>
             <td>{{ number+1 }}</td>

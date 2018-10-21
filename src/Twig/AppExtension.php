@@ -2,6 +2,7 @@
 
 namespace App\Twig;
 
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Psr\Container\ContainerInterface;
 use Twig\Extension\AbstractExtension;
 use App\Service\UserLoader;
@@ -20,7 +21,7 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
 
     public function __construct(UserLoader $userLoader, AttemptRepository $attemptRepository, UserRepository $userRepository, EntityManagerInterface $entityManager, ContainerInterface $container)
     {
-        $hasActualAttempt = (bool) $attemptRepository->findLastActualByCurrentUser();
+        $hasActualAttempt = (bool)$attemptRepository->findLastActualByCurrentUser();
         $user = $userLoader->getUser()->setEntityRepository($userRepository);
 
         $this->entityManager = $entityManager;
@@ -46,6 +47,7 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
             'dt',
             'addTimeNumber',
             'sortByAddTime',
+            'sortByDateTime',
             'sortProfiles',
             'sortTeachers',
             'sortStudents',
@@ -110,6 +112,26 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
     private function addTimeSorter($e1, $e2)
     {
         return addTimeSorter($e1, $e2);
+    }
+
+    public function sortByDateTime(array $entityList, string $dtProperty = 'addTime') : array
+    {
+        $propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
+            ->enableExceptionOnInvalidIndex()
+            ->getPropertyAccessor();
+
+        usort($entityList, function ($e1, $e2) use ($propertyAccessor, $dtProperty) : int {
+            $t1 = $propertyAccessor->getValue($e1, "$dtProperty.timestamp");
+            $t2 = $propertyAccessor->getValue($e2, "$dtProperty.timestamp");
+
+            if ($t1 == $t2) {
+                return 0;
+            }
+
+            return $t1 > $t2 ? 1 : -1;
+        });
+
+        return $entityList;
     }
 
     public function sortTeachers($teachers)

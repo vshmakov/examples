@@ -1,4 +1,4 @@
-{% macro list_table(t, profiles, pR, hasActions=true) %}
+{% macro list_table(t, profiles, pR, canManipulate=true) %}
 <div class="">
 	<h1>{{t}}</h1>
 	{#{%set pR=app.pR%}#}
@@ -14,9 +14,7 @@
 			{%if isA%}
 			<th>Пользователь</th>
 			{%endif%}
-			{% if hasActions %}
 			<th>Действия</th>
-			{% endif %}
 		</thead>
 		<tbody>
 			{%for profile in sortProfiles(profiles)%}
@@ -32,17 +30,16 @@
 				{%if isA%}
 				<td>{{profile.author.username}}</td>
 				{%endif%}
-				{% if hasActions %}
 				<td class="actions">
-					{%if is_granted("APPOINT", profile)%}
+					{%if is_granted("APPOINT", profile) and canManipulate %}
 					<a href="{{path('profile_appoint', {'id':profile.id})}}">Выбрать</a>
 					{%endif%}
-					<a href="{{path('profile_edit', {'id':profile.id})}}">{{is_granted("EDIT", profile) ? "Редактировать" :
+					<a href="{{path('profile_edit', {'id':profile.id})}}">{{is_granted("EDIT", profile) and canManipulate ?
+						"Редактировать" :
 						"Просмотреть"}}</a>
-					{%if canDel%}
+					{%if canDel and canManipulate %}
 					{{include("profile/_delete_form.html.twig")}}{%endif%}
 				</td>
-				{% endif %}
 			</tr>
 			{%endfor%}
 		</tbody>

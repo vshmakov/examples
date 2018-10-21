@@ -37,4 +37,9 @@ class TaskVoter extends Voter
         return $authChecker->isGranted('ROLE_USER') && !$authChecker->isGranted('ROLE_CHILD')
             && $this->userLoader->getUser()->isTeacher();
     }
+
+    private function canShow() : bool
+    {
+        return $this->subject->isAuthor($this->userLoader->getUser());
+    }
 }

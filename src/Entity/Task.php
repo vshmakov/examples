@@ -192,4 +192,9 @@ class Task
 
         return $this;
     }
+
+    public function isAuthor(User $author) : bool
+    {
+        return $this->author === $author;
+    }
 }

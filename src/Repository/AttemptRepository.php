@@ -12,6 +12,7 @@ use App\Entity\Session;
 use App\Entity\Settings;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use App\Entity\Task;
 
 class AttemptRepository extends ServiceEntityRepository
 {
@@ -234,5 +235,14 @@ where u = ?1')
     public function isDone(Attempt $attempt) : bool
     {
         return $this->getSolvedExamplesCount($attempt) == $attempt->getSettings()->getExamplesCount();
+    }
+
+    public function findByTaskAndUser(Task $task, User $user) : array
+    {
+        return $this->createQuery('select a from App:Attempt a
+join a.session s
+where a.task = :task and s.user = :user')
+            ->setParameters(['task' => $task, 'user' => $user])
+            ->getResult();
     }
 }

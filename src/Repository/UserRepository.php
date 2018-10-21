@@ -9,6 +9,7 @@ use App\Entity\Attempt;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use App\Utils\Cache\LocalCache;
+use App\Entity\Task;
 
 class UserRepository extends ServiceEntityRepository
 {
@@ -143,10 +144,10 @@ where u = :u')
         return $user;
     }
 
-    public function getDoneAttemptsCount(User $user, \DateTimeInterface $dt = null): int
+    public function getDoneAttemptsCount(User $user, \DateTimeInterface $dt = null) : int
     {
         $localCache = $this->localCache;
-        $attempts = $localCache->get(['users[%s].attempts', $user], function () use ($user): array {
+        $attempts = $localCache->get(['users[%s].attempts', $user], function () use ($user) : array {
             return $this->createQuery('select a from App:Attempt a
 join a.session s
 join s.user u
@@ -156,7 +157,7 @@ where u = :u')
         });
 
         if ($dt) {
-            $attempts = array_filter($attempts, function (Attempt $attempt) use ($dt): bool {
+            $attempts = array_filter($attempts, function (Attempt $attempt) use ($dt) : bool {
                 return $attempt->getAddTime()->getTimestamp() > $dt->getTimestamp();
             });
         }
@@ -165,7 +166,7 @@ where u = :u')
         $count = 0;
 
         foreach ($attempts as $attempt) {
-            $isAttemptDone = $localCache->get(['attempts[%s].isDone', $attempt], function () use ($attempt, $attemptRepository): bool {
+            $isAttemptDone = $localCache->get(['attempts[%s].isDone', $attempt], function () use ($attempt, $attemptRepository) : bool {
                 return $attemptRepository->isDone($attempt);
             });
 
@@ -177,7 +178,7 @@ where u = :u')
         return $count;
     }
 
-    public function getSolvedExamplesCount(User $user, \DateTimeInterface $dt = null): int
+    public function getSolvedExamplesCount(User $user, \DateTimeInterface $dt = null) : int
     {
         $andWhere = '';
         $parameters = ['u' => $user];
@@ -213,9 +214,9 @@ where u = :u and e.isRight = true $andWhere")
         return count($users);
     }
 
-    public function hasExamples(User $user): bool
+    public function hasExamples(User $user) : bool
     {
-        return $this->localCache->get(['users[%s].hasExamples', $user], function () use ($user): bool {
+        return $this->localCache->get(['users[%s].hasExamples', $user], function () use ($user) : bool {
             return $this->getValue(
                 $this->createQuery('select count(e) from App:Example e
 join e.attempt a
@@ -225,5 +226,14 @@ where u = :user')
                     ->setParameters(['user' => $user])
             );
         });
+    }
+
+    public function findByHomework(Task $task) : array
+    {
+        return $this->createQuery('select u from App:User u
+            join u.homework h
+            where h = :task')
+            ->setParameters(['task' => $task])
+            ->getResult();
     }
 }

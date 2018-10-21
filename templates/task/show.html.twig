@@ -1,26 +1,39 @@
-{% extends 'base.html.twig' %}
+{% extends 'main.html.twig' %}
 
-{% block title %}Task{% endblock %}
+{% block title %}Задание ({{ task.settings.description }}){% endblock %}
 
-{% block body %}
-    <h1>Task</h1>
+{% block main %}
+<h1>Задание</h1>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ task.id }}</td>
-            </tr>
-            <tr>
-                <th>TimesCount</th>
-                <td>{{ task.timesCount }}</td>
-            </tr>
-        </tbody>
-    </table>
+<table class="table">
+    <tbody>
+        <tr>
+            <th>Настройки</th>
+            <td><a href="{{ path('settings_show', {'id': task.settings.id}) }}">{{ task.settings.description }}</a></td>
+        </tr>
+        <tr>
+            <th>Количество повторений</th>
+            <td>{{ task.timesCount }}</td>
+        </tr>
+        <tr>
+            <th>Время создания</th>
+            <td>{{ task.addTime }}</td>
+        </tr>
+        <tr>
+            <th>Время окончания</th>
+            <td>{{ task.limitTime }}</td>
+        </tr>
+    </tbody>
+</table>
 
-    <a href="{{ path('task_index') }}">back to list</a>
+{% from 'task/contractors_table.html.twig' import contractors_table as contractors %}
+<h1>Ученики</h1>
+{{ contractors('Выполнившие задания', finishedTaskContractors) }}
+{{ contractors('Не выполнившие задания', notFinishedTaskContractors) }}
+{% block bottom_links %}
+{{ parent() }}
+<a href="{{ path('task_edit', {'id': task.id}) }}">edit</a>
+{% endblock %}
 
-    <a href="{{ path('task_edit', {'id': task.id}) }}">edit</a>
-
-    {{ include('task/_delete_form.html.twig') }}
+{{ include('task/_delete_form.html.twig') }}
 {% endblock %}

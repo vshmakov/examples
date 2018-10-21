@@ -84,9 +84,23 @@ class TaskController extends AbstractController
     /**
      * @Route("/{id}", name="task_show", methods="GET")
      */
-    public function show(Task $task) : Response
+    public function show(Task $task, UserRepository $userRepository, TaskRepository $taskRepository) : Response
     {
-        return $this->render('task/show.html.twig', ['task' => $task]);
+        $this->denyAccessUnlessGranted('SHOW', $task);
+
+        $contractors = $userRepository->findByHomework($task);
+        $finishedTaskContractors = $notFinishedTaskContractors = [];
+
+        foreach ($contractors as $contractor) {
+            $group = $taskRepository->isSolvedByUser($task, $contractor) ? $finishedTaskContractors : $notFinishedTaskContractors;
+            $group[] = $contractor;
+        }
+
+        return $this->render('task/show.html.twig', [
+            'task' => $task,
+            'finishedTaskContractors' => $finishedTaskContractors,
+            'notFinishedTaskContractors' => $notFinishedTaskContractors,
+        ]);
     }
 
     /**

@@ -1,4 +1,10 @@
 {{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Сохранить') }}</button>
+{{ form_widget(form) }}
+
+{% from "profile/list_table.html.twig" import list_table as profileTable %}
+
+{{ profileTable("Профили по умолчанию", publicProfiles, profileRepository, false) }}
+{{ profileTable("Личные профили", profiles, profileRepository, false) }}
+
+<button class="btn">{{ button_label|default('Сохранить') }}</button>
 {{ form_end(form) }}

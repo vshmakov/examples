@@ -183,7 +183,7 @@ class Task
 
     public function getLimitTime() : ? \DateTimeInterface
     {
-        return $this->limitTime;
+        return $this->dt($this->limitTime);
     }
 
     public function setLimitTime(\DateTimeInterface $limitTime) : self

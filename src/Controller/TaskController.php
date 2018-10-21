@@ -3,8 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Task;
+use App\Entity\Settings;
 use App\Form\TaskType;
 use App\Repository\TaskRepository;
+use App\Repository\ProfileRepository;
+use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,15 +24,19 @@ class TaskController extends AbstractController
      */
     public function index(TaskRepository $taskRepository) : Response
     {
-        return $this->render('task/index.html.twig', ['tasks' => $taskRepository->findAll()]);
+        return $this->render('task/index.html.twig', [
+            'tasks' => $taskRepository->findAll(),
+            'taskRepository' => $taskRepository,
+        ]);
     }
 
     /**
      * @Route("/new", name="task_new", methods="GET|POST")
      */
-    public function new(Request $request, UserLoader $userLoader) : Response
+    public function new(Request $request, UserLoader $userLoader, ProfileRepository $profileRepository, UserRepository $userRepository) : Response
     {
-        $currentUser=$userLoader->getUser();
+        $currentUser = $userLoader->getUser()
+            ->setEntityRepository($userRepository);
         $task = (new Task())
             ->setAuthor($currentUser)
             ->setContractors($currentUser->getStudents())
@@ -37,17 +44,40 @@ class TaskController extends AbstractController
         $form = $this->createForm(TaskType::class, $task);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($task);
-            $em->flush();
+        if ($form->isSubmitted()) {
+            $profile = $profileRepository->find($request->request->get('profile_id', ''));
 
-            return $this->redirectToRoute('task_index');
+            if (!$profile) {
+                throw $this->createNotFoundException();
+            }
+
+            if (!$this->isGranted('appoint', $profile)) {
+                throw $this->createAccessDenyedException();
+            }
+
+            if ($form->isValid()) {
+                $settings = new Settings();
+                Settings::copySettings($profile, $settings);
+                $task->setSettings($settings);
+
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($settings);
+                $em->persist($task);
+                $em->flush();
+
+                return $this->redirectToRoute('task_index');
+            }
         }
 
         return $this->render('task/new.html.twig', [
+            'jsParams' => [
+                'current' => $currentUser->getCurrentProfile()->getId(),
+            ],
             'task' => $task,
             'form' => $form->createView(),
+            'publicProfiles' => $profileRepository->findByIsPublic(true),
+            'profiles' => $profileRepository->findByAuthor($currentUser),
+            'profileRepository' => $profileRepository,
         ]);
     }
 

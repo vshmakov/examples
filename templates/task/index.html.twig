@@ -28,7 +28,6 @@
             <td>
                 <a href="{{ path('task_show', {'id': task.id}) }}">Просмотреть</a>
                 <a href="{{ path('task_edit', {'id': task.id}) }}">Редактировать</a>
-                {{ include ('task/_delete_form.html.twig') }}
             </td>
         </tr>
         {% endfor %}
@@ -37,3 +36,16 @@
 
 <a href="{{ path('task_new') }}" role="button" class="btn">Создать задание</a>
 {% endblock %}
+
+{%block javascripts%}
+{{parent()}}
+<script src="/js/jquery.datatables.min.js"></script>
+<script>
+    $("table").DataTable({
+        pageLength: 50,
+        //order: [1, "asc"],
+        lengthMenu: [25, 50, 100, 250],
+        language: {{ include("task/language.json.twig") }}
+    });
+</script>
+{%endblock%}

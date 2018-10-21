@@ -1,0 +1,154 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Settings{% endblock %}
+
+{% block body %}
+    <h1>Settings</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ setting.id }}</td>
+            </tr>
+            <tr>
+                <th>AddTime</th>
+                <td>{{ setting.addTime ? setting.addTime|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Duration</th>
+                <td>{{ setting.duration }}</td>
+            </tr>
+            <tr>
+                <th>ExamplesCount</th>
+                <td>{{ setting.examplesCount }}</td>
+            </tr>
+            <tr>
+                <th>AddFMin</th>
+                <td>{{ setting.addFMin }}</td>
+            </tr>
+            <tr>
+                <th>AddFMax</th>
+                <td>{{ setting.addFMax }}</td>
+            </tr>
+            <tr>
+                <th>AddSMin</th>
+                <td>{{ setting.addSMin }}</td>
+            </tr>
+            <tr>
+                <th>AddSMax</th>
+                <td>{{ setting.addSMax }}</td>
+            </tr>
+            <tr>
+                <th>AddMin</th>
+                <td>{{ setting.addMin }}</td>
+            </tr>
+            <tr>
+                <th>AddMax</th>
+                <td>{{ setting.addMax }}</td>
+            </tr>
+            <tr>
+                <th>SubFMin</th>
+                <td>{{ setting.subFMin }}</td>
+            </tr>
+            <tr>
+                <th>SubFMax</th>
+                <td>{{ setting.subFMax }}</td>
+            </tr>
+            <tr>
+                <th>SubSMin</th>
+                <td>{{ setting.subSMin }}</td>
+            </tr>
+            <tr>
+                <th>SubSMax</th>
+                <td>{{ setting.subSMax }}</td>
+            </tr>
+            <tr>
+                <th>SubMin</th>
+                <td>{{ setting.subMin }}</td>
+            </tr>
+            <tr>
+                <th>SubMax</th>
+                <td>{{ setting.subMax }}</td>
+            </tr>
+            <tr>
+                <th>MultFMin</th>
+                <td>{{ setting.multFMin }}</td>
+            </tr>
+            <tr>
+                <th>MultFMax</th>
+                <td>{{ setting.multFMax }}</td>
+            </tr>
+            <tr>
+                <th>MultSMin</th>
+                <td>{{ setting.multSMin }}</td>
+            </tr>
+            <tr>
+                <th>MultSMax</th>
+                <td>{{ setting.multSMax }}</td>
+            </tr>
+            <tr>
+                <th>MultMin</th>
+                <td>{{ setting.multMin }}</td>
+            </tr>
+            <tr>
+                <th>MultMax</th>
+                <td>{{ setting.multMax }}</td>
+            </tr>
+            <tr>
+                <th>DivFMin</th>
+                <td>{{ setting.divFMin }}</td>
+            </tr>
+            <tr>
+                <th>DivFMax</th>
+                <td>{{ setting.divFMax }}</td>
+            </tr>
+            <tr>
+                <th>DivSMin</th>
+                <td>{{ setting.divSMin }}</td>
+            </tr>
+            <tr>
+                <th>DivSMax</th>
+                <td>{{ setting.divSMax }}</td>
+            </tr>
+            <tr>
+                <th>DivMin</th>
+                <td>{{ setting.divMin }}</td>
+            </tr>
+            <tr>
+                <th>DivMax</th>
+                <td>{{ setting.divMax }}</td>
+            </tr>
+            <tr>
+                <th>AddPerc</th>
+                <td>{{ setting.addPerc }}</td>
+            </tr>
+            <tr>
+                <th>SubPerc</th>
+                <td>{{ setting.subPerc }}</td>
+            </tr>
+            <tr>
+                <th>MultPerc</th>
+                <td>{{ setting.multPerc }}</td>
+            </tr>
+            <tr>
+                <th>DivPerc</th>
+                <td>{{ setting.divPerc }}</td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td>{{ setting.description }}</td>
+            </tr>
+            <tr>
+                <th>IsDemanding</th>
+                <td>{{ setting.isDemanding ? 'Yes' : 'No' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('settings_index') }}">back to list</a>
+
+    <a href="{{ path('settings_edit', {'id': setting.id}) }}">edit</a>
+
+    {{ include('settings/_delete_form.html.twig') }}
+{% endblock %}

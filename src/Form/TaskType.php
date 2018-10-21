@@ -6,6 +6,7 @@ use App\Entity\Task;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\RadioType;
 
 class TaskType extends AbstractType
 {
@@ -20,6 +21,7 @@ class TaskType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Task::class,
+            'allow_extra_fields' => true,
         ]);
     }
 }

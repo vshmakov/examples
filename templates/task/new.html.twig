@@ -11,3 +11,20 @@
 <a href="{{ path('task_index') }}">Вернуться к списку заданий</a>
 {% endblock %}
 {% endblock %}
+
+
+{%block javascripts%}
+{{parent()}}
+<script>
+var r=$("[type=radio]");
+r.filter("[value="+P.current+"]").attr("checked", true);
+</script>
+<script src="/js/jquery.datatables.min.js"></script>
+<script>
+$("table").DataTable({
+pageLength: 25,
+//order: [1, "asc"],
+language: {%include("profile/language.json.twig")%}
+});
+</script>
+{%endblock%}

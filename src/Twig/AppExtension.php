@@ -41,6 +41,13 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
         return $this->globals;
     }
 
+    public function getFilters()
+    {
+        return [
+            new \Twig_Filter('property', [$this, 'propertyFilter']),
+        ];
+    }
+
     public function getFunctions()
     {
         return $this->prepareFunctions([
@@ -177,5 +184,20 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
         });
 
         return $students;
+    }
+
+    public function propertyFilter($objectOrArray, $property, $default = '-')
+    {
+        $propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
+            ->enableMagicCall()
+            ->getPropertyAccessor();
+        $value = $objectOrArray ? $propertyAccessor->getValue($objectOrArray, $property) : null;
+
+        return false !== $default ? $value ? : $default : $value;
+    }
+
+    public function sortContractors(array $contractors) : array
+    {
+        return $contractors;
     }
 }

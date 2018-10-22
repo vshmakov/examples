@@ -28,8 +28,9 @@
 
 {% from 'task/contractors_table.html.twig' import contractors_table as contractors %}
 <h1>Ученики</h1>
-{{ contractors('Выполнившие задания', finishedTaskContractors) }}
-{{ contractors('Не выполнившие задания', notFinishedTaskContractors) }}
+{{ contractors('Выполнившие задания', task, finishedTaskContractors, attemptRepository) }}
+{{ contractors('Не выполнившие задания', task, notFinishedTaskContractors, attemptRepository) }}
+
 {% block bottom_links %}
 {{ parent() }}
 <a href="{{ path('task_edit', {'id': task.id}) }}">edit</a>
@@ -37,3 +38,16 @@
 
 {{ include('task/_delete_form.html.twig') }}
 {% endblock %}
+
+
+{%block javascripts%}
+{{parent()}}
+<script src="/js/jquery.datatables.min.js"></script>
+<script>
+    $("table.contractors").DataTable({
+        pageLength: 25,
+                lengthMenu: [25, 50, 100, 250],
+        language: {{ include("student/language.json.twig") }}
+    });
+</script>
+{%endblock%}

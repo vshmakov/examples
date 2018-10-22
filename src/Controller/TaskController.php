@@ -6,6 +6,7 @@ use App\Entity\Task;
 use App\Entity\Settings;
 use App\Form\TaskType;
 use App\Repository\TaskRepository;
+use App\Repository\AttemptRepository;
 use App\Repository\ProfileRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -84,7 +85,7 @@ class TaskController extends AbstractController
     /**
      * @Route("/{id}", name="task_show", methods="GET")
      */
-    public function show(Task $task, UserRepository $userRepository, TaskRepository $taskRepository) : Response
+    public function show(Task $task, UserRepository $userRepository, TaskRepository $taskRepository, AttemptRepository $attemptRepository) : Response
     {
         $this->denyAccessUnlessGranted('SHOW', $task);
 
@@ -92,14 +93,15 @@ class TaskController extends AbstractController
         $finishedTaskContractors = $notFinishedTaskContractors = [];
 
         foreach ($contractors as $contractor) {
-            $group = $taskRepository->isSolvedByUser($task, $contractor) ? $finishedTaskContractors : $notFinishedTaskContractors;
-            $group[] = $contractor;
+            $group = $taskRepository->isSolvedByUser($task, $contractor) ? 'finishedTaskContractors' : 'notFinishedTaskContractors';
+            ($$group)[] = $contractor;
         }
 
         return $this->render('task/show.html.twig', [
             'task' => $task,
             'finishedTaskContractors' => $finishedTaskContractors,
             'notFinishedTaskContractors' => $notFinishedTaskContractors,
+            'attemptRepository' => $attemptRepository,
         ]);
     }
 

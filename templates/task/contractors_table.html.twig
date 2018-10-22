@@ -1,7 +1,7 @@
-{% macro contractors_table(title, contractors) %}
+{% macro contractors_table(title,task, contractors, attemptRepository) %}
 <h2>{{ title }}</h2>
 
-<table class="table">
+<table class="table contractors">
     <thead>
         <th>№</th>
         <th>Ученик</th>
@@ -10,6 +10,17 @@
         <th>Средняя оценка</th>
         <th>Действия</th>
     </thead>
-    <tbody></tbody>
+    <tbody>
+        {% for number, contractor in sortContractors(contractors) %}
+        <tr>
+            <td>{{ number+1 }}</td>
+            <td>{{ contractor.lastName }} {{ contractor.firstName }}</td>
+            <td>{{ attemptRepository.findLastOneByTaskAndUser(task, contractor)|property('addTime') }}</td>
+            <td>{{attemptRepository.findDoneByTaskAndUser(task, contractor)|length }}</td>
+            <td>{{ attemptRepository.getAverageRatingByTaskAndUser(task, contractor) ?? '-'}}</td>
+            <td></td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
 {% endmacro %}

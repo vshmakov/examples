@@ -13,6 +13,7 @@ use App\Entity\Settings;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use App\Entity\Task;
+use App\Utils\Cache\LocalCache;
 
 class AttemptRepository extends ServiceEntityRepository
 {
@@ -22,8 +23,9 @@ class AttemptRepository extends ServiceEntityRepository
     private $sessionRepository;
     private $userRepository;
     private $authChecker;
+    private $localCache;
 
-    public function __construct(RegistryInterface $registry, ExampleRepository $exampleRepository, UserLoader $userLoader, SessionRepository $sessionRepository, UserRepository $userRepository, AuthChecker $authChecker)
+    public function __construct(RegistryInterface $registry, ExampleRepository $exampleRepository, UserLoader $userLoader, SessionRepository $sessionRepository, UserRepository $userRepository, AuthChecker $authChecker, LocalCache $localCache)
     {
         parent::__construct($registry, Attempt::class);
         $this->exampleRepository = $exampleRepository;
@@ -31,6 +33,7 @@ class AttemptRepository extends ServiceEntityRepository
         $this->sessionRepository = $sessionRepository;
         $this->userRepository = $userRepository;
         $this->authChecker = $authChecker;
+        $this->localCache = $localCache;
     }
 
     public function findLastActualByCurrentUser()
@@ -244,5 +247,36 @@ join a.session s
 where a.task = :task and s.user = :user')
             ->setParameters(['task' => $task, 'user' => $user])
             ->getResult();
+    }
+
+    public function findLastOneByTaskAndUser(Task $task, User $user) : ? Attempt
+    {
+        return $this->getValue(
+            $this->createQuery('select a from App:Attempt a
+        join a.session s
+        where a.task = :task and s.user = :user
+        order by a.addTime desc')
+                ->setParameters(['task' => $task, 'user' => $user])
+        );
+    }
+
+    public function findDoneByTaskAndUser(Task $task, User $user) : array
+    {
+        $attempts = $this->findByTaskAndUser($task, $user);
+
+        return array_filter($attempts, function (Attempt $attempt) : bool {
+            return $this->isDone($attempt);
+        });
+    }
+
+    public function getAverageRatingByTaskAndUser(Task $task, User $user) : ? float
+    {
+        $attempts = $this->findByTaskAndUser($task, $user);
+        $attemptsCount = count($attempts);
+        $ratingSumm = array_reduce($attempts, function (int $ratingSumm, Attempt $attempt) : int {
+            return $ratingSumm + $this->getRating($attempt);
+        }, 0);
+
+        return $attemptsCount ? $ratingSumm / $attemptsCount : null;
     }
 }

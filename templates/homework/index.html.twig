@@ -1,20 +1,24 @@
-{% extends 'base.html.twig' %}
+{% extends 'homework/base.html.twig' %}
 
-{% block title %}Hello {{ controller_name }}!{% endblock %}
+{% block title %}Домашнее задание{% endblock %}
 
-{% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+{% block main %}
+<h1>Домашнее задание</h1>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ 'src/Controller/HomeworkController.php'|file_link(0) }}">src/Controller/HomeworkController.php</a></code></li>
-        <li>Your template at <code><a href="{{ 'templates/homework/index.html.twig'|file_link(0) }}">templates/homework/index.html.twig</a></code></li>
-    </ul>
-</div>
+{% from 'homework/tasks_table.html.twig' import tasks_table as tasks %}
+{{ tasks("Активные задания", activeTasks, attemptRepository) }}
+{{ tasks("Архив заданий", archiveTasks, attemptRepository) }}
 {% endblock %}
+
+{%block javascripts%}
+{{parent()}}
+<script src="/js/jquery.datatables.min.js"></script>
+<script>
+    $("table").DataTable({
+        pageLength: 25,
+        //order: [1, "asc"],
+        lengthMenu: [25, 50, 100, 250],
+        language: {{ include("task/language.json.twig") }}
+    });
+</script>
+{%endblock%}

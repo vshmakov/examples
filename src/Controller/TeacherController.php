@@ -46,6 +46,7 @@ class TeacherController extends Controller
     {
         $this->denyAccessUnlessGranted('APPOINT', $teacher);
         $currentUser = $this->currentUser;
+        $currentUser->cleanSocialUsername();
         $errors = $validator->validate($currentUser, null, ['child']);
 
         if (!count($errors)) {
@@ -57,7 +58,6 @@ class TeacherController extends Controller
             return $this->redirectToRoute('account_index');
         }
 
-        $currentUser->cleanSocialUsername();
         $form = $this->createForm(ChildType::class, $currentUser);
         $form->remove('isTeacher');
         $form->handleRequest($request);

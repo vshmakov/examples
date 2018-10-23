@@ -279,4 +279,14 @@ where a.task = :task and s.user = :user')
 
         return $attemptsCount ? $ratingSumm / $attemptsCount : null;
     }
+
+    public function getAverageRatingByTaskAndCurrentUser(Task $task): ? float
+    {
+        return $this->getAverageRatingByTaskAndUser($task, $this->userLoader->getUser());
+    }
+
+    public function findByTaskAndCurrentUser(Task $task) : array
+    {
+        return $this->findByTaskAndUser($task, $this->userLoader->getUser());
+    }
 }

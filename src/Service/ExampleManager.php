@@ -32,7 +32,7 @@ class ExampleManager
 
     public static function rating(int $answeredExamplesCount, int $errorsCount) : int
     {
-        $rightExamplesCount = $answeredExamplesCount - abs($errorsCount);
+        $rightExamplesCount = $answeredExamplesCount - $errorsCount;
         $ratingRightExamplesCount = [];
 
         for ($i = 5; $i >= 1; --$i) {
@@ -55,7 +55,7 @@ class ExampleManager
                 $coefficient = 5 == $i ? 1 : 0.85;
             }
 
-            $ratingRightExamplesCount[$i] = abs((int)($prevRatingRightExamplesCount * $coefficient));
+            $ratingRightExamplesCount[$i] = (int)($prevRatingRightExamplesCount * $coefficient);
         }
 
         $rating = 1;
@@ -82,7 +82,7 @@ class ExampleManager
 
             if ($qualityCoefficient > $maxQualityCoefficient) {
                 $maxQualityCoefficient = $qualityCoefficient;
-                $example = ['first' => $first, 'second' => $second, 'sign' => $sign];
+                $example = $this->createExampleArray($first, $second) + ['sign' => $sign];
             }
         }
 
@@ -91,7 +91,7 @@ class ExampleManager
 
     private function getBooleanByPercentsProbability(int $percentsProbability) : bool
     {
-        return true;
+        return $percentsProbability >= mt_rand(1, 100);
     }
 
     private function getExampleQualityCoefficient(float $first, float $second, int $sign, array $settings, array $previousExamples, bool $needUniqueAnswer, bool $needMaxAmplitude) : float
@@ -140,7 +140,11 @@ class ExampleManager
 
     private function getPercentsAmplitude(float $number, float $min, float $max) : float
     {
-        return 0;
+        $middle = ($max - $min) / 2;
+        $amplitude = ($middle - $number);
+        $percentsAmplitude = round(abs($amplitude) / abs($middle) * 100);
+
+        return $percentsAmplitude;
     }
 
     private function getActionName(int $sign) : string
@@ -167,9 +171,9 @@ class ExampleManager
         return $sign;
     }
 
-    private function getValueBetween(float $min, float $max) : float
+    private function getValueBetween(float $value, float $min, float $max) : float
     {
-        return 0;
+        return \btwVal($value, $min, $max);
     }
 
     private function add(array $settings) : array

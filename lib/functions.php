@@ -1,177 +1,69 @@
 <?php
 
-use App\DT;
-
-function show(...$vars)
+function normPerc(array $percents) : array
 {
-    dump(implode(' - ', $vars));
-}
+    $totalPercents = 0;
 
-function dt($dt)
-{
-    return DT::createFromDT($dt);
-}
-
-function normPerc($p)
-{
-    $all1 = 0;
-
-    foreach ($p as $k => $v) {
-        $all1 += abs($v);
+    foreach ($percents as $percent) {
+        $totalPercents += abs($percent);
     }
 
-    if (!$all1) {
-        $all1 = 1;
-    }
-    $all2 = 0;
-
-    foreach ($p as $key => $val) {
-        $all2 += $p[$key] = round($val / $all1 * 100);
+    if (!$totalPercents) {
+        $totalPercents = 1;
     }
 
-    foreach (array_reverse($p) as $k => $v) {
-        if ($v) {
-            $p[$k] += 100 - $all2;
+    $percentsSumm = 0;
 
-            return $p;
+    foreach ($percents as $key => $percent) {
+        $percentsSumm += $percents[$key] = round($percent / $totalPercents * 100);
+    }
+
+    foreach (array_reverse($percents) as $key => $percent) {
+        if ($percent) {
+            $percents[$key] += 100 - $percentsSumm;
+
+            return $percents;
         }
     }
 
-    $p[$k] += 100 - $all2;
+    $percents[$key] += 100 - $percentsSumm;
 
-    return $p;
+    return $percents;
 }
 
-function getArrByKeies($arr, $ka)
-{
-    $res = [];
-
-    foreach ($ka as $k) {
-        if (isset($arr[$k])) {
-            $res[$k] = $arr[$k];
-        }
-    }
-
-    return $res;
-}
-
-function getArrByStr($string)
-{
-    return arr($string);
-}
-
-function arr(string $string): array
+function arr(string $string) : array
 {
     $array = explode(' ', $string);
 
     return $array;
 }
 
-function getMethodName($s, $p = '')
+function minVal(float $min, float $value) : float
 {
-    $s = getVarName($s);
+    return $value >= $min ? $value : $min;
+}
 
-    if ($p) {
-        $s = ucfirst($s);
+function maxVal(float $max, float $value) : float
+{
+    return $value <= $max ? $value : $max;
+}
+
+function btwVal(float $min, float $max, float $value, ? bool $switch = null) : float
+{
+    if (null === $switch) {
+        return maxVal($max, minVal($min, $value));
     }
 
-    return $p.$s;
-}
+    $out = (($value < $min) or ($value > $max));
 
-function entityGetter($v)
-{
-    return preg_match('#^get[A-Z]#', $v) ? $v : 'get'.ucfirst($v);
-}
-
-function getKeysFromEntity($s, $e)
-{
-    $d = [];
-
-    foreach ((getArrByStr($s)) as $k) {
-        $m = entityGetter($k);
-        $d[$k] = $e->$m();
-    }
-
-    return $d;
-}
-
-function _log(...$attr)
-{
-    file_put_contents(__DIR__.'/log.log', json_encode($attr));
-}
-
-function createNumArr($a)
-{
-    $rn = [];
-
-    foreach ($a as $v) {
-        $rn[] = $v;
-    }
-
-    return $rn;
-}
-
-function minVal($k, $v)
-{
-    return $v >= $k ? $v : $k;
-}
-
-function maxVal($k, $v)
-{
-    return $v <= $k ? $v : $k;
-}
-
-function btwVal($min, $max, $v, $k = null)
-{
-    if (null === $k) {
-        return maxVal($max, minVal($min, $v));
-    }
-
-    $out = (($v < $min) or ($v > $max));
-
-    if ($k) {
-        return $out ? $max : $v;
+    if ($switch) {
+        return $out ? $max : $value;
     } else {
-        return ($out) ? $min : $v;
+        return ($out) ? $min : $value;
     }
 }
 
-function makeVarKeys($a, $s = 'x')
-{
-    foreach ($a as $k => $v) {
-        $a[$s.$k] = $v;
-    }
-
-    return $a;
-}
-
-function getVarName($s)
-{
-    $a = explode('_', strtolower($s));
-    $v = array_shift($a);
-
-    foreach ($a as $t) {
-        $v .= ucfirst($t);
-    }
-
-    return $v;
-}
-
-function distPerc(float $v, float $f, float $t)
-{
-    $o = ($t - $f) / 2;
-    $d = ($o - $v);
-    $r = round(abs($d) / abs($o) * 100);
-
-    return $r;
-}
-
-function prob($p)
-{
-    return mt_rand(1, 100) <= $p;
-}
-
-function randStr($length = 32)
+function randStr(int $length = 32) : string
 {
     $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPRQSTUVWXYZ0123456789';
     $code = '';
@@ -182,33 +74,6 @@ function randStr($length = 32)
     }
 
     return $code;
-}
-
-function hugeNumStyle(int $n)
-{
-    $rev = function (string $s) {
-        $s1 = '';
-
-        for ($i = strlen($s) - 1; $i >= 0; --$i) {
-            $s1 .= $s[$i];
-        }
-
-        return $s1;
-    };
-
-    $s = $rev($n);
-    $s1 = '';
-    $to = strlen($s) - 1;
-
-    for ($i = 0; $i <= $to; ++$i) {
-        $s1 .= $s[$i];
-
-        if ($i != $to && 0 == (($i + 1) % 3)) {
-            $s1 .= '.';
-        }
-    }
-
-    return $rev($s1);
 }
 
 function addTimeSorter($e1, $e2)

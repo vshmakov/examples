@@ -8,7 +8,7 @@
             <th>Задание</th>
             <th>Время добавления</th>
             <th>Время окончания</th>
-            <th>Выполнено попыток</th>
+            <th>Попытки (выполнено / начато)</th>
             <th>Средняя оценка</th>
             <th>Действия</th>
         </tr>
@@ -20,13 +20,15 @@
             <td><a href="{{ path('settings_show', {'id': task.settings.id}) }}">{{ task.settings.description }}</a></td>
             <td>{{ task.addTime }}</td>
             <td>{{ task.limitTime }}</td>
-            <td>{{ attemptRepository.findByTaskAndCurrentUser(task)|length }}</td>
-            <td>{{ attemptRepository.getAverageRatingByTaskAndCurrentUser(task) ?? '-' }}</td>
+            <td>{{ attemptRepository.findDoneByCurrentUserAndTask(task)|length }} / {{
+                attemptRepository.countByCurrentUserAndTask(task) }}</td>
+            {% set rating = attemptRepository.getAverageRatingByCurrentUserAndTask(task) %}
+            <td>{{ rating ? rating|round : '-' }}</td>
             <td>
                 {% if is_granted('SOLVE', task) %}
-<a href="{{ path('homework_solve', {'id': task.id}) }}" role="button">Выполнить</a>
-{% else %}
--
+                <a href="{{ path('homework_solve', {'id': task.id}) }}" role="button">Выполнить</a>
+                {% else %}
+                -
                 {% endif %}
             </td>
         </tr>

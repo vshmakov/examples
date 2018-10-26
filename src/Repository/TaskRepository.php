@@ -23,7 +23,7 @@ class TaskRepository extends ServiceEntityRepository
     public function isDoneByUser(Task $task, User $user) : bool
     {
         $attemptRepository = $this->getEntityRepository(Attempt::class);
-        $userAttempts = $attemptRepository->findByTaskAndUser($task, $user);
+        $userAttempts = $attemptRepository->findByUserAndTask($user, $task);
         $outstandingAttemptsCount = array_reduce($userAttempts, function (int $outstandingAttemptsCount, Attempt $attempt) use ($attemptRepository) : int {
             if ($attemptRepository->isDone($attempt)) {
                 --$outstandingAttemptsCount;

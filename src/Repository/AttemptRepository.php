@@ -139,18 +139,33 @@ where u = :u')
 
     public function getNewByCurrentUser() : Attempt
     {
-        return $this->getNewByCurrentUserAndSettings($this->getEntityRepository(Settings::class)->getNewByCurrentUser());
-    }
-
-    public function getNewByCurrentUserAndSettings(Settings $settings) : Attempt
-    {
-        $attempt = (new Attempt())
-            ->setSession($this->getEntityRepository(Session::class)->findOneByCurrentUserOrGetNew())
-            ->setSettings($settings);
+        $attempt = $this->createNewByCurrentUser()
+            ->setSettings($this->getEntityRepository(Settings::class)->getNewByCurrentUser());
 
         $entityManager = $this->getEntityManager();
         $entityManager->persist($attempt);
         $entityManager->flush();
+
+        return $attempt;
+    }
+
+    public function getNewByCurrentUserAndTask(Task $task) : Attempt
+    {
+        $attempt = $this->createNewByCurrentUser()
+            ->setTask($task)
+            ->setSettings($task->getSettings());
+
+        $entityManager = $this->getEntityManager();
+        $entityManager->persist($attempt);
+        $entityManager->flush();
+
+        return $attempt;
+    }
+
+    private function createNewByCurrentUser() : Attempt
+    {
+        $attempt = (new Attempt())
+            ->setSession($this->getEntityRepository(Session::class)->findOneByCurrentUserOrGetNew());
 
         return $attempt;
     }
@@ -160,13 +175,14 @@ where u = :u')
         return (bool)$this->exampleRepository->findLastByAttempt($attempt);
     }
 
-    public function getData(Attempt $attempt) : array
+    public function getData(Attempt $attempt) : ? array
     {
         $exampleRepository = $this->exampleRepository;
 
         if (!$example = $exampleRepository->findLastUnansweredByAttempt($attempt)) {
-            return false;
+            return null;
         }
+
         $example->setEntityRepository($exampleRepository);
         $attempt->setEntityRepository($this);
 
@@ -245,7 +261,7 @@ where u = ?1')
         return $this->getSolvedExamplesCount($attempt) == $attempt->getSettings()->getExamplesCount();
     }
 
-    public function findByTaskAndUser(Task $task, User $user) : array
+    public function findByUserAndTask(User $user, Task $task) : array
     {
         return $this->createQuery('select a from App:Attempt a
 join a.session s
@@ -265,18 +281,18 @@ where a.task = :task and s.user = :user')
         );
     }
 
-    public function findDoneByTaskAndUser(Task $task, User $user) : array
+    public function findDoneByUserAndTask(User $user, Task $task) : array
     {
-        $attempts = $this->findByTaskAndUser($task, $user);
+        $attempts = $this->findByUserAndTask($user, $task);
 
         return array_filter($attempts, function (Attempt $attempt) : bool {
             return $this->isDone($attempt);
         });
     }
 
-    public function getAverageRatingByTaskAndUser(Task $task, User $user) : ? float
+    public function getAverageRatingByUserAndTask(User $user, Task $task) : ? float
     {
-        $attempts = $this->findByTaskAndUser($task, $user);
+        $attempts = $this->findByUserAndTask($user, $task);
         $attemptsCount = count($attempts);
         $ratingSumm = array_reduce($attempts, function (int $ratingSumm, Attempt $attempt) : int {
             return $ratingSumm + $this->getRating($attempt);
@@ -285,13 +301,23 @@ where a.task = :task and s.user = :user')
         return $attemptsCount ? $ratingSumm / $attemptsCount : null;
     }
 
-    public function getAverageRatingByTaskAndCurrentUser(Task $task) : ? float
+    public function getAverageRatingByCurrentUserAndTask(Task $task) : ? float
     {
-        return $this->getAverageRatingByTaskAndUser($task, $this->userLoader->getUser());
+        return $this->getAverageRatingByUserAndTask($this->userLoader->getUser(), $task);
     }
 
-    public function findByTaskAndCurrentUser(Task $task) : array
+    public function findByCurrentUserAndTask(Task $task) : array
     {
-        return $this->findByTaskAndUser($task, $this->userLoader->getUser());
+        return $this->findByUserAndTask($this->userLoader->getUser(), $task);
+    }
+
+    public function countByCurrentUserAndTask(Task $task) : int
+    {
+        return \count($this->findByCurrentUserAndTask($task));
+    }
+
+    public function findDoneByCurrentUserAndTask(Task $task) : array
+    {
+        return $this->findDoneByUserAndTask($this->userLoader->getUser(), $task);
     }
 }

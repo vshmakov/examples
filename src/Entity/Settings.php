@@ -17,32 +17,20 @@ class Settings extends BaseProfile
      * @ORM\Column(type="integer")
      */
     protected $id;
-
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Attempt", mappedBy="settings", cascade={"persist", "remove"})
-     */
-    private $attempt;
-
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Task", mappedBy="settings", cascade={"persist", "remove"})
      */
     private $task;
 
-    public function getAttempt(): ?Attempt
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Attempt", mappedBy="settings")
+     */
+    private $attempts;
+
+    public function __construct()
     {
-        return $this->attempt;
-    }
-
-    public function setAttempt(Attempt $attempt): self
-    {
-        $this->attempt = $attempt;
-
-        // set the owning side of the relation if necessary
-        if ($this !== $attempt->getSettings()) {
-            $attempt->setSettings($this);
-        }
-
-        return $this;
+        parent::__construct();
+        $this->attempts = new ArrayCollection();
     }
 
     public function getTask(): ?Task
@@ -57,6 +45,37 @@ class Settings extends BaseProfile
         // set the owning side of the relation if necessary
         if ($this !== $task->getSettings()) {
             $task->setSettings($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Attempt[]
+     */
+    public function getAttempts(): Collection
+    {
+        return $this->attempts;
+    }
+
+    public function addAttempt(Attempt $attempt): self
+    {
+        if (!$this->attempts->contains($attempt)) {
+            $this->attempts[] = $attempt;
+            $attempt->setSettings($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAttempt(Attempt $attempt): self
+    {
+        if ($this->attempts->contains($attempt)) {
+            $this->attempts->removeElement($attempt);
+            // set the owning side to null (unless already changed)
+            if ($attempt->getSettings() === $this) {
+                $attempt->setSettings(null);
+            }
         }
 
         return $this;

@@ -51,7 +51,7 @@ class HomeworkController extends AbstractController
         $this->denyAccessUnlessGranted('SOLVE', $task);
 
         return $this->redirectToRoute('attempt_solve', [
-            'id' => $attemptRepository->getNewByCurrentUserAndSettings($task->getSettings())->getId()
+            'id' => $attemptRepository->getNewByCurrentUserAndTask($task)->getId()
         ]);
 
     }

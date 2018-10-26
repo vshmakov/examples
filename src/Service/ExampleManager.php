@@ -25,9 +25,9 @@ class ExampleManager
         }
     }
 
-    public function isRight(float $first, float $second, int $sign, float $answer) : bool
+    public function isRight(float $first, float $second, int $sign, ? float $answer) : bool
     {
-        return $answer === self::solve($first, $second, $sign);
+        return is_float($answer) && $answer === self::solve($first, $second, $sign);
     }
 
     public static function rating(int $answeredExamplesCount, int $errorsCount) : int

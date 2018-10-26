@@ -13,6 +13,7 @@ use App\Repository\AttemptRepository;
 use App\Repository\ProfileRepository;
 use App\Repository\UserRepository;
 use App\Service\UserLoader;
+use App\Entity\Attempt;
 
 /**
  * @Route("/homework")
@@ -40,5 +41,18 @@ class HomeworkController extends AbstractController
             'archiveTasks' => $archiveTasks,
             'attemptRepository' => $attemptRepository,
         ]);
+    }
+
+    /**
+     * @Route("{id}/solve", name="homework_solve")
+     */
+    public function solve(Task $task, AttemptRepository $attemptRepository) : Response
+    {
+        $this->denyAccessUnlessGranted('SOLVE', $task);
+
+        return $this->redirectToRoute('attempt_solve', [
+            'id' => $attemptRepository->getNewByCurrentUserAndSettings($task->getSettings())->getId()
+        ]);
+
     }
 }

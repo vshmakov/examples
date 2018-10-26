@@ -19,7 +19,7 @@ class Settings extends BaseProfile
     protected $id;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Attempt", mappedBy="settings", cascade={"persist", "remove"})
+     * @ORM\OneToMany(targetEntity="App\Entity\Attempt", mappedBy="settings", cascade={"persist", "remove"})
      */
     private $attempt;
 

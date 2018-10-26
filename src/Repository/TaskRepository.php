@@ -48,4 +48,10 @@ class TaskRepository extends ServiceEntityRepository
     {
         return $this->isDoneByUser($task, $this->userLoader->getUser());
     }
+
+    public function getFinishedUsersCount(Task $task) : int
+    {
+        return $this->getEntityRepository(User::class)
+            ->getFinishedCountByTask($task);
+    }
 }

@@ -38,7 +38,7 @@ class Attempt
     private $session;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Settings", inversedBy="attempt", cascade={"persist", "remove"})
+     * @ORM\ManyToOne(targetEntity="App\Entity\Settings", inversedBy="attempt", cascade={"persist", "remove"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $settings;

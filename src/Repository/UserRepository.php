@@ -243,7 +243,7 @@ where u = :user')
         $taskRepository = $this->getEntityRepository(Task::class);
 
             foreach ($task->getContractors()->toArray() as $user) {
-            if ($taskRepository->isSolvedByUser($task, $user)) {
+            if ($taskRepository->isDoneByUser($task, $user)) {
                 ++$finishedUsersCount;
             }
         }

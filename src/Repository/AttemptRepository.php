@@ -139,9 +139,14 @@ where u = :u')
 
     public function getNewByCurrentUser() : Attempt
     {
+        return $this->getNewByCurrentUserAndSettings($this->getEntityRepository(Settings::class)->getNewByCurrentUser());
+    }
+
+    public function getNewByCurrentUserAndSettings(Settings $settings) : Attempt
+    {
         $attempt = (new Attempt())
             ->setSession($this->getEntityRepository(Session::class)->findOneByCurrentUserOrGetNew())
-            ->setSettings($this->getEntityRepository(Settings::class)->getNewByCurrentUser());
+            ->setSettings($settings);
 
         $entityManager = $this->getEntityManager();
         $entityManager->persist($attempt);

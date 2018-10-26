@@ -22,7 +22,13 @@
             <td>{{ task.limitTime }}</td>
             <td>{{ attemptRepository.findByTaskAndCurrentUser(task)|length }}</td>
             <td>{{ attemptRepository.getAverageRatingByTaskAndCurrentUser(task) ?? '-' }}</td>
-            <td></td>
+            <td>
+                {% if is_granted('SOLVE', task) %}
+<a href="{{ path('homework_solve', {'id': task.id}) }}" role="button">Выполнить</a>
+{% else %}
+-
+                {% endif %}
+            </td>
         </tr>
         {% endfor %}
     </tbody>

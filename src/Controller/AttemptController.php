@@ -96,10 +96,8 @@ class AttemptController extends Controller
      */
     public function answer(Attempt $attempt, Request $request, ExampleRepository $exampleRepository, EntityManagerInterface $entityManager, AttemptRepository $attemptRepository)
     {
-        $showAttemptUrl = ['targetUrl' => $this->generateUrl('attempt_show', ['id' => $attempt->getId()])];
-
         if (!$this->isGranted('ANSWER', $attempt)) {
-            return $this->json(['finish' => true] + $showAttemptUrl);
+            return $this->json(['finish' => true]);
         }
 
         $example = $exampleRepository->findLastUnansweredByAttempt($attempt);
@@ -117,8 +115,7 @@ class AttemptController extends Controller
             'isRight' => $example->isRight(),
             'finish' => $finish,
             'attData' => $attempt->setEntityRepository($attemptRepository)->getData(),
-        ]
-            + $showAttemptUrl);
+        ]);
     }
 
     /**

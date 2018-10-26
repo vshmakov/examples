@@ -52,7 +52,7 @@ class AttemptVoter extends Voter
 
         if (($userLoader->isGuest() && $attempt->getSession() !== $this->sessionRepository->findOneByCurrentUser())
             or (0 == $attempt->getRemainedExamplesCount())
-            or (0 == $attempt->getRemainedTime())) {
+            or (0 == $attempt->getRemainedTime()->getTimestamp())) {
             return false;
         }
 

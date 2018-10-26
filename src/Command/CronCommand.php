@@ -11,7 +11,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use App\Repository\SessionRepository;
 use App\Repository\UserRepository;
 use App\Repository\VisitRepository;
-use App\Service\JsonLogger;
 use App\Service\UserLoader;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -21,15 +20,13 @@ class CronCommand extends Command
     private $sessionRepository;
     private $userRepository;
     private $visitRepository;
-    private $logger;
     private $userLoader;
     private $entityManager;
 
-    public function __construct(SessionRepository $sessionRepository, JsonLogger $logger, UserLoader $userLoader, EntityManagerInterface $entityManager, UserRepository $userRepository, VisitRepository $visitRepository)
+    public function __construct(SessionRepository $sessionRepository, UserLoader $userLoader, EntityManagerInterface $entityManager, UserRepository $userRepository, VisitRepository $visitRepository)
     {
         parent::__construct();
         $this->sessionRepository = $sessionRepository;
-        $this->logger = $logger;
         $this->userLoader = $userLoader;
         $this->entityManager = $entityManager;
         $this->userRepository = $userRepository;

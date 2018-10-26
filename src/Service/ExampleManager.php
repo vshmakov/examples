@@ -126,13 +126,13 @@ class ExampleManager
         foreach (['f', 's', ''] as $number) {
             foreach (['min', 'max'] as $restriction) {
                 $variableName = $number . ucfirst($restriction);
-                $$variableName = $settings[$actionName . ucfirst($number) . ucfirst($m)];
+                $$variableName = $settings[$actionName . ucfirst($number) . ucfirst($restriction)];
             }
         }
 
         $amplitudeCoefficient = 0;
         $amplitudeCoefficient += $this->getPercentsAmplitude($first, $fMin, $fMax);
-        $amplitudeCoefficient += $this->getPercentsAmplitude($b, $sMin, $sMax);
+        $amplitudeCoefficient += $this->getPercentsAmplitude($second, $sMin, $sMax);
         $amplitudeCoefficient = round(($amplitudeCoefficient / 3) ** 0.7);
 
         return $amplitudeCoefficient;

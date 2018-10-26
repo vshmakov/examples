@@ -36,14 +36,14 @@ class AttemptRepository extends ServiceEntityRepository
         $this->localCache = $localCache;
     }
 
-    public function findLastActualByCurrentUser()
+    public function findLastActualByCurrentUser() : ? Attempt
     {
         $attempt = $this->findLastByCurrentUser();
 
         return $this->authChecker->isGranted('SOLVE', $attempt) ? $attempt : null;
     }
 
-    public function findLastByCurrentUser()
+    public function findLastByCurrentUser() : ? Attempt
     {
         $userLoader = $this->userLoader;
         $where = !$userLoader->isGuest() ? 's.user = :u' : 'a.session = :s';
@@ -57,12 +57,12 @@ order by a.addTime desc");
         return $this->getValue($query);
     }
 
-    public function getTitle(Attempt $attempt)
+    public function getTitle(Attempt $attempt) : string
     {
         return 'Попытка №' . $this->getNumber($attempt);
     }
 
-    public function getNumber(Attempt $attempt)
+    public function getNumber(Attempt $attempt) : int
     {
         return $this->getValue(
             $this->createQuery('select count(a) from App:Attempt a
@@ -72,7 +72,7 @@ where s.user = :u and a.addTime <= :dt
         );
     }
 
-    public function getFinishTime(Attempt $attempt)
+    public function getFinishTime(Attempt $attempt) : \DateTimeInterface
     {
         return $this->dt($this->getValue(
             $this->createQuery('select e.answerTime from App:Attempt a
@@ -83,7 +83,7 @@ order by e.answerTime desc
         )) ? : $attempt->getAddTime();
     }
 
-    public function getSolvedExamplesCount(Attempt $attempt)
+    public function getSolvedExamplesCount(Attempt $attempt) : int
     {
         return $attempt->getSettings()->isDemanding() ? $this->getValue(
             $this->createQuery('select count(e) from App:Attempt a
@@ -93,7 +93,7 @@ where e.isRight = true and a = :a
         ) : $this->getAnsweredExamplesCount($attempt);
     }
 
-    public function getAnsweredExamplesCount(Attempt $attempt)
+    public function getAnsweredExamplesCount(Attempt $attempt) : int
     {
         return $this->getValue(
             $this->createQuery('select count(e) from App:Attempt a
@@ -103,7 +103,7 @@ where e.answer is not null and a = :a
         );
     }
 
-    public function getErrorsCount(Attempt $attempt)
+    public function getErrorsCount(Attempt $attempt) : int
     {
         return $this->exampleRepository->count([
             'attempt' => $attempt,
@@ -111,12 +111,12 @@ where e.answer is not null and a = :a
         ]);
     }
 
-    public function getRating(Attempt $attempt)
+    public function getRating(Attempt $attempt) : int
     {
         return ExampleManager::rating($attempt->getExamplesCount(), $this->getRongExamplesCount($attempt));
     }
 
-    public function countByCurrentUser()
+    public function countByCurrentUser() : int
     {
         return $this->getValue(
             $this->createQuery('select count(a) from App:Attempt a
@@ -127,7 +127,7 @@ where u = :u')
         );
     }
 
-    public function findAllByCurrentUser()
+    public function findAllByCurrentUser() : array
     {
         return $this->createQuery('select a from App:Attempt a
 join a.session s
@@ -150,12 +150,12 @@ where u = :u')
         return $attempt;
     }
 
-    public function hasPreviousExample(Attempt $attempt)
+    public function hasPreviousExample(Attempt $attempt) : bool
     {
         return (bool)$this->exampleRepository->findLastByAttempt($attempt);
     }
 
-    public function getData(Attempt $attempt)
+    public function getData(Attempt $attempt) : array
     {
         $exampleRepository = $this->exampleRepository;
 
@@ -176,21 +176,21 @@ where u = :u')
         ];
     }
 
-    public function getRemainedExamplesCount(Attempt $attempt)
+    public function getRemainedExamplesCount(Attempt $attempt) : int
     {
         $count = $attempt->getSettings()->getExamplesCount() - $this->getSolvedExamplesCount($attempt);
 
         return $count > 0 ? $count : 0;
     }
 
-    public function getRemainedTime(Attempt $attempt)
+    public function getRemainedTime(Attempt $attempt) : \DateTimeInterface
     {
         $remainedTime = $attempt->getLimitTime()->getTimestamp() - time();
 
-        return $remainedTime > 0 ? $remainedTime : 0;
+        return $this->dts($remainedTime > 0 ? $remainedTime : 0);
     }
 
-    public function getAllData(Attempt $attempt)
+    public function getAllData(Attempt $attempt) : array
     {
         $data = $attempt->setEntityRepository($this)->getData();
         $propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
@@ -204,14 +204,14 @@ where u = :u')
         return $data;
     }
 
-    public function getSolvedTime(Attempt $attempt)
+    public function getSolvedTime(Attempt $attempt) : \DateTimeInterface
     {
         return $this->dts(
             $this->getFinishTime($attempt)->getTimestamp() - $attempt->getAddTime()->getTimestamp()
         );
     }
 
-    public function getAverSolveTime(Attempt $attempt)
+    public function getAverSolveTime(Attempt $attempt) : \DateTimeInterface
     {
         $count = $this->getSolvedExamplesCount($attempt);
 
@@ -220,12 +220,12 @@ where u = :u')
         );
     }
 
-    public function getRongExamplesCount(Attempt $attempt)
+    public function getRongExamplesCount(Attempt $attempt) : int
     {
         return $this->getErrorsCount($attempt) + $attempt->getExamplesCount() - $this->getSolvedExamplesCount($attempt);
     }
 
-    public function findByUser(User $user)
+    public function findByUser(User $user) : array
     {
         return $this->createQuery('select a from App:Attempt a
 join a.session s
@@ -280,7 +280,7 @@ where a.task = :task and s.user = :user')
         return $attemptsCount ? $ratingSumm / $attemptsCount : null;
     }
 
-    public function getAverageRatingByTaskAndCurrentUser(Task $task): ? float
+    public function getAverageRatingByTaskAndCurrentUser(Task $task) : ? float
     {
         return $this->getAverageRatingByTaskAndUser($task, $this->userLoader->getUser());
     }

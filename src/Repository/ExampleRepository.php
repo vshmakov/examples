@@ -9,6 +9,7 @@ use App\Service\UserLoader;
 use App\Entity\Example;
 use App\Entity\Attempt;
 use App\Entity\User;
+use App\Entity\Task;
 use App\Utils\Cache\GlobalCache;
 
 class ExampleRepository extends ServiceEntityRepository
@@ -161,5 +162,15 @@ where u = :u and e.addTime < :dt and (e.isRight != false or e.isRight is null)')
                     'dt' => $example->getAddTime(),
                 ])
         ) + 1;
+    }
+
+    public function findByCurrentUserAndHomework(Task $task) : array
+    {
+        return $this->createQuery('select e from App:Example e
+join e.attempt a
+join a.session s
+where s.user = :user and a.task = :task')
+            ->setParameters(['user' => $this->userLoader->getUser(), 'task' => $task])
+            ->getResult();
     }
 }

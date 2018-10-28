@@ -53,4 +53,14 @@ class HomeworkVoter extends Voter
             && $task->getLimitTime()->getTimestamp() > time();
     }
 
+    private function canShowExamples() : bool
+    {
+        return $this->subject->getContractors()
+            ->contains($this->userLoader->getUser());
+    }
+
+    private function canShowAttempts() : bool
+    {
+        return $this->canShowExamples();
+    }
 }

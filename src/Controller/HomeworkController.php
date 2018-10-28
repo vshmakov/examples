@@ -12,6 +12,7 @@ use App\Repository\TaskRepository;
 use App\Repository\AttemptRepository;
 use App\Repository\ProfileRepository;
 use App\Repository\UserRepository;
+use App\Repository\ExampleRepository;
 use App\Service\UserLoader;
 use App\Entity\Attempt;
 
@@ -54,5 +55,31 @@ class HomeworkController extends AbstractController
             'id' => $attemptRepository->getNewByCurrentUserAndTask($task)->getId()
         ]);
 
+    }
+
+    /**
+     * @Route("{id}/examples", name="homework_examples")
+     */
+    public function examples(Task $task, ExampleRepository $exampleRepository) : Response
+    {
+        $this->denyAccessUnlessGranted('SHOW_EXAMPLES', $task);
+
+        return $this->render('homework/examples.html.twig', [
+            'task' => $task,
+            'examples' => $exampleRepository->findByCurrentUserAndHomework($task),
+        ]);
+    }
+
+    /**
+     * @Route("{id}/attempts", name="homework_attempts")
+     */
+    public function attempts(Task $task, AttemptRepository $attemptRepository) : Response
+    {
+        $this->denyAccessUnlessGranted('SHOW_ATTEMPTS', $task);
+
+        return $this->render('homework/attempts.html.twig', [
+            'task' => $task,
+            'attempts' => $attemptRepository->findByCurrentUserAndHomework($task),
+        ]);
     }
 }

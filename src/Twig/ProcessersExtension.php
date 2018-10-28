@@ -31,13 +31,13 @@ class ProcessersExtension extends AbstractExtension
             array_filter(
                 get_class_methods($this),
                 function ($method) {
-                    return (bool) preg_match('#^process#', $method);
+                    return (bool)preg_match('#^process#', $method);
                 }
             )
         );
     }
 
-    public function processVisits(array $visits): array
+    public function processVisits(array $visits) : array
     {
         return $this->prepareData($visits, function ($propertyAccessor) {
             $this->performanceMeter->start('processers_extension.process_visits');
@@ -64,27 +64,29 @@ class ProcessersExtension extends AbstractExtension
         });
     }
 
-    public function processExamples(array $examples): array
+    public function processExamples(array $examples) : array
     {
-        return $this->prepareData($examples, function ($propertyAccessor, $example) {
+        static $number = 0;
+
+        return $this->prepareData($examples, function ($propertyAccessor, $example) use (&$number) : array {
             $example->setEntityRepository($this->exampleRepository);
             $attempt = $example->getAttempt()
                 ->setEntityRepository($this->attemptRepository);
 
             return [
-                $propertyAccessor('userNumber'),
+                ++$number,
                 "$example",
                 $propertyAccessor('answer', false) ?? '-',
                 $propertyAccessor('isRight', false) ? 'Да' : 'Нет',
-                $propertyAccessor('solvingTime.timestamp') ?: '-',
-                $propertyAccessor('addTime').'',
+                $propertyAccessor('solvingTime.timestamp') ? : '-',
+                $propertyAccessor('addTime') . '',
                 $this->router->linkToRoute('attempt_show', ['id' => $attempt->getId()], $attempt->getTitle()),
                 $this->router->linkToRoute('attempt_profile', ['id' => $attempt->getId()], $attempt->getSettings()->getDescription()),
             ];
         });
     }
 
-    public function processIps(array $ips): array
+    public function processIps(array $ips) : array
     {
         return $this->prepareData($ips, function ($propertyAccessor) {
             return [
@@ -96,12 +98,12 @@ class ProcessersExtension extends AbstractExtension
                 $propertyAccessor('continent'),
                 $propertyAccessor('addTime.dbFormat'),
                 $this->router->linkToRoute('ip_show', ['id' => $propertyAccessor('id')], 'show')
-                    .$this->router->linkToRoute('ip_edit', ['id' => $propertyAccessor('id')], 'edit'),
+                    . $this->router->linkToRoute('ip_edit', ['id' => $propertyAccessor('id')], 'edit'),
             ];
         });
     }
 
-    public function processAttempts(array $attempts): array
+    public function processAttempts(array $attempts) : array
     {
         return $this->prepareData($attempts, function ($propertyAccessor, $attempt) {
             $attempt->setEntityRepository($this->attemptRepository);
@@ -131,8 +133,8 @@ class ProcessersExtension extends AbstractExtension
 
             return [
                 $this->router->linkToRoute('attempt_show', ['id' => $propertyAccessor('id')], $propertyAccessor('title')),
-                $propertyAccessor('addTime').'',
-                $propertyAccessor('finishTime').'',
+                $propertyAccessor('addTime') . '',
+                $propertyAccessor('finishTime') . '',
                 $this->router->linkToRoute('attempt_profile', ['id' => $propertyAccessor('id')], $propertyAccessor('settings.description')),
                 $propertyAccessor('solvedExamplesCount', false) ? sprintf('%s из %s (%s сек/пример)', $propertyAccessor('solvedTime.minSecFormat'), $propertyAccessor('maxTime.minSecFormat'), $propertyAccessor('averSolveTime.timestamp')) : '-',
                 sprintf('%s из %s', $propertyAccessor('solvedExamplesCount', false), $propertyAccessor('examplesCount', false)),
@@ -171,7 +173,7 @@ class ProcessersExtension extends AbstractExtension
                 $defaultSign = $value;
             }
 
-            return $value ?: $defaultSign;
+            return $value ? : $defaultSign;
         };
     }
 }

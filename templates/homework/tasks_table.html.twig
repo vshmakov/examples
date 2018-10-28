@@ -25,10 +25,10 @@
             {% set rating = attemptRepository.getAverageRatingByCurrentUserAndTask(task) %}
             <td>{{ rating ? rating|round : '-' }}</td>
             <td>
+                <a href="{{ path('homework_attempts', {'id': task.id}) }}">Посмотреть попытки</a>
+                <a href="{{ path('homework_examples', {'id': task.id}) }}">Посмотреть список примеров</a>
                 {% if is_granted('SOLVE', task) %}
                 <a href="{{ path('homework_solve', {'id': task.id}) }}" role="button">Выполнить</a>
-                {% else %}
-                -
                 {% endif %}
             </td>
         </tr>

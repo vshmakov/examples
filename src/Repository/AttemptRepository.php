@@ -10,9 +10,9 @@ use App\Entity\Attempt;
 use App\Entity\User;
 use App\Entity\Session;
 use App\Entity\Settings;
+use App\Entity\Task;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
-use App\Entity\Task;
 use App\Utils\Cache\LocalCache;
 
 class AttemptRepository extends ServiceEntityRepository
@@ -319,5 +319,14 @@ where a.task = :task and s.user = :user')
     public function findDoneByCurrentUserAndTask(Task $task) : array
     {
         return $this->findDoneByUserAndTask($this->userLoader->getUser(), $task);
+    }
+
+    public function findByCurrentUserAndHomework(Task $task) : array
+    {
+        return $this->createQuery('select a from App:Attempt a
+join a.session s
+where s.user = :user and a.task = :task')
+            ->setParameters(['user' => $this->userLoader->getUser(), 'task' => $task])
+            ->getResult();
     }
 }

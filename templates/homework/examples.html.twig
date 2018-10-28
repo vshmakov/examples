@@ -1,0 +1,23 @@
+{% extends "homework/base.html.twig" %}
+
+{% block title "Архив примеров ("~task.settings.description~")" %}
+
+{% block main %}
+<h1>Архив примеров</h1>
+{{ include('student/examples_table.html.twig') }}
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="/js/jquery.datatables.min.js"></script>
+<script>
+$("table").DataTable({
+searching: false,
+sorting: false,
+data: {{processExamples(examples)|reverse|json_encode|raw}},
+deferRender: true,
+pageLength: 50,
+language: {{include("example/language.json.twig")}}
+});
+</script>
+{% endblock %}

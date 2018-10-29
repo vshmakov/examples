@@ -1,4 +1,4 @@
-{% extends 'main.html.twig' %}
+{% extends 'task/base.html.twig' %}
 
 {% block title %}Создать задание{% endblock %}
 
@@ -6,10 +6,6 @@
 <h1>Создать задание</h1>
 
 {{ include('task/_form.html.twig') }}
-
-{% block bottom_links %}
-<a href="{{ path('task_index') }}">Вернуться к списку заданий</a>
-{% endblock %}
 {% endblock %}
 
 

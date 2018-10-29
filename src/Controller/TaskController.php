@@ -12,7 +12,9 @@ use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Form\Form;
 use App\Service\UserLoader;
 
 /**
@@ -25,10 +27,21 @@ class TaskController extends AbstractController
      */
     public function index(TaskRepository $taskRepository) : Response
     {
+        $tasks = array_reduce(
+            $taskRepository->findByCurrentAuthor(),
+            function (array $data, Task $task) use ($taskRepository) : array {
+                $group = $taskRepository->isActual($task) ? 'actualTasks' : 'archiveTasks';
+                $data[$group][] = $task;
+
+                return $data;
+            },
+            ['actualTasks' => [], 'archiveTasks' => []]
+        );
+
         return $this->render('task/index.html.twig', [
-            'tasks' => $taskRepository->findAll(),
             'taskRepository' => $taskRepository,
-        ]);
+        ]
+            + $tasks);
     }
 
     /**
@@ -45,29 +58,8 @@ class TaskController extends AbstractController
         $form = $this->createForm(TaskType::class, $task);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
-            $profile = $profileRepository->find($request->request->get('profile_id', ''));
-
-            if (!$profile) {
-                throw $this->createNotFoundException();
-            }
-
-            if (!$this->isGranted('appoint', $profile)) {
-                throw $this->createAccessDenyedException();
-            }
-
-            if ($form->isValid()) {
-                $settings = new Settings();
-                Settings::copySettings($profile, $settings);
-                $task->setSettings($settings);
-
-                $em = $this->getDoctrine()->getManager();
-                $em->persist($settings);
-                $em->persist($task);
-                $em->flush();
-
-                return $this->redirectToRoute('task_index');
-            }
+        if ($form->isSubmitted() && $redirectResponse = $this->processForm($form, $request, $profileRepository)) {
+            return $redirectResponse;
         }
 
         return $this->render('task/new.html.twig', [
@@ -81,6 +73,7 @@ class TaskController extends AbstractController
             'profileRepository' => $profileRepository,
         ]);
     }
+
 
     /**
      * @Route("/{id}", name="task_show", methods="GET")
@@ -105,23 +98,58 @@ class TaskController extends AbstractController
         ]);
     }
 
+    private function processForm(Form $form, Request $request, ProfileRepository $profileRepository) : ? RedirectResponse
+    {
+        $task = $form->getData();
+        $profile = $profileRepository->find($request->request->get('profile_id', ''));
+
+        if (!$profile) {
+            throw $this->createNotFoundException();
+        }
+
+        if (!$this->isGranted('appoint', $profile)) {
+            throw $this->createAccessDenyedException();
+        }
+
+        if ($form->isValid()) {
+            $settings = new Settings();
+            Settings::copySettings($profile, $settings);
+            $task->setSettings($settings);
+
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($settings);
+            $em->persist($task);
+            $em->flush();
+
+            return $this->redirectToRoute('task_index');
+        }
+
+        return null;
+    }
+
     /**
      * @Route("/{id}/edit", name="task_edit", methods="GET|POST")
      */
-    public function edit(Request $request, Task $task) : Response
+    public function edit(Request $request, Task $task, ProfileRepository $profileRepository, UserRepository $userRepository, UserLoader $userLoader) : Response
     {
+        $currentUser = $userLoader->getUser()
+            ->setEntityRepository($userRepository);
         $form = $this->createForm(TaskType::class, $task);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
-
-            return $this->redirectToRoute('task_edit', ['id' => $task->getId()]);
+        if ($form->isSubmitted() && $redirectResponse = $this->processForm($form, $request, $profileRepository)) {
+            return $redirectResponse;
         }
 
         return $this->render('task/edit.html.twig', [
+            'jsParams' => [
+                'current' => $currentUser->getCurrentProfile()->getId(),
+            ],
             'task' => $task,
             'form' => $form->createView(),
+            'publicProfiles' => $profileRepository->findByIsPublic(true),
+            'profiles' => $profileRepository->findByAuthor($currentUser),
+            'profileRepository' => $profileRepository,
         ]);
     }
 

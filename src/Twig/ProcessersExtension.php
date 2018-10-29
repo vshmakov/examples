@@ -66,7 +66,7 @@ class ProcessersExtension extends AbstractExtension
 
     public function processExamples(array $examples) : array
     {
-        static $number = 0;
+        $number = 0;
 
         return $this->prepareData($examples, function ($propertyAccessor, $example) use (&$number) : array {
             $example->setEntityRepository($this->exampleRepository);

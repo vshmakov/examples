@@ -4,9 +4,9 @@ namespace App\Repository;
 
 use App\Entity\Task;
 use App\Entity\Attempt;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
-use App\Entity\User;
 use App\Service\UserLoader;
 
 class TaskRepository extends ServiceEntityRepository
@@ -53,5 +53,17 @@ class TaskRepository extends ServiceEntityRepository
     {
         return $this->getEntityRepository(User::class)
             ->getFinishedCountByTask($task);
+    }
+
+    public function findByCurrentAuthor() : array
+    {
+        return $this->findByAuthor($this->userLoader->getUser());
+    }
+
+    public function isActual(Task $task) : bool
+    {
+        return time() > $task->getAddTime()->getTimestamp()
+            && time() < $task->getLimitTime()->getTimestamp()
+            && $this->getEntityRepository(User::class)->getFinishedCountByTask($task) < $task->getContractors()->count();
     }
 }

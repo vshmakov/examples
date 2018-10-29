@@ -4,37 +4,9 @@
 
 {% block main %}
 <h1>Задания</h1>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>№</th>
-            <th>Профиль настроек</th>
-            <th>Количество повторений</th>
-            <th>Время создания</th>
-            <th>Время окончания</th>
-            <th>Выполнило учеников</th>
-            <th>Действия</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for number, task in sortByDateTime(tasks, 'limitTime')|reverse %}
-        {% set task = task.setEntityRepository(taskRepository) %}
-        <tr>
-            <td>{{ number+1 }}</td>
-            <td> <a href="{{ path('settings_show', {'id': task.id}) }}">{{ task.settings.description }}</a></td>
-            <td>{{ task.timesCount }}</td>
-            <td>{{ task.addTime }}</td>
-            <td>{{ task.limitTime }}</td>
-            <td>{{ task.finishedUsersCount }} из {{ task.contractors.count }}</td>
-            <td>
-                <a href="{{ path('task_show', {'id': task.id}) }}">Просмотреть</a>
-                <a href="{{ path('task_edit', {'id': task.id}) }}">Редактировать</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+{% from 'task/tasks_table.html.twig' import tasks_table as table %}
+{{ table('Актуальные', actualTasks, taskRepository) }}
+{{ table('Архив', archiveTasks, taskRepository) }}
 
 <a href="{{ path('task_new') }}" role="button" class="btn">Создать задание</a>
 {% endblock %}

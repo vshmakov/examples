@@ -4,7 +4,16 @@
 
 {%block main%}
 <div class="attempt-show">
-<div class="attempt-show-statistic">
+	{% set attempt = att %}
+	{% set task = attempt.task %}
+{% if task and is_granted('SOLVE', task) %}
+<h1><a href="{{ path('homework_index') }}">Задание</a></h1>
+<ul>
+	<li><a href="{{ path('settings_show', {'id': task.settings.id}) }}">{{ task.settings.description }}</a></li>
+	<li><a href="{{ path('homework_solve', {'id': task.id}) }}" role="button">Продолжить решение задания</a></li>
+</ul>
+{% endif %}
+	<div class="attempt-show-statistic">
 <h1>Статистика</h1>
 
 <ul class="list-group">

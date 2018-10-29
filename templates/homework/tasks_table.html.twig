@@ -6,6 +6,7 @@
         <tr>
             <th>№</th>
             <th>Задание</th>
+            <th>Количество повторений</th>
             <th>Время добавления</th>
             <th>Время окончания</th>
             <th>Попытки (выполнено / начато)</th>
@@ -18,6 +19,7 @@
         <tr>
             <td>{{ number + 1 }}</td>
             <td><a href="{{ path('settings_show', {'id': task.settings.id}) }}">{{ task.settings.description }}</a></td>
+            <td>{{ task.timesCount }}</td>
             <td>{{ task.addTime }}</td>
             <td>{{ task.limitTime }}</td>
             <td>{{ attemptRepository.findDoneByCurrentUserAndTask(task)|length }} / {{

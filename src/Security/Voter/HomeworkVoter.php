@@ -50,6 +50,7 @@ class HomeworkVoter extends Voter
         return $this->canShowHomework()
             && $task->getContractors()->contains($currentUser)
             && !$this->taskRepository->isDoneByUser($task, $currentUser)
+            && $task->getAddTime()->getTimestamp() < time()
             && $task->getLimitTime()->getTimestamp() > time();
     }
 

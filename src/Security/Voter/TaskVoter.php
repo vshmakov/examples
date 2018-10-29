@@ -22,7 +22,7 @@ class TaskVoter extends Voter
 
     protected function supports($attribute, $subject)
     {
-        return (($subject instanceof Task) or null === $subject) && $this->hasHandler($attribute);
+        return $subject instanceof Task && $this->hasHandler($attribute);
     }
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
@@ -30,16 +30,18 @@ class TaskVoter extends Voter
         return $this->checkRight($attribute, $subject, $token);
     }
 
-    private function canShowTasks() : bool
-    {
-        $authChecker = $this->authChecker;
-
-        return $authChecker->isGranted('ROLE_USER') && !$authChecker->isGranted('ROLE_CHILD')
-            && $this->userLoader->getUser()->isTeacher();
-    }
-
     private function canShow() : bool
     {
         return $this->subject->isAuthor($this->userLoader->getUser());
+    }
+
+    private function canEdit() : bool
+    {
+        return $this->canShow();
+    }
+
+    private function canDelete() : bool
+    {
+        return $this->canShow();
     }
 }

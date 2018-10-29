@@ -27,6 +27,8 @@ class TaskController extends AbstractController
      */
     public function index(TaskRepository $taskRepository) : Response
     {
+        $this->denyAccessUnlessGranted('SHOW_TASKS');
+
         $tasks = array_reduce(
             $taskRepository->findByCurrentAuthor(),
             function (array $data, Task $task) use ($taskRepository) : array {
@@ -49,6 +51,8 @@ class TaskController extends AbstractController
      */
     public function new(Request $request, UserLoader $userLoader, ProfileRepository $profileRepository, UserRepository $userRepository) : Response
     {
+        $this->denyAccessUnlessGranted('CREATE_TASKS');
+
         $currentUser = $userLoader->getUser()
             ->setEntityRepository($userRepository);
         $task = (new Task())
@@ -132,6 +136,8 @@ class TaskController extends AbstractController
      */
     public function edit(Request $request, Task $task, ProfileRepository $profileRepository, UserRepository $userRepository, UserLoader $userLoader) : Response
     {
+        $this->denyAccessUnlessGranted('EDIT', $task);
+
         $currentUser = $userLoader->getUser()
             ->setEntityRepository($userRepository);
         $form = $this->createForm(TaskType::class, $task);
@@ -158,6 +164,8 @@ class TaskController extends AbstractController
      */
     public function delete(Request $request, Task $task) : Response
     {
+        $this->denyAccessUnlessGranted('DELETE', $task);
+        
         if ($this->isCsrfTokenValid('delete' . $task->getId(), $request->request->get('_token'))) {
             $em = $this->getDoctrine()->getManager();
             $em->remove($task);

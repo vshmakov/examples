@@ -49,4 +49,17 @@ class UserVoter extends Voter
     {
         return $this->authChecker->isGranted('ROLE_SUPER_ADMIN');
     }
+
+    private function canShowTasks() : bool
+    {
+        $authChecker = $this->authChecker;
+
+        return $authChecker->isGranted('ROLE_USER') && !$authChecker->isGranted('ROLE_CHILD')
+            && $this->userLoader->getUser()->isTeacher();
+    }
+
+    private function canCreateTasks() : bool
+    {
+        return $this->canShowTasks();
+    }
 }

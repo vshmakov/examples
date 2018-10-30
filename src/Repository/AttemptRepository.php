@@ -281,6 +281,17 @@ where a.task = :task and s.user = :user')
         );
     }
 
+    public function countByUserAndTask(User $user, Task $task) : int
+    {
+        return $this->getValue(
+            $this->createQuery('select count(a) from App:Attempt a
+join a.session s
+where s.user = :user and a.task = :task
+')
+                ->setParameters(['user' => $user, 'task' => $task])
+        );
+    }
+
     public function findDoneByUserAndTask(User $user, Task $task) : array
     {
         $attempts = $this->findByUserAndTask($user, $task);
@@ -290,9 +301,18 @@ where a.task = :task and s.user = :user')
         });
     }
 
+    public function getDoneAverageRatingByUserAndTask(User $user, Task $task) : ? float
+    {
+        return $this->getAverageRatingByAttempts($this->findDoneByUserAndTask($user, $task));
+    }
+
     public function getAverageRatingByUserAndTask(User $user, Task $task) : ? float
     {
-        $attempts = $this->findByUserAndTask($user, $task);
+        return $this->getAverageRatingByAttempts($this->findByUserAndTask($user, $task));
+    }
+
+    private function getAverageRatingByAttempts(array $attempts) : ? float
+    {
         $attemptsCount = count($attempts);
         $ratingSumm = array_reduce($attempts, function (int $ratingSumm, Attempt $attempt) : int {
             return $ratingSumm + $this->getRating($attempt);

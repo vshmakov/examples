@@ -1,4 +1,4 @@
-{% extends 'main.html.twig' %}
+{% extends 'task/base.html.twig' %}
 
 {% block title %}Задание ({{ task.settings.description }}){% endblock %}
 
@@ -16,7 +16,7 @@
             <td>{{ task.timesCount }}</td>
         </tr>
         <tr>
-            <th>Время создания</th>
+            <th>Время начала</th>
             <td>{{ task.addTime }}</td>
         </tr>
         <tr>
@@ -30,15 +30,12 @@
 <h1>Ученики</h1>
 {{ contractors('Выполнившие задания', task, finishedTaskContractors, attemptRepository) }}
 {{ contractors('Не выполнившие задания', task, notFinishedTaskContractors, attemptRepository) }}
+{% endblock %}
 
 {% block bottom_links %}
+<a href="{{ path('task_edit', {'id': task.id}) }}">Редактировать задание</a>
 {{ parent() }}
-<a href="{{ path('task_edit', {'id': task.id}) }}">edit</a>
 {% endblock %}
-
-{{ include('task/_delete_form.html.twig') }}
-{% endblock %}
-
 
 {%block javascripts%}
 {{parent()}}

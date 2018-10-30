@@ -4,11 +4,13 @@ namespace App\Controller;
 
 use App\Entity\Task;
 use App\Entity\Settings;
+use App\Entity\User;
 use App\Form\TaskType;
 use App\Repository\TaskRepository;
 use App\Repository\AttemptRepository;
 use App\Repository\ProfileRepository;
 use App\Repository\UserRepository;
+use App\Repository\ExampleRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,6 +18,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Form\Form;
 use App\Service\UserLoader;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
 
 /**
  * @Route("/task")
@@ -90,7 +93,7 @@ class TaskController extends AbstractController
         $finishedTaskContractors = $notFinishedTaskContractors = [];
 
         foreach ($contractors as $contractor) {
-            $group = $taskRepository->isSolvedByUser($task, $contractor) ? 'finishedTaskContractors' : 'notFinishedTaskContractors';
+            $group = $taskRepository->isDoneByUser($task, $contractor) ? 'finishedTaskContractors' : 'notFinishedTaskContractors';
             ($$group)[] = $contractor;
         }
 
@@ -165,7 +168,7 @@ class TaskController extends AbstractController
     public function delete(Request $request, Task $task) : Response
     {
         $this->denyAccessUnlessGranted('DELETE', $task);
-        
+
         if ($this->isCsrfTokenValid('delete' . $task->getId(), $request->request->get('_token'))) {
             $em = $this->getDoctrine()->getManager();
             $em->remove($task);
@@ -173,5 +176,37 @@ class TaskController extends AbstractController
         }
 
         return $this->redirectToRoute('task_index');
+    }
+
+    /**
+     * @Route("/{id}/contractor/{contractor_id}/attempts", name="task_contractor_attempts", methods="GET")
+     * @Entity("user", expr="repository.find(contractor_id)")
+     */
+    public function contractorAttempts(Task $task, User $user, AttemptRepository $attemptRepository) : Response
+    {
+        $this->denyAccessUnlessGranted('SHOW', $task);
+        $this->denyAccessUnlessGranted('SHOW_ATTEMPTS', $user);
+
+        return $this->render('task/contractor_attempts.html.twig', [
+            'task' => $task,
+            'contractor' => $user,
+            'attempts' => $attemptRepository->findByUserAndTask($user, $task)
+        ]);
+    }
+
+    /**
+     * @Route("/{id}/contractor/{contractor_id}/examples", name="task_contractor_examples", methods="GET")
+     * @Entity("user", expr="repository.find(contractor_id)")
+     */
+    public function contractorExamples(Task $task, User $user, ExampleRepository $exampleRepository) : Response
+    {
+        $this->denyAccessUnlessGranted('SHOW', $task);
+        $this->denyAccessUnlessGranted('SHOW_EXAMPLES', $user);
+
+        return $this->render('task/contractor_examples.html.twig', [
+            'task' => $task,
+            'contractor' => $user,
+            'examples' => $exampleRepository->findByUserAndTask($user, $task)
+        ]);
     }
 }

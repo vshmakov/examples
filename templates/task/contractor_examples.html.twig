@@ -1,0 +1,28 @@
+{% extends "task/base.html.twig" %}
+
+{% block title "Архив примеров ("~contractor.LFName~")" %}
+
+{% block main %}
+<h1>Архив примеров</h1>
+{{ include('student/examples_table.html.twig') }}
+{% endblock %}
+
+{% block bottom_links %}
+<a href="{{ path('task_show', {'id': task.id}) }}">Назад к просмотру задания</a>
+{{ parent() }}
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="/js/jquery.datatables.min.js"></script>
+<script>
+$("table").DataTable({
+searching: false,
+sorting: false,
+data: {{processExamples(examples)|reverse|json_encode|raw}},
+deferRender: true,
+pageLength: 50,
+language: {{include("example/language.json.twig")}}
+});
+</script>
+{% endblock %}

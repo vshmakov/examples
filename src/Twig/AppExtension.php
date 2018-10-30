@@ -58,6 +58,7 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
             'sortProfiles',
             'sortTeachers',
             'sortStudents',
+            'sortContractors',
             'fillIp',
         ]);
     }

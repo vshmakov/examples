@@ -173,4 +173,14 @@ where s.user = :user and a.task = :task')
             ->setParameters(['user' => $this->userLoader->getUser(), 'task' => $task])
             ->getResult();
     }
+
+    public function findByUserAndTask(User $user, Task $task) : array
+    {
+return $this->createQuery('select e from App:Example e
+join e.attempt a
+join a.session s
+where s.user = :user and a.task = :task')
+->setParameters(['user'=>$user, 'task'=>$task])
+->getResult();
+    }
 }

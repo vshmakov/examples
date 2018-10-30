@@ -14,7 +14,16 @@ class TaskType extends AbstractType
     {
         $builder
             ->add('timesCount', null, ['label' => 'Количество повторений'])
-            ->add('limitTime', null, ['label' => 'Время окончания задания']);
+            ->add('addTime', null, [
+                'label' => 'Время начала задания',
+                'choice_translation_domain' => 'datetime',
+                'date_format' => 'dMMMy',
+            ])
+            ->add('limitTime', null, [
+                'label' => 'Время окончания задания',
+                'choice_translation_domain' => 'datetime',
+                'date_format' => 'dMMMy',
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver)

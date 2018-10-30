@@ -17,12 +17,12 @@ class TaskType extends AbstractType
             ->add('addTime', null, [
                 'label' => 'Время начала задания',
                 'choice_translation_domain' => 'datetime',
-                'date_format' => 'dMMMy',
+                'date_format' => 'ddMMMy',
             ])
             ->add('limitTime', null, [
                 'label' => 'Время окончания задания',
                 'choice_translation_domain' => 'datetime',
-                'date_format' => 'dMMMy',
+                'date_format' => 'ddMMMy',
             ]);
     }
 

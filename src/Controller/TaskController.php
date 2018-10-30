@@ -61,7 +61,7 @@ class TaskController extends AbstractController
         $task = (new Task())
             ->setAuthor($currentUser)
             ->setContractors($currentUser->getStudents())
-            ->setLimitTime((new \DT())->add(new \DateInterval('P3D')));
+            ->setLimitTime((new \DT())->add(new \DateInterval('P7D')));
         $form = $this->createForm(TaskType::class, $task);
         $form->handleRequest($request);
 
@@ -167,6 +167,7 @@ class TaskController extends AbstractController
      */
     public function delete(Request $request, Task $task) : Response
     {
+        throw $this->createNotFoundException();
         $this->denyAccessUnlessGranted('DELETE', $task);
 
         if ($this->isCsrfTokenValid('delete' . $task->getId(), $request->request->get('_token'))) {

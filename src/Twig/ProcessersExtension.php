@@ -112,26 +112,22 @@ class ProcessersExtension extends AbstractExtension
             switch ($rating) {
                 case 3:
                     $color = 'orange';
-
                     break;
 
                 case 4:
                     $color = 'yellow';
-
                     break;
 
                 case 5:
                     $color = 'green';
-
                     break;
 
                 default:
                     $color = 'red';
-
                     break;
             }
 
-            return [
+           return [
                 $this->router->linkToRoute('attempt_show', ['id' => $propertyAccessor('id')], $propertyAccessor('title')),
                 $propertyAccessor('addTime').'',
                 $propertyAccessor('finishTime').'',

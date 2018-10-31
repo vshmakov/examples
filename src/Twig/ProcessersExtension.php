@@ -153,7 +153,7 @@ class ProcessersExtension extends AbstractExtension
 
         $this->performanceMeter->finish('processers_extension.prepare_data');
 
-      return $data;
+        return $data;
     }
 
     private function getPropertyAccessor($entity)

@@ -127,7 +127,7 @@ class ProcessersExtension extends AbstractExtension
                     break;
             }
 
-           return [
+            return [
                 $this->router->linkToRoute('attempt_show', ['id' => $propertyAccessor('id')], $propertyAccessor('title')),
                 $propertyAccessor('addTime').'',
                 $propertyAccessor('finishTime').'',

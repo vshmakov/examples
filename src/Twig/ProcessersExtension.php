@@ -140,7 +140,7 @@ class ProcessersExtension extends AbstractExtension
         });
     }
 
-    private function prepareData(array $entityList, callable $callback)
+    private function prepareData(array $entityList, callable $callback):array
     {
         $this->performanceMeter->start('processers_extension.prepare_data');
 

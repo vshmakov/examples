@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Form\AccountType;
 use App\Repository\TransferRepository;
 use App\Repository\UserRepository;
 use App\Service\UserLoader;
@@ -10,6 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Form\AccountType;
 
 /**
  * @Route("/account")

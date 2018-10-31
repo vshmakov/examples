@@ -8,8 +8,8 @@ use App\Service\UserLoader;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use App\Form\AccountType;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Form\AccountType;
 
 /**
  * @Route("/account")

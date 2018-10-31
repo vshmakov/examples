@@ -2,13 +2,13 @@
 
 namespace App\Twig;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Psr\Container\ContainerInterface;
-use Twig\Extension\AbstractExtension;
-use App\Service\UserLoader;
 use App\Repository\AttemptRepository;
 use App\Repository\UserRepository;
+use App\Service\UserLoader;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Twig\Extension\AbstractExtension;
 
 class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsInterface
 {
@@ -21,7 +21,7 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
 
     public function __construct(UserLoader $userLoader, AttemptRepository $attemptRepository, UserRepository $userRepository, EntityManagerInterface $entityManager, ContainerInterface $container)
     {
-        $hasActualAttempt = (bool)$attemptRepository->findLastActualByCurrentUser();
+        $hasActualAttempt = (bool) $attemptRepository->findLastActualByCurrentUser();
         $user = $userLoader->getUser()->setEntityRepository($userRepository);
 
         $this->entityManager = $entityManager;
@@ -65,7 +65,7 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
 
     public function dt(string $staticMethod, ...$parameters)
     {
-        return call_user_func_array(sprintf(
+        return \call_user_func_array(sprintf(
             '\DT::%s',
             $staticMethod
         ), $parameters);
@@ -80,7 +80,7 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
             function ($number, $entity) use ($addTime) {
                 return $addTime->getTimestamp() < $entity->getAddTime()->getTimestamp() ? --$number : $number;
             },
-            count($entityList)
+            \count($entityList)
         );
     }
 
@@ -122,17 +122,17 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
         return addTimeSorter($e1, $e2);
     }
 
-    public function sortByDateTime(array $entityList, string $dtProperty = 'addTime') : array
+    public function sortByDateTime(array $entityList, string $dtProperty = 'addTime'): array
     {
         $propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
             ->enableExceptionOnInvalidIndex()
             ->getPropertyAccessor();
 
-        usort($entityList, function ($e1, $e2) use ($propertyAccessor, $dtProperty) : int {
+        usort($entityList, function ($e1, $e2) use ($propertyAccessor, $dtProperty): int {
             $t1 = $propertyAccessor->getValue($e1, "$dtProperty.timestamp");
             $t2 = $propertyAccessor->getValue($e2, "$dtProperty.timestamp");
 
-            if ($t1 == $t2) {
+            if ($t1 === $t2) {
                 return 0;
             }
 
@@ -157,7 +157,7 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
             $s1 = $e1->getStudents()->count();
             $s2 = $e2->getStudents()->count();
 
-            if ($s1 != $s2) {
+            if ($s1 !== $s2) {
                 return $s1 > $s2 ? -1 : 1;
             }
 
@@ -194,10 +194,10 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
             ->getPropertyAccessor();
         $value = $objectOrArray ? $propertyAccessor->getValue($objectOrArray, $property) : null;
 
-        return false !== $default ? $value ? : $default : $value;
+        return false !== $default ? $value ?: $default : $value;
     }
 
-    public function sortContractors(array $contractors) : array
+    public function sortContractors(array $contractors): array
     {
         return $contractors;
     }

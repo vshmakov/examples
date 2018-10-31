@@ -4,10 +4,10 @@ namespace App\Controller\Admin;
 
 use App\Entity\User;
 use App\Form\UserType;
-use App\Repository\UserRepository;
-use App\Repository\SessionRepository;
-use App\Repository\ExampleRepository;
 use App\Repository\AttemptRepository;
+use App\Repository\ExampleRepository;
+use App\Repository\SessionRepository;
+use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

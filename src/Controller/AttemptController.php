@@ -2,16 +2,15 @@
 
 namespace App\Controller;
 
-use App\Form\SettingsType;
-use App\Repository\ProfileRepository;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Attempt;
+use App\Form\SettingsType;
 use App\Repository\AttemptRepository;
 use App\Repository\ExampleRepository;
-use Symfony\Component\Routing\Annotation\Route;
+use App\Repository\ProfileRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/attempt")
@@ -52,9 +51,8 @@ class AttemptController extends Controller
         if (!$this->isGranted('SOLVE', $attempt)) {
             if ($this->isGranted('VIEW', $attempt)) {
                 return $this->redirectToRoute('attempt_show', ['id' => $attempt->getId()]);
-            } else {
-                throw $this->createAccessDenyedException();
             }
+            throw $this->createAccessDenyedException();
         }
 
         $exampleRepository->findLastUnansweredByAttemptOrGetNew($attempt);
@@ -101,7 +99,7 @@ class AttemptController extends Controller
         }
 
         $example = $exampleRepository->findLastUnansweredByAttempt($attempt);
-        $answer = (float)$request->request->get('answer');
+        $answer = (float) $request->request->get('answer');
         $example->setAnswer($answer);
         $entityManager->flush();
 

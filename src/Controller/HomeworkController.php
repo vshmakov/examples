@@ -2,19 +2,13 @@
 
 namespace App\Controller;
 
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Task;
-use App\Entity\Settings;
-use App\Form\TaskType;
-use App\Repository\TaskRepository;
 use App\Repository\AttemptRepository;
-use App\Repository\ProfileRepository;
-use App\Repository\UserRepository;
 use App\Repository\ExampleRepository;
-use App\Service\UserLoader;
-use App\Entity\Attempt;
+use App\Repository\TaskRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/homework")
@@ -22,10 +16,11 @@ use App\Entity\Attempt;
 class HomeworkController extends AbstractController
 {
     use BaseTrait;
+
     /**
      * @Route("/", name="homework_index")
      */
-    public function index(TaskRepository $taskRepository, AttemptRepository $attemptRepository) : Response
+    public function index(TaskRepository $taskRepository, AttemptRepository $attemptRepository): Response
     {
         $this->denyAccessUnlessGranted('SHOW_HOMEWORK');
 
@@ -47,20 +42,19 @@ class HomeworkController extends AbstractController
     /**
      * @Route("{id}/solve", name="homework_solve")
      */
-    public function solve(Task $task, AttemptRepository $attemptRepository) : Response
+    public function solve(Task $task, AttemptRepository $attemptRepository): Response
     {
         $this->denyAccessUnlessGranted('SOLVE', $task);
 
         return $this->redirectToRoute('attempt_solve', [
-            'id' => $attemptRepository->getNewByCurrentUserAndTask($task)->getId()
+            'id' => $attemptRepository->getNewByCurrentUserAndTask($task)->getId(),
         ]);
-
     }
 
     /**
      * @Route("{id}/examples", name="homework_examples")
      */
-    public function examples(Task $task, ExampleRepository $exampleRepository) : Response
+    public function examples(Task $task, ExampleRepository $exampleRepository): Response
     {
         $this->denyAccessUnlessGranted('SHOW_EXAMPLES', $task);
 
@@ -73,7 +67,7 @@ class HomeworkController extends AbstractController
     /**
      * @Route("{id}/attempts", name="homework_attempts")
      */
-    public function attempts(Task $task, AttemptRepository $attemptRepository) : Response
+    public function attempts(Task $task, AttemptRepository $attemptRepository): Response
     {
         $this->denyAccessUnlessGranted('SHOW_ATTEMPTS', $task);
 

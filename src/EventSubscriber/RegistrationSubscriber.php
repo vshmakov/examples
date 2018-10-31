@@ -2,9 +2,9 @@
 
 namespace App\EventSubscriber;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use FOS\UserBundle\Event\FilterUserResponseEvent;
 use Doctrine\ORM\EntityManagerInterface;
+use FOS\UserBundle\Event\FilterUserResponseEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class RegistrationSubscriber implements EventSubscriberInterface
 {
@@ -21,7 +21,7 @@ class RegistrationSubscriber implements EventSubscriberInterface
         $user = $event->getUser();
         $user->setRoles([]);
 
-        if ($user->getUsername() == $superAdminUsername) {
+        if ($user->getUsername() === $superAdminUsername) {
             $user->addRole('ROLE_SUPER_ADMIN');
         }
 

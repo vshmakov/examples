@@ -28,6 +28,6 @@ where v.addTime < :dt')
         }
         $entityManager->flush();
 
-        return count($visits);
+        return \count($visits);
     }
 }

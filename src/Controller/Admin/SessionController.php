@@ -4,8 +4,8 @@ namespace App\Controller\Admin;
 
 use App\Entity\Session;
 use App\Form\SessionType;
-use App\Repository\SessionRepository;
 use App\Repository\IpRepository;
+use App\Repository\SessionRepository;
 use App\Repository\VisitRepository as VR;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;

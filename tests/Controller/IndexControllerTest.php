@@ -12,7 +12,7 @@ class IndexControllerTest extends WebTestCase
 
         $client->request('POST', '/api/request/yandex');
 
-        $this->assertEquals(400, $client->getResponse()->getStatusCode());
+        $this->assertSame(400, $client->getResponse()->getStatusCode());
     }
 
     public function testAll()
@@ -32,7 +32,7 @@ class IndexControllerTest extends WebTestCase
             foreach ($urlList as $url) {
                 $client->request('GET', $url);
             }
-            $this->assertEquals($status, $client->getResponse()->getStatusCode());
+            $this->assertSame($status, $client->getResponse()->getStatusCode());
         }
     }
 }

@@ -5,12 +5,12 @@ namespace App\Controller;
 use App\Entity\Profile;
 use App\Form\ProfileType;
 use App\Repository\ProfileRepository;
+use App\Repository\UserRepository;
+use App\Service\UserLoader;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Service\UserLoader;
-use App\Repository\UserRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 /**
  * @Route("/profile")

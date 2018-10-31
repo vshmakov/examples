@@ -2,8 +2,6 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
@@ -187,91 +185,91 @@ abstract class BaseProfile
         return $this->id;
     }
 
-    public function getAddTime() : ? \DateTimeInterface
+    public function getAddTime(): ? \DateTimeInterface
     {
         return $this->dt($this->addTime);
     }
 
-    public function setAddTime(\DateTimeInterface $addTime) : self
+    public function setAddTime(\DateTimeInterface $addTime): self
     {
         $this->addTime = $addTime;
 
         return $this;
     }
 
-    public function getDuration() : ? int
+    public function getDuration(): ? int
     {
         return $this->duration;
     }
 
-    public function setDuration(int $duration) : self
+    public function setDuration(int $duration): self
     {
         $this->duration = btwVal(30, HOUR - 1, $duration);
 
         return $this;
     }
 
-    public function getExamplesCount() : ? int
+    public function getExamplesCount(): ? int
     {
         return $this->examplesCount;
     }
 
-    public function setExamplesCount(int $examplesCount) : self
+    public function setExamplesCount(int $examplesCount): self
     {
         $this->examplesCount = btwVal(3, 150, $examplesCount);
 
         return $this;
     }
 
-    public function getAddPerc() : ? int
+    public function getAddPerc(): ? int
     {
         return $this->addPerc;
     }
 
-    public function setAddPerc(int $addPerc) : self
+    public function setAddPerc(int $addPerc): self
     {
         $this->addPerc = $addPerc;
 
         return $this;
     }
 
-    public function getSubPerc() : ? int
+    public function getSubPerc(): ? int
     {
         return $this->subPerc;
     }
 
-    public function setSubPerc(int $subPerc) : self
+    public function setSubPerc(int $subPerc): self
     {
         $this->subPerc = $subPerc;
 
         return $this;
     }
 
-    public function getMultPerc() : ? int
+    public function getMultPerc(): ? int
     {
         return $this->multPerc;
     }
 
-    public function setMultPerc(int $multPerc) : self
+    public function setMultPerc(int $multPerc): self
     {
         $this->multPerc = $multPerc;
 
         return $this;
     }
 
-    public function getDivPerc() : ? int
+    public function getDivPerc(): ? int
     {
         return $this->divPerc;
     }
 
-    public function setDivPerc(int $divPerc) : self
+    public function setDivPerc(int $divPerc): self
     {
         $this->divPerc = $divPerc;
 
         return $this;
     }
 
-    public function getMinutes() : int
+    public function getMinutes(): int
     {
         return $this->duration / MIN;
     }
@@ -284,7 +282,7 @@ abstract class BaseProfile
         return $this;
     }
 
-    public function getSeconds() : int
+    public function getSeconds(): int
     {
         return $this->duration % MIN;
     }
@@ -297,12 +295,12 @@ abstract class BaseProfile
         return $this;
     }
 
-    public function getDescription() : ? string
+    public function getDescription(): ? string
     {
         return $this->description;
     }
 
-    public function setDescription(string $description) : self
+    public function setDescription(string $description): self
     {
         $this->description = $description;
 
@@ -320,7 +318,7 @@ abstract class BaseProfile
 
         return array_reduce(
             self::getSettingsFields(),
-            function ($settings, $property) use ($propertyAccessor) : array {
+            function ($settings, $property) use ($propertyAccessor): array {
                 $settings[$property] = $propertyAccessor->getValue($this, $property);
 
                 return $settings;
@@ -329,12 +327,12 @@ abstract class BaseProfile
         );
     }
 
-    public function isDemanding() : bool
+    public function isDemanding(): bool
     {
         return $this->isDemanding;
     }
 
-    public function setIsDemanding(bool $isDemanding) : self
+    public function setIsDemanding(bool $isDemanding): self
     {
         $this->isDemanding = $isDemanding;
 
@@ -359,14 +357,14 @@ abstract class BaseProfile
         return $this;
     }
 
-    public static function copySettings(self $source, self $target) : self
+    public static function copySettings(self $source, self $target): self
     {
         $propertyAccessor = self::createPropertyAccessor();
 
         return array_reduce(
             self::getSettingsFields(),
-            function ($target, $property) use ($source, $propertyAccessor) : self {
-                                $propertyAccessor->setValue(
+            function ($target, $property) use ($source, $propertyAccessor): self {
+                $propertyAccessor->setValue(
                     $target,
                     $property,
                     $propertyAccessor->getValue($source, $property)
@@ -385,7 +383,7 @@ abstract class BaseProfile
             ->getPropertyAccessor();
     }
 
-    private static function getSettingsFields() : array
+    private static function getSettingsFields(): array
     {
         return arr('duration examplesCount addFMin addFMax addSMin addSMax addMin addMax subFMin subFMax subSMin subSMax subMin subMax multFMin multFMax multSMin multSMax multMin multMax divFMin divFMax divSMin divSMax divMin divMax addPerc subPerc multPerc divPerc description');
     }

@@ -96,7 +96,7 @@ class DT extends DateTime
         $t = $this->getTimestamp();
         $d = (((int) ($t / DAY)));
 
-        return 0 == $t % DAY ? $d : $d + 1;
+        return 0 === $t % DAY ? $d : $d + 1;
     }
 
     public function minSecFormat()

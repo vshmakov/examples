@@ -2,20 +2,20 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Inflector\Inflector;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Inflector\Inflector;
 
 trait BaseTrait
 {
     use \App\BaseTrait;
     private $entityRepository;
 
-    public function setER(ServiceEntityRepository $entityRepository) : self
+    public function setER(ServiceEntityRepository $entityRepository): self
     {
         return $this->setEntityRepository($entityRepository);
     }
 
-    public function setEntityRepository(ServiceEntityRepository $entityRepository) : self
+    public function setEntityRepository(ServiceEntityRepository $entityRepository): self
     {
         $this->entityRepository = $entityRepository;
 
@@ -33,7 +33,7 @@ trait BaseTrait
         $getter = Inflector::camelize($method);
 
         if (!$entityRepository or !method_exists($entityRepository, $getter)) {
-            throw new \Exception(sprintf('Entity %s and %s repository does not contain %s getter', self::class, $entityRepository ? get_class($entityRepository) : 'empty', $method));
+            throw new \Exception(sprintf('Entity %s and %s repository does not contain %s getter', self::class, $entityRepository ? \get_class($entityRepository) : 'empty', $method));
         }
 
         return $entityRepository->$getter($this);

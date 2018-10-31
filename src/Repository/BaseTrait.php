@@ -2,14 +2,14 @@
 
 namespace App\Repository;
 
-use Doctrine\ORM\Query;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query;
 
 trait BaseTrait
 {
     use \App\BaseTrait;
 
-    protected function createQuery(string $dql) : Query
+    protected function createQuery(string $dql): Query
     {
         return $this->getEntityManager()->createQuery($dql);
     }
@@ -23,7 +23,7 @@ trait BaseTrait
     {
         $result = ($query->setMaxResults(1)->getOneOrNullResult());
 
-        if (!is_array($result)) {
+        if (!\is_array($result)) {
             return $result;
         }
 
@@ -32,7 +32,7 @@ trait BaseTrait
         }
     }
 
-    protected function getEntityRepository(string $class) : ServiceEntityRepository
+    protected function getEntityRepository(string $class): ServiceEntityRepository
     {
         return $this->getentityManager()->getRepository($class);
     }

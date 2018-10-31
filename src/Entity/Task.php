@@ -64,17 +64,17 @@ class Task
         $this->addTime = new \DateTime();
     }
 
-    public function getId() : ? int
+    public function getId(): ? int
     {
         return $this->id;
     }
 
-    public function getAuthor() : ? User
+    public function getAuthor(): ? User
     {
         return $this->author;
     }
 
-    public function setAuthor(? User $author) : self
+    public function setAuthor(? User $author): self
     {
         $this->author = $author;
 
@@ -84,12 +84,12 @@ class Task
     /**
      * @return Collection|User[]
      */
-    public function getContractors() : Collection
+    public function getContractors(): Collection
     {
         return $this->contractors;
     }
 
-    public function addContractor(User $contractor) : self
+    public function addContractor(User $contractor): self
     {
         if (!$this->contractors->contains($contractor)) {
             $this->contractors[] = $contractor;
@@ -98,7 +98,7 @@ class Task
         return $this;
     }
 
-    public function removeContractor(User $contractor) : self
+    public function removeContractor(User $contractor): self
     {
         if ($this->contractors->contains($contractor)) {
             $this->contractors->removeElement($contractor);
@@ -107,19 +107,19 @@ class Task
         return $this;
     }
 
-    public function setContractors(Collection $contractors) : self
+    public function setContractors(Collection $contractors): self
     {
         $this->contractors = $contractors;
 
         return $this;
     }
 
-    public function getSettings() : ? Settings
+    public function getSettings(): ? Settings
     {
         return $this->settings;
     }
 
-    public function setSettings(Settings $settings) : self
+    public function setSettings(Settings $settings): self
     {
         $this->settings = $settings;
 
@@ -129,12 +129,12 @@ class Task
     /**
      * @return Collection|Attempt[]
      */
-    public function getAttempts() : Collection
+    public function getAttempts(): Collection
     {
         return $this->attempts;
     }
 
-    public function addAttempt(Attempt $attempt) : self
+    public function addAttempt(Attempt $attempt): self
     {
         if (!$this->attempts->contains($attempt)) {
             $this->attempts[] = $attempt;
@@ -144,7 +144,7 @@ class Task
         return $this;
     }
 
-    public function removeAttempt(Attempt $attempt) : self
+    public function removeAttempt(Attempt $attempt): self
     {
         if ($this->attempts->contains($attempt)) {
             $this->attempts->removeElement($attempt);
@@ -157,43 +157,43 @@ class Task
         return $this;
     }
 
-    public function getTimesCount() : ? int
+    public function getTimesCount(): ? int
     {
         return $this->timesCount;
     }
 
-    public function setTimesCount(int $timesCount) : self
+    public function setTimesCount(int $timesCount): self
     {
         $this->timesCount = $timesCount;
 
         return $this;
     }
 
-    public function getAddTime() : ? \DateTimeInterface
+    public function getAddTime(): ? \DateTimeInterface
     {
         return $this->dt($this->addTime);
     }
 
-    public function setAddTime(\DateTimeInterface $addTime) : self
+    public function setAddTime(\DateTimeInterface $addTime): self
     {
         $this->addTime = $addTime;
 
         return $this;
     }
 
-    public function getLimitTime() : ? \DateTimeInterface
+    public function getLimitTime(): ? \DateTimeInterface
     {
         return $this->dt($this->limitTime);
     }
 
-    public function setLimitTime(\DateTimeInterface $limitTime) : self
+    public function setLimitTime(\DateTimeInterface $limitTime): self
     {
         $this->limitTime = $limitTime;
 
         return $this;
     }
 
-    public function isAuthor(User $author) : bool
+    public function isAuthor(User $author): bool
     {
         return $this->author === $author;
     }

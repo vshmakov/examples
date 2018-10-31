@@ -2,9 +2,9 @@
 
 namespace App\Security\Voter;
 
+use App\Entity\User;
 use Doctrine\Common\Inflector\Inflector;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use App\Entity\User;
 
 trait BaseTrait
 {
@@ -79,6 +79,6 @@ trait BaseTrait
             $prefix = 'has';
         }
 
-        return Inflector::camelize(strtolower($prefix.'_'.$attribute));
+        return Inflector::camelize(mb_strtolower($prefix.'_'.$attribute));
     }
 }

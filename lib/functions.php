@@ -1,6 +1,6 @@
 <?php
 
-function normPerc(array $percents) : array
+function normPerc(array $percents): array
 {
     $totalPercents = 0;
 
@@ -31,24 +31,24 @@ function normPerc(array $percents) : array
     return $percents;
 }
 
-function arr(string $string) : array
+function arr(string $string): array
 {
     $array = explode(' ', $string);
 
     return $array;
 }
 
-function minVal(float $min, float $value) : float
+function minVal(float $min, float $value): float
 {
     return $value >= $min ? $value : $min;
 }
 
-function maxVal(float $max, float $value) : float
+function maxVal(float $max, float $value): float
 {
     return $value <= $max ? $value : $max;
 }
 
-function btwVal(float $min, float $max, float $value, ? bool $switch = null) : float
+function btwVal(float $min, float $max, float $value, ? bool $switch = null): float
 {
     if (null === $switch) {
         return maxVal($max, minVal($min, $value));
@@ -58,18 +58,18 @@ function btwVal(float $min, float $max, float $value, ? bool $switch = null) : f
 
     if ($switch) {
         return $out ? $max : $value;
-    } else {
-        return ($out) ? $min : $value;
     }
+
+    return ($out) ? $min : $value;
 }
 
-function randStr(int $length = 32) : string
+function randStr(int $length = 32): string
 {
     $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPRQSTUVWXYZ0123456789';
     $code = '';
-    $clen = strlen($chars) - 1;
+    $clen = mb_strlen($chars) - 1;
 
-    while (strlen($code) < $length) {
+    while (mb_strlen($code) < $length) {
         $code .= $chars[mt_rand(0, $clen)];
     }
 
@@ -86,7 +86,7 @@ function addTimeSorter($e1, $e2)
 
 function timeSorter($t1, $t2)
 {
-    if ($t1 == $t2) {
+    if ($t1 === $t2) {
         return 0;
     }
 

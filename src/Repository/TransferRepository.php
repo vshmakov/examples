@@ -2,8 +2,8 @@
 
 namespace App\Repository;
 
-use App\Service\UserLoader;
 use App\Entity\Transfer;
+use App\Service\UserLoader;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 

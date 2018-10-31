@@ -2,14 +2,14 @@
 
 namespace App\Controller;
 
-use App\Repository\UserRepository;
+use App\Entity\User;
 use App\Repository\AttemptRepository;
 use App\Repository\ExampleRepository;
-use Symfony\Component\Routing\Annotation\Route;
+use App\Repository\UserRepository;
 use App\Service\UserLoader;
-use App\Entity\User;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/student")

@@ -4,7 +4,7 @@ namespace App\Service;
 
 class ExampleManager
 {
-    public static function solve(float $first, float $second, int $sign) : ? float
+    public static function solve(float $first, float $second, int $sign): ? float
     {
         switch ($sign) {
             case 1:
@@ -25,37 +25,37 @@ class ExampleManager
         }
     }
 
-    public function isRight(float $first, float $second, int $sign, ? float $answer) : bool
+    public function isRight(float $first, float $second, int $sign, ? float $answer): bool
     {
-        return is_float($answer) && $answer === self::solve($first, $second, $sign);
+        return \is_float($answer) && $answer === self::solve($first, $second, $sign);
     }
 
-    public static function rating(int $answeredExamplesCount, int $errorsCount) : int
+    public static function rating(int $answeredExamplesCount, int $errorsCount): int
     {
         $rightExamplesCount = $answeredExamplesCount - $errorsCount;
         $ratingRightExamplesCount = [];
 
         for ($i = 5; $i >= 1; --$i) {
-            $prevRatingRightExamplesCount = 5 == $i ? $answeredExamplesCount : $ratingRightExamplesCount[$i + 1];
-            $coefficient = 5 == $i ? 0.98 : 0.97;
+            $prevRatingRightExamplesCount = 5 === $i ? $answeredExamplesCount : $ratingRightExamplesCount[$i + 1];
+            $coefficient = 5 === $i ? 0.98 : 0.97;
 
             if ($answeredExamplesCount <= 50) {
-                $coefficient = 5 == $i ? 0.96 : 0.94;
+                $coefficient = 5 === $i ? 0.96 : 0.94;
             }
 
             if ($answeredExamplesCount <= 30) {
-                $coefficient = 5 == $i ? 0.97 : 0.92;
+                $coefficient = 5 === $i ? 0.97 : 0.92;
             }
 
             if ($answeredExamplesCount <= 15) {
-                $coefficient = 5 == $i ? 0.94 : 0.88;
+                $coefficient = 5 === $i ? 0.94 : 0.88;
             }
 
             if ($answeredExamplesCount <= 9) {
-                $coefficient = 5 == $i ? 1 : 0.85;
+                $coefficient = 5 === $i ? 1 : 0.85;
             }
 
-            $ratingRightExamplesCount[$i] = (int)($prevRatingRightExamplesCount * $coefficient);
+            $ratingRightExamplesCount[$i] = (int) ($prevRatingRightExamplesCount * $coefficient);
         }
 
         $rating = 1;
@@ -69,7 +69,7 @@ class ExampleManager
         return $rating;
     }
 
-    public function getRandomExample(int $sign, array $settings, array $previousExamples) : array
+    public function getRandomExample(int $sign, array $settings, array $previousExamples): array
     {
         $actionName = $this->getActionName($sign);
         $maxQualityCoefficient = 0;
@@ -89,19 +89,19 @@ class ExampleManager
         return $example;
     }
 
-    private function getBooleanByPercentsProbability(int $percentsProbability) : bool
+    private function getBooleanByPercentsProbability(int $percentsProbability): bool
     {
         return $percentsProbability >= mt_rand(1, 100);
     }
 
-    private function getExampleQualityCoefficient(float $first, float $second, int $sign, array $settings, array $previousExamples, bool $needUniqueAnswer, bool $needMaxAmplitude) : float
+    private function getExampleQualityCoefficient(float $first, float $second, int $sign, array $settings, array $previousExamples, bool $needUniqueAnswer, bool $needMaxAmplitude): float
     {
         $qualityCoefficient = 100;
         $uniqueExampleCoefficient = $uniqueAnswerCoefficient = $amplitudeCoefficient = 0;
-        $previousExamplesCount = count($previousExamples) ? : 1;
+        $previousExamplesCount = \count($previousExamples) ?: 1;
 
         foreach ($previousExamples as $example) {
-            if ($example->getFirst() == $first && $example->getSecond() == $second && $example->getSign() == $sign) {
+            if ($example->getFirst() === $first && $example->getSecond() === $second && $example->getSign() === $sign) {
                 $uniqueExampleCoefficient += 1 / $previousExamplesCount * 60;
             }
 
@@ -119,14 +119,14 @@ class ExampleManager
         return $qualityCoefficient;
     }
 
-    private function getAmplitudeCoefficient(float $first, float $second, int $sign, array $settings) : float
+    private function getAmplitudeCoefficient(float $first, float $second, int $sign, array $settings): float
     {
         $actionName = $this->getActionName($sign);
 
         foreach (['f', 's', ''] as $number) {
             foreach (['min', 'max'] as $restriction) {
-                $variableName = $number . ucfirst($restriction);
-                $$variableName = $settings[$actionName . ucfirst($number) . ucfirst($restriction)];
+                $variableName = $number.ucfirst($restriction);
+                $$variableName = $settings[$actionName.ucfirst($number).ucfirst($restriction)];
             }
         }
 
@@ -138,7 +138,7 @@ class ExampleManager
         return $amplitudeCoefficient;
     }
 
-    private function getPercentsAmplitude(float $number, float $min, float $max) : float
+    private function getPercentsAmplitude(float $number, float $min, float $max): float
     {
         $middle = ($max - $min) / 2;
         $amplitude = ($middle - $number);
@@ -147,12 +147,12 @@ class ExampleManager
         return $percentsAmplitude;
     }
 
-    private function getActionName(int $sign) : string
+    private function getActionName(int $sign): string
     {
         return [1 => 'add', 'sub', 'mult', 'div'][$sign];
     }
 
-    public function getRandomSign(array $settings) : int
+    public function getRandomSign(array $settings): int
     {
         $randomPercent = mt_rand(1, 100);
         $totalProbability = 0;
@@ -171,12 +171,12 @@ class ExampleManager
         return $sign;
     }
 
-    private function getValueBetween(float $value, float $min, float $max) : float
+    private function getValueBetween(float $value, float $min, float $max): float
     {
         return \btwVal($value, $min, $max);
     }
 
-    private function add(array $settings) : array
+    private function add(array $settings): array
     {
         extract($settings);
         $switch = $this->getBooleanByPercentsProbability((50));
@@ -202,12 +202,12 @@ class ExampleManager
         return $this->createExampleArray($first, $second);
     }
 
-    private function createExampleArray(float $first, float $second) : array
+    private function createExampleArray(float $first, float $second): array
     {
         return ['first' => $first, 'second' => $second];
     }
 
-    private function sub(array $settings) : array
+    private function sub(array $settings): array
     {
         extract($settings);
         extract($this->add([
@@ -222,33 +222,33 @@ class ExampleManager
         return $this->createExampleArray($first + $second, $second);
     }
 
-    private function mult(array $settings) : array
+    private function mult(array $settings): array
     {
         extract($settings);
         $switch = $this->getBooleanByPercentsProbability(50);
 
         if ($switch) {
-            $firstMin = $this->getValueBetween($multFMin, $multFMax, $multMin / ($multSMax ? : 1));
-            $firstMax = $this->getValueBetween($multFMin, $multFMax, $multMax / ($multSMin ? : 1));
+            $firstMin = $this->getValueBetween($multFMin, $multFMax, $multMin / ($multSMax ?: 1));
+            $firstMax = $this->getValueBetween($multFMin, $multFMax, $multMax / ($multSMin ?: 1));
             $first = mt_rand($firstMin, $firstMax);
 
-            $secondMin = $this->getValueBetween($multSMin, $multSMax, $multMin / ($first ? : 1));
-            $secondMax = $this->getValueBetween($multSMin, $multSMax, $multMax / ($first ? : 1));
+            $secondMin = $this->getValueBetween($multSMin, $multSMax, $multMin / ($first ?: 1));
+            $secondMax = $this->getValueBetween($multSMin, $multSMax, $multMax / ($first ?: 1));
             $second = mt_rand($secondMin, $secondMax);
         } else {
-            $secondMin = $this->getValueBetween($multSMin, $multSMax, $multMin / ($multFMax ? : 1));
-            $secondMax = $this->getValueBetween($multSMin, $multSMax, $multMax / ($multFMin ? : 1));
+            $secondMin = $this->getValueBetween($multSMin, $multSMax, $multMin / ($multFMax ?: 1));
+            $secondMax = $this->getValueBetween($multSMin, $multSMax, $multMax / ($multFMin ?: 1));
             $second = mt_rand($secondMin, $secondMax);
 
-            $firstMin = $this->getValueBetween($multFMin, $multFMax, $multMin / ($second ? : 1));
-            $firstMax = $this->getValueBetween($multFMin, $multFMax, $multMax / ($second ? : 1));
+            $firstMin = $this->getValueBetween($multFMin, $multFMax, $multMin / ($second ?: 1));
+            $firstMax = $this->getValueBetween($multFMin, $multFMax, $multMax / ($second ?: 1));
             $first = mt_rand($firstMin, $firstMax);
         }
 
         return $this->createExampleArray($first, $second);
     }
 
-    private function div(array $settings) : array
+    private function div(array $settings): array
     {
         extract($settings);
         extract($this->mult([

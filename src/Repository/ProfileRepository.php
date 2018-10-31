@@ -4,9 +4,9 @@ namespace App\Repository;
 
 use App\Entity\Profile;
 use App\Entity\User;
+use App\Service\UserLoader;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
-use App\Service\UserLoader;
 
 class ProfileRepository extends ServiceEntityRepository
 {

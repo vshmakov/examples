@@ -3,9 +3,9 @@
 namespace App\Security\Voter;
 
 use App\Service\AuthChecker;
+use App\Service\UserLoader;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
-use App\Service\UserLoader;
 
 class TeacherVoter extends Voter
 {

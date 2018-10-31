@@ -2,9 +2,9 @@
 
 namespace App\Service;
 
-use Symfony\Component\Security\Core\User\UserInterface;
 use App\Repository\UserRepository;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class UserLoader
 {

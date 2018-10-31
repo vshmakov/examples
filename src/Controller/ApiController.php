@@ -4,9 +4,9 @@ namespace App\Controller;
 
 use App\Repository\TransferRepository;
 use App\Repository\UserRepository;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/api")
@@ -29,7 +29,7 @@ class ApiController extends Controller
         $transfer = $transferRepository->findOneBy(['label' => $label, 'held' => false]);
         $user = $transfer ? $transfer->getUser() : null;
 
-        if ($user && 'true' != $unaccepted) {
+        if ($user && 'true' !== $unaccepted) {
             $user->addMoney($withdraw_amount);
             $transfer->setMoney($withdraw_amount)
                 ->setHeldTime(new \DateTime())

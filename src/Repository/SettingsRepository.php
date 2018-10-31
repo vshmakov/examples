@@ -4,9 +4,9 @@ namespace App\Repository;
 
 use App\Entity\Settings;
 use App\Entity\User;
+use App\Service\UserLoader;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
-use App\Service\UserLoader;
 
 class SettingsRepository extends ServiceEntityRepository
 {
@@ -19,7 +19,7 @@ class SettingsRepository extends ServiceEntityRepository
         $this->userLoader = $userLoader;
     }
 
-    public function getNewByCurrentUser() : Settings
+    public function getNewByCurrentUser(): Settings
     {
         $currentUser = $this->userLoader->getUser()
             ->setEntityRepository($this->getEntityRepository(User::class));

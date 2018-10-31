@@ -5,10 +5,10 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use FOS\UserBundle\Model\UserInterface;
 use FOS\UserBundle\Model\GroupableInterface;
-use Symfony\Component\Validator\Constraints as Assert;
+use FOS\UserBundle\Model\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
@@ -367,7 +367,7 @@ class User implements UserInterface, GroupableInterface
             $con = false;
 
             foreach ($this->ips as $e) {
-                if ($e->getIp() == $ip->getIp()) {
+                if ($e->getIp() === $ip->getIp()) {
                     $con = true;
 
                     break;
@@ -656,7 +656,7 @@ class User implements UserInterface, GroupableInterface
         return $this->students;
     }
 
-    public function addStudent(User $student): self
+    public function addStudent(self $student): self
     {
         if (!$this->students->contains($student)) {
             $this->students[] = $student;
@@ -666,7 +666,7 @@ class User implements UserInterface, GroupableInterface
         return $this;
     }
 
-    public function removeStudent(User $student): self
+    public function removeStudent(self $student): self
     {
         if ($this->students->contains($student)) {
             $this->students->removeElement($student);
@@ -684,7 +684,7 @@ class User implements UserInterface, GroupableInterface
         return $this->teacher;
     }
 
-    public function setTeacher(? User $teacher): self
+    public function setTeacher(? self $teacher): self
     {
         $this->teacher = $teacher;
 
@@ -696,7 +696,7 @@ class User implements UserInterface, GroupableInterface
         return (bool) $this->teacher;
     }
 
-    public function isUserTeacher(User $teacher)
+    public function isUserTeacher(self $teacher)
     {
         return $this->teacher === $teacher;
     }
@@ -761,7 +761,7 @@ class User implements UserInterface, GroupableInterface
         return $this->children;
     }
 
-    public function addChild(User $child): self
+    public function addChild(self $child): self
     {
         if (!$this->children->contains($child)) {
             $this->children[] = $child;
@@ -771,7 +771,7 @@ class User implements UserInterface, GroupableInterface
         return $this;
     }
 
-    public function removeChild(User $child): self
+    public function removeChild(self $child): self
     {
         if ($this->children->contains($child)) {
             $this->children->removeElement($child);
@@ -789,7 +789,7 @@ class User implements UserInterface, GroupableInterface
         return $this->parent;
     }
 
-    public function setParent(? User $parent): self
+    public function setParent(? self $parent): self
     {
         $this->parent = $parent;
 

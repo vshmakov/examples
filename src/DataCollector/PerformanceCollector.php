@@ -2,10 +2,10 @@
 
 namespace App\DataCollector;
 
-use Symfony\Component\HttpKernel\DataCollector\DataCollector;
+use App\Utils\PerformanceMeter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use App\Utils\PerformanceMeter;
+use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 
 class PerformanceCollector extends DataCollector
 {

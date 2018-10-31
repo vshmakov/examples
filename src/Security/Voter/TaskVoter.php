@@ -2,11 +2,11 @@
 
 namespace App\Security\Voter;
 
+use App\Entity\Task;
 use App\Service\AuthChecker;
+use App\Service\UserLoader;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
-use App\Service\UserLoader;
-use App\Entity\Task;
 
 class TaskVoter extends Voter
 {
@@ -30,17 +30,17 @@ class TaskVoter extends Voter
         return $this->checkRight($attribute, $subject, $token);
     }
 
-    private function canShow() : bool
+    private function canShow(): bool
     {
         return $this->subject->isAuthor($this->userLoader->getUser());
     }
 
-    private function canEdit() : bool
+    private function canEdit(): bool
     {
         return $this->canShow();
     }
 
-    private function canDelete() : bool
+    private function canDelete(): bool
     {
         return $this->canShow();
     }

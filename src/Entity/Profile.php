@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Profile extends BaseProfile
 {
-        /**
+    /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
@@ -34,7 +34,6 @@ class Profile extends BaseProfile
      */
     private $users;
 
-
     public function __construct()
     {
         parent::__construct();
@@ -42,24 +41,24 @@ class Profile extends BaseProfile
         $this->normalize();
     }
 
-    public function getAuthor() : ? User
+    public function getAuthor(): ? User
     {
         return $this->author;
     }
 
-    public function setAuthor(? User $author) : self
+    public function setAuthor(? User $author): self
     {
         $this->author = $author;
 
         return $this;
     }
 
-    public function isPublic() : bool
+    public function isPublic(): bool
     {
         return $this->isPublic;
     }
 
-    public function setIsPublic(bool $isPublic) : self
+    public function setIsPublic(bool $isPublic): self
     {
         $this->isPublic = $isPublic;
 
@@ -69,12 +68,12 @@ class Profile extends BaseProfile
     /**
      * @return Collection|User[]
      */
-    public function getUsers() : Collection
+    public function getUsers(): Collection
     {
         return $this->users;
     }
 
-    public function addUser(User $user) : self
+    public function addUser(User $user): self
     {
         if (!$this->users->contains($user)) {
             $this->users[] = $user;
@@ -84,7 +83,7 @@ class Profile extends BaseProfile
         return $this;
     }
 
-    public function removeUser(User $user) : self
+    public function removeUser(User $user): self
     {
         if ($this->users->contains($user)) {
             $this->users->removeElement($user);
@@ -114,7 +113,7 @@ class Profile extends BaseProfile
         return $this;
     }
 
-    public function getMinutes() : int
+    public function getMinutes(): int
     {
         return $this->duration / MIN;
     }
@@ -127,7 +126,7 @@ class Profile extends BaseProfile
         return $this;
     }
 
-    public function getSeconds() : int
+    public function getSeconds(): int
     {
         return $this->duration % MIN;
     }
@@ -140,7 +139,7 @@ class Profile extends BaseProfile
         return $this;
     }
 
-    public function getSettings() : array
+    public function getSettings(): array
     {
         $this->normalize();
 
@@ -160,13 +159,13 @@ class Profile extends BaseProfile
 
         foreach (['add', 'sub', 'mult', 'div'] as $k) {
             foreach (['F', 'S'] as $n) {
-                $min = $k . $n . 'Min';
-                $max = $k . $n . 'Max';
+                $min = $k.$n.'Min';
+                $max = $k.$n.'Max';
                 $this->$max = minVal($this->$min, $this->$max);
             }
         }
 
-        if (0 == $this->divSMin) {
+        if (0 === $this->divSMin) {
             $this->divSMin = 1;
         }
         $this->divSMax = minVal($this->divSMin, $this->divSMax);
@@ -194,8 +193,8 @@ class Profile extends BaseProfile
         foreach (['add', 'sub', 'mult', 'div'] as $k) {
             foreach (['F', 'S', ''] as $n) {
                 foreach (['Min', 'Max'] as $m) {
-                    $v = $k . $n . $m;
-                    $this->$v = (int)$this->$v;
+                    $v = $k.$n.$m;
+                    $this->$v = (int) $this->$v;
                 }
             }
         }
@@ -205,6 +204,6 @@ class Profile extends BaseProfile
 
     public function __toString()
     {
-        return parent::__toString() . ' - ' . $this->getAuthor()->getUsername();
+        return parent::__toString().' - '.$this->getAuthor()->getUsername();
     }
 }

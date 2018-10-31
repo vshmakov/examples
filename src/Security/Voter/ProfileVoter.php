@@ -2,11 +2,11 @@
 
 namespace App\Security\Voter;
 
+use App\Entity\Profile;
 use App\Service\AuthChecker;
+use App\Service\UserLoader;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
-use App\Entity\Profile;
-use App\Service\UserLoader;
 
 class ProfileVoter extends Voter
 {
@@ -22,12 +22,12 @@ class ProfileVoter extends Voter
 
     protected function supports($attribute, $subject)
     {
-        return !is_array($subject) ? ($subject instanceof Profile or null === $subject && $this->hasHandler($attribute)) : $this->supportsArr($attribute, $subject);
+        return !\is_array($subject) ? ($subject instanceof Profile or null === $subject && $this->hasHandler($attribute)) : $this->supportsArr($attribute, $subject);
     }
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
     {
-        if (is_array($subject)) {
+        if (\is_array($subject)) {
             return $this->voteOnArr($attribute, $subject, $token);
         }
 

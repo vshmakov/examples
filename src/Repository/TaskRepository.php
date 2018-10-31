@@ -2,12 +2,12 @@
 
 namespace App\Repository;
 
-use App\Entity\Task;
 use App\Entity\Attempt;
+use App\Entity\Task;
 use App\Entity\User;
+use App\Service\UserLoader;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
-use App\Service\UserLoader;
 
 class TaskRepository extends ServiceEntityRepository
 {
@@ -20,11 +20,11 @@ class TaskRepository extends ServiceEntityRepository
         $this->userLoader = $userLoader;
     }
 
-    public function isDoneByUser(Task $task, User $user) : bool
+    public function isDoneByUser(Task $task, User $user): bool
     {
         $attemptRepository = $this->getEntityRepository(Attempt::class);
         $userAttempts = $attemptRepository->findByUserAndTask($user, $task);
-        $outstandingAttemptsCount = array_reduce($userAttempts, function (int $outstandingAttemptsCount, Attempt $attempt) use ($attemptRepository) : int {
+        $outstandingAttemptsCount = array_reduce($userAttempts, function (int $outstandingAttemptsCount, Attempt $attempt) use ($attemptRepository): int {
             if ($attemptRepository->isDone($attempt)) {
                 --$outstandingAttemptsCount;
             }
@@ -32,10 +32,10 @@ class TaskRepository extends ServiceEntityRepository
             return $outstandingAttemptsCount;
         }, $task->getTimesCount());
 
-        return $outstandingAttemptsCount == 0;
+        return 0 === $outstandingAttemptsCount;
     }
 
-    public function findHomeworkByCurrentUser() : array
+    public function findHomeworkByCurrentUser(): array
     {
         return $this->createQuery('select t from App:Task t
         join t.contractors c
@@ -44,23 +44,23 @@ class TaskRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function isDoneByCurrentUser(Task $task) : bool
+    public function isDoneByCurrentUser(Task $task): bool
     {
         return $this->isDoneByUser($task, $this->userLoader->getUser());
     }
 
-    public function getFinishedUsersCount(Task $task) : int
+    public function getFinishedUsersCount(Task $task): int
     {
         return $this->getEntityRepository(User::class)
             ->getFinishedCountByTask($task);
     }
 
-    public function findByCurrentAuthor() : array
+    public function findByCurrentAuthor(): array
     {
         return $this->findByAuthor($this->userLoader->getUser());
     }
 
-    public function isActual(Task $task) : bool
+    public function isActual(Task $task): bool
     {
         return time() > $task->getAddTime()->getTimestamp()
             && time() < $task->getLimitTime()->getTimestamp()

@@ -23,13 +23,13 @@ trait BaseUserTrait
      */
     public function addRole($role)
     {
-        $role = strtoupper($role);
+        $role = mb_strtoupper($role);
 
         if ($role === static::ROLE_DEFAULT) {
             return $this;
         }
 
-        if (!in_array($role, $this->roles, true)) {
+        if (!\in_array($role, $this->roles, true)) {
             $this->roles[] = $role;
         }
 
@@ -60,11 +60,11 @@ trait BaseUserTrait
     {
         $data = unserialize($serialized);
 
-        if (13 === count($data)) {
+        if (13 === \count($data)) {
             // Unserializing a User object from 1.3.x
             unset($data[4], $data[5], $data[6], $data[9], $data[10]);
             $data = array_values($data);
-        } elseif (11 === count($data)) {
+        } elseif (11 === \count($data)) {
             // Unserializing a User from a dev version somewhere between 2.0-alpha3 and 2.0-beta1
             unset($data[4], $data[7], $data[8]);
             $data = array_values($data);
@@ -194,7 +194,7 @@ trait BaseUserTrait
      */
     public function hasRole($role)
     {
-        return in_array(strtoupper($role), $this->getRoles(), true);
+        return \in_array(mb_strtoupper($role), $this->getRoles(), true);
     }
 
     /**
@@ -239,7 +239,7 @@ trait BaseUserTrait
      */
     public function removeRole($role)
     {
-        if (false !== $key = array_search(strtoupper($role), $this->roles, true)) {
+        if (false !== $key = array_search(mb_strtoupper($role), $this->roles, true)) {
             unset($this->roles[$key]);
             $this->roles = array_values($this->roles);
         }
@@ -431,7 +431,7 @@ trait BaseUserTrait
      */
     public function hasGroup($name)
     {
-        return in_array($name, $this->getGroupNames());
+        return \in_array($name, $this->getGroupNames(), true);
     }
 
     /**

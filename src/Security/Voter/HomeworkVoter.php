@@ -2,12 +2,12 @@
 
 namespace App\Security\Voter;
 
+use App\Entity\Task;
 use App\Repository\TaskRepository;
 use App\Service\AuthChecker;
+use App\Service\UserLoader;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
-use App\Service\UserLoader;
-use App\Entity\Task;
 
 class HomeworkVoter extends Voter
 {
@@ -33,7 +33,7 @@ class HomeworkVoter extends Voter
         return $this->checkRight($attribute, $subject, $token);
     }
 
-    private function canShowHomework() : bool
+    private function canShowHomework(): bool
     {
         $currentUser = $this->userLoader->getUser();
 
@@ -41,8 +41,7 @@ class HomeworkVoter extends Voter
             && (!$currentUser->isTeacher() or $currentUser->getHomework()->count());
     }
 
-
-    private function canSolve() : bool
+    private function canSolve(): bool
     {
         $task = $this->subject;
         $currentUser = $this->userLoader->getUser();
@@ -54,13 +53,13 @@ class HomeworkVoter extends Voter
             && $task->getLimitTime()->getTimestamp() > time();
     }
 
-    private function canShowExamples() : bool
+    private function canShowExamples(): bool
     {
         return $this->subject->getContractors()
             ->contains($this->userLoader->getUser());
     }
 
-    private function canShowAttempts() : bool
+    private function canShowAttempts(): bool
     {
         return $this->canShowExamples();
     }

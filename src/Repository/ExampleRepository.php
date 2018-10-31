@@ -2,15 +2,15 @@
 
 namespace App\Repository;
 
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use App\Entity\Attempt;
+use App\Entity\Example;
+use App\Entity\Task;
+use App\Entity\User;
 use App\Service\ExampleManager;
 use App\Service\UserLoader;
-use App\Entity\Example;
-use App\Entity\Attempt;
-use App\Entity\User;
-use App\Entity\Task;
 use App\Utils\Cache\GlobalCache;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class ExampleRepository extends ServiceEntityRepository
 {
@@ -27,7 +27,7 @@ class ExampleRepository extends ServiceEntityRepository
         $this->globalCache = $globalCache;
     }
 
-    public function findLastUnansweredByAttempt(Attempt $attempt) : ? Example
+    public function findLastUnansweredByAttempt(Attempt $attempt): ? Example
     {
         return $this->getValue(
             $this->createQuery('select e from App:Example e
@@ -37,7 +37,7 @@ order by e.addTime desc')
         );
     }
 
-    public function findLastByAttempt(Attempt $attempt) : ? Example
+    public function findLastByAttempt(Attempt $attempt): ? Example
     {
         return $this->getValue(
             $this->createQuery('select e from App:Example e
@@ -47,7 +47,7 @@ order by e.addTime desc')
         );
     }
 
-    public function getErrorNum(Example $example) : ? int
+    public function getErrorNum(Example $example): ? int
     {
         if (false !== $example->isRight()) {
             return null;
@@ -60,7 +60,7 @@ where e.attempt = :a and e.isRight = false and e.addTime <= :dt')
         );
     }
 
-    public function getNumber(Example $example) : int
+    public function getNumber(Example $example): int
     {
         $where = $example->getAttempt()->getSettings()->isDemanding() ? ' and e.isRight != false' : '';
 
@@ -74,12 +74,12 @@ where e.attempt = :a and e.addTime < :dt $where")
         ) + 1;
     }
 
-    public function findLastUnansweredByAttemptOrGetNew(Attempt $attempt) : Example
+    public function findLastUnansweredByAttemptOrGetNew(Attempt $attempt): Example
     {
         return $this->findLastUnansweredByAttempt($attempt) ?? $this->getNew($attempt);
     }
 
-    public function getNew(Attempt $attempt) : Example
+    public function getNew(Attempt $attempt): Example
     {
         $example = (new Example())
             ->setAttempt($attempt);
@@ -105,7 +105,7 @@ where u = :u and a.addTime > :dt')
                 ])
                 ->getResult();
 
-            $exampleData = (object)$exampleManager->getRandomExample($sign, $settings, $previousExamples);
+            $exampleData = (object) $exampleManager->getRandomExample($sign, $settings, $previousExamples);
             $example->setFirst($exampleData->first)
                 ->setSecond($exampleData->second)
                 ->setSign($exampleData->sign);
@@ -118,11 +118,11 @@ where u = :u and a.addTime > :dt')
         return $example;
     }
 
-    public function getSolvingTime(Example $example) : \DateTimeInterface
+    public function getSolvingTime(Example $example): \DateTimeInterface
     {
         $solvingTime = !$example->isAnswered() ? null
             : $this->globalCache->get(['examples[%s].solvingTime', $example], function () use ($example) {
-            $previousExample = $this->getValue(
+                $previousExample = $this->getValue(
                 $this->createQuery('select e from App:Example e
 where e.attempt = :att and e.addTime < :dt
 order by e.addTime desc')
@@ -131,15 +131,15 @@ order by e.addTime desc')
                         'att' => $example->getAttempt(),
                     ])
             );
-            $previousTime = $previousExample ? $previousExample->getAnswerTime() : $example->getAttempt()->getAddTime();
+                $previousTime = $previousExample ? $previousExample->getAnswerTime() : $example->getAttempt()->getAddTime();
 
-            return $example->getAnswerTime()->getTimestamp() - $previousTime->getTimestamp();
-        });
+                return $example->getAnswerTime()->getTimestamp() - $previousTime->getTimestamp();
+            });
 
         return $this->dts($solvingTime);
     }
 
-    public function findByUser(User $user) : array
+    public function findByUser(User $user): array
     {
         return $this->createQuery('select e from App:Example e
 join e.attempt a
@@ -149,7 +149,7 @@ where s.user = :u')
             ->getResult();
     }
 
-    public function getUserNumber(Example $example) : int
+    public function getUserNumber(Example $example): int
     {
         return $this->getValue(
             $this->createQuery('select count(e) from App:Example e
@@ -164,7 +164,7 @@ where u = :u and e.addTime < :dt and (e.isRight != false or e.isRight is null)')
         ) + 1;
     }
 
-    public function findByCurrentUserAndHomework(Task $task) : array
+    public function findByCurrentUserAndHomework(Task $task): array
     {
         return $this->createQuery('select e from App:Example e
 join e.attempt a
@@ -174,13 +174,13 @@ where s.user = :user and a.task = :task')
             ->getResult();
     }
 
-    public function findByUserAndTask(User $user, Task $task) : array
+    public function findByUserAndTask(User $user, Task $task): array
     {
-return $this->createQuery('select e from App:Example e
+        return $this->createQuery('select e from App:Example e
 join e.attempt a
 join a.session s
 where s.user = :user and a.task = :task')
-->setParameters(['user'=>$user, 'task'=>$task])
+->setParameters(['user' => $user, 'task' => $task])
 ->getResult();
     }
 }

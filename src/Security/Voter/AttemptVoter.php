@@ -2,14 +2,14 @@
 
 namespace App\Security\Voter;
 
-use App\Service\AuthChecker;
-use App\Repository\ExampleRepository;
+use App\Entity\Attempt;
 use App\Repository\AttemptRepository;
+use App\Repository\ExampleRepository;
+use App\Repository\SessionRepository;
+use App\Service\AuthChecker;
+use App\Service\UserLoader;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
-use App\Entity\Attempt;
-use App\Service\UserLoader;
-use App\Repository\SessionRepository;
 
 class AttemptVoter extends Voter
 {
@@ -51,8 +51,8 @@ class AttemptVoter extends Voter
         $user = $userLoader->getUser();
 
         if (($userLoader->isGuest() && $attempt->getSession() !== $this->sessionRepository->findOneByCurrentUser())
-            or (0 == $attempt->getRemainedExamplesCount())
-            or (0 == $attempt->getRemainedTime()->getTimestamp())) {
+            or (0 === $attempt->getRemainedExamplesCount())
+            or (0 === $attempt->getRemainedTime()->getTimestamp())) {
             return false;
         }
 

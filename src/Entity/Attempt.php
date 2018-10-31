@@ -30,14 +30,13 @@ class Attempt
      */
     private $addTime;
 
-    
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Session", inversedBy="attempts")
      * @ORM\JoinColumn(nullable=false)
      */
     private $session;
 
-        /**
+    /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Task", inversedBy="attempts")
      */
     private $task;
@@ -102,8 +101,6 @@ class Attempt
         return $this;
     }
 
-    
-
     public function getSession(): ? Session
     {
         return $this->session;
@@ -136,7 +133,7 @@ class Attempt
         return $this->getSession()->getUser();
     }
 
-        public function getTask(): ?Task
+    public function getTask(): ?Task
     {
         return $this->task;
     }

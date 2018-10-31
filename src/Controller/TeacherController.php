@@ -2,17 +2,17 @@
 
 namespace App\Controller;
 
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Form\FormError;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
+use App\Entity\User;
 use App\Form\ChildType;
 use App\Repository\UserRepository;
-use Symfony\Component\Routing\Annotation\Route;
 use App\Service\UserLoader;
-use App\Entity\User;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @Route("/teacher")
@@ -49,7 +49,7 @@ class TeacherController extends Controller
         $currentUser->cleanSocialUsername();
         $errors = $validator->validate($currentUser, null, ['child']);
 
-        if (!count($errors)) {
+        if (!\count($errors)) {
             if ($this->isGranted('APPOINT', $teacher)) {
                 $currentUser->setTeacher($teacher);
                 $this->getEntityManager()->flush();

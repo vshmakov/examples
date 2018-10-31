@@ -2,13 +2,13 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Form\ChildType;
 use App\Repository\UserRepository;
-use Symfony\Component\Routing\Annotation\Route;
 use App\Service\UserLoader;
-use App\Entity\User;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/child")

@@ -2,10 +2,10 @@
 
 namespace App\Repository;
 
-use App\Service\SessionMarker;
-use App\Service\UserLoader;
 use App\Entity\Session;
 use App\Entity\User;
+use App\Service\SessionMarker;
+use App\Service\UserLoader;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -88,7 +88,7 @@ where a.id is null and s.lastTime < :dt')
             $this->remove($session);
         }
 
-        return count($sessions);
+        return \count($sessions);
     }
 
     public function remove(Session $session)

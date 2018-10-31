@@ -2,17 +2,17 @@
 
 namespace App\EventSubscriber;
 
-use Psr\Container\ContainerInterface;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\HttpFoundation\RequestStack;
-use App\Service\UserLoader;
-use App\Repository\SessionRepository;
-use App\Repository\IpRepository;
 use App\Entity\Visit;
+use App\Repository\IpRepository;
+use App\Repository\SessionRepository;
 use App\Service\AuthChecker;
+use App\Service\UserLoader;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 
 class ResponseSubscriber implements EventSubscriberInterface
 {
@@ -52,7 +52,7 @@ class ResponseSubscriber implements EventSubscriberInterface
             $uri = $request->getRequestUri();
             $routeName = $request->attributes->get('_route', $uri);
 
-            if ('_wdt' != $routeName &&
+            if ('_wdt' !== $routeName &&
                 !$this->authChecker->isGranted('ROLE_ADMIN')) {
                 $visit = (new Visit())
                     ->setUri($uri)

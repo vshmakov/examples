@@ -2,8 +2,8 @@
 
 namespace App\Service;
 
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class SessionMarker
 {

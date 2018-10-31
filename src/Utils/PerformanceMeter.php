@@ -16,7 +16,7 @@ class PerformanceMeter
         $this->data = new ArrayCollection();
         $this->states = new ArrayCollection();
         $environment = $container->getParameter('app_env');
-        $this->isDevelopmentEnvironment = 'dev' == $environment;
+        $this->isDevelopmentEnvironment = 'dev' === $environment;
     }
 
     public function start(string $key): self
@@ -30,7 +30,7 @@ class PerformanceMeter
             $this->states->set($key, 'finished');
         }
 
-        if ('finished' != $this->states->get($key)) {
+        if ('finished' !== $this->states->get($key)) {
             throw new \LogicException(sprintf(
                 'The %s key das not finished',
                 $key
@@ -51,7 +51,7 @@ class PerformanceMeter
             return $this;
         }
 
-        if ('started' != $this->states->get($key)) {
+        if ('started' !== $this->states->get($key)) {
             throw new \LogicException(sprintf(
                 'Attempted finished %1$s key, but it has not started',
                 $key
@@ -72,7 +72,7 @@ class PerformanceMeter
                 $key = $this->data->indexOf($momentsList);
                 $momentsListState = $this->states->get($key);
 
-                if ($momentsListState && 'finished' != $momentsListState) {
+                if ($momentsListState && 'finished' !== $momentsListState) {
                     throw new \LogicException(sprintf(
                         'The %s key das not finished',
                         $key

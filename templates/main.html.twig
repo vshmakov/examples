@@ -159,7 +159,7 @@
   <script src="/js/custom.js"></script>
   <script>
     function setCookie(name, value) {
-      document.cookie = name + "=" + value+'; path=/';
+      document.cookie = name + "=" + value + '; path=/';
     }
 
     function getCookie(name) {
@@ -175,10 +175,11 @@
     }
 
     var hideHomeworksButton = $('.hide-homeworks');
+    var actualHomeworksBlock = $('.actual-homeworks-block');
     var hideCookie = 'hide-homeworks-block';
 
     function hideHomeworksBlock() {
-      $('.actual-homeworks-block').css('display', 'none');
+      actualHomeworksBlock.css('display', 'none');
     }
 
     hideHomeworksButton.click(function () {

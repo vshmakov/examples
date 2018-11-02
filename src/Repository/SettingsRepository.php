@@ -20,7 +20,7 @@ class SettingsRepository extends ServiceEntityRepository
         $this->userLoader = $userLoader;
     }
 
-    public function getNewByCurrentUser() : Settings
+    public function getNewByCurrentUser(): Settings
     {
         $currentUser = $this->userLoader->getUser()
             ->setEntityRepository($this->getEntityRepository(User::class));
@@ -29,7 +29,7 @@ class SettingsRepository extends ServiceEntityRepository
         return $this->findBySettingsDataOrNew($profile);
     }
 
-    public function findBySettingsDataOrNew(BaseProfile $profile) : Settings
+    public function findBySettingsDataOrNew(BaseProfile $profile): Settings
     {
         if ($settings = $this->findOneBy($profile->getSettings())) {
             return $settings;

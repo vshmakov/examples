@@ -55,7 +55,7 @@ where p.isPublic = true
 
     public function getTitle(Profile $profile)
     {
-        return $profile->getDescription() ? : 'Профиль №' . $this->getNumber($profile);
+        return $profile->getDescription() ?: 'Профиль №'.$this->getNumber($profile);
     }
 
     public function countByCurrentAuthor()
@@ -94,14 +94,14 @@ where p.author =:a and p.id <= :id')
         return $this->findByAuthor($user->getTeacher());
     }
 
-    public function findOneByCurrentAuthorOrPublicAndSettingsData(BaseProfile $settings) : ? Profile
+    public function findOneByCurrentAuthorOrPublicAndSettingsData(BaseProfile $settings): ? Profile
     {
-        $where = array_reduce(Profile::getSettingsFields(), function (string $where, string $property) : string {
+        $where = array_reduce(Profile::getSettingsFields(), function (string $where, string $property): string {
             if ($where) {
                 $where .= ' and ';
             }
 
-            return $where . "p.$property = :$property";
+            return $where."p.$property = :$property";
         }, '');
 
         $profile = $this->getValue(

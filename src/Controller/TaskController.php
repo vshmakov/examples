@@ -2,16 +2,15 @@
 
 namespace App\Controller;
 
-use App\Entity\Settings;
 use App\Entity\Task;
 use App\Entity\User;
 use App\Form\TaskType;
 use App\Repository\AttemptRepository;
 use App\Repository\ExampleRepository;
 use App\Repository\ProfileRepository;
+use App\Repository\SettingsRepository;
 use App\Repository\TaskRepository;
 use App\Repository\UserRepository;
-use App\Repository\SettingsRepository;
 use App\Service\UserLoader;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,13 +28,13 @@ class TaskController extends AbstractController
     /**
      * @Route("/", name="task_index", methods="GET")
      */
-    public function index(TaskRepository $taskRepository) : Response
+    public function index(TaskRepository $taskRepository): Response
     {
         $this->denyAccessUnlessGranted('SHOW_TASKS');
 
         $tasks = array_reduce(
             $taskRepository->findByCurrentAuthor(),
-            function (array $data, Task $task) use ($taskRepository) : array {
+            function (array $data, Task $task) use ($taskRepository): array {
                 $group = $taskRepository->isActual($task) ? 'actualTasks' : 'archiveTasks';
                 $data[$group][] = $task;
 
@@ -53,7 +52,7 @@ class TaskController extends AbstractController
     /**
      * @Route("/new", name="task_new", methods="GET|POST")
      */
-    public function new(Request $request, UserLoader $userLoader, ProfileRepository $profileRepository, UserRepository $userRepository, SettingsRepository $settingsRepository) : Response
+    public function new(Request $request, UserLoader $userLoader, ProfileRepository $profileRepository, UserRepository $userRepository, SettingsRepository $settingsRepository): Response
     {
         $this->denyAccessUnlessGranted('CREATE_TASKS');
 
@@ -85,7 +84,7 @@ class TaskController extends AbstractController
     /**
      * @Route("/{id}", name="task_show", methods="GET")
      */
-    public function show(Task $task, UserRepository $userRepository, TaskRepository $taskRepository, AttemptRepository $attemptRepository) : Response
+    public function show(Task $task, UserRepository $userRepository, TaskRepository $taskRepository, AttemptRepository $attemptRepository): Response
     {
         $this->denyAccessUnlessGranted('SHOW', $task);
 
@@ -105,7 +104,7 @@ class TaskController extends AbstractController
         ]);
     }
 
-    private function processForm(Form $form, Request $request, ProfileRepository $profileRepository, SettingsRepository $settingsRepository) : ? RedirectResponse
+    private function processForm(Form $form, Request $request, ProfileRepository $profileRepository, SettingsRepository $settingsRepository): ? RedirectResponse
     {
         $task = $form->getData();
         $profile = $profileRepository->find($request->request->get('profile_id', ''));
@@ -135,7 +134,7 @@ class TaskController extends AbstractController
     /**
      * @Route("/{id}/edit", name="task_edit", methods="GET|POST")
      */
-    public function edit(Request $request, Task $task, ProfileRepository $profileRepository, UserRepository $userRepository, UserLoader $userLoader, SettingsRepository $settingsRepository) : Response
+    public function edit(Request $request, Task $task, ProfileRepository $profileRepository, UserRepository $userRepository, UserLoader $userLoader, SettingsRepository $settingsRepository): Response
     {
         $this->denyAccessUnlessGranted('EDIT', $task);
 
@@ -164,7 +163,7 @@ class TaskController extends AbstractController
      * @Route("/{id}/contractor/{contractor_id}/attempts", name="task_contractor_attempts", methods="GET")
      * @Entity("user", expr="repository.find(contractor_id)")
      */
-    public function contractorAttempts(Task $task, User $user, AttemptRepository $attemptRepository) : Response
+    public function contractorAttempts(Task $task, User $user, AttemptRepository $attemptRepository): Response
     {
         $this->denyAccessUnlessGranted('SHOW', $task);
         $this->denyAccessUnlessGranted('SHOW_ATTEMPTS', $user);
@@ -180,7 +179,7 @@ class TaskController extends AbstractController
      * @Route("/{id}/contractor/{contractor_id}/examples", name="task_contractor_examples", methods="GET")
      * @Entity("user", expr="repository.find(contractor_id)")
      */
-    public function contractorExamples(Task $task, User $user, ExampleRepository $exampleRepository) : Response
+    public function contractorExamples(Task $task, User $user, ExampleRepository $exampleRepository): Response
     {
         $this->denyAccessUnlessGranted('SHOW', $task);
         $this->denyAccessUnlessGranted('SHOW_EXAMPLES', $user);

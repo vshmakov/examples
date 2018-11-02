@@ -3,6 +3,7 @@
 namespace App\Twig;
 
 use App\Repository\AttemptRepository;
+use App\Repository\TaskRepository;
 use App\Repository\UserRepository;
 use App\Service\UserLoader;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,15 +18,17 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
     private $globals = [];
     private $entityManager;
     private $attemptRepository;
+    private $taskRepository;
     private $userRepository;
 
-    public function __construct(UserLoader $userLoader, AttemptRepository $attemptRepository, UserRepository $userRepository, EntityManagerInterface $entityManager, ContainerInterface $container)
+    public function __construct(UserLoader $userLoader, AttemptRepository $attemptRepository, UserRepository $userRepository, EntityManagerInterface $entityManager, ContainerInterface $container, TaskRepository $taskRepository)
     {
-        $hasActualAttempt = (bool) $attemptRepository->findLastActualByCurrentUser();
-        $user = $userLoader->getUser()->setEntityRepository($userRepository);
-
         $this->entityManager = $entityManager;
+        $this->taskRepository = $taskRepository;
         $this->userLoader = $userLoader;
+
+        $hasActualAttempt = (bool)$attemptRepository->findLastActualByCurrentUser();
+        $user = $userLoader->getUser()->setEntityRepository($userRepository);
         $this->globals = [
             'user' => $user,
             'hasActualAttempt' => $hasActualAttempt,
@@ -60,6 +63,7 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
             'sortStudents',
             'sortContractors',
             'fillIp',
+            'getActualHomeworksCount',
         ]);
     }
 
@@ -122,13 +126,13 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
         return addTimeSorter($e1, $e2);
     }
 
-    public function sortByDateTime(array $entityList, string $dtProperty = 'addTime'): array
+    public function sortByDateTime(array $entityList, string $dtProperty = 'addTime') : array
     {
         $propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
             ->enableExceptionOnInvalidIndex()
             ->getPropertyAccessor();
 
-        usort($entityList, function ($e1, $e2) use ($propertyAccessor, $dtProperty): int {
+        usort($entityList, function ($e1, $e2) use ($propertyAccessor, $dtProperty) : int {
             $t1 = $propertyAccessor->getValue($e1, "$dtProperty.timestamp");
             $t2 = $propertyAccessor->getValue($e2, "$dtProperty.timestamp");
 
@@ -194,11 +198,16 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
             ->getPropertyAccessor();
         $value = $objectOrArray ? $propertyAccessor->getValue($objectOrArray, $property) : null;
 
-        return false !== $default ? $value ?: $default : $value;
+        return false !== $default ? $value ? : $default : $value;
     }
 
-    public function sortContractors(array $contractors): array
+    public function sortContractors(array $contractors) : array
     {
         return $contractors;
+    }
+
+    public function getActualHomeworksCount() : int
+    {
+return $this->taskRepository->countActualHomeworksByCurrentUser();
     }
 }

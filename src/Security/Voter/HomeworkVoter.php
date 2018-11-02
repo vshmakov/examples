@@ -33,7 +33,7 @@ class HomeworkVoter extends Voter
         return $this->checkRight($attribute, $subject, $token);
     }
 
-    private function canShowHomework(): bool
+    private function canShowHomeworks(): bool
     {
         $currentUser = $this->userLoader->getUser();
 
@@ -46,7 +46,7 @@ class HomeworkVoter extends Voter
         $task = $this->subject;
         $currentUser = $this->userLoader->getUser();
 
-        return $this->canShowHomework()
+        return $this->canShowHomeworks()
             && $task->getContractors()->contains($currentUser)
             && !$this->taskRepository->isDoneByUser($task, $currentUser)
             && $task->getAddTime()->getTimestamp() < time()

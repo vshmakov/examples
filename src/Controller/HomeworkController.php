@@ -22,7 +22,7 @@ class HomeworkController extends AbstractController
      */
     public function index(TaskRepository $taskRepository, AttemptRepository $attemptRepository): Response
     {
-        $this->denyAccessUnlessGranted('SHOW_HOMEWORK');
+        $this->denyAccessUnlessGranted('SHOW_HOMEWORKS');
 
         $tasks = $taskRepository->findHomeworkByCurrentUser();
         $activeTasks = $archiveTasks = [];

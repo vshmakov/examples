@@ -18,7 +18,7 @@
             <td>{{ attemptRepository.findLastOneByTaskAndUser(task, contractor)|property('addTime') }}</td>
             <td>{{attemptRepository.findDoneByUserAndTask(contractor, task)|length }} / {{
                 attemptRepository.countByUserAndTask(contractor, task) }}</td>
-            <td>{{ attemptRepository.getDoneAverageRatingByUserAndTask(contractor, task) }} / {{
+            <td>{{ attemptRepository.getDoneAverageRatingByUserAndTask(contractor, task) ?? '-'}} / {{
                 attemptRepository.getAverageRatingByUserAndTask(contractor, task) ?? '-'}}</td>
             <td>
                 <a href="{{ path('task_contractor_attempts', {'id': task.id, 'contractor_id': contractor.id}) }}">Просмотреть

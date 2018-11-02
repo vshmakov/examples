@@ -32,6 +32,17 @@
   {% block body %}
   <div class="container">
 
+    {% block actual_homeworks %}
+    {% if is_granted('SHOW_HOMEWORKS') %}
+    {% set actualHomeworksCount = getActualHomeworksCount() %}
+    {% if actualHomeworksCount %}
+    <ul class="actual-homeworks-block">
+      <li><a href="{{ path('homework_index') }}">У вас есть {{ actualHomeworksCount }} невыполненных заданий.</a></li>
+      <li><button class="hide-homeworks">Скрыть</button></li>
+    </ul>
+    {% endif %}
+    {% endif %}
+    {% endblock %}
     {%block nav%}
     <nav class="navbar navbar-expand-lg {#navbar-dark bg-primary#} main-menu">
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01"
@@ -68,10 +79,10 @@
               {% if is_granted('SHOW_TASKS') %}
               <a class="dropdown-item" href="{{path("task_index")}}">Задания</a>
               {% endif %}
-              {% if is_granted('SHOW_HOMEWORK') %}
+              {% if is_granted('SHOW_HOMEWORKS') %}
               <a class="dropdown-item" href="{{path("homework_index")}}">Домашнее задание</a>
               {% endif %}
-                            {% if is_granted('SHOW_TEACHERS') %}
+              {% if is_granted('SHOW_TEACHERS') %}
               <a class="dropdown-item" href="{{path("teacher_index")}}">Выбрать учителя</a>
               {% endif %}
 
@@ -103,7 +114,7 @@
           </li>
           {%endif%}
           <li class="nav-item">
-            <a onclick="return confirm('Вы действительно хотите выйти?')"             class="nav-link" href="{{path("fos_user_security_logout")}}">Выход</a>
+            <a onclick="return confirm('Вы действительно хотите выйти?')" class="nav-link" href="{{path("fos_user_security_logout")}}">Выход</a>
           </li>
           {%else%}
           {{item("fos_user_security_login", "Вход")}}
@@ -117,9 +128,9 @@
     <main class="main row">
       {% block main %}{% endblock %}
 
-<p>
-{% block bottom_links %}{% endblock %}
-</p>
+      <p>
+        {% block bottom_links %}{% endblock %}
+      </p>
     </main>
 
     {%block guest_auth%}
@@ -147,12 +158,47 @@
   <script src="/js/bootstrap.min.js"></script>
   <script src="/js/custom.js"></script>
   <script>
-$('form input').each(function () {
-$(this).attr('pattern', '.*');
-});
-    var d = {{user.remainedTime.roundUpDays}};
+    function setCookie(name, value) {
+      document.cookie = name + "=" + value+'; path=/';
+    }
+
+    function getCookie(name) {
+      var r = document.cookie.match("(^|;) ?" + name + "=([^;]*)(;|$)");
+      if (r) return r[2];
+      else return "";
+    }
+
+    function deleteCookie(name) {
+      var date = new Date(); // Берём текущую дату
+      date.setTime(date.getTime() - 1); // Возвращаемся в "прошлое"
+      document.cookie = name += "=; expires=" + date.toGMTString(); // Устанавливаем cookie пустое значение и срок действия до прошедшего уже времени
+    }
+
+    var hideHomeworksButton = $('.hide-homeworks');
+    var hideCookie = 'hide-homeworks-block';
+
+    function hideHomeworksBlock() {
+      $('.actual-homeworks-block').css('display', 'none');
+    }
+
+    hideHomeworksButton.click(function () {
+      setCookie(hideCookie, 1);
+      hideHomeworksBlock();
+    });
+
+    if (getCookie(hideCookie)) {
+      hideHomeworksBlock();
+    }
+
+    $('form input').each(function () {
+      $(this).attr('pattern', '.*');
+    });
+
+    /*
+    var d = {{ user.remainedTime.roundUpDays }};
     c = d == 0 ? "red" : d <= 3 ? "orange" : d <= 7 ? "yellow" : "green";
-    //$(".account-button").css("background", c);
+    $(".account-button").css("background", c);
+    */
   </script>
   {% endblock %}
 </body>

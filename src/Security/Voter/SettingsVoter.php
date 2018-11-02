@@ -30,10 +30,11 @@ class SettingsVoter extends Voter
         if (\is_array($subject)) {
             return $this->voteOnArr($attribute, $subject, $token);
         }
+
         return $this->checkRight($attribute, $subject, $token);
     }
 
-    private function canShow() : bool
+    private function canShow(): bool
     {
         return true;
     }

@@ -32,12 +32,6 @@ class Task
     private $contractors;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Settings", inversedBy="task", cascade={"persist", "remove"})
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $settings;
-
-    /**
      * @ORM\OneToMany(targetEntity="App\Entity\Attempt", mappedBy="task")
      */
     private $attempts;
@@ -56,6 +50,12 @@ class Task
      * @ORM\Column(type="datetime")
      */
     private $limitTime;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Settings", inversedBy="tasks")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $settings;
 
     public function __construct()
     {
@@ -110,18 +110,6 @@ class Task
     public function setContractors(Collection $contractors): self
     {
         $this->contractors = $contractors;
-
-        return $this;
-    }
-
-    public function getSettings(): ? Settings
-    {
-        return $this->settings;
-    }
-
-    public function setSettings(Settings $settings): self
-    {
-        $this->settings = $settings;
 
         return $this;
     }
@@ -196,5 +184,17 @@ class Task
     public function isAuthor(User $author): bool
     {
         return $this->author === $author;
+    }
+
+    public function getSettings(): ?Settings
+    {
+        return $this->settings;
+    }
+
+    public function setSettings(?Settings $settings): self
+    {
+        $this->settings = $settings;
+
+        return $this;
     }
 }

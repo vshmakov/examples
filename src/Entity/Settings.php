@@ -17,37 +17,21 @@ class Settings extends BaseProfile
      * @ORM\Column(type="integer")
      */
     protected $id;
-    /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Task", mappedBy="settings", cascade={"persist", "remove"})
-     */
-    private $task;
-
-    /**
+        /**
      * @ORM\OneToMany(targetEntity="App\Entity\Attempt", mappedBy="settings")
      */
     private $attempts;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Task", mappedBy="settings", orphanRemoval=true)
+     */
+    private $tasks;
 
     public function __construct()
     {
         parent::__construct();
         $this->attempts = new ArrayCollection();
-    }
-
-    public function getTask(): ?Task
-    {
-        return $this->task;
-    }
-
-    public function setTask(Task $task): self
-    {
-        $this->task = $task;
-
-        // set the owning side of the relation if necessary
-        if ($this !== $task->getSettings()) {
-            $task->setSettings($this);
-        }
-
-        return $this;
+        $this->tasks = new ArrayCollection();
     }
 
     /**
@@ -75,6 +59,37 @@ class Settings extends BaseProfile
             // set the owning side to null (unless already changed)
             if ($attempt->getSettings() === $this) {
                 $attempt->setSettings(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Task[]
+     */
+    public function getTasks(): Collection
+    {
+        return $this->tasks;
+    }
+
+    public function addTask(Task $task): self
+    {
+        if (!$this->tasks->contains($task)) {
+            $this->tasks[] = $task;
+            $task->setSettings($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTask(Task $task): self
+    {
+        if ($this->tasks->contains($task)) {
+            $this->tasks->removeElement($task);
+            // set the owning side to null (unless already changed)
+            if ($task->getSettings() === $this) {
+                $task->setSettings(null);
             }
         }
 

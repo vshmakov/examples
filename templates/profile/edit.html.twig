@@ -111,11 +111,13 @@
 {%endif%}
 {%endblock%}
 
+{% block bottom_links %}
 <div class="profile-back-link">
 {%block back_link%}
 <a href="{{path("profile_index")}}">Вернуться к списку профилей</a>
 {%endblock%}
 </div>
+{% endblock bottom_links %}
 
 </div>
 {% endblock %}

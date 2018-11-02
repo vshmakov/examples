@@ -18,7 +18,7 @@
         {% set task = task.setEntityRepository(taskRepository) %}
         <tr>
             <td>{{ number+1 }}</td>
-            <td> <a href="{{ path('settings_show', {'id': task.id}) }}">{{ task.settings.description }}</a></td>
+            <td> <a href="{{ path('settings_show', {'id': task.settings.id}) }}">{{ task.settings.description }}</a></td>
             <td>{{ task.timesCount }}</td>
             <td>{{ task.addTime }}</td>
             <td>{{ task.limitTime }}</td>

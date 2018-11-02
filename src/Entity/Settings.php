@@ -17,7 +17,7 @@ class Settings extends BaseProfile
      * @ORM\Column(type="integer")
      */
     protected $id;
-        /**
+    /**
      * @ORM\OneToMany(targetEntity="App\Entity\Attempt", mappedBy="settings")
      */
     private $attempts;

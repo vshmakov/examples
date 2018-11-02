@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\BaseProfile;
 use App\Entity\Profile;
 use App\Entity\User;
 use App\Service\UserLoader;
@@ -54,7 +55,7 @@ where p.isPublic = true
 
     public function getTitle(Profile $profile)
     {
-        return $profile->getDescription() ?: 'Профиль №'.$this->getNumber($profile);
+        return $profile->getDescription() ? : 'Профиль №' . $this->getNumber($profile);
     }
 
     public function countByCurrentAuthor()
@@ -91,5 +92,24 @@ where p.author =:a and p.id <= :id')
         }
 
         return $this->findByAuthor($user->getTeacher());
+    }
+
+    public function findOneByCurrentAuthorOrPublicAndSettingsData(BaseProfile $settings) : ? Profile
+    {
+        $where = array_reduce(Profile::getSettingsFields(), function (string $where, string $property) : string {
+            if ($where) {
+                $where .= ' and ';
+            }
+
+            return $where . "p.$property = :$property";
+        }, '');
+
+        $profile = $this->getValue(
+            $this->createQuery("select p from App:Profile p
+where p.author = :user and $where")
+                ->setParameters(['user' => $this->userLoader->getUser()] + $settings->getSettings())
+        );
+
+        return $profile ?? $this->findOneBy(['isPublic' => true] + $settings->getSettings());
     }
 }

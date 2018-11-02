@@ -383,7 +383,7 @@ abstract class BaseProfile
             ->getPropertyAccessor();
     }
 
-    private static function getSettingsFields(): array
+    public static function getSettingsFields(): array
     {
         return arr('duration examplesCount addFMin addFMax addSMin addSMax addMin addMax subFMin subFMax subSMin subSMax subMin subMax multFMin multFMax multSMin multSMax multMin multMax divFMin divFMax divSMin divSMax divMin divMax addPerc subPerc multPerc divPerc description');
     }

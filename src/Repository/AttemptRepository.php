@@ -132,7 +132,8 @@ where u = :u')
         return $this->createQuery('select a from App:Attempt a
 join a.session s
 join s.user u
-where u = :u')
+where u = :u
+order by a.addTime asc')
             ->setParameter('u', $this->userLoader->getUser())
             ->getResult();
     }

@@ -39,7 +39,7 @@ class Task
     /**
      * @ORM\Column(type="smallint")
      */
-    private $timesCount = 3;
+    private $timesCount = 5;
 
     /**
      * @ORM\Column(type="datetime")

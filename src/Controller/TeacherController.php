@@ -4,15 +4,14 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\ChildType;
-use App\Repository\UserRepository;
 use App\Repository\TaskRepository;
+use App\Repository\UserRepository;
 use App\Service\UserLoader;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -34,7 +33,7 @@ class TeacherController extends Controller
     /**
      *@Route("/", name="teacher_index")
      */
-    public function index(UserRepository $userRepository) : Response
+    public function index(UserRepository $userRepository): Response
     {
         return $this->render('teacher/index.html.twig', [
             'teachers' => $userRepository->findByIsTeacher(true),
@@ -44,7 +43,7 @@ class TeacherController extends Controller
     /**
      *@Route("/{id}/appoint", name="teacher_appoint")
      */
-    public function appoint(User $teacher, ValidatorInterface $validator, Request $request, TaskRepository $taskRepository) : Response
+    public function appoint(User $teacher, ValidatorInterface $validator, Request $request, TaskRepository $taskRepository): Response
     {
         $this->denyAccessUnlessGranted('APPOINT', $teacher);
         $currentUser = $this->currentUser;
@@ -91,7 +90,7 @@ class TeacherController extends Controller
     /**
      *@Route("/disappoint", name="teacher_disappoint")
      */
-    public function disappoint() : Response
+    public function disappoint(): Response
     {
         $this->denyAccessUnlessGranted('DISAPPOINT_TEACHERS');
         $this->currentUser->setTeacher(null);

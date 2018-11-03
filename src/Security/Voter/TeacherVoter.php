@@ -30,7 +30,7 @@ class TeacherVoter extends Voter
         return $this->checkRight($attribute, $subject, $token);
     }
 
-    private function canAppoint()
+    private function canAppoint() : bool
     {
         $teacher = $this->subject;
 
@@ -39,21 +39,21 @@ class TeacherVoter extends Voter
             && !$this->userLoader->getUser()->isUserTeacher($teacher);
     }
 
-    private function canDisappoint()
+    private function canDisappoint() : bool
     {
         return $this->userLoader->getUser()->isUserTeacher($this->subject);
     }
 
-    private function canDisappointTeachers()
+    private function canDisappointTeachers() : bool
     {
         return $this->canShowTeachers();
     }
 
-    private function canShowTeachers()
+    private function canShowTeachers() : bool
     {
         $authChecker = $this->authChecker;
 
         return $authChecker->isGranted('ROLE_USER') && !$authChecker->isGranted('ROLE_CHILD')
-        && !$this->userLoader->getUser()->isTeacher();
+            && !$this->userLoader->getUser()->isTeacher();
     }
 }

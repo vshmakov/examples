@@ -32,7 +32,7 @@
                     {{ day }}.
                     {% set doneAttemptsCount = userRepository.getDoneAttemptsCount(student, dt('createBySubDays', day)) %}
                     {{ doneAttemptsCount }}
-                    ({{ (doneAttemptsCount / day)|round(2) }})
+                    ({{ (doneAttemptsCount / day)|round(1) }})
                 </div>
                 {% else %}
                 -
@@ -45,7 +45,7 @@
                     {% set solvedExamplesCount = userRepository.GetSolvedExamplesCount(student, dt('createBySubDays',
                     day)) %}
                     {{ solvedExamplesCount }}
-                    ({{ (solvedExamplesCount / day)|round(2) }})
+                    ({{ (solvedExamplesCount / day)|round(1) }})
                 </div>
                 {% else %}
                 -

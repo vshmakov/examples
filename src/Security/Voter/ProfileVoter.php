@@ -38,17 +38,17 @@ class ProfileVoter extends Voter
         return $this->checkRight($attribute, $subject, $token);
     }
 
-    private function canCreateProfile()
+    private function canCreateProfile() : bool
     {
         return $this->canCreate();
     }
 
-    private function canCreate()
+    private function canCreate() : bool
     {
         return !$this->userLoader->isGuest();
     }
 
-    private function canView()
+    private function canView() : bool
     {
         $profile = $this->subject;
         $user = $this->userLoader->getUser();
@@ -57,26 +57,31 @@ class ProfileVoter extends Voter
         return $profile->isPublic() or $user === $author or $user->isUserTeacher($author);
     }
 
-    private function canEdit()
+    private function canEdit() : bool
     {
         $profile = $this->subject;
 
         return $this->canCreate() && $this->userLoader->getUser() === $profile->getAuthor() && !$profile->isPublic();
     }
 
-    private function canDelete()
+    private function canDelete() : bool
     {
         return $this->canEdit();
     }
 
-    private function canAppoint()
+    private function canAppoint() : bool
     {
-        return $this->authChecker->isGranted('IS_ACCOUNT_PAID')
-            && $this->canCreate() && $this->canView()
+        return $this->canUse()
             && $this->userLoader->getUser()->getCurrentProfile() !== $this->subject;
     }
 
-    private function canCopy()
+    private function canUse() : bool
+    {
+        return $this->authChecker->isGranted('IS_ACCOUNT_PAID')
+            && $this->canCreate() && $this->canView();
+    }
+
+    private function canCopy() : bool
     {
         return $this->canCreate() && $this->canView();
     }

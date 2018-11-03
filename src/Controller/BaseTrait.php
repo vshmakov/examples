@@ -16,6 +16,6 @@ trait BaseTrait
 
     protected function denyAccess(...$parameters)
     {
-        throw $this->createAccessDenyedException(...$parameters);
+        throw $this->createAccessDeniedException(...$parameters);
     }
 }

@@ -113,8 +113,8 @@ class TaskController extends AbstractController
             throw $this->createNotFoundException();
         }
 
-        if (!$this->isGranted('appoint', $profile)) {
-            throw $this->createAccessDenyedException();
+        if (!$this->isGranted('USE', $profile)) {
+            throw $this->createAccessDeniedException();
         }
 
         if ($form->isValid()) {

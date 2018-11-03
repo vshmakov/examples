@@ -179,13 +179,11 @@
     var hideCookie = 'hide-homeworks-block';
 
     function hideHomeworksBlock() {
+      setCookie(hideCookie, 1);
       actualHomeworksBlock.css('display', 'none');
     }
 
-    hideHomeworksButton.click(function () {
-      setCookie(hideCookie, 1);
-      hideHomeworksBlock();
-    });
+    hideHomeworksButton.click(hideHomeworksBlock);
 
     if (getCookie(hideCookie)) {
       hideHomeworksBlock();

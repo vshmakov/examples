@@ -9,8 +9,8 @@
             <th>Количество повторений</th>
             <th>Время добавления</th>
             <th>Время окончания</th>
-            <th>Попытки (выполнено / начато)</th>
-            <th>Средняя оценка</th>
+            <th>Попытки (Выполненные / Начатые)</th>
+            <th>Средняя оценка (Выполненные / Начатые)</th>
             <th>Действия</th>
         </tr>
     </thead>
@@ -24,8 +24,9 @@
             <td>{{ task.limitTime }}</td>
             <td>{{ attemptRepository.findDoneByCurrentUserAndTask(task)|length }} / {{
                 attemptRepository.countByCurrentUserAndTask(task) }}</td>
-            {% set rating = attemptRepository.getAverageRatingByCurrentUserAndTask(task) %}
-            <td>{{ rating ? rating|round : '-' }}</td>
+                {% set doneRating = attemptRepository.getDoneAverageRatingByCurrentUserAndTask(task) %}
+                {% set rating = attemptRepository.getAverageRatingByCurrentUserAndTask(task) %}
+            <td>{{ doneRating ? doneRating|round : '-' }} / {{ rating ? rating|round : '-' }}</td>
             <td>
                 <a href="{{ path('homework_attempts', {'id': task.id}) }}">Посмотреть попытки</a>
                 <a href="{{ path('homework_examples', {'id': task.id}) }}">Посмотреть список примеров</a>

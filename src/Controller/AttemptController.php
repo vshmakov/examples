@@ -10,6 +10,9 @@ use App\Repository\ProfileRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -22,7 +25,7 @@ class AttemptController extends Controller
     /**
      * @Route("/", name="attempt_index")
      */
-    public function index(AttemptRepository $attemptRepository)
+    public function index(AttemptRepository $attemptRepository) : Response
     {
         return $this->render('attempt/index.html.twig', [
             'attempts' => $attemptRepository->findAllByCurrentUser(),
@@ -32,11 +35,12 @@ class AttemptController extends Controller
     /**
      *@Route("/{id}/show", name="attempt_show", requirements={"id": "\d+"})
      */
-    public function show(Attempt $attempt, ExampleRepository $exampleRepository, AttemptRepository $attemptRepository)
+    public function show(Attempt $attempt, ExampleRepository $exampleRepository, AttemptRepository $attemptRepository) : Response
     {
         $this->denyAccessUnlessGranted('VIEW', $attempt);
 
         return $this->render('attempt/show.html.twig', [
+            'attemptRepository' => $attemptRepository,
             'att' => $attempt->setEntityRepository($attemptRepository),
             'examples' => $exampleRepository->findByAttempt($attempt),
             'exR' => $exampleRepository,
@@ -46,13 +50,13 @@ class AttemptController extends Controller
     /**
      *@Route("/{id}", name="attempt_solve", requirements={"id": "\d+"})
      */
-    public function solve(Attempt $attempt, ExampleRepository $exampleRepository, AttemptRepository $attemptRepository)
+    public function solve(Attempt $attempt, ExampleRepository $exampleRepository, AttemptRepository $attemptRepository) : Response
     {
         if (!$this->isGranted('SOLVE', $attempt)) {
             if ($this->isGranted('VIEW', $attempt)) {
                 return $this->redirectToRoute('attempt_show', ['id' => $attempt->getId()]);
             }
-            throw $this->createAccessDenyedException();
+            throw $this->createAccessDeniedException();
         }
 
         $exampleRepository->findLastUnansweredByAttemptOrGetNew($attempt);
@@ -70,7 +74,7 @@ class AttemptController extends Controller
     /**
      *@Route("/last", name="attempt_last")
      */
-    public function last(AttemptRepository $attemptRepository)
+    public function last(AttemptRepository $attemptRepository) : Response
     {
         if ($attempt = $attemptRepository->findLastActualByCurrentUser()) {
             return $this->redirectToRoute('attempt_solve', ['id' => $attempt->getId()]);
@@ -82,7 +86,7 @@ class AttemptController extends Controller
     /**
      *@Route("/new", name="attempt_new")
      */
-    public function new(AttemptRepository $attemptRepository)
+    public function new(AttemptRepository $attemptRepository) : RedirectResponse
     {
         return $this->redirectToRoute('attempt_solve', [
             'id' => $attemptRepository->getNewByCurrentUser()->getId(),
@@ -92,14 +96,14 @@ class AttemptController extends Controller
     /**
      *@Route("/{id}/answer", name="attempt_answer", methods="POST")
      */
-    public function answer(Attempt $attempt, Request $request, ExampleRepository $exampleRepository, EntityManagerInterface $entityManager, AttemptRepository $attemptRepository)
+    public function answer(Attempt $attempt, Request $request, ExampleRepository $exampleRepository, EntityManagerInterface $entityManager, AttemptRepository $attemptRepository) : JsonResponse
     {
         if (!$this->isGranted('ANSWER', $attempt)) {
             return $this->json(['finish' => true]);
         }
 
         $example = $exampleRepository->findLastUnansweredByAttempt($attempt);
-        $answer = (float) $request->request->get('answer');
+        $answer = (float)$request->request->get('answer');
         $example->setAnswer($answer);
         $entityManager->flush();
 
@@ -119,7 +123,7 @@ class AttemptController extends Controller
     /**
      *@Route("/{id}/profile", name="attempt_profile")
      */
-    public function profile(Attempt $attempt, ProfileRepository $profileRepository, AttemptRepository $attemptRepository)
+    public function profile(Attempt $attempt, ProfileRepository $profileRepository, AttemptRepository $attemptRepository) : Response
     {
         $this->denyAccessUnlessGranted('VIEW', $attempt);
         $profile = $attempt->getSettings()->setEntityRepository($profileRepository);

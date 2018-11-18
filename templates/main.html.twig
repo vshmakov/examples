@@ -189,11 +189,7 @@
       hideHomeworksBlock();
     }
 
-    $('form input').each(function () {
-      $(this).attr('pattern', '.*');
-    });
-
-    /*
+    
     var d = {{ user.remainedTime.roundUpDays }};
     c = d == 0 ? "red" : d <= 3 ? "orange" : d <= 7 ? "yellow" : "green";
     $(".account-button").css("background", c);

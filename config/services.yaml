@@ -33,3 +33,8 @@ services:
                 name:     data_collector
                 template: 'data_collector/performance_collector.html.twig'
                 id:       'app.performance_collector'
+
+    app.no_validation_form_extension:
+        class: App\Form\Extension\NoValidateExtension
+        tags:
+            - {name: form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType}

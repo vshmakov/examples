@@ -26,13 +26,20 @@ class IndexControllerTest extends WebTestCase
                 '/login',
                 '/register/',
             ],
+302=>[
+'/account/',
+'/teacher/',
+'/student/',
+'/homework/',
+'/task/',
+],
         ];
 
         foreach ($routes as $status => $urlList) {
             foreach ($urlList as $url) {
                 $client->request('GET', $url);
-            }
             $this->assertSame($status, $client->getResponse()->getStatusCode());
+            }
         }
     }
 }

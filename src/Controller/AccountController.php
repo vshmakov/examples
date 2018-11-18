@@ -29,7 +29,7 @@ class AccountController extends Controller
     /**
      *@Route("/", name="account_index", methods="GET")
      */
-    public function index():Response
+    public function index(): Response
     {
         return $this->render('account/index.html.twig');
     }
@@ -37,7 +37,7 @@ class AccountController extends Controller
     /**
      *@Route("/recharge", name="account_recharge")
      */
-    public function recharge(TransferRepository $transferRepository):Response
+    public function recharge(TransferRepository $transferRepository): Response
     {
         return $this->render('account/Recharge.html.twig', [
             'label' => $transferRepository->findUnheldByCurrentUserOrNew()->getLabel(),
@@ -47,7 +47,7 @@ class AccountController extends Controller
     /**
      *@Route("/pay", name="account_pay", methods="GET|POST")
      */
-    public function pay(Request $request):Response
+    public function pay(Request $request): Response
     {
         $month = (int) $request->request->get('months');
         $user = $this->currentUser;
@@ -74,7 +74,7 @@ class AccountController extends Controller
     /**
      *@Route("/edit", name="account_edit", methods="GET|POST")
      */
-    public function edit(Request $request, SessionInterface $session):Response
+    public function edit(Request $request, SessionInterface $session): Response
     {
         $this->denyAccessUnlessGranted('EDIT_ACCOUNT');
         $user = $this->currentUser;

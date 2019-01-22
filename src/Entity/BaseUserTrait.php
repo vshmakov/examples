@@ -374,7 +374,7 @@ trait BaseUserTrait
     /**
      * Gets the timestamp that the user requested a password reset.
      *
-     * @return null|\DateTime
+     * @return \DateTime|null
      */
     public function getPasswordRequestedAt()
     {

@@ -1,7 +1,8 @@
 
 ###> symfony/framework-bundle ###
-/.env
-/*.bat
+/.env.local
+/.env.local.php
+/.env.*.local
 /var/
 /vendor/
 ###< symfony/framework-bundle ###
@@ -20,11 +21,5 @@ yarn-error.log
 ###> symfony/web-server-bundle ###
 /.web-server-pid
 ###< symfony/web-server-bundle ###
-symfony.lock
-
-###> friendsofphp/php-cs-fixer ###
-/.php_cs
-/.php_cs.cache
-###< friendsofphp/php-cs-fixer ###
 
 /.idea/

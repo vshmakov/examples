@@ -1,0 +1,1 @@
+php .php_cs_ignore.dist

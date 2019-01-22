@@ -173,7 +173,7 @@ class ExampleManager
 
     private function getValueBetween(float $value, float $min, float $max): float
     {
-        return \btwVal($value, $min, $max);
+        return btwVal($value, $min, $max);
     }
 
     private function add(array $settings): array

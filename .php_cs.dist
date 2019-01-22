@@ -13,6 +13,7 @@ return PhpCsFixer\Config::create()
     ->setRules([
         '@Symfony' => true,
         '@Symfony:risky' => true,
+        '@PHP71Migration' => true,
         'array_syntax' => ['syntax' => 'short'],
         'linebreak_after_opening_tag' => true,
         'mb_str_functions' => true,

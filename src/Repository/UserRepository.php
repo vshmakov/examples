@@ -14,7 +14,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 class UserRepository extends ServiceEntityRepository
 {
     use BaseTrait;
-    const GUEST_LOGIN = '__guest';
+    public const GUEST_LOGIN = '__guest';
     private $authChecker;
     private $localCache;
 

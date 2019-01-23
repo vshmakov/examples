@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 abstract class BaseSettings
 {
-    use AdditionSettingsTrait, SubtractionSettingsTrait, MultiplicationSettingsTrait;
+    use AdditionSettingsTrait, SubtractionSettingsTrait, MultiplicationSettingsTrait, DivisionSettingsTrait;
 
     /**
      * @var int|null

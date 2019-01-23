@@ -4,10 +4,14 @@ namespace App\Entity\Attempt\Settings;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/** @ORM\MappedSuperclass */
+/**
+ * Class BaseSettings.
+ *
+ * @ORM\MappedSuperclass
+ */
 abstract class BaseSettings
 {
-    use AdditionSettingsTrait, SubtractionSettingsTrait;
+    use AdditionSettingsTrait, SubtractionSettingsTrait, MultiplicationSettingsTrait;
 
     /**
      * @var int|null

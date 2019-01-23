@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Value\ValueResolver;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -41,7 +42,7 @@ class Profile extends BaseProfile
         $this->normalize();
     }
 
-    public function getAuthor(): ? User
+    public function getAuthor(): ?User
     {
         return $this->author;
     }
@@ -161,14 +162,14 @@ class Profile extends BaseProfile
             foreach (['F', 'S'] as $n) {
                 $min = $k.$n.'Min';
                 $max = $k.$n.'Max';
-                $this->$max = minVal($this->$min, $this->$max);
+                $this->$max = ValueResolver::greaterThan($this->$max, $this->$min);
             }
         }
 
         if (0 === $this->divSMin) {
             $this->divSMin = 1;
         }
-        $this->divSMax = minVal($this->divSMin, $this->divSMax);
+        $this->divSMax = ValueResolver::greaterThan($this->divSMax, $this->divSMin);
 
         $addMin = $this->addFMin + $this->addSMin;
         $addMax = $this->addFMax + $this->addSMax;

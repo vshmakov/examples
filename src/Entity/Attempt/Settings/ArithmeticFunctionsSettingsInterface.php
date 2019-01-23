@@ -4,19 +4,6 @@ namespace App\Entity\Attempt\Settings;
 
 interface ArithmeticFunctionsSettingsInterface
 {
-    //Addition
-    public function getMinimumFirstAddend(): float;
-
-    public function getMaximumFirstAddend(): float;
-
-    public function getMinimumSecondAddend(): float;
-
-    public function getMaximumSecondAddend(): float;
-
-    public function getMinimumSum(): float;
-
-    public function getMaximumSum(): float;
-
     //Subtraction
     public function getMinimumMinuend(): float;
 

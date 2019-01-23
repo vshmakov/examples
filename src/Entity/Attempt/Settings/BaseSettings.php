@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\MappedSuperclass
  */
-abstract class BaseSettings
+abstract class BaseSettings implements ArithmeticFunctionsSettingsInterface
 {
     use AdditionSettingsTrait, SubtractionSettingsTrait, MultiplicationSettingsTrait, DivisionSettingsTrait;
 

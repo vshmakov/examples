@@ -11,42 +11,42 @@ trait SubtractionSettingsTrait
      *
      * @ORM\Column(type="float")
      */
-    private $minimumMinuend;
+    private $minimumMinuend = 10;
 
     /**
      * @var float
      *
      * @ORM\Column(type="float")
      */
-    private $maximumMinuend;
+    private $maximumMinuend = 20;
 
     /**
      * @var float
      *
      * @ORM\Column(type="float")
      */
-    private $minimumSubtrahend;
+    private $minimumSubtrahend = 5;
 
     /**
      * @var float
      *
      * @ORM\Column(type="float")
      */
-    private $maximumSubtrahend;
+    private $maximumSubtrahend = 15;
 
     /**
      * @var float
      *
      * @ORM\Column(type="float")
      */
-    private $minimumDifference;
+    private $minimumDifference = 5;
 
     /**
      * @var float
      *
      * @ORM\Column(type="float")
      */
-    private $maximumDifference;
+    private $maximumDifference = 15;
 
     public function getMinimumMinuend(): float
     {

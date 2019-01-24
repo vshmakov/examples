@@ -9,42 +9,42 @@ trait DivisionSettingsTrait
      *
      * @ORM\Column(type="float")
      */
-    private $minimumDividend;
+    private $minimumDividend = 4;
 
     /**
      * @var float
      *
      * @ORM\Column(type="float")
      */
-    private $maximumDividend;
+    private $maximumDividend = 20;
 
     /**
      * @var float
      *
      * @ORM\Column(type="float")
      */
-    private $minimumDivisor;
+    private $minimumDivisor = 2;
 
     /**
      * @var float
      *
      * @ORM\Column(type="float")
      */
-    private $maximumDivisor;
+    private $maximumDivisor = 10;
 
     /**
      * @var float
      *
      * @ORM\Column(type="float")
      */
-    private $minimumQuotient;
+    private $minimumQuotient = 2;
 
     /**
      * @var float
      *
      * @ORM\Column(type="float")
      */
-    private $maximumQuotient;
+    private $maximumQuotient = 4;
 
     public function getMinimumDividend(): float
     {

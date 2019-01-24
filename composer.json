@@ -24,13 +24,11 @@
         "symfony/translation": "^4.0",
         "symfony/twig-bundle": "^4.0",
         "symfony/validator": "^4.0",
-        "symfony/web-link": "^4.0",
-                "symfony/yaml": "^4.0"
+        "symfony/web-link": "^4.0"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^2.13",
         "easycorp/easy-deploy-bundle": "^1.0",
-        "symfony/webpack-encore-pack": "^1.0",
+        "friendsofphp/php-cs-fixer": "^2.13",
         "sensiolabs/security-checker": "^5.0",
         "symfony/browser-kit": "^4.0",
         "symfony/css-selector": "^4.0",
@@ -39,7 +37,8 @@
         "symfony/maker-bundle": "^1.0",
         "symfony/phpunit-bridge": "^4.0",
         "symfony/profiler-pack": "*",
-        "symfony/web-server-bundle": "^4.0"
+        "symfony/web-server-bundle": "^4.0",
+        "symfony/webpack-encore-pack": "^1.0"
     },
     "config": {
         "preferred-install": {
@@ -90,6 +89,12 @@
         "symfony": {
             "id": "01CACSAHBMXKFQRC6C2J11QPSJ",
             "allow-contrib": true
+        }
+    },
+    "repositories": {
+        "phpunit-bridge": {
+            "type": "path",
+            "url": "C:\\OSPanel\\domains\\examples\\vendor\\symfony\\phpunit-bridge"
         }
     }
 }

@@ -9,42 +9,42 @@ trait MultiplicationSettingsTrait
      *
      * @ORM\Column(type="float")
      */
-    private $minimumMultiplicands;
+    private $minimumMultiplicands = 2;
 
     /**
      * @var float
      *
      * @ORM\Column(type="float")
      */
-    private $maximumMultiplicands;
+    private $maximumMultiplicands = 5;
 
     /**
      * @var float
      *
      * @ORM\Column(type="float")
      */
-    private $minimumMultiplier;
+    private $minimumMultiplier = 2;
 
     /**
      * @var float
      *
      * @ORM\Column(type="float")
      */
-    private $maximumMultiplier;
+    private $maximumMultiplier = 5;
 
     /**
      * @var float
      *
      * @ORM\Column(type="float")
      */
-    private $minimumProduct;
+    private $minimumProduct = 4;
 
     /**
      * @var float
      *
      * @ORM\Column(type="float")
      */
-    private $maximumProduct;
+    private $maximumProduct = 25;
 
     public function getMinimumMultiplicands(): float
     {

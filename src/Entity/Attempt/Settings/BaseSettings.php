@@ -2,11 +2,10 @@
 
 namespace App\Entity\Attempt\Settings;
 
+use App\ObjectManager;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Class BaseSettings.
- *
  * @ORM\MappedSuperclass
  */
 abstract class BaseSettings implements ArithmeticFunctionsSettingsInterface
@@ -25,5 +24,43 @@ abstract class BaseSettings implements ArithmeticFunctionsSettingsInterface
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getArithmeticProperties(): array
+    {
+        return ObjectManager::getValues($this, self::getArithmeticPropertyNames());
+    }
+
+    private static function getArithmeticPropertyNames(): array
+    {
+        return [
+            'minimumFirstAddend',
+            'maximumFirstAddend',
+            'minimumSecondAddend',
+            'maximumSecondAddend',
+            'minimumSum',
+            'maximumSum',
+
+            'minimumMinuend',
+            'maximumMinuend',
+            'minimumSubtrahend',
+            'maximumSubtrahend',
+            'minimumDifference',
+            'maximumDifference',
+
+            'minimumMultiplicands',
+            'maximumMultiplicands',
+            'minimumMultiplier',
+            'maximumMultiplier',
+            'minimumProduct',
+            'maximumProduct',
+
+            'minimumDividend',
+            'maximumDividend',
+            'minimumDivisor',
+            'maximumDivisor',
+            'minimumQuotient',
+            'maximumQuotient',
+        ];
     }
 }

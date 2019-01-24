@@ -11,42 +11,42 @@ trait AdditionSettingsTrait
      *
      * @ORM\Column(type="float")
      */
-    private $minimumFirstAddend;
+    private $minimumFirstAddend = 5;
 
     /**
      * @var float
      *
      * @ORM\Column(type="float")
      */
-    private $maximumFirstAddend;
+    private $maximumFirstAddend = 10;
 
     /**
      * @var float
      *
      * @ORM\Column(type="float")
      */
-    private $minimumSecondAddend;
+    private $minimumSecondAddend = 5;
 
     /**
      * @var float
      *
      * @ORM\Column(type="float")
      */
-    private $maximumSecondAddend;
+    private $maximumSecondAddend = 10;
 
     /**
      * @var float
      *
      * @ORM\Column(type="float")
      */
-    private $minimumSum;
+    private $minimumSum = 10;
 
     /**
      * @var float
      *
      * @ORM\Column(type="float")
      */
-    private $maximumSum;
+    private $maximumSum = 20;
 
     public function getMinimumFirstAddend(): float
     {

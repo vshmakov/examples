@@ -52,10 +52,6 @@ final class Version20181020083315 extends AbstractMigration implements Container
         $this->addSql('ALTER TABLE attempt ADD settings_id INT NOT NULL DEFAULT 1 , DROP settings');
         $this->addSql('ALTER TABLE attempt ADD CONSTRAINT FK_18EC026659949888 FOREIGN KEY (settings_id) REFERENCES settings (id)');
 
-        foreach ($queries as $query) {
-            $this->addSql($query);
-        }
-
         $this->addSql('CREATE UNIQUE INDEX UNIQ_18EC026659949888 ON attempt (settings_id)');
 
         $entityManager->flush();

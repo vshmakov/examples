@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\DataFixtures\Attempt\ProfileFixtures;
 use App\Entity\Attempt;
 use App\Entity\Profile;
 use App\Entity\Task;
@@ -29,7 +30,7 @@ class UserRepository extends ServiceEntityRepository
     {
         $profileRepository = $this->getEntityRepository(Profile::class);
         $profile = $user->getProfile() ?? $profileRepository->findOneByAuthor($user) ?? $profileRepository->findOnePublic();
-        $testProfileDescription = 'Тестовый профиль';
+        $testProfileDescription = ProfileFixtures::GUEST_PROFILE_DESCRIPTION;
 
         if (!$profile) {
             $profile = $profileRepository->getNewByCurrentUser()

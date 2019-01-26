@@ -58,6 +58,14 @@ class UserVoter extends Voter
             && $this->userLoader->getUser()->isTeacher();
     }
 
+    private function canShowHomeworks(): bool
+    {
+        $currentUser = $this->userLoader->getUser();
+
+        return $this->authChecker->isGranted('ROLE_USER')
+            && (!$currentUser->isTeacher() or $currentUser->getHomework()->count());
+    }
+
     private function canCreateTasks(): bool
     {
         return $this->canShowTasks();

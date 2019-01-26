@@ -1,48 +1,48 @@
-{% macro list_table(t, profiles, pR, canManipulate=true) %}
-<div class="">
-	<h1>{{t}}</h1>
-	{#{%set pR=app.pR%}#}
-	{%set isA=is_granted("ROLE_ADMIN")%}
-	{%set canDel=is_granted("DELETE", profiles)%}
+{% macro list_table(title, profiles, profileRepository, canManipulate=true) %}
+    <div>
+        <h1>{{ title }}</h1>
+        {% set isAdmin = is_granted("ROLE_ADMIN") %}
+        {% set canDelete = is_granted("DELETE", profiles) %}
 
-	<table class="table table-striped} tbl-bordered">
-		<thead class="thead-dark">
-			<th>Выбрать</th>
-			<th>№</th>
-			<th>Описание</th>
-			<th>Время создания</th>
-			{%if isA%}
-			<th>Пользователь</th>
-			{%endif%}
-			<th>Действия</th>
-		</thead>
-		<tbody>
-			{%for profile in sortProfiles(profiles)%}
-			<tr>
-				<td>
-					<div class="profile-check-radio">
-						<input type="radio" name="profile_id" class="form-check-input" value="{{profile.id}}" data-href="{{path("profile_appoint", {"id": profile.id})}}">
-					</div>
-				</td>
-				<td>{{addTimeNumber(profile, profiles)}}</td>
-				<td>{{profile.setER(pR).title}}</td>
-				<td>{{profile.addTime}}</td>
-				{%if isA%}
-				<td>{{profile.author.username}}</td>
-				{%endif%}
-				<td class="actions">
-					{%if is_granted("APPOINT", profile) and canManipulate %}
-					<a href="{{path('profile_appoint', {'id':profile.id})}}">Выбрать</a>
-					{%endif%}
-					<a href="{{path('profile_edit', {'id':profile.id})}}">{{is_granted("EDIT", profile) and canManipulate ?
-						"Редактировать" :
-						"Просмотреть"}}</a>
-					{%if canDel and canManipulate %}
-					{{include("profile/_delete_form.html.twig")}}{%endif%}
-				</td>
-			</tr>
-			{%endfor%}
-		</tbody>
-	</table>
-</div>
-{%endmacro%}
+        <table class="table table-striped} tbl-bordered">
+            <thead class="thead-dark">
+            <th>Выбрать</th>
+            <th>№</th>
+            <th>Описание</th>
+            <th>Время создания</th>
+            {% if isAdmin %}
+                <th>Пользователь</th>
+            {% endif %}
+            <th>Действия</th>
+            </thead>
+            <tbody>
+            {% for profile in sortProfiles(profiles) %}
+                <tr>
+                    <td>
+                        <div class="profile-check-radio">
+                            <input type="radio" name="profile_id" class="form-check-input" value="{{ profile.id }}"
+                                   data-href="{{ path("profile_appoint", {"id": profile.id}) }}">
+                        </div>
+                    </td>
+                    <td>{{ addTimeNumber(profile, profiles) }}</td>
+                    <td>{{ profile.setEntityRepository(profileRepository).title }}</td>
+                    <td>{{ profile.addTime }}</td>
+                    {% if isAdmin %}
+                        <td>{{ profile.author.username }}</td>
+                    {% endif %}
+                    <td class="actions">
+                        {% if is_granted("APPOINT", profile) and canManipulate %}
+                            <a href="{{ path('profile_appoint', {'id':profile.id}) }}">Выбрать</a>
+                        {% endif %}
+                        <a href="{{ path('profile_edit', {'id':profile.id}) }}">{{ is_granted("EDIT", profile) and canManipulate ?
+                            "Редактировать" :
+                            "Просмотреть" }}</a>
+                        {% if canDelete and canManipulate %}
+                            {{ include("profile/_delete_form.html.twig") }}{% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endmacro %}

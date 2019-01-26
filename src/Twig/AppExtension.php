@@ -77,15 +77,9 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
 
     public function addTimeNumber($entity, array $entityList)
     {
-        $addTime = $entity->getAddTime();
+        $this->sortByAddTime($entityList);
 
-        return array_reduce(
-            $entityList,
-            function ($number, $entity) use ($addTime) {
-                return $addTime->getTimestamp() < $entity->getAddTime()->getTimestamp() ? --$number : $number;
-            },
-            \count($entityList)
-        );
+        return array_search($entity, $entityList, true) + 1;
     }
 
     public function sortByAddTime($entityList)

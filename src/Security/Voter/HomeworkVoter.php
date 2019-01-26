@@ -25,20 +25,12 @@ class HomeworkVoter extends Voter
 
     protected function supports($attribute, $subject)
     {
-        return (($subject instanceof Task) or null === $subject) && $this->hasHandler($attribute);
+        return $subject instanceof Task && $this->hasHandler($attribute);
     }
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
     {
         return $this->checkRight($attribute, $subject, $token);
-    }
-
-    private function canShowHomeworks(): bool
-    {
-        $currentUser = $this->userLoader->getUser();
-
-        return $this->authChecker->isGranted('ROLE_USER')
-            && (!$currentUser->isTeacher() or $currentUser->getHomework()->count());
     }
 
     private function canSolve(): bool

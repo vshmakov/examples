@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /** @ORM\MappedSuperclass */
 abstract class BaseProfile
@@ -17,160 +18,250 @@ abstract class BaseProfile
 
     /**
      * @ORM\Column(type="smallint")
+     * @Groups({"settings"})
      */
     protected $duration = 180;
 
     /**
      * @ORM\Column(type="smallint")
+     * @Groups({"settings"})
      */
     protected $examplesCount = 5;
 
     /**
+     * @var int
+     *
      * @ORM\Column(type="integer")
+     * @Groups({"settings"})
      */
     protected $addFMin = 0;
 
     /**
+     * @var int
+     *
      * @ORM\Column(type="integer")
+     * @Groups({"settings"})
      */
     protected $addFMax = 3;
 
     /**
+     * @var int
+     *
      * @ORM\Column(type="integer")
+     * @Groups({"settings"})
      */
     protected $addSMin = 0;
 
     /**
+     * @var int
+     *
      * @ORM\Column(type="integer")
+     * @Groups({"settings"})
      */
     protected $addSMax = 3;
 
     /**
+     * @var int
+     *
      * @ORM\Column(type="integer")
+     * @Groups({"settings"})
      */
     protected $addMin = -1;
 
     /**
+     * @var int
+     *
      * @ORM\Column(type="integer")
+     * @Groups({"settings"})
      */
     protected $addMax = -1;
 
     /**
+     * @var int
+     *
      * @ORM\Column(type="integer")
+     * @Groups({"settings"})
      */
     protected $subFMin = 0;
 
     /**
+     * @var int
+     *
      * @ORM\Column(type="integer")
+     * @Groups({"settings"})
      */
     protected $subFMax = 5;
 
     /**
+     * @var int
+     *
      * @ORM\Column(type="integer")
+     * @Groups({"settings"})
      */
     protected $subSMin = 0;
 
     /**
+     * @var int
+     *
      * @ORM\Column(type="integer")
+     * @Groups({"settings"})
      */
     protected $subSMax = 5;
 
     /**
+     * @var int
+     *
      * @ORM\Column(type="integer")
+     * @Groups({"settings"})
      */
     protected $subMin = 0;
 
     /**
+     * @var int
+     *
      * @ORM\Column(type="integer")
+     * @Groups({"settings"})
      */
     protected $subMax = 1000;
 
     /**
+     * @var int
+     *
      * @ORM\Column(type="integer")
+     * @Groups({"settings"})
      */
     protected $multFMin = 0;
 
     /**
+     * @var int
+     *
      * @ORM\Column(type="integer")
+     * @Groups({"settings"})
      */
     protected $multFMax = 3;
 
     /**
+     * @var int
+     *
      * @ORM\Column(type="integer")
+     * @Groups({"settings"})
      */
     protected $multSMin = 0;
 
     /**
+     * @var int
+     *
      * @ORM\Column(type="integer")
+     * @Groups({"settings"})
      */
     protected $multSMax = 3;
 
     /**
+     * @var int
+     *
      * @ORM\Column(type="integer")
+     * @Groups({"settings"})
      */
     protected $multMin = -1;
 
     /**
+     * @var int
+     *
      * @ORM\Column(type="integer")
+     * @Groups({"settings"})
      */
     protected $multMax = -1;
 
     /**
+     * @var int
+     *
      * @ORM\Column(type="integer")
+     * @Groups({"settings"})
      */
     protected $divFMin = 0;
 
     /**
+     * @var int
+     *
      * @ORM\Column(type="integer")
+     * @Groups({"settings"})
      */
     protected $divFMax = 6;
 
     /**
+     * @var int
+     *
      * @ORM\Column(type="integer")
+     * @Groups({"settings"})
      */
     protected $divSMin = 1;
 
     /**
+     * @var int
+     *
      * @ORM\Column(type="integer")
+     * @Groups({"settings"})
      */
     protected $divSMax = 6;
 
     /**
+     * @var int
+     *
      * @ORM\Column(type="integer")
+     * @Groups({"settings"})
      */
     protected $divMin = -1;
 
     /**
+     * @var int
+     *
      * @ORM\Column(type="integer")
+     * @Groups({"settings"})
      */
     protected $divMax = -1;
 
     /**
+     * @var int
+     *
      * @ORM\Column(type="smallint")
+     * @Groups({"settings"})
      */
     protected $addPerc = 25;
 
     /**
+     * @var int
+     *
      * @ORM\Column(type="smallint")
+     * @Groups({"settings"})
      */
     protected $subPerc = 25;
 
     /**
+     * @var int
+     *
      * @ORM\Column(type="smallint")
+     * @Groups({"settings"})
      */
     protected $multPerc = 25;
 
     /**
+     * @var int
+     *
      * @ORM\Column(type="smallint")
+     * @Groups({"settings"})
      */
     protected $divPerc = 25;
 
     /**
+     * @var string
+     *
      * @ORM\Column(type="string", length=255)
      */
     protected $description;
 
     /**
+     * @var bool
+     *
      * @ORM\Column(type="boolean")
      */
     protected $isDemanding = true;
@@ -185,7 +276,7 @@ abstract class BaseProfile
         return $this->id;
     }
 
-    public function getAddTime(): ? \DateTimeInterface
+    public function getAddTime(): ?\DateTimeInterface
     {
         return $this->dt($this->addTime);
     }
@@ -197,7 +288,7 @@ abstract class BaseProfile
         return $this;
     }
 
-    public function getDuration(): ? int
+    public function getDuration(): ?int
     {
         return $this->duration;
     }
@@ -209,7 +300,7 @@ abstract class BaseProfile
         return $this;
     }
 
-    public function getExamplesCount(): ? int
+    public function getExamplesCount(): ?int
     {
         return $this->examplesCount;
     }
@@ -221,7 +312,295 @@ abstract class BaseProfile
         return $this;
     }
 
-    public function getAddPerc(): ? int
+    public function getAddFMin(): int
+    {
+        return $this->addFMin;
+    }
+
+    public function setAddFMin(int $addFMin): self
+    {
+        $this->addFMin = $addFMin;
+
+        return $this;
+    }
+
+    public function getAddFMax(): int
+    {
+        return $this->addFMax;
+    }
+
+    public function setAddFMax(int $addFMax): self
+    {
+        $this->addFMax = $addFMax;
+
+        return $this;
+    }
+
+    public function getAddSMin(): int
+    {
+        return $this->addSMin;
+    }
+
+    public function setAddSMin(int $addSMin): self
+    {
+        $this->addSMin = $addSMin;
+
+        return $this;
+    }
+
+    public function getAddSMax(): int
+    {
+        return $this->addSMax;
+    }
+
+    public function setAddSMax(int $addSMax): self
+    {
+        $this->addSMax = $addSMax;
+
+        return $this;
+    }
+
+    public function getAddMin(): int
+    {
+        return $this->addMin;
+    }
+
+    public function setAddMin(int $addMin): self
+    {
+        $this->addMin = $addMin;
+
+        return $this;
+    }
+
+    public function getAddMax(): int
+    {
+        return $this->addMax;
+    }
+
+    public function setAddMax(int $addMax): self
+    {
+        $this->addMax = $addMax;
+
+        return $this;
+    }
+
+    public function getSubFMin(): int
+    {
+        return $this->subFMin;
+    }
+
+    public function setSubFMin(int $subFMin): self
+    {
+        $this->subFMin = $subFMin;
+
+        return $this;
+    }
+
+    public function getSubFMax(): int
+    {
+        return $this->subFMax;
+    }
+
+    public function setSubFMax(int $subFMax): self
+    {
+        $this->subFMax = $subFMax;
+
+        return $this;
+    }
+
+    public function getSubSMin(): int
+    {
+        return $this->subSMin;
+    }
+
+    public function setSubSMin(int $subSMin): self
+    {
+        $this->subSMin = $subSMin;
+
+        return $this;
+    }
+
+    public function getSubSMax(): int
+    {
+        return $this->subSMax;
+    }
+
+    public function setSubSMax(int $subSMax): self
+    {
+        $this->subSMax = $subSMax;
+
+        return $this;
+    }
+
+    public function getSubMin(): int
+    {
+        return $this->subMin;
+    }
+
+    public function setSubMin(int $subMin): self
+    {
+        $this->subMin = $subMin;
+
+        return $this;
+    }
+
+    public function getSubMax(): int
+    {
+        return $this->subMax;
+    }
+
+    public function setSubMax(int $subMax): self
+    {
+        $this->subMax = $subMax;
+
+        return $this;
+    }
+
+    public function getMultFMin(): int
+    {
+        return $this->multFMin;
+    }
+
+    public function setMultFMin(int $multFMin): self
+    {
+        $this->multFMin = $multFMin;
+
+        return $this;
+    }
+
+    public function getMultFMax(): int
+    {
+        return $this->multFMax;
+    }
+
+    public function setMultFMax(int $multFMax): self
+    {
+        $this->multFMax = $multFMax;
+
+        return $this;
+    }
+
+    public function getMultSMin(): int
+    {
+        return $this->multSMin;
+    }
+
+    public function setMultSMin(int $multSMin): self
+    {
+        $this->multSMin = $multSMin;
+
+        return $this;
+    }
+
+    public function getMultSMax(): int
+    {
+        return $this->multSMax;
+    }
+
+    public function setMultSMax(int $multSMax): self
+    {
+        $this->multSMax = $multSMax;
+
+        return $this;
+    }
+
+    public function getMultMin(): int
+    {
+        return $this->multMin;
+    }
+
+    public function setMultMin(int $multMin): self
+    {
+        $this->multMin = $multMin;
+
+        return $this;
+    }
+
+    public function getMultMax(): int
+    {
+        return $this->multMax;
+    }
+
+    public function setMultMax(int $multMax): self
+    {
+        $this->multMax = $multMax;
+
+        return $this;
+    }
+
+    public function getDivFMin(): int
+    {
+        return $this->divFMin;
+    }
+
+    public function setDivFMin(int $divFMin): self
+    {
+        $this->divFMin = $divFMin;
+
+        return $this;
+    }
+
+    public function getDivFMax(): int
+    {
+        return $this->divFMax;
+    }
+
+    public function setDivFMax(int $divFMax): self
+    {
+        $this->divFMax = $divFMax;
+
+        return $this;
+    }
+
+    public function getDivSMin(): int
+    {
+        return $this->divSMin;
+    }
+
+    public function setDivSMin(int $divSMin): self
+    {
+        $this->divSMin = $divSMin;
+
+        return $this;
+    }
+
+    public function getDivSMax(): int
+    {
+        return $this->divSMax;
+    }
+
+    public function setDivSMax(int $divSMax): self
+    {
+        $this->divSMax = $divSMax;
+
+        return $this;
+    }
+
+    public function getDivMin(): int
+    {
+        return $this->divMin;
+    }
+
+    public function setDivMin(int $divMin): self
+    {
+        $this->divMin = $divMin;
+
+        return $this;
+    }
+
+    public function getDivMax(): int
+    {
+        return $this->divMax;
+    }
+
+    public function setDivMax(int $divMax): self
+    {
+        $this->divMax = $divMax;
+
+        return $this;
+    }
+
+    public function getAddPerc(): ?int
     {
         return $this->addPerc;
     }
@@ -233,7 +612,7 @@ abstract class BaseProfile
         return $this;
     }
 
-    public function getSubPerc(): ? int
+    public function getSubPerc(): ?int
     {
         return $this->subPerc;
     }
@@ -245,7 +624,7 @@ abstract class BaseProfile
         return $this;
     }
 
-    public function getMultPerc(): ? int
+    public function getMultPerc(): ?int
     {
         return $this->multPerc;
     }
@@ -257,7 +636,7 @@ abstract class BaseProfile
         return $this;
     }
 
-    public function getDivPerc(): ? int
+    public function getDivPerc(): ?int
     {
         return $this->divPerc;
     }
@@ -295,7 +674,7 @@ abstract class BaseProfile
         return $this;
     }
 
-    public function getDescription(): ? string
+    public function getDescription(): ?string
     {
         return $this->description;
     }
@@ -343,18 +722,6 @@ abstract class BaseProfile
     {
         $this->id = null;
         $this->addTime = new \DateTime();
-    }
-
-    public function __get($property)
-    {
-        return $this->$property;
-    }
-
-    public function __set($property, $value)
-    {
-        $this->$property = $value;
-
-        return $this;
     }
 
     public static function copySettings(self $source, self $target): self

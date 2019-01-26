@@ -21,24 +21,24 @@ class IndexControllerTest extends WebTestCase
         $routes = [
             200 => [
                 '/',
-                '/attempt',
-                '/profile',
+                '/attempt/',
+                '/profile/',
                 '/login',
                 '/register/',
             ],
-302 => [
-'/account/',
-'/teacher/',
-'/student/',
-'/homework/',
-'/task/',
-],
+            302 => [
+                '/account/',
+                '/teacher/',
+                '/student/',
+                '/homework/',
+                '/task/',
+            ],
         ];
 
         foreach ($routes as $status => $urlList) {
             foreach ($urlList as $url) {
                 $client->request('GET', $url);
-                $this->assertSame($status, $client->getResponse()->getStatusCode());
+                $this->assertSame($status, $client->getResponse()->getStatusCode(), sprintf('%s endpoint das not answer with %s status code', $url, $status));
             }
         }
     }

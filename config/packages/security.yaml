@@ -35,8 +35,6 @@ security:
 
         main:
             pattern: ^/
-            #stateless: true
-            #context: main
             form_login:
                 always_use_default_target_path: true
                 provider: fos_userbundle

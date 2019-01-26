@@ -38,6 +38,7 @@ class User implements UserInterface, GroupableInterface
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Profile", inversedBy="users")
+     * @ORM\JoinColumn(onDelete="set null")
      */
     private $profile;
 
@@ -77,102 +78,14 @@ class User implements UserInterface, GroupableInterface
     private $transfers;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="username", type="string", length=180, nullable=true)
-     * @Assert\NotBlank(message="Имя не должно быть пустым")
-     * @Assert\Regex(
-     *     pattern="/^[a-z][a-z0-9\._\-]+[a-z0-9]$/",
-     *     message="Логин должен начинаться с буквы, заканчиваться буквой или цифрой  и может содержать только строчные латинские символы, цифры, а также ._-"
-     * )
-     */
-    private $username;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="username_canonical", type="string", length=180, unique=true, nullable=true)
-     */
-    private $usernameCanonical;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="email", type="string", length=180, nullable=true)
-     */
-    private $email;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="email_canonical", type="string", length=180, unique=true, nullable=true)
-     */
-    private $emailCanonical;
-
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="enabled", type="boolean", nullable=false)
-     */
-    private $enabled;
-
-    /**
      * @var bool
      *
      * @ORM\Column(type="boolean", nullable=true)
      */
     private $isSocial = false;
 
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="salt", type="string", length=255, nullable=true)
-     */
-    private $salt;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="password", type="string", length=255, nullable=true)
-     * @Assert\Length(
-     * min = 3,
-     * minMessage = "Ваш пароль должен содержать как минимум {{ limit }} символовlong",
-     * )
-     */
-    private $password;
-
-    /**
-     * @var \DateTime|null
-     *
-     * @ORM\Column(name="last_login", type="datetime", nullable=true)
-     */
-    private $lastLogin;
-
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="confirmation_token", type="string", length=180, unique=true, nullable=true)
-     */
-    private $confirmationToken;
-
-    /**
-     * @var \DateTime|null
-     *
-     * @ORM\Column(name="password_requested_at", type="datetime", nullable=true)
-     */
-    private $passwordRequestedAt;
-
-    /**
-     * @var array
-     *
-     * @ORM\Column(name="roles", type="array", length=0, nullable=false)
-     */
-    private $roles;
-
     public function __construct()
     {
-        $this->enabled = false;
-        $this->roles = [];
         $this->sessions = new ArrayCollection();
         $this->profiles = new ArrayCollection();
         $l = TEST_DAYS;
@@ -193,7 +106,7 @@ class User implements UserInterface, GroupableInterface
         return $this->id;
     }
 
-    public function getAddTime(): ? \DateTimeInterface
+    public function getAddTime(): ?\DateTimeInterface
     {
         return $this->dt($this->addTime);
     }
@@ -267,7 +180,7 @@ class User implements UserInterface, GroupableInterface
         return $this;
     }
 
-    public function getProfile(): ? Profile
+    public function getProfile(): ?Profile
     {
         return $this->profile;
     }
@@ -279,12 +192,12 @@ class User implements UserInterface, GroupableInterface
         return $this;
     }
 
-    public function getAllMoney(): ? int
+    public function getAllMoney(): ?int
     {
         return $this->allMoney;
     }
 
-    public function getMoney(): ? int
+    public function getMoney(): ?int
     {
         return $this->money;
     }
@@ -296,7 +209,7 @@ class User implements UserInterface, GroupableInterface
         return $this;
     }
 
-    public function getLimitTime(): ? \DateTimeInterface
+    public function getLimitTime(): ?\DateTimeInterface
     {
         return $this->dt($this->limitTime);
     }
@@ -475,7 +388,7 @@ class User implements UserInterface, GroupableInterface
     /**
      * @ORM\Column(type="boolean", nullable=true)
      */
-    private $isTeacher;
+    private $isTeacher = false;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\User", mappedBy="teacher")
@@ -507,7 +420,7 @@ class User implements UserInterface, GroupableInterface
      */
     private $homework;
 
-    public function getFirstName(): ? string
+    public function getFirstName(): ?string
     {
         return $this->firstName;
     }
@@ -519,7 +432,7 @@ class User implements UserInterface, GroupableInterface
         return $this;
     }
 
-    public function getLastName(): ? string
+    public function getLastName(): ?string
     {
         return $this->lastName;
     }
@@ -600,7 +513,7 @@ class User implements UserInterface, GroupableInterface
         return $this->setUsernameCanonical($u);
     }
 
-    public function getNetwork(): ? string
+    public function getNetwork(): ?string
     {
         return $this->network;
     }
@@ -612,7 +525,7 @@ class User implements UserInterface, GroupableInterface
         return $this;
     }
 
-    public function getNetworkId(): ? string
+    public function getNetworkId(): ?string
     {
         return $this->networkId;
     }
@@ -624,7 +537,7 @@ class User implements UserInterface, GroupableInterface
         return $this;
     }
 
-    public function getFatherName(): ? string
+    public function getFatherName(): ?string
     {
         return $this->fatherName;
     }
@@ -636,7 +549,7 @@ class User implements UserInterface, GroupableInterface
         return $this;
     }
 
-    public function isTeacher(): ? bool
+    public function isTeacher(): ?bool
     {
         return (bool) $this->isTeacher;
     }
@@ -801,7 +714,7 @@ class User implements UserInterface, GroupableInterface
         return $this->parent === $parent;
     }
 
-    public function getRealStudents()
+    public function getRealStudents(): Collection
     {
         return array_reduce(
             $this->getStudents()->getValues(),

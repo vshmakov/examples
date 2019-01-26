@@ -2,7 +2,7 @@
 
 namespace App\Entity\Attempt\Settings;
 
-use App\ObjectManager;
+use App\Object\ObjectAccessor;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -28,7 +28,7 @@ abstract class BaseSettings implements ArithmeticFunctionsSettingsInterface
 
     public function getArithmeticProperties(): array
     {
-        return ObjectManager::getValues($this, self::getArithmeticPropertyNames());
+        return ObjectAccessor::getValues($this, self::getArithmeticPropertyNames());
     }
 
     private static function getArithmeticPropertyNames(): array

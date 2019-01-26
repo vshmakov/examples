@@ -24,6 +24,7 @@ class ProfileController extends Controller
      */
     public function index(ProfileRepository $profileRepository, UserLoader $userLoader, UserRepository $userRepository): Response
     {
+        $currentUser = $userLoader->getUser();
         $publicProfiles = $profileRepository->findByIsPublic(true);
         $userProfiles = $profileRepository->findByCurrentAuthor();
         $teacherProfiles = $profileRepository->findByCurrentUserTeacher();
@@ -35,7 +36,7 @@ class ProfileController extends Controller
             'canAppoint' => $can = $this->isGranted('PRIV_APPOINT_PROFILES'),
             'pR' => $profileRepository,
             'jsParams' => [
-                'current' => $userRepository->getCurrentProfile($userLoader->getUser())->getId(),
+                'current' => $userRepository->getCurrentProfile($currentUser)->getId(),
                 'canAppoint' => $can,
             ],
         ]);

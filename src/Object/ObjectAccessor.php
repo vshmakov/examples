@@ -1,11 +1,11 @@
 <?php
 
-namespace App;
+namespace App\Object;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
-abstract class ObjectManager
+abstract class ObjectAccessor
 {
     public static function getValues($objectOrArray, array $fields): array
     {
@@ -28,5 +28,22 @@ abstract class ObjectManager
         return PropertyAccess::createPropertyAccessorBuilder()
             ->enableExceptionOnInvalidIndex()
             ->getPropertyAccessor();
+    }
+
+    public static function initialize(string $class, array $data): object
+    {
+        $object = new $class();
+        self::setValues($object, $data);
+
+        return $object;
+    }
+
+    public static function setValues(object $object, array $values): void
+    {
+        $propertyAccessor = self::createPropertyAccessor();
+
+        foreach ($values as $key => $value) {
+            $propertyAccessor->setValue($object, $key, $value);
+        }
     }
 }

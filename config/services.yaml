@@ -38,3 +38,11 @@ services:
         class: App\Form\Extension\NoValidateExtension
         tags:
             - {name: form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType}
+
+    App\Parameter\Environment\AppEnv:
+        arguments:
+            $appEnv: '%env(APP_ENV)%'
+
+    App\Security\TestAuthenticator:
+        arguments:
+            $appEnv: '@App\Parameter\Environment\AppEnv'

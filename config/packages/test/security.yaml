@@ -1,0 +1,14 @@
+security:
+    providers:
+        test:
+            entity:
+                class: App\Entity\User
+                property: username
+
+    firewalls:
+        main:
+            guard:
+                provider: test
+                authenticators:
+                    - App\Security\TestAuthenticator
+            anonymous:    true

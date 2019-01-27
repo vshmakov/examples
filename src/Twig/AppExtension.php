@@ -2,12 +2,12 @@
 
 namespace App\Twig;
 
+use App\Parameter\StringInterface;
 use App\Repository\AttemptRepository;
 use App\Repository\TaskRepository;
 use App\Repository\UserRepository;
 use App\Service\UserLoader;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Twig\Extension\AbstractExtension;
 
@@ -21,7 +21,7 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
     private $taskRepository;
     private $userRepository;
 
-    public function __construct(UserLoader $userLoader, AttemptRepository $attemptRepository, UserRepository $userRepository, EntityManagerInterface $entityManager, ContainerInterface $container, TaskRepository $taskRepository)
+    public function __construct(UserLoader $userLoader, AttemptRepository $attemptRepository, UserRepository $userRepository, EntityManagerInterface $entityManager, TaskRepository $taskRepository, StringInterface $appName)
     {
         $this->entityManager = $entityManager;
         $this->taskRepository = $taskRepository;
@@ -33,7 +33,7 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
             'user' => $user,
             'hasActualAttempt' => $hasActualAttempt,
             'PRICE' => PRICE,
-            'app_name' => $container->getParameter('app_name'),
+            'app_name' => $appName->toString(),
             'isGuest' => $userLoader->isGuest(),
             'FEEDBACK_EMAIL' => 'post@exmasters.ru',
         ];

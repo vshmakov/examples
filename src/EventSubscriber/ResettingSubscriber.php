@@ -7,7 +7,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class ResettingSubscriber implements EventSubscriberInterface
+final class ResettingSubscriber implements EventSubscriberInterface
 {
     private $uurlGenerator;
 

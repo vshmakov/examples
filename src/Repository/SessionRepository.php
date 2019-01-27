@@ -24,30 +24,30 @@ class SessionRepository extends ServiceEntityRepository
         $this->sessionMarker = $sessionMarker;
     }
 
-    public function findOneByCurrentUser()
+    public function findOneByCurrentUser(): ?Session
     {
         return $this->findOneByUser($this->currentUser);
     }
 
-    public function findOneByUser(User $user)
+    public function findOneByUser(User $user): ?Session
     {
         $sid = $this->sessionMarker->getKey();
 
         return $this->findOneByUserAndSid($user, $sid);
     }
 
-    public function findOneByCurrentUserOrGetNew()
+    public function findOneByCurrentUserOrGetNew(): Session
     {
         return $this->findOneByUserOrGetNew($this->currentUser);
     }
 
-    public function findOneByUserOrGetNew(User $user)
+    public function findOneByUserOrGetNew(User $user): Session
     {
         return $this->findOneByUser($user)
             ?? $this->getNewByUserAndSid($user, $this->sessionMarker->getKey());
     }
 
-    public function findOneByUserAndSid(User $user, $sid)
+    public function findOneByUserAndSid(User $user, $sid): ?Session
     {
         $where = ['user' => $user];
 
@@ -58,7 +58,7 @@ class SessionRepository extends ServiceEntityRepository
         return $this->findOneBy($where);
     }
 
-    private function getNewByUserAndSid(User $user, $sid)
+    private function getNewByUserAndSid(User $user, $sid): Session
     {
         if ($session = $this->findOneByUserAndSid($user, $sid)) {
             return $session;
@@ -75,23 +75,24 @@ class SessionRepository extends ServiceEntityRepository
         return $session;
     }
 
-    public function clearSessions(\DateTimeInterface $dt)
+    public function clearSessions(\DateTimeInterface $dt): int
     {
         $sessions = $this->createQuery('select s from App:Session s
 left join s.attempts a
 where a.id is null and s.lastTime < :dt')
             ->setParameter('dt', $dt)
             ->getResult();
+        $removedSessionsCount = \count($sessions);
         $entityManager = $this->getEntityManager();
 
         foreach ($sessions as $session) {
             $this->remove($session);
         }
 
-        return \count($sessions);
+        return $removedSessionsCount;
     }
 
-    public function remove(Session $session)
+    public function remove(Session $session): void
     {
         $entityManager = $this->GetEntityManager();
 

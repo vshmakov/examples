@@ -6,7 +6,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class RegistrationSubscriber implements EventSubscriberInterface
+final class RegistrationSubscriber implements EventSubscriberInterface
 {
     private $entityManager;
 

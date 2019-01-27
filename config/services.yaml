@@ -46,3 +46,17 @@ services:
     App\Security\TestAuthenticator:
         arguments:
             $appEnv: '@App\Parameter\Environment\AppEnv'
+
+    App\Service\AuthChecker:
+        arguments:
+            $authorizationChecker: '@security.authorization_checker'
+
+    Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface: '@App\Service\AuthChecker'
+
+    App\Parameter\Environment\AppName:
+        arguments:
+            $appName: '%env(APP_NAME)%'
+
+    App\Twig\AppExtension:
+        arguments:
+            $appName: '@App\Parameter\Environment\AppName'

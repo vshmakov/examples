@@ -2,83 +2,124 @@
 
 namespace App\EventSubscriber;
 
+use App\Entity\Session;
 use App\Entity\Visit;
 use App\Repository\IpRepository;
 use App\Repository\SessionRepository;
-use App\Service\AuthChecker;
 use App\Service\UserLoader;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Container\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class ResponseSubscriber implements EventSubscriberInterface
+final class ResponseSubscriber implements EventSubscriberInterface
 {
+    /** @var SessionRepository */
     private $sessionRepository;
-    private $userRepository;
-    private $request;
-    private $userLoader;
-    private $authChecker;
-    private $session;
-    private $ipRepository;
-    private $entityManager;
-    private $container;
 
-    public function __construct(SessionRepository $sessionRepository, RequestStack $requestStack, UserLoader $userLoader, IpRepository $ipRepository, AuthChecker $authChecker, SessionInterface $session, EntityManagerInterface $entityManager, ContainerInterface $container)
-    {
+    /** @var Request|null */
+    private $request;
+
+    /** @var UserLoader */
+    private $userLoader;
+
+    /** @var AuthorizationCheckerInterface */
+    private $authorizationChecker;
+
+    /** @var SessionInterface */
+    private $session;
+
+    /** @var IpRepository */
+    private $ipRepository;
+
+    /** @var EntityManagerInterface */
+    private $entityManager;
+
+    public function __construct(
+        SessionRepository $sessionRepository,
+        RequestStack $requestStack,
+        UserLoader $userLoader,
+        IpRepository $ipRepository,
+        AuthorizationCheckerInterface $authorizationChecker,
+        SessionInterface $session,
+        EntityManagerInterface $entityManager
+    ) {
         $this->session = $session;
         $this->sessionRepository = $sessionRepository;
         $this->ipRepository = $ipRepository;
         $this->request = $requestStack->getMasterRequest();
         $this->userLoader = $userLoader;
-        $this->authChecker = $authChecker;
+        $this->authorizationChecker = $authorizationChecker;
         $this->entityManager = $entityManager;
-        $this->container = $container;
     }
 
-    public function onKernelResponse(FilterResponseEvent $event)
+    public function onKernelResponse(FilterResponseEvent $event): void
     {
-        $request = $this->request;
-        $entityManager = $this->entityManager;
         $currentUserSession = $this->sessionRepository->findOneByCurrentUser();
         $missResponseEvent = $this->session->getFlashBag()->get('missResponseEvent', []);
 
-        if ($request && $event->isMasterRequest() && $currentUserSession && !$missResponseEvent) {
-            $currentUserSession->setLastTime(new \DateTime());
-            $user = $this->userLoader->getUser();
-            $ip = $this->ipRepository->findOneByIpOrNew($request->getClientIp());
-            $uri = $request->getRequestUri();
-            $routeName = $request->attributes->get('_route', $uri);
+        if (!$this->request or $missResponseEvent or null === $currentUserSession) {
+            return;
+        }
 
-            if ('_wdt' !== $routeName &&
-                !$this->authChecker->isGranted('ROLE_ADMIN')) {
-                $visit = (new Visit())
-                    ->setUri($uri)
-                    ->setRouteName($routeName)
-                    ->setMethod($request->getMethod())
-                    ->setSession($currentUserSession)
-                    ->setStatusCode($event->getResponse()->getStatusCode());
+        $clientIp = $this->request->getClientIp();
 
-                $entityManager->persist($visit);
+        if (null === $clientIp) {
+            return;
+        }
+
+        $this->updateSession($currentUserSession);
+        $this->saveVisit($currentUserSession, $event->getResponse()->getStatusCode());
+        $this->saveIp($currentUserSession, $clientIp);
+        $this->entityManager->flush();
+    }
+
+    private function updateSession(Session $session): void
+    {
+        $session->setLastTime(new \DateTime());
+    }
+
+    private function saveVisit(Session $session, int $statusCode): void
+    {
+        $request = $this->request;
+        $uri = $request->getRequestUri();
+        $routeName = $request->attributes->get('_route', $uri);
+
+        if ('_wdt' !== $routeName &&
+            !$this->authorizationChecker->isGranted('ROLE_ADMIN')) {
+            $visit = (new Visit())
+                ->setUri($uri)
+                ->setRouteName($routeName)
+                ->setMethod($request->getMethod())
+                ->setSession($session)
+                ->setStatusCode($statusCode);
+
+            $this->entityManager->persist($visit);
+        }
+    }
+
+    private function saveIp(Session $session, string $clientIp): void
+    {
+        $user = $this->userLoader->getUser();
+        $ip = $this->ipRepository->findOneByIpOrNew($clientIp);
+
+        if ($ip) {
+            $session->setIp($ip);
+
+            if (!$this->userLoader->isGuest()) {
+                $user->addIp($ip);
             }
-
-            if ($ip) {
-                if (!$this->userLoader->isGuest()) {
-                    $user->addIp($ip);
-                }
-                $currentUserSession->setIp($ip);
-            }
-
-            $entityManager->flush();
         }
     }
 
     public static function getSubscribedEvents()
     {
         return [
-            'kernel.response' => 'onKernelResponse',
+            KernelEvents::RESPONSE => 'onKernelResponse',
         ];
     }
 }

@@ -60,3 +60,5 @@ services:
     App\Twig\AppExtension:
         arguments:
             $appName: '@App\Parameter\Environment\AppName'
+
+    App\Response\AttemptResponseProviderInterface: '@App\Repository\AttemptRepository'

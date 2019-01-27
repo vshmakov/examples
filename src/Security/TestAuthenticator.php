@@ -4,7 +4,7 @@ namespace App\Security;
 
 use App\Parameter\ChooseInterface;
 use App\Parameter\Environment\AppEnv;
-use App\Tests\Controller\BaseWebTestCase;
+use App\Tests\Functional\BaseWebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;

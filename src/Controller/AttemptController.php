@@ -7,6 +7,7 @@ use App\Form\SettingsType;
 use App\Repository\AttemptRepository;
 use App\Repository\ExampleRepository;
 use App\Repository\ProfileRepository;
+use App\Response\AttemptResponseProviderInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,6 +15,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * @Route("/attempt")
@@ -50,7 +52,7 @@ class AttemptController extends Controller
     /**
      *@Route("/{id}", name="attempt_solve", requirements={"id": "\d+"})
      */
-    public function solve(Attempt $attempt, ExampleRepository $exampleRepository, AttemptRepository $attemptRepository): Response
+    public function solve(Attempt $attempt, AttemptResponseProviderInterface $attemptResponseProvider, NormalizerInterface $normalizer): Response
     {
         if (!$this->isGranted('SOLVE', $attempt)) {
             if ($this->isGranted('VIEW', $attempt)) {
@@ -59,15 +61,17 @@ class AttemptController extends Controller
             throw $this->createAccessDeniedException();
         }
 
-        $exampleRepository->findLastUnansweredByAttemptOrGetNew($attempt);
+        $attemptResponse = $attemptResponseProvider->createAttemptResponse($attempt);
+        $attemptResponseData = $normalizer->normalize($attemptResponse);
 
         return $this->render('attempt/solve.html.twig', [
             'jsParams' => [
-                'attData' => $attempt->setEntityRepository($attemptRepository)->getData(),
-                'attempt_answer' => $this->generateUrl('attempt_answer', ['id' => $attempt->getId()]),
+                'attempt' => $attemptResponseData,
+                'answerAttemptUrl' => $this->generateUrl('attempt_answer', ['id' => $attempt->getId()]),
                 'showAttemptUrl' => $this->generateUrl('attempt_show', ['id' => $attempt->getId()]),
             ],
-            'att' => $attempt,
+            'attempt' => $attempt,
+            'attemptResponse' => $attemptResponse,
         ]);
     }
 

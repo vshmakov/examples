@@ -11,7 +11,7 @@ h.createObj({
         $.each(["num", "exRem", "str", "errors"], function () {
             self[this] = $("#" + this);
         });
-        this.setData(P.attData);
+        this.setData(P.attempt);
         this.form.submit(this.answer.bind(this));
     },
 
@@ -33,22 +33,22 @@ h.createObj({
         event.preventDefault();
         if (!this.inp.val()) return;
         this.disableForm();
-        $.post(P.attempt_answer, {
+        $.post(P.answerAttemptUrl, {
             answer: this.inp.val()
         }, this.getResult.bind(this));
     },
 
     getResult: function (data) {
         if (data.finish === true) return finishSolving();
-        this.setData(data.attData);
+        this.setData(data.attempt);
     },
 
     setData: function (d) {
         var o = {
-            num: d.ex.num,
-            str: d.ex.str,
-            errors: d.errors,
-            exRem: d.exRem
+            num: d.example.number,
+            str: d.example.string,
+            errors: d.errorsCount,
+            exRem: d.remainedExamplesCount
         };
         for (var k in o) {
             this[k].html(o[k]);
@@ -61,7 +61,7 @@ h.createObj({
 
     timer: h.createObj({
         constructor: function () {
-            this.finishTime = P.attData.limTime * 1000;
+            this.finishTime = P.attempt.limitTime* 1000;
             this.intId = setInterval(this.setTime.bind(this), 1000);
         },
 

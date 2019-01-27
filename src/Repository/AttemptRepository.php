@@ -3,10 +3,14 @@
 namespace App\Repository;
 
 use App\Entity\Attempt;
+use App\Entity\Example;
 use App\Entity\Session;
 use App\Entity\Settings;
 use App\Entity\Task;
 use App\Entity\User;
+use App\Response\AttemptResponse;
+use App\Response\AttemptResponseProviderInterface;
+use App\Response\ExampleResponse;
 use App\Service\AuthChecker;
 use App\Service\ExampleManager;
 use App\Service\UserLoader;
@@ -15,7 +19,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class AttemptRepository extends ServiceEntityRepository
+class AttemptRepository extends ServiceEntityRepository implements AttemptResponseProviderInterface
 {
     use BaseTrait;
     private $exampleRepository;
@@ -36,14 +40,14 @@ class AttemptRepository extends ServiceEntityRepository
         $this->localCache = $localCache;
     }
 
-    public function findLastActualByCurrentUser(): ? Attempt
+    public function findLastActualByCurrentUser(): ?Attempt
     {
         $attempt = $this->findLastByCurrentUser();
 
         return $this->authChecker->isGranted('SOLVE', $attempt) ? $attempt : null;
     }
 
-    public function findLastByCurrentUser(): ? Attempt
+    public function findLastByCurrentUser(): ?Attempt
     {
         $userLoader = $this->userLoader;
         $where = !$userLoader->isGuest() ? 's.user = :u' : 'a.session = :s';
@@ -176,7 +180,7 @@ order by a.addTime asc')
         return (bool) $this->exampleRepository->findLastByAttempt($attempt);
     }
 
-    public function getData(Attempt $attempt): ? array
+    public function getData(Attempt $attempt): ?array
     {
         $exampleRepository = $this->exampleRepository;
 
@@ -271,7 +275,7 @@ where a.task = :task and s.user = :user')
             ->getResult();
     }
 
-    public function findLastOneByTaskAndUser(Task $task, User $user): ? Attempt
+    public function findLastOneByTaskAndUser(Task $task, User $user): ?Attempt
     {
         return $this->getValue(
             $this->createQuery('select a from App:Attempt a
@@ -307,22 +311,22 @@ where s.user = :user and a.task = :task
         });
     }
 
-    public function getDoneAverageRatingByCurrentUserAndTask(Task $task): ? float
+    public function getDoneAverageRatingByCurrentUserAndTask(Task $task): ?float
     {
         return $this->getDoneAverageRatingByUserAndTask($this->userLoader->getUser(), $task);
     }
 
-    public function getDoneAverageRatingByUserAndTask(User $user, Task $task): ? float
+    public function getDoneAverageRatingByUserAndTask(User $user, Task $task): ?float
     {
         return $this->getAverageRatingByAttempts($this->findDoneByUserAndTask($user, $task));
     }
 
-    public function getAverageRatingByUserAndTask(User $user, Task $task): ? float
+    public function getAverageRatingByUserAndTask(User $user, Task $task): ?float
     {
         return $this->getAverageRatingByAttempts($this->findByUserAndTask($user, $task));
     }
 
-    private function getAverageRatingByAttempts(array $attempts): ? float
+    private function getAverageRatingByAttempts(array $attempts): ?float
     {
         $attemptsCount = \count($attempts);
         $ratingSumm = array_reduce($attempts, function (int $ratingSumm, Attempt $attempt): int {
@@ -332,7 +336,7 @@ where s.user = :user and a.task = :task
         return $attemptsCount ? $ratingSumm / $attemptsCount : null;
     }
 
-    public function getAverageRatingByCurrentUserAndTask(Task $task): ? float
+    public function getAverageRatingByCurrentUserAndTask(Task $task): ?float
     {
         return $this->getAverageRatingByUserAndTask($this->userLoader->getUser(), $task);
     }
@@ -359,5 +363,21 @@ join a.session s
 where s.user = :user and a.task = :task')
             ->setParameters(['user' => $this->userLoader->getUser(), 'task' => $task])
             ->getResult();
+    }
+
+    public function createAttemptResponse(Attempt $attempt): AttemptResponse
+    {
+        /** @var ExampleRepository $exampleRepository */
+        $exampleRepository = $this->getEntityRepository(Example::class);
+        $example = $exampleRepository->findLastUnansweredByAttemptOrGetNew($attempt);
+        $exampleNumber = $exampleRepository->getNumber($example);
+        $exampleResponse = new ExampleResponse($example, $exampleNumber);
+
+        return new AttemptResponse(
+            $this->getNumber($attempt),
+            $exampleResponse, $attempt->getLimitTime(),
+            $this->getErrorsCount($attempt),
+            $this->getRemainedExamplesCount($attempt)
+        );
     }
 }

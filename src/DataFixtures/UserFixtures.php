@@ -4,7 +4,6 @@ namespace App\DataFixtures;
 
 use App\Entity\User;
 use App\Object\ObjectAccessor;
-use App\Repository\UserRepository;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
@@ -16,7 +15,8 @@ class UserFixtures extends Fixture
     public const STUDENT_USER_REFERENCE = 'STUDENT_USER_REFERENCE';
     public const TEACHER_USER_REFERENCE = 'TEACHER_USER_REFERENCE';
 
-    public const GUEST_USERNAME = UserRepository::GUEST_LOGIN;
+    public const GUEST_USERNAME = '__guest';
+    public const ADMIN_USERNAME = 'admin';
     public const STUDENT_USERNAME = 'student';
     public const TEACHER_USERNAME = 'teacher';
 
@@ -26,7 +26,7 @@ class UserFixtures extends Fixture
     ];
 
     private const ADMIN_USER = [
-        'username' => 'admin',
+        'username' => self::ADMIN_USERNAME,
         'email' => 'admin@exmasters.ru',
         'plainPassword' => 123,
         'roles' => ['ROLE_ADMIN'],
@@ -41,6 +41,8 @@ class UserFixtures extends Fixture
 
     private const TEACHER_USER = [
         'username' => self::TEACHER_USERNAME,
+        'email' => 'teacher@exmasters.ru',
+        'plainPassword' => 123,
         'isTeacher' => true,
         'roles' => ['ROLE_TEACHER'],
     ];

@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\DataFixtures\Attempt\ProfileFixtures;
+use App\DataFixtures\UserFixtures;
 use App\Entity\Attempt;
 use App\Entity\Profile;
 use App\Entity\Task;
@@ -15,7 +16,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 class UserRepository extends ServiceEntityRepository
 {
     use BaseTrait;
-    public const GUEST_LOGIN = '__guest';
+
     private $authChecker;
     private $localCache;
 
@@ -83,16 +84,16 @@ where u = :u')
     public function getGuest()
     {
         static $user = false;
-        $guestLogin = self::GUEST_LOGIN;
+        $guestUsername = UserFixtures::GUEST_USERNAME;
 
         if (false === $user) {
-            $user = $this->findOneByUsername($guestLogin);
+            $user = $this->findOneByUsername($guestUsername);
         }
 
         if (!$user) {
             $user = $this->getNew()
-                ->setUsername($guestLogin)
-                ->setUsernameCanonical($guestLogin);
+                ->setUsername($guestUsername)
+                ->setUsernameCanonical($guestUsername);
 
             $entityManager = $this->getEntityManager();
             $entityManager->persist($user);

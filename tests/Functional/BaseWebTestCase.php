@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Controller;
+namespace App\Tests\Functional;
 
 use App\DataFixtures\UserFixtures;
 use Symfony\Bundle\FrameworkBundle\Client;

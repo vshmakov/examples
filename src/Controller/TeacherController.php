@@ -3,11 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Exception\RequiresStudentAccessException;
 use App\Form\ChildType;
 use App\Repository\TaskRepository;
 use App\Repository\UserRepository;
+use App\Security\Annotation as AppSecurity;
 use App\Service\UserLoader;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,9 +18,9 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @Route("/teacher")
- * @Security("is_granted('SHOW_TEACHERS')")
+ * @AppSecurity\IsGranted("ROLE_STUDENT", exception=RequiresStudentAccessException::class)
  */
-class TeacherController extends Controller
+final class TeacherController extends Controller
 {
     use BaseTrait;
     private $currentUser;
@@ -31,7 +32,7 @@ class TeacherController extends Controller
     }
 
     /**
-     *@Route("/", name="teacher_index")
+     * @Route("/", name="teacher_index")
      */
     public function index(UserRepository $userRepository): Response
     {
@@ -41,7 +42,7 @@ class TeacherController extends Controller
     }
 
     /**
-     *@Route("/{id}/appoint", name="teacher_appoint")
+     * @Route("/{id}/appoint", name="teacher_appoint")
      */
     public function appoint(User $teacher, ValidatorInterface $validator, Request $request, TaskRepository $taskRepository): Response
     {
@@ -88,7 +89,7 @@ class TeacherController extends Controller
     }
 
     /**
-     *@Route("/disappoint", name="teacher_disappoint")
+     * @Route("/disappoint", name="teacher_disappoint")
      */
     public function disappoint(): Response
     {

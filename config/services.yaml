@@ -62,3 +62,7 @@ services:
             $appName: '@App\Parameter\Environment\AppName'
 
     App\Response\AttemptResponseProviderInterface: '@App\Repository\AttemptRepository'
+
+    App\Security\Annotation\IsGrantedListener:
+        arguments:
+            $argumentNameConverter: '@framework_extra_bundle.argument_name_convertor'

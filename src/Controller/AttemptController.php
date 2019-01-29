@@ -7,10 +7,12 @@ use App\Form\SettingsType;
 use App\Repository\AttemptRepository;
 use App\Repository\ExampleRepository;
 use App\Repository\ProfileRepository;
+use App\Response\AnswerAttemptResponse;
+use App\Response\AttemptResponse;
 use App\Response\AttemptResponseProviderInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -35,7 +37,7 @@ class AttemptController extends Controller
     }
 
     /**
-     *@Route("/{id}/show", name="attempt_show", requirements={"id": "\d+"})
+     * @Route("/{id}/show", name="attempt_show", requirements={"id": "\d+"})
      */
     public function show(Attempt $attempt, ExampleRepository $exampleRepository, AttemptRepository $attemptRepository): Response
     {
@@ -50,7 +52,7 @@ class AttemptController extends Controller
     }
 
     /**
-     *@Route("/{id}", name="attempt_solve", requirements={"id": "\d+"})
+     * @Route("/{id}", name="attempt_solve", requirements={"id": "\d+"})
      */
     public function solve(Attempt $attempt, AttemptResponseProviderInterface $attemptResponseProvider, NormalizerInterface $normalizer): Response
     {
@@ -61,22 +63,28 @@ class AttemptController extends Controller
             throw $this->createAccessDeniedException();
         }
 
-        $attemptResponse = $attemptResponseProvider->createAttemptResponse($attempt);
-        $attemptResponseData = $normalizer->normalize($attemptResponse);
-
         return $this->render('attempt/solve.html.twig', [
             'jsParams' => [
-                'attempt' => $attemptResponseData,
+                'solveAttemptDataUrl' => $this->generateUrl('attempt_solve_data', ['id' => $attempt->getId()]),
                 'answerAttemptUrl' => $this->generateUrl('attempt_answer', ['id' => $attempt->getId()]),
                 'showAttemptUrl' => $this->generateUrl('attempt_show', ['id' => $attempt->getId()]),
             ],
             'attempt' => $attempt,
-            'attemptResponse' => $attemptResponse,
+            'attemptResponse' => $attemptResponseProvider->createAttemptResponse($attempt),
         ]);
     }
 
     /**
-     *@Route("/last", name="attempt_last")
+     * @Route("/{id}/solve-data/", name="attempt_solve_data")
+     * @IsGranted("VIEW", subject="attempt")
+     */
+    public function solveData(Attempt $attempt, AttemptResponseProviderInterface $attemptResponseProvider): AttemptResponse
+    {
+        return$attemptResponseProvider->createAttemptResponse($attempt);
+    }
+
+    /**
+     * @Route("/last", name="attempt_last")
      */
     public function last(AttemptRepository $attemptRepository): Response
     {
@@ -88,7 +96,7 @@ class AttemptController extends Controller
     }
 
     /**
-     *@Route("/new", name="attempt_new")
+     * @Route("/new", name="attempt_new")
      */
     public function new(AttemptRepository $attemptRepository): RedirectResponse
     {
@@ -98,12 +106,14 @@ class AttemptController extends Controller
     }
 
     /**
-     *@Route("/{id}/answer", name="attempt_answer", methods="POST")
+     * @Route("/{id}/answer", name="attempt_answer", methods="POST")
      */
-    public function answer(Attempt $attempt, Request $request, ExampleRepository $exampleRepository, EntityManagerInterface $entityManager, AttemptRepository $attemptRepository): JsonResponse
+    public function answer(Attempt $attempt, Request $request, ExampleRepository $exampleRepository, EntityManagerInterface $entityManager, AttemptResponseProviderInterface $attemptResponseProvider, NormalizerInterface $normalizer): AnswerAttemptResponse
     {
-        if (!$this->isGranted('ANSWER', $attempt)) {
-            return $this->json(['finish' => true]);
+        $attemptResponse = $attemptResponseProvider->createAttemptResponse($attempt);
+
+        if ($attemptResponse->isFinished()) {
+            return new AttemptResponse(null, $attemptResponse);
         }
 
         $example = $exampleRepository->findLastUnansweredByAttempt($attempt);
@@ -111,21 +121,14 @@ class AttemptController extends Controller
         $example->setAnswer($answer);
         $entityManager->flush();
 
-        $finish = !$this->isGranted('SOLVE', $attempt);
-
-        if (!$finish) {
-            $exampleRepository->getNew($attempt);
-        }
-
-        return $this->json([
-            'isRight' => $example->isRight(),
-            'finish' => $finish,
-            'attData' => $attempt->setEntityRepository($attemptRepository)->getData(),
-        ]);
+        return new AttemptResponse(
+            $example->isRight(),
+            $attemptResponseProvider->createAttemptResponse($attempt)
+        );
     }
 
     /**
-     *@Route("/{id}/profile", name="attempt_profile")
+     * @Route("/{id}/profile", name="attempt_profile")
      */
     public function profile(Attempt $attempt, ProfileRepository $profileRepository, AttemptRepository $attemptRepository): Response
     {

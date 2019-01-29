@@ -13,7 +13,13 @@ final class AttemptResponse
     private $number;
 
     /**
-     * @var ExampleResponse
+     * @var bool
+     * @Groups({"attempt"})
+     */
+    private $isFinished;
+
+    /**
+     * @var ExampleResponse|null
      * @Groups({"attempt"})
      */
     private $example;
@@ -36,9 +42,16 @@ final class AttemptResponse
      */
     private $remainedExamplesCount;
 
-    public function __construct(int $number, ExampleResponse $example, \DateTimeInterface $limitTime, int $errorsCount, int $remainedExamplesCount)
-    {
+    public function __construct(
+        int $number,
+        bool $isFinished,
+        ?ExampleResponse $example,
+        \DateTimeInterface $limitTime,
+        int $errorsCount,
+        int $remainedExamplesCount
+    ) {
         $this->number = $number;
+        $this->isFinished = $isFinished;
         $this->example = $example;
         $this->limitTime = $limitTime;
         $this->errorsCount = $errorsCount;
@@ -50,7 +63,12 @@ final class AttemptResponse
         return $this->number;
     }
 
-    public function getExample(): ExampleResponse
+    public function isFinished(): bool
+    {
+        return $this->isFinished;
+    }
+
+    public function getExample(): ?ExampleResponse
     {
         return $this->example;
     }

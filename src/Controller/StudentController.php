@@ -3,19 +3,21 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\User\Role;
+use App\Exception\RequiresTeacherAccessException;
 use App\Repository\AttemptRepository;
 use App\Repository\ExampleRepository;
 use App\Repository\UserRepository;
+use App\Security\Annotation as AppSecurity;
 use App\Service\UserLoader;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/student")
- * @Security("is_granted('SHOW_STUDENTS')")
+ * @AppSecurity\IsGranted(Role::TEACHER, exception=RequiresTeacherAccessException::class)
  */
-class StudentController extends Controller
+final class StudentController extends Controller
 {
     use BaseTrait;
     private $currentUser;
@@ -27,7 +29,7 @@ class StudentController extends Controller
     }
 
     /**
-     *@Route("/", name="student_index")
+     * @Route("/", name="student_index")
      */
     public function index(UserRepository $userRepository)
     {
@@ -44,7 +46,7 @@ class StudentController extends Controller
     }
 
     /**
-     *@Route("/{id}/attempts", name="student_attempts")
+     * @Route("/{id}/attempts", name="student_attempts")
      */
     public function attempts(User $student, AttemptRepository $attemptRepository)
     {
@@ -57,7 +59,7 @@ class StudentController extends Controller
     }
 
     /**
-     *@Route("/{id}/examples", name="student_examples")
+     * @Route("/{id}/examples", name="student_examples")
      */
     public function examples(User $student, ExampleRepository $exampleRepository)
     {

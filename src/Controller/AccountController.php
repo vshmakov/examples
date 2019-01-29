@@ -27,7 +27,7 @@ class AccountController extends Controller
     }
 
     /**
-     *@Route("/", name="account_index", methods="GET")
+     * @Route("/", name="account_index", methods="GET")
      */
     public function index(): Response
     {
@@ -35,7 +35,7 @@ class AccountController extends Controller
     }
 
     /**
-     *@Route("/recharge", name="account_recharge")
+     * @Route("/recharge", name="account_recharge")
      */
     public function recharge(TransferRepository $transferRepository): Response
     {
@@ -45,7 +45,7 @@ class AccountController extends Controller
     }
 
     /**
-     *@Route("/pay", name="account_pay", methods="GET|POST")
+     * @Route("/pay", name="account_pay", methods="GET|POST")
      */
     public function pay(Request $request): Response
     {
@@ -72,7 +72,7 @@ class AccountController extends Controller
     }
 
     /**
-     *@Route("/edit", name="account_edit", methods="GET|POST")
+     * @Route("/edit", name="account_edit", methods="GET|POST")
      */
     public function edit(Request $request, SessionInterface $session): Response
     {

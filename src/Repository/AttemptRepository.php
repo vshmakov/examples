@@ -11,13 +11,13 @@ use App\Entity\User;
 use App\Response\AttemptResponse;
 use App\Response\AttemptResponseProviderInterface;
 use App\Response\ExampleResponse;
-use App\Service\AuthChecker;
 use App\Service\ExampleManager;
 use App\Service\UserLoader;
 use App\Utils\Cache\LocalCache;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class AttemptRepository extends ServiceEntityRepository implements AttemptResponseProviderInterface
 {
@@ -26,17 +26,27 @@ class AttemptRepository extends ServiceEntityRepository implements AttemptRespon
     private $userLoader;
     private $sessionRepository;
     private $userRepository;
-    private $authChecker;
+
+    /** @var AuthorizationCheckerInterface */
+    private $authorizationChecker;
     private $localCache;
 
-    public function __construct(RegistryInterface $registry, ExampleRepository $exampleRepository, UserLoader $userLoader, SessionRepository $sessionRepository, UserRepository $userRepository, AuthChecker $authChecker, LocalCache $localCache)
-    {
+    public function __construct(
+        RegistryInterface $registry,
+        ExampleRepository $exampleRepository,
+        UserLoader $userLoader,
+        SessionRepository $sessionRepository,
+        UserRepository $userRepository,
+        AuthorizationCheckerInterface $authorizationChecker,
+        LocalCache $localCache
+    ) {
         parent::__construct($registry, Attempt::class);
+
         $this->exampleRepository = $exampleRepository;
         $this->userLoader = $userLoader;
         $this->sessionRepository = $sessionRepository;
         $this->userRepository = $userRepository;
-        $this->authChecker = $authChecker;
+        $this->authorizationChecker = $authorizationChecker;
         $this->localCache = $localCache;
     }
 
@@ -44,7 +54,8 @@ class AttemptRepository extends ServiceEntityRepository implements AttemptRespon
     {
         $attempt = $this->findLastByCurrentUser();
 
-        return $this->authChecker->isGranted('SOLVE', $attempt) ? $attempt : null;
+        /* @deprecated */
+        return $this->authorizationChecker->isGranted('SOLVE', $attempt) ? $attempt : null;
     }
 
     public function findLastByCurrentUser(): ?Attempt
@@ -369,13 +380,21 @@ where s.user = :user and a.task = :task')
     {
         /** @var ExampleRepository $exampleRepository */
         $exampleRepository = $this->getEntityRepository(Example::class);
-        $example = $exampleRepository->findLastUnansweredByAttemptOrGetNew($attempt);
-        $exampleNumber = $exampleRepository->getNumber($example);
-        $exampleResponse = new ExampleResponse($example, $exampleNumber);
+
+        /** @deprecated */
+        $isFinished = $this->authorizationChecker->isGranted('SOLVE', $attempt);
+
+        if (!$isFinished) {
+            $example = $exampleRepository->findLastUnansweredByAttemptOrGetNew($attempt);
+            $exampleNumber = $exampleRepository->getNumber($example);
+            $exampleResponse = new ExampleResponse($example, $exampleNumber);
+        }
 
         return new AttemptResponse(
             $this->getNumber($attempt),
-            $exampleResponse, $attempt->getLimitTime(),
+            $isFinished,
+            !$isFinished ? $exampleResponse : null,
+            $attempt->getLimitTime(),
             $this->getErrorsCount($attempt),
             $this->getRemainedExamplesCount($attempt)
         );

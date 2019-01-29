@@ -8,6 +8,8 @@ use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\GroupableInterface;
 use FOS\UserBundle\Model\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\EquatableInterface;
+use Symfony\Component\Security\Core\User\UserInterface as SymfonyUserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -15,7 +17,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @UniqueEntity(fields="username", message="Логин занят")
  * @UniqueEntity(fields="email", message="Данный адрес электронной почты уже зарегистрирован")
  */
-class User implements UserInterface, GroupableInterface
+class User implements UserInterface, GroupableInterface, EquatableInterface
 {
     use BaseTrait, BaseUserTrait;
 
@@ -549,7 +551,7 @@ class User implements UserInterface, GroupableInterface
         return $this;
     }
 
-    public function isTeacher(): ?bool
+    public function isTeacher(): bool
     {
         return (bool) $this->isTeacher;
     }
@@ -791,5 +793,13 @@ class User implements UserInterface, GroupableInterface
         }
 
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEqualTo(SymfonyUserInterface $user)
+    {
+        return $user->getRoles() === $this->getRoles();
     }
 }

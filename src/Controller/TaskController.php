@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Task;
 use App\Entity\User;
+use App\Entity\User\Role;
+use App\Exception\RequiresTeacherAccessException;
 use App\Form\TaskType;
 use App\Repository\AttemptRepository;
 use App\Repository\ExampleRepository;
@@ -11,6 +13,7 @@ use App\Repository\ProfileRepository;
 use App\Repository\SettingsRepository;
 use App\Repository\TaskRepository;
 use App\Repository\UserRepository;
+use App\Security\Annotation as AppSecurity;
 use App\Service\UserLoader;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,16 +25,15 @@ use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/task")
+ * @AppSecurity\IsGranted(Role::TEACHER, exception=RequiresTeacherAccessException::class)
  */
-class TaskController extends AbstractController
+final class TaskController extends AbstractController
 {
     /**
      * @Route("/", name="task_index", methods="GET")
      */
     public function index(TaskRepository $taskRepository): Response
     {
-        $this->denyAccessUnlessGranted('SHOW_TASKS');
-
         $tasks = array_reduce(
             $taskRepository->findByCurrentAuthor(),
             function (array $data, Task $task) use ($taskRepository): array {
@@ -44,8 +46,8 @@ class TaskController extends AbstractController
         );
 
         return $this->render('task/index.html.twig', [
-            'taskRepository' => $taskRepository,
-        ]
+                'taskRepository' => $taskRepository,
+            ]
             + $tasks);
     }
 
@@ -104,7 +106,7 @@ class TaskController extends AbstractController
         ]);
     }
 
-    private function processForm(Form $form, Request $request, ProfileRepository $profileRepository, SettingsRepository $settingsRepository): ? RedirectResponse
+    private function processForm(Form $form, Request $request, ProfileRepository $profileRepository, SettingsRepository $settingsRepository): ?RedirectResponse
     {
         $task = $form->getData();
         $profile = $profileRepository->find($request->request->get('profile_id', ''));

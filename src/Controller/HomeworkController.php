@@ -3,15 +3,18 @@
 namespace App\Controller;
 
 use App\Entity\Task;
+use App\Exception\RequiresStudentAccessException;
 use App\Repository\AttemptRepository;
 use App\Repository\ExampleRepository;
 use App\Repository\TaskRepository;
+use App\Security\Annotation as AppSecurity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/homework")
+ * @AppSecurity\IsGranted("ROLE_STUDENT", exception=RequiresStudentAccessException::class)
  */
 class HomeworkController extends AbstractController
 {

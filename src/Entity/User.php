@@ -11,7 +11,6 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\EquatableInterface;
 use Symfony\Component\Security\Core\User\UserInterface as SymfonyUserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
-use App\Entity\User\Role;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
@@ -457,7 +456,7 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
         $fn = $this->getFirstName();
         $ln = $this->getLastName();
 
-        return $fn . $ln ? $fn . ' ' . $ln : null;
+        return $fn.$ln ? $fn.' '.$ln : null;
     }
 
     public function getFFName()
@@ -483,7 +482,7 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
 
     public function hasStudents(): bool
     {
-        return (bool)$this->getStudents()->count();
+        return (bool) $this->getStudents()->count();
     }
 
     public function existsName()
@@ -554,7 +553,7 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
 
     public function isTeacher(): bool
     {
-        return (bool)$this->isTeacher;
+        return (bool) $this->isTeacher;
     }
 
     public function setIsTeacher(? bool $isTeacher): self
@@ -609,7 +608,7 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
 
     public function hasTeacher()
     {
-        return (bool)$this->teacher;
+        return (bool) $this->teacher;
     }
 
     public function isUserTeacher(self $teacher)
@@ -619,7 +618,7 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
 
     public function fio()
     {
-        return $this->lastName . ' ' . $this->firstName . ' ' . $this->fatherName;
+        return $this->lastName.' '.$this->firstName.' '.$this->fatherName;
     }
 
     public function getAttempts()
@@ -734,7 +733,7 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
 
     public function hasParent(): bool
     {
-        return (bool)$this->parent;
+        return (bool) $this->parent;
     }
 
     /**

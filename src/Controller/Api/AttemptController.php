@@ -3,24 +3,18 @@
 namespace App\Controller\Api;
 
 use App\Entity\Attempt;
-use App\Form\SettingsType;
-use App\Repository\AttemptRepository;
 use App\Repository\ExampleRepository;
-use App\Repository\ProfileRepository;
-use App\Response\AnswerAttemptResponse;
 use App\Response\AttemptResponse;
 use App\Response\AttemptResponseProviderInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
- * Class AttemptController
+ * Class AttemptController.
+ *
  * @Route("/api/attempt")
  */
 final class AttemptController
@@ -37,7 +31,7 @@ final class AttemptController
         }
 
         $example = $exampleRepository->findLastUnansweredByAttempt($attempt);
-        $answer = (float)$request->request->get('answer');
+        $answer = (float) $request->request->get('answer');
         $example->setAnswer($answer);
         $entityManager->flush();
 

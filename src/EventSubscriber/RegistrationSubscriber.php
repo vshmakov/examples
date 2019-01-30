@@ -5,10 +5,10 @@ namespace App\EventSubscriber;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use App\Entity\User\Role;
+
 final class RegistrationSubscriber implements EventSubscriberInterface
 {
-    /** @var EntityManagerInterface  */
+    /** @var EntityManagerInterface */
     private $entityManager;
 
     public function __construct(EntityManagerInterface $entityManager)
@@ -20,7 +20,7 @@ final class RegistrationSubscriber implements EventSubscriberInterface
     {
         $user = $event->getUser();
         $user->addRole();
-                $this->entityManager->flush();
+        $this->entityManager->flush();
     }
 
     public static function getSubscribedEvents()

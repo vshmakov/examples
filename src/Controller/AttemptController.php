@@ -7,18 +7,13 @@ use App\Form\SettingsType;
 use App\Repository\AttemptRepository;
 use App\Repository\ExampleRepository;
 use App\Repository\ProfileRepository;
-use App\Response\AnswerAttemptResponse;
-use App\Response\AttemptResponse;
 use App\Response\AttemptResponseProviderInterface;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Security\Voter\AttemptVoter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use App\Security\Voter\AttemptVoter;
 
 /**
  * @Route("/attempt")
@@ -74,14 +69,13 @@ final class AttemptController extends Controller
         ]);
     }
 
-
     /**
      * @Route("/{id}/profile", name="attempt_profile")
      * @IsGranted(AttemptVoter::VIEW, subject="attempt")
      */
-    public    function profile(Attempt $attempt, ProfileRepository $profileRepository, AttemptRepository $attemptRepository): Response
+    public function profile(Attempt $attempt, ProfileRepository $profileRepository, AttemptRepository $attemptRepository): Response
     {
-                $profile = $attempt->getSettings()->setEntityRepository($profileRepository);
+        $profile = $attempt->getSettings()->setEntityRepository($profileRepository);
 
         return $this->render('attempt/profile.html.twig', [
             'jsParams' => [
@@ -93,11 +87,10 @@ final class AttemptController extends Controller
         ]);
     }
 
-
     /**
      * @Route("/last", name="attempt_last")
      */
-    public    function last(AttemptRepository $attemptRepository): Response
+    public function last(AttemptRepository $attemptRepository): Response
     {
         if ($attempt = $attemptRepository->findLastActualByCurrentUser()) {
             return $this->redirectToRoute('attempt_solve', ['id' => $attempt->getId()]);
@@ -109,7 +102,7 @@ final class AttemptController extends Controller
     /**
      * @Route("/new", name="attempt_new")
      */
-    public    function new(AttemptRepository $attemptRepository): RedirectResponse
+    public function new(AttemptRepository $attemptRepository): RedirectResponse
     {
         return $this->redirectToRoute('attempt_solve', [
             'id' => $attemptRepository->getNewByCurrentUser()->getId(),

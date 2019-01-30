@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use FOS\UserBundle\Model\GroupInterface;
+use App\Entity\User\Role;
 
 trait BaseUserTrait
 {
@@ -101,7 +102,7 @@ trait BaseUserTrait
      */
     public function __toString()
     {
-        return (string) $this->getUsername();
+        return (string)$this->getUsername();
     }
 
     /**
@@ -113,6 +114,14 @@ trait BaseUserTrait
 
         if ($role === static::ROLE_DEFAULT) {
             return $this;
+        }
+
+        if ($role === Role::STUDENT) {
+            $this->removeRole(Role::TEACHER);
+        }
+
+        if ($role === Role::TEACHER) {
+            $this->removeRole(Role::STUDENT);
         }
 
         if (!\in_array($role, $this->roles, true)) {
@@ -272,6 +281,10 @@ trait BaseUserTrait
         // we need to make sure to have at least one role
         $roles[] = static::ROLE_DEFAULT;
 
+        if (false === array_search(Role::TEACHER, $roles)) {
+            $roles[] = Role::STUDENT;
+        }
+
         return array_unique($roles);
     }
 
@@ -388,7 +401,7 @@ trait BaseUserTrait
      */
     public function setEnabled($boolean)
     {
-        $this->enabled = (bool) $boolean;
+        $this->enabled = (bool)$boolean;
 
         return $this;
     }

@@ -11,8 +11,10 @@ use App\Service\UserLoader;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
-class AttemptVoter extends Voter
+final class AttemptVoter extends Voter
 {
+    public const VIEW = 'VIEW';
+
     use BaseTrait;
     private $userLoader;
     private $sessionRepository;

@@ -18,11 +18,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use App\Security\Voter\AttemptVoter;
 
 /**
  * @Route("/attempt")
  */
-class AttemptController extends Controller
+final class AttemptController extends Controller
 {
     use BaseTrait;
 
@@ -38,11 +39,10 @@ class AttemptController extends Controller
 
     /**
      * @Route("/{id}/show", name="attempt_show", requirements={"id": "\d+"})
+     * @IsGranted(AttemptVoter::VIEW, subject="attempt")
      */
     public function show(Attempt $attempt, ExampleRepository $exampleRepository, AttemptRepository $attemptRepository): Response
     {
-        $this->denyAccessUnlessGranted('VIEW', $attempt);
-
         return $this->render('attempt/show.html.twig', [
             'attemptRepository' => $attemptRepository,
             'att' => $attempt->setEntityRepository($attemptRepository),
@@ -53,40 +53,51 @@ class AttemptController extends Controller
 
     /**
      * @Route("/{id}", name="attempt_solve", requirements={"id": "\d+"})
+     * @IsGranted(AttemptVoter::VIEW, subject="attempt")
      */
-    public function solve(Attempt $attempt, AttemptResponseProviderInterface $attemptResponseProvider, NormalizerInterface $normalizer): Response
+    public function solve(Attempt $attempt, AttemptResponseProviderInterface $attemptResponseProvider): Response
     {
-        if (!$this->isGranted('SOLVE', $attempt)) {
-            if ($this->isGranted('VIEW', $attempt)) {
-                return $this->redirectToRoute('attempt_show', ['id' => $attempt->getId()]);
-            }
-            throw $this->createAccessDeniedException();
+        $attemptResponse = $attemptResponseProvider->createAttemptResponse($attempt);
+
+        if ($attemptResponse->isFinished()) {
+            return $this->redirectToRoute('attempt_show', ['id' => $attempt->getId()]);
         }
 
         return $this->render('attempt/solve.html.twig', [
             'jsParams' => [
-                'solveAttemptDataUrl' => $this->generateUrl('attempt_solve_data', ['id' => $attempt->getId()]),
-                'answerAttemptUrl' => $this->generateUrl('attempt_answer', ['id' => $attempt->getId()]),
+                'solveAttemptDataUrl' => $this->generateUrl('api_attempt_solve_data', ['id' => $attempt->getId()]),
+                'answerAttemptUrl' => $this->generateUrl('api_attempt_answer', ['id' => $attempt->getId()]),
                 'showAttemptUrl' => $this->generateUrl('attempt_show', ['id' => $attempt->getId()]),
             ],
             'attempt' => $attempt,
-            'attemptResponse' => $attemptResponseProvider->createAttemptResponse($attempt),
+            'attemptResponse' => $attemptResponse,
         ]);
     }
 
+
     /**
-     * @Route("/{id}/solve-data/", name="attempt_solve_data")
-     * @IsGranted("VIEW", subject="attempt")
+     * @Route("/{id}/profile", name="attempt_profile")
+     * @IsGranted(AttemptVoter::VIEW, subject="attempt")
      */
-    public function solveData(Attempt $attempt, AttemptResponseProviderInterface $attemptResponseProvider): AttemptResponse
+    public    function profile(Attempt $attempt, ProfileRepository $profileRepository, AttemptRepository $attemptRepository): Response
     {
-        return$attemptResponseProvider->createAttemptResponse($attempt);
+                $profile = $attempt->getSettings()->setEntityRepository($profileRepository);
+
+        return $this->render('attempt/profile.html.twig', [
+            'jsParams' => [
+                'canEdit' => false,
+            ],
+            'profile' => $profile,
+            'form' => $this->createForm(SettingsType::class, $profile)->createView(),
+            'att' => $attempt->setEntityRepository($attemptRepository),
+        ]);
     }
+
 
     /**
      * @Route("/last", name="attempt_last")
      */
-    public function last(AttemptRepository $attemptRepository): Response
+    public    function last(AttemptRepository $attemptRepository): Response
     {
         if ($attempt = $attemptRepository->findLastActualByCurrentUser()) {
             return $this->redirectToRoute('attempt_solve', ['id' => $attempt->getId()]);
@@ -98,50 +109,10 @@ class AttemptController extends Controller
     /**
      * @Route("/new", name="attempt_new")
      */
-    public function new(AttemptRepository $attemptRepository): RedirectResponse
+    public    function new(AttemptRepository $attemptRepository): RedirectResponse
     {
         return $this->redirectToRoute('attempt_solve', [
             'id' => $attemptRepository->getNewByCurrentUser()->getId(),
-        ]);
-    }
-
-    /**
-     * @Route("/{id}/answer", name="attempt_answer", methods="POST")
-     */
-    public function answer(Attempt $attempt, Request $request, ExampleRepository $exampleRepository, EntityManagerInterface $entityManager, AttemptResponseProviderInterface $attemptResponseProvider, NormalizerInterface $normalizer): AnswerAttemptResponse
-    {
-        $attemptResponse = $attemptResponseProvider->createAttemptResponse($attempt);
-
-        if ($attemptResponse->isFinished()) {
-            return new AttemptResponse(null, $attemptResponse);
-        }
-
-        $example = $exampleRepository->findLastUnansweredByAttempt($attempt);
-        $answer = (float) $request->request->get('answer');
-        $example->setAnswer($answer);
-        $entityManager->flush();
-
-        return new AttemptResponse(
-            $example->isRight(),
-            $attemptResponseProvider->createAttemptResponse($attempt)
-        );
-    }
-
-    /**
-     * @Route("/{id}/profile", name="attempt_profile")
-     */
-    public function profile(Attempt $attempt, ProfileRepository $profileRepository, AttemptRepository $attemptRepository): Response
-    {
-        $this->denyAccessUnlessGranted('VIEW', $attempt);
-        $profile = $attempt->getSettings()->setEntityRepository($profileRepository);
-
-        return $this->render('attempt/profile.html.twig', [
-            'jsParams' => [
-                'canEdit' => false,
-            ],
-            'profile' => $profile,
-            'form' => $this->createForm(SettingsType::class, $profile)->createView(),
-            'att' => $attempt->setEntityRepository($attemptRepository),
         ]);
     }
 }

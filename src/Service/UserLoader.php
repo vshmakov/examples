@@ -53,7 +53,9 @@ final class UserLoader implements CurrentUserProviderInterface
     private function getUserFromToken(): ?User
     {
         if ($token = $this->tokenStorage->getToken()) {
-            return $token->getUser();
+            $user = $token->getUser();
+
+            return $user instanceof User ? $user : null;
         }
 
         return null;

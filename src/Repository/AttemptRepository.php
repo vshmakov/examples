@@ -382,7 +382,7 @@ where s.user = :user and a.task = :task')
         $exampleRepository = $this->getEntityRepository(Example::class);
 
         /** @deprecated */
-        $isFinished = $this->authorizationChecker->isGranted('SOLVE', $attempt);
+        $isFinished = !$this->authorizationChecker->isGranted('SOLVE', $attempt);
 
         if (!$isFinished) {
             $example = $exampleRepository->findLastUnansweredByAttemptOrGetNew($attempt);

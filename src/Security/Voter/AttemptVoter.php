@@ -43,22 +43,18 @@ final class AttemptVoter extends Voter
 
     private function canSolve()
     {
+        /** @var Attempt $attempt */
         $attempt = $this->subject;
 
-        if (!$this->canView()) {
-            return false;
-        }
+        return $this->canView()
+            && $this->isCurrentSessionAttempt($attempt)
+            && $attempt->getRemainedExamplesCount() > 0
+            && $attempt->getRemainedTime()->getTimestamp() > 0;
+    }
 
-        $userLoader = $this->userLoader;
-        $user = $userLoader->getUser();
-
-        if (($userLoader->isGuest() && $attempt->getSession() !== $this->sessionRepository->findOneByCurrentUser())
-            or (0 === $attempt->getRemainedExamplesCount())
-            or (0 === $attempt->getRemainedTime()->getTimestamp())) {
-            return false;
-        }
-
-        return true;
+    private function isCurrentSessionAttempt(Attempt $attempt): bool
+    {
+        return !$this->userLoader->isGuest() or $attempt->getSession() === $this->sessionRepository->findOneByCurrentUser();
     }
 
     private function canAnswer()

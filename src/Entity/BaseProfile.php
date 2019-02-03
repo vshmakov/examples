@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Serializer\Group;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -24,7 +25,7 @@ abstract class BaseProfile
 
     /**
      * @ORM\Column(type="smallint")
-     * @Groups({"settings"})
+     * @Groups({Group::SETTINGS})
      */
     protected $examplesCount = 5;
 
@@ -40,7 +41,7 @@ abstract class BaseProfile
      * @var int
      *
      * @ORM\Column(type="integer")
-     * @Groups({"settings"})
+     * @Groups({Group::SETTINGS})
      */
     protected $addFMax = 3;
 
@@ -48,7 +49,7 @@ abstract class BaseProfile
      * @var int
      *
      * @ORM\Column(type="integer")
-     * @Groups({"settings"})
+     * @Groups({Group::SETTINGS})
      */
     protected $addSMin = 0;
 
@@ -56,7 +57,7 @@ abstract class BaseProfile
      * @var int
      *
      * @ORM\Column(type="integer")
-     * @Groups({"settings"})
+     * @Groups({Group::SETTINGS})
      */
     protected $addSMax = 3;
 
@@ -64,7 +65,7 @@ abstract class BaseProfile
      * @var int
      *
      * @ORM\Column(type="integer")
-     * @Groups({"settings"})
+     * @Groups({Group::SETTINGS})
      */
     protected $addMin = -1;
 
@@ -72,7 +73,7 @@ abstract class BaseProfile
      * @var int
      *
      * @ORM\Column(type="integer")
-     * @Groups({"settings"})
+     * @Groups({Group::SETTINGS})
      */
     protected $addMax = -1;
 
@@ -80,7 +81,7 @@ abstract class BaseProfile
      * @var int
      *
      * @ORM\Column(type="integer")
-     * @Groups({"settings"})
+     * @Groups({Group::SETTINGS})
      */
     protected $subFMin = 0;
 
@@ -88,7 +89,7 @@ abstract class BaseProfile
      * @var int
      *
      * @ORM\Column(type="integer")
-     * @Groups({"settings"})
+     * @Groups({Group::SETTINGS})
      */
     protected $subFMax = 5;
 
@@ -96,7 +97,7 @@ abstract class BaseProfile
      * @var int
      *
      * @ORM\Column(type="integer")
-     * @Groups({"settings"})
+     * @Groups({Group::SETTINGS})
      */
     protected $subSMin = 0;
 
@@ -104,7 +105,7 @@ abstract class BaseProfile
      * @var int
      *
      * @ORM\Column(type="integer")
-     * @Groups({"settings"})
+     * @Groups({Group::SETTINGS})
      */
     protected $subSMax = 5;
 
@@ -112,7 +113,7 @@ abstract class BaseProfile
      * @var int
      *
      * @ORM\Column(type="integer")
-     * @Groups({"settings"})
+     * @Groups({Group::SETTINGS})
      */
     protected $subMin = 0;
 
@@ -120,7 +121,7 @@ abstract class BaseProfile
      * @var int
      *
      * @ORM\Column(type="integer")
-     * @Groups({"settings"})
+     * @Groups({Group::SETTINGS})
      */
     protected $subMax = 1000;
 
@@ -128,7 +129,7 @@ abstract class BaseProfile
      * @var int
      *
      * @ORM\Column(type="integer")
-     * @Groups({"settings"})
+     * @Groups({Group::SETTINGS})
      */
     protected $multFMin = 0;
 
@@ -136,7 +137,7 @@ abstract class BaseProfile
      * @var int
      *
      * @ORM\Column(type="integer")
-     * @Groups({"settings"})
+     * @Groups({Group::SETTINGS})
      */
     protected $multFMax = 3;
 
@@ -144,7 +145,7 @@ abstract class BaseProfile
      * @var int
      *
      * @ORM\Column(type="integer")
-     * @Groups({"settings"})
+     * @Groups({Group::SETTINGS})
      */
     protected $multSMin = 0;
 
@@ -152,7 +153,7 @@ abstract class BaseProfile
      * @var int
      *
      * @ORM\Column(type="integer")
-     * @Groups({"settings"})
+     * @Groups({Group::SETTINGS})
      */
     protected $multSMax = 3;
 
@@ -160,7 +161,7 @@ abstract class BaseProfile
      * @var int
      *
      * @ORM\Column(type="integer")
-     * @Groups({"settings"})
+     * @Groups({Group::SETTINGS})
      */
     protected $multMin = -1;
 
@@ -168,7 +169,7 @@ abstract class BaseProfile
      * @var int
      *
      * @ORM\Column(type="integer")
-     * @Groups({"settings"})
+     * @Groups({Group::SETTINGS})
      */
     protected $multMax = -1;
 
@@ -176,7 +177,7 @@ abstract class BaseProfile
      * @var int
      *
      * @ORM\Column(type="integer")
-     * @Groups({"settings"})
+     * @Groups({Group::SETTINGS})
      */
     protected $divFMin = 0;
 
@@ -184,7 +185,7 @@ abstract class BaseProfile
      * @var int
      *
      * @ORM\Column(type="integer")
-     * @Groups({"settings"})
+     * @Groups({Group::SETTINGS})
      */
     protected $divFMax = 6;
 
@@ -192,7 +193,7 @@ abstract class BaseProfile
      * @var int
      *
      * @ORM\Column(type="integer")
-     * @Groups({"settings"})
+     * @Groups({Group::SETTINGS})
      */
     protected $divSMin = 1;
 
@@ -200,7 +201,7 @@ abstract class BaseProfile
      * @var int
      *
      * @ORM\Column(type="integer")
-     * @Groups({"settings"})
+     * @Groups({Group::SETTINGS})
      */
     protected $divSMax = 6;
 
@@ -208,7 +209,7 @@ abstract class BaseProfile
      * @var int
      *
      * @ORM\Column(type="integer")
-     * @Groups({"settings"})
+     * @Groups({Group::SETTINGS})
      */
     protected $divMin = -1;
 
@@ -216,7 +217,7 @@ abstract class BaseProfile
      * @var int
      *
      * @ORM\Column(type="integer")
-     * @Groups({"settings"})
+     * @Groups({Group::SETTINGS})
      */
     protected $divMax = -1;
 
@@ -224,7 +225,7 @@ abstract class BaseProfile
      * @var int
      *
      * @ORM\Column(type="smallint")
-     * @Groups({"settings"})
+     * @Groups({Group::SETTINGS})
      */
     protected $addPerc = 25;
 
@@ -232,7 +233,7 @@ abstract class BaseProfile
      * @var int
      *
      * @ORM\Column(type="smallint")
-     * @Groups({"settings"})
+     * @Groups({Group::SETTINGS})
      */
     protected $subPerc = 25;
 
@@ -240,7 +241,7 @@ abstract class BaseProfile
      * @var int
      *
      * @ORM\Column(type="smallint")
-     * @Groups({"settings"})
+     * @Groups({Group::SETTINGS})
      */
     protected $multPerc = 25;
 
@@ -248,7 +249,7 @@ abstract class BaseProfile
      * @var int
      *
      * @ORM\Column(type="smallint")
-     * @Groups({"settings"})
+     * @Groups({Group::SETTINGS})
      */
     protected $divPerc = 25;
 

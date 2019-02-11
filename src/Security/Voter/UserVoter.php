@@ -32,7 +32,7 @@ class UserVoter extends Voter
 
     private function isAccountPaid()
     {
-        return !$this->userLoader->isGuest();
+        return !$this->userLoader->isCurrentUserGuest();
     }
 
     private function hasPrivAppointProfiles()

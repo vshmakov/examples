@@ -2,12 +2,17 @@
 
 namespace App\Service;
 
+use App\DataFixtures\UserFixtures;
 use App\Entity\User;
 use App\Repository\UserRepository;
-use App\Security\CurrentUserProviderInterface;
+use App\Security\User\CurrentUserProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+/**
+ * @deprecated
+ * @see \App\Security\User\CurrentUserProviderInterface
+ */
 final class UserLoader implements CurrentUserProviderInterface
 {
     private $user;
@@ -21,16 +26,12 @@ final class UserLoader implements CurrentUserProviderInterface
         $this->user = $this->getUserFromToken();
     }
 
-    /**
-     * @deprecated
-     * use \App\Security\CurrentUserProviderInterface::getCurrentUserOrGuest instead
-     */
     public function getUser(): User
     {
         return $this->getCurrentUserOrGuest();
     }
 
-    public function isGuest(): bool
+    public function isCurrentUserGuest(): bool
     {
         return !($this->user instanceof UserInterface);
     }
@@ -42,7 +43,7 @@ final class UserLoader implements CurrentUserProviderInterface
 
     public function getCurrentUserOrGuest(): User
     {
-        return !$this->isGuest() ? $this->user : $this->getGuest();
+        return !$this->isCurrentUserGuest() ? $this->user : $this->getGuest();
     }
 
     public function isCurrentUser(User $user): bool
@@ -59,5 +60,15 @@ final class UserLoader implements CurrentUserProviderInterface
         }
 
         return null;
+    }
+
+    /**
+     * @param User $user
+     *
+     * @return bool
+     */
+    public function isGuest(User $user): bool
+    {
+        return UserFixtures::GUEST_USERNAME === $user->getUsername();
     }
 }

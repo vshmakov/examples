@@ -2,12 +2,16 @@
 
 namespace App\Service;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
-class SessionMarker
+final class SessionMarker
 {
+    /** @var SessionInterface */
     private $session;
+
+    /** @var Request|null */
     private $request;
 
     public function __construct(SessionInterface $session, RequestStack $requestStack)
@@ -16,8 +20,12 @@ class SessionMarker
         $this->request = $requestStack->getMasterRequest();
     }
 
-    public function getKey()
+    public function getKey(): string
     {
+        if (null === $this->request) {
+            return '';
+        }
+
         $value = $this->request ? $this->request->getClientIp() : '';
         $session = $this->session;
         $key = 'VISIT_KEY';
@@ -26,8 +34,6 @@ class SessionMarker
             $session->set($key, $value);
         }
 
-        $sid = $session->get($key);
-
-        return $sid;
+        return $session->get($key);
     }
 }

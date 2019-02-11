@@ -5,30 +5,44 @@ namespace App\Security\Voter;
 use App\Entity\Attempt;
 use App\Repository\AttemptRepository;
 use App\Repository\ExampleRepository;
-use App\Repository\SessionRepository;
+use App\Security\User\CurrentUserProviderInterface;
+use App\Security\User\CurrentUserSessionProviderInterface;
 use App\Service\AuthChecker;
 use App\Service\UserLoader;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+use Webmozart\Assert\Assert;
 
 final class AttemptVoter extends Voter
 {
     public const VIEW = 'VIEW';
-
     use BaseTrait;
+
     private $userLoader;
-    private $sessionRepository;
     private $attemptRepository;
     private $exampleRepository;
     private $authChecker;
 
-    public function __construct(UserLoader $userLoader, SessionRepository $sessionRepository, AttemptRepository $attemptRepository, ExampleRepository $exampleRepository, AuthChecker $authChecker)
-    {
+    /** @var CurrentUserProviderInterface */
+    private $currentUserProvider;
+
+    /** @var CurrentUserSessionProviderInterface */
+    private $currentUserSessionProvider;
+
+    public function __construct(
+        UserLoader $userLoader,
+        AttemptRepository $attemptRepository,
+        ExampleRepository $exampleRepository,
+        AuthChecker $authChecker,
+        CurrentUserProviderInterface $currentUserProvider,
+        CurrentUserSessionProviderInterface $currentUserSessionProvider
+    ) {
         $this->userLoader = $userLoader;
-        $this->sessionRepository = $sessionRepository;
         $this->attemptRepository = $attemptRepository;
         $this->exampleRepository = $exampleRepository;
         $this->authChecker = $authChecker;
+        $this->currentUserProvider = $currentUserProvider;
+        $this->currentUserSessionProvider = $currentUserSessionProvider;
     }
 
     protected function supports($attribute, $subject)
@@ -54,7 +68,14 @@ final class AttemptVoter extends Voter
 
     private function isCurrentSessionAttempt(Attempt $attempt): bool
     {
-        return !$this->userLoader->isGuest() or $attempt->getSession() === $this->sessionRepository->findOneByCurrentUser();
+        if (!$this->currentUserProvider->isCurrentUserGuest()) {
+            return true;
+        }
+
+        $session = $attempt->getSession();
+        Assert::notNull($session);
+
+        return $this->currentUserSessionProvider->isCurrentUserSession($session);
     }
 
     private function canAnswer()

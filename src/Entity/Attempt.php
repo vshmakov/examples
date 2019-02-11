@@ -89,7 +89,7 @@ class Attempt
         return $this;
     }
 
-    public function getAddTime(): ? \DateTimeInterface
+    public function getAddTime(): ?\DateTimeInterface
     {
         return $this->dt($this->addTime);
     }
@@ -101,7 +101,7 @@ class Attempt
         return $this;
     }
 
-    public function getSession(): ? Session
+    public function getSession(): ?Session
     {
         return $this->session;
     }
@@ -118,7 +118,7 @@ class Attempt
         return $this->getSettings()->getExamplesCount();
     }
 
-    public function getLimitTime()
+    public function getLimitTime(): \DateTimeInterface
     {
         return $this->dts($this->getAddTime()->getTimestamp() + $this->getSettings()->getDuration());
     }

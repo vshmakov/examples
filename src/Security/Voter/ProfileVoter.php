@@ -45,7 +45,7 @@ class ProfileVoter extends Voter
 
     private function canCreate(): bool
     {
-        return !$this->userLoader->isGuest();
+        return !$this->userLoader->isCurrentUserGuest();
     }
 
     private function canView(): bool

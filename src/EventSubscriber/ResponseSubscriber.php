@@ -5,7 +5,7 @@ namespace App\EventSubscriber;
 use App\Entity\Session;
 use App\Entity\Visit;
 use App\Repository\IpRepository;
-use App\Repository\SessionRepository;
+use App\Security\User\CurrentUserSessionProviderInterface;
 use App\Service\UserLoader;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -18,9 +18,6 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 final class ResponseSubscriber implements EventSubscriberInterface
 {
-    /** @var SessionRepository */
-    private $sessionRepository;
-
     /** @var Request|null */
     private $request;
 
@@ -39,8 +36,11 @@ final class ResponseSubscriber implements EventSubscriberInterface
     /** @var EntityManagerInterface */
     private $entityManager;
 
+    /** @var CurrentUserSessionProviderInterface */
+    private $currentUserSessionProvider;
+
     public function __construct(
-        SessionRepository $sessionRepository,
+        CurrentUserSessionProviderInterface $currentUserSessionProvider,
         RequestStack $requestStack,
         UserLoader $userLoader,
         IpRepository $ipRepository,
@@ -49,7 +49,7 @@ final class ResponseSubscriber implements EventSubscriberInterface
         EntityManagerInterface $entityManager
     ) {
         $this->session = $session;
-        $this->sessionRepository = $sessionRepository;
+        $this->currentUserSessionProvider = $currentUserSessionProvider;
         $this->ipRepository = $ipRepository;
         $this->request = $requestStack->getMasterRequest();
         $this->userLoader = $userLoader;
@@ -59,7 +59,7 @@ final class ResponseSubscriber implements EventSubscriberInterface
 
     public function onKernelResponse(FilterResponseEvent $event): void
     {
-        $currentUserSession = $this->sessionRepository->findOneByCurrentUser();
+        $currentUserSession = $this->currentUserSessionProvider->getCurrentUserSession();
         $missResponseEvent = $this->session->getFlashBag()->get('missResponseEvent', []);
 
         if (!$this->request or $missResponseEvent or null === $currentUserSession) {
@@ -110,7 +110,7 @@ final class ResponseSubscriber implements EventSubscriberInterface
         if ($ip) {
             $session->setIp($ip);
 
-            if (!$this->userLoader->isGuest()) {
+            if (!$this->userLoader->isCurrentUserGuest()) {
                 $user->addIp($ip);
             }
         }

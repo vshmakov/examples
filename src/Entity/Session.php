@@ -31,7 +31,7 @@ class Session
     private $lastTime;
 
     /**
-     * @ORM\Column(type="string", length=32)
+     * @ORM\Column(type="string", length=32, nullable=true)
      */
     private $sid;
 
@@ -98,7 +98,7 @@ class Session
         return $this->sid;
     }
 
-    public function setSid(string $sid): self
+    public function setSid(?string $sid): self
     {
         $this->sid = $sid;
 

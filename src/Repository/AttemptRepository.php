@@ -4,13 +4,14 @@ namespace App\Repository;
 
 use App\Entity\Attempt;
 use App\Entity\Example;
-use App\Entity\Session;
 use App\Entity\Settings;
 use App\Entity\Task;
 use App\Entity\User;
+use App\Object\ObjectAccessor;
 use App\Response\AttemptResponse;
 use App\Response\AttemptResponseProviderInterface;
 use App\Response\ExampleResponse;
+use App\Security\User\CurrentUserSessionProviderInterface;
 use App\Service\ExampleManager;
 use App\Service\UserLoader;
 use App\Utils\Cache\LocalCache;
@@ -19,35 +20,39 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class AttemptRepository extends ServiceEntityRepository implements AttemptResponseProviderInterface
+final class AttemptRepository extends ServiceEntityRepository implements AttemptResponseProviderInterface
 {
     use BaseTrait;
+
     private $exampleRepository;
     private $userLoader;
-    private $sessionRepository;
     private $userRepository;
 
     /** @var AuthorizationCheckerInterface */
     private $authorizationChecker;
+
     private $localCache;
+
+    /** @var CurrentUserSessionProviderInterface */
+    private $currentUserSessionProvider;
 
     public function __construct(
         RegistryInterface $registry,
         ExampleRepository $exampleRepository,
         UserLoader $userLoader,
-        SessionRepository $sessionRepository,
         UserRepository $userRepository,
         AuthorizationCheckerInterface $authorizationChecker,
-        LocalCache $localCache
+        LocalCache $localCache,
+        CurrentUserSessionProviderInterface $currentUserSessionProvider
     ) {
         parent::__construct($registry, Attempt::class);
 
         $this->exampleRepository = $exampleRepository;
         $this->userLoader = $userLoader;
-        $this->sessionRepository = $sessionRepository;
         $this->userRepository = $userRepository;
         $this->authorizationChecker = $authorizationChecker;
         $this->localCache = $localCache;
+        $this->currentUserSessionProvider = $currentUserSessionProvider;
     }
 
     public function findLastActualByCurrentUser(): ?Attempt
@@ -61,12 +66,12 @@ class AttemptRepository extends ServiceEntityRepository implements AttemptRespon
     public function findLastByCurrentUser(): ?Attempt
     {
         $userLoader = $this->userLoader;
-        $where = !$userLoader->isGuest() ? 's.user = :u' : 'a.session = :s';
+        $where = !$userLoader->isCurrentUserGuest() ? 's.user = :u' : 'a.session = :s';
         $query = $this->createQuery("select a from App:Attempt a
 join a.session s
 where $where
 order by a.addTime desc");
-        $parameters = !$userLoader->isGuest() ? ['u' => $userLoader->getUser()] : ['s' => $this->sessionRepository->findOneByCurrentUserOrGetNew()];
+        $parameters = !$userLoader->isCurrentUserGuest() ? ['u' => $userLoader->getUser()] : ['s' => $this->currentUserSessionProvider->getCurrentUserSessionOrNew()];
         $query->setParameters($parameters);
 
         return $this->getValue($query);
@@ -180,8 +185,9 @@ order by a.addTime asc')
 
     private function createNewByCurrentUser(): Attempt
     {
-        $attempt = (new Attempt())
-            ->setSession($this->getEntityRepository(Session::class)->findOneByCurrentUserOrGetNew());
+        $attempt = ObjectAccessor::initialize(Attempt::class, [
+            'session' => $this->currentUserSessionProvider->getCurrentUserSessionOrNew(),
+        ]);
 
         return $attempt;
     }
@@ -380,9 +386,9 @@ where s.user = :user and a.task = :task')
     {
         /** @var ExampleRepository $exampleRepository */
         $exampleRepository = $this->getEntityRepository(Example::class);
-
-        /** @deprecated */
-        $isFinished = !$this->authorizationChecker->isGranted('SOLVE', $attempt);
+        $limitTime = $attempt->getLimitTime();
+        $remainedExamplesCount = $this->getRemainedExamplesCount($attempt);
+        $isFinished = 0 === $remainedExamplesCount or time() > $limitTime->getTimestamp();
 
         if (!$isFinished) {
             $example = $exampleRepository->findLastUnansweredByAttemptOrGetNew($attempt);
@@ -394,9 +400,9 @@ where s.user = :user and a.task = :task')
             $this->getNumber($attempt),
             $isFinished,
             !$isFinished ? $exampleResponse : null,
-            $attempt->getLimitTime(),
+            $limitTime,
             $this->getErrorsCount($attempt),
-            $this->getRemainedExamplesCount($attempt)
+            $remainedExamplesCount
         );
     }
 }

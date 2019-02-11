@@ -6,12 +6,12 @@ use App\Parameter\StringInterface;
 use App\Repository\AttemptRepository;
 use App\Repository\TaskRepository;
 use App\Repository\UserRepository;
-use App\Service\UserLoader;
+use App\Security\User\CurrentUserProviderInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Twig\Extension\AbstractExtension;
 
-class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsInterface
+final class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsInterface
 {
     use BaseTrait;
     private $userLoader;
@@ -21,20 +21,21 @@ class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsI
     private $taskRepository;
     private $userRepository;
 
-    public function __construct(UserLoader $userLoader, AttemptRepository $attemptRepository, UserRepository $userRepository, EntityManagerInterface $entityManager, TaskRepository $taskRepository, StringInterface $appName)
+    public function __construct(CurrentUserProviderInterface $currentUserProvider, AttemptRepository $attemptRepository, UserRepository $userRepository, EntityManagerInterface $entityManager, TaskRepository $taskRepository, StringInterface $appName)
     {
         $this->entityManager = $entityManager;
         $this->taskRepository = $taskRepository;
-        $this->userLoader = $userLoader;
+        $this->userLoader = $currentUserProvider;
 
         $hasActualAttempt = (bool) $attemptRepository->findLastActualByCurrentUser();
-        $user = $userLoader->getUser()->setEntityRepository($userRepository);
+        $user = $currentUserProvider->getCurrentUserOrGuest();
+        $user->setEntityRepository($userRepository);
         $this->globals = [
             'user' => $user,
             'hasActualAttempt' => $hasActualAttempt,
             'PRICE' => PRICE,
             'app_name' => $appName->toString(),
-            'isGuest' => $userLoader->isGuest(),
+            'isGuest' => $currentUserProvider->isGuest($user),
             'FEEDBACK_EMAIL' => 'post@exmasters.ru',
         ];
     }

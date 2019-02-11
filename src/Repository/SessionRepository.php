@@ -4,69 +4,45 @@ namespace App\Repository;
 
 use App\Entity\Session;
 use App\Entity\User;
+use App\Object\ObjectAccessor;
+use App\Security\User\CurrentUserProviderInterface;
+use App\Security\User\CurrentUserSessionProviderInterface;
 use App\Service\SessionMarker;
-use App\Service\UserLoader;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class SessionRepository extends ServiceEntityRepository
+/**
+ * @deprecated
+ */
+final class SessionRepository extends ServiceEntityRepository implements CurrentUserSessionProviderInterface
 {
     use BaseTrait;
-    private $userLoader;
-    private $currentUser;
+
+    /** @var SessionMarker */
     private $sessionMarker;
 
-    public function __construct(RegistryInterface $registry, UserLoader $userLoader, SessionMarker $sessionMarker)
+    /** @var CurrentUserProviderInterface */
+    private $currentUserProvider;
+
+    /** @var AuthorizationCheckerInterface */
+    private $authorizationChecker;
+
+    public function __construct(RegistryInterface $registry, SessionMarker $sessionMarker, CurrentUserProviderInterface $currentUserProvider, AuthorizationCheckerInterface $authorizationChecker)
     {
         parent::__construct($registry, Session::class);
-        $this->userLoader = $userLoader;
-        $this->currentUser = $userLoader->getUser();
+
         $this->sessionMarker = $sessionMarker;
+        $this->currentUserProvider = $currentUserProvider;
+        $this->authorizationChecker = $authorizationChecker;
     }
 
-    public function findOneByCurrentUser(): ?Session
+    private function getNewByUserAndSid(User $user, ?string $sid): Session
     {
-        return $this->findOneByUser($this->currentUser);
-    }
-
-    public function findOneByUser(User $user): ?Session
-    {
-        $sid = $this->sessionMarker->getKey();
-
-        return $this->findOneByUserAndSid($user, $sid);
-    }
-
-    public function findOneByCurrentUserOrGetNew(): Session
-    {
-        return $this->findOneByUserOrGetNew($this->currentUser);
-    }
-
-    public function findOneByUserOrGetNew(User $user): Session
-    {
-        return $this->findOneByUser($user)
-            ?? $this->getNewByUserAndSid($user, $this->sessionMarker->getKey());
-    }
-
-    public function findOneByUserAndSid(User $user, $sid): ?Session
-    {
-        $where = ['user' => $user];
-
-        if ($user === $this->userLoader->getGuest()) {
-            $where += ['sid' => $sid];
-        }
-
-        return $this->findOneBy($where);
-    }
-
-    private function getNewByUserAndSid(User $user, $sid): Session
-    {
-        if ($session = $this->findOneByUserAndSid($user, $sid)) {
-            return $session;
-        }
-
-        $session = (new Session())
-            ->setUser($user)
-            ->setSid(($this->userLoader->isGuest()) ? $sid : '');
+        $session = ObjectAccessor::initialize(Session::class, [
+            'user' => $user,
+            'sid' => $sid,
+        ]);
 
         $entityManager = $this->getEntityManager();
         $entityManager->persist($session);
@@ -83,7 +59,6 @@ where a.id is null and s.lastTime < :dt')
             ->setParameter('dt', $dt)
             ->getResult();
         $removedSessionsCount = \count($sessions);
-        $entityManager = $this->getEntityManager();
 
         foreach ($sessions as $session) {
             $this->remove($session);
@@ -92,7 +67,7 @@ where a.id is null and s.lastTime < :dt')
         return $removedSessionsCount;
     }
 
-    public function remove(Session $session): void
+    private function remove(Session $session): void
     {
         $entityManager = $this->GetEntityManager();
 
@@ -103,5 +78,34 @@ where a.id is null and s.lastTime < :dt')
 
         $entityManager->remove($session);
         $entityManager->flush();
+    }
+
+    public function getCurrentUserSession(): ?Session
+    {
+        $where = ['user' => $this->currentUserProvider->getCurrentUserOrGuest()];
+
+        if ($this->currentUserProvider->isGuest($user)) {
+            $where += ['sid' => $this->sessionMarker->getKey()];
+        }
+
+        return $this->findOneBy($where);
+    }
+
+    public function getCurrentUserSessionOrNew(): Session
+    {
+        return $this->getCurrentUserSession() ?? $this->createSessionByCurrentUser();
+    }
+
+    private function createSessionByCurrentUser(): Session
+    {
+        return $this->getNewByUserAndSid(
+            $this->currentUserProvider->getCurrentUserOrGuest(),
+            $this->currentUserProvider->isCurrentUserGuest() ? $this->sessionMarker->getKey() : null
+        );
+    }
+
+    public function isCurrentUserSession(Session $session): bool
+    {
+        return $session === $this->getCurrentUserSession();
     }
 }

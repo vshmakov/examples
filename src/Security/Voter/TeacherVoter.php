@@ -35,7 +35,7 @@ class TeacherVoter extends Voter
         $teacher = $this->subject;
 
         return $this->canDisappointTeachers()
-            && !$this->userLoader->isGuest()
+            && !$this->userLoader->isCurrentUserGuest()
             && !$this->userLoader->getUser()->isUserTeacher($teacher);
     }
 

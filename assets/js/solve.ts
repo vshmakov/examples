@@ -1,10 +1,11 @@
 "use strict";
 
 import $ from 'jquery'
-import series from 'async/series'
 import './app'
 
 class Timer {
+    private intervalId: number;
+
     constructor(remainedTime) {
         this.remainedTime = remainedTime;
     }
@@ -18,11 +19,11 @@ class Timer {
     }
 
     start() {
-        this.intervalId = setInterval(() => this._timer(), 1000);
+        this.intervalId = setInterval(() => this.timer(), 1000);
         this.started = true;
     }
 
-    _timer() {
+    private timer() {
         this.remainedTime -= 1000;
 
         if (0 >= this.remainedTime && this.started) {

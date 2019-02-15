@@ -10,6 +10,7 @@ Encore
 
     .addEntry('js/app', './assets/js/app.js')
     .addEntry('js/homework', './assets/js/homework.js')
+    .addEntry('js/solve', './assets/js/solve.ts')
     .addStyleEntry('css/app', './assets/css/app.css')
 
     // will require an extra script tag for runtime.js
@@ -26,7 +27,7 @@ Encore
     //.enableSassLoader()
 
     // uncomment if you use TypeScript
-    //.enableTypeScriptLoader()
+    .enableTypeScriptLoader()
 
     // uncomment if you're having problems with a jQuery plugin
     //.autoProvidejQuery()

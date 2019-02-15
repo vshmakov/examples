@@ -1,10 +1,82 @@
 "use strict";
 
+import $ from 'jquery'
+import series from 'async/series'
+import './app'
+
+class Timer {
+    constructor(remainedTime) {
+        this.remainedTime = remainedTime;
+    }
+
+    setSecondHandler(callback) {
+        this.secondHandler = callback;
+    }
+
+    setFinishHandler(callback) {
+        this.finishHandler = callback;
+    }
+
+    start() {
+        this.intervalId = setInterval(() => this._timer(), 1000);
+        this.started = true;
+    }
+
+    _timer() {
+        this.remainedTime -= 1000;
+
+        if (0 >= this.remainedTime && this.started) {
+            clearInterval(this.intervalId);
+            this.started = false;
+            this.finishHandler();
+        }
+
+        this.secondHandler(new Date(this.remainedTime));
+    }
+}
+
+class App {
+    constructor() {
+        this.refresh(callback => {
+            Api.getData(data => {
+                this.setData(data);
+                this.startTimer();
+                callback();
+            });
+        });
+    }
+
+    refresh(initializeCallback) {
+        series([
+            callback => {
+                this.disableForm();
+                callback();
+            },
+            initializeCallback,
+            callback => {
+                this.enableForm();
+                callback();
+            },
+        ]);
+    }
+
+    disableForm() {
+        $(this.input).add(this.submitButton).attr('disabled', true);
+        this.submitButton.html('Пожалуйста, подождите...');
+    }
+
+    enableForm() {
+        $(this.input).add(this.submitButton).attr('disabled', false);
+        this.submitButton.html('Ответить');
+    }
+}
+
+
 function finishSolving() {
     location.href = P.showAttemptUrl;
 }
 
-h.createObj({
+({
     constructor: function () {
         this.disableForm();
         var self = this;
@@ -19,15 +91,6 @@ h.createObj({
     inp: $('form input[type=text]'),
     submitButton: $('form [type=submit]'),
 
-    enableForm: function () {
-        $(this.inp).add(this.submitButton).attr('disabled', false);
-        this.submitButton.html('Ответить');
-    },
-
-    disableForm: function () {
-        $(this.inp).add(this.submitButton).attr('disabled', true);
-        this.submitButton.html('Пожалуйста, подождите...');
-    },
 
     answer: function (event) {
         event.preventDefault();
@@ -59,9 +122,9 @@ h.createObj({
         this.inp.focus().click().select();
     },
 
-    timer: h.createObj({
+    timer: ({
         constructor: function () {
-            this.finishTime = P.attempt.limitTime* 1000;
+            this.finishTime = P.attempt.limitTime * 1000;
             this.intId = setInterval(this.setTime.bind(this), 1000);
         },
 

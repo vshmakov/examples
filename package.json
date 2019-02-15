@@ -1,9 +1,7 @@
 {
     "devDependencies": {
-        "@symfony/webpack-encore": "^0.17.0",
-        "jquery": "^3.3.1",
-        "ts-loader": "^5.3.0",
-        "typescript": "^3.1.6"
+        "@symfony/webpack-encore": "^0.22.0",
+        "webpack-notifier": "^1.6.0"
     },
     "license": "UNLICENSED",
     "private": true,
@@ -11,12 +9,12 @@
         "dev-server": "encore dev-server",
         "dev": "encore dev",
         "watch": "encore dev --watch",
-        "build": "encore production"
+        "build": "encore production --progress"
     },
     "dependencies": {
-        "babel-preset-react": "^6.24.1",
-        "prop-types": "^15.6.2",
-        "react": "^16.4.2",
-        "react-dom": "^16.4.2"
+        "bootstrap": "^4.3.1",
+        "datatables.net-dt": "^1.10.19",
+        "jquery": "^3.3.1",
+        "popper.js": "^1.14.7"
     }
 }

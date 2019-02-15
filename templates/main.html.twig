@@ -19,8 +19,7 @@
         {% endblock %}
     </title>
     {% block stylesheets %}
-        <link rel="stylesheet" href="/css/bootstrap.min.css">
-        <link rel="stylesheet" href="/css/style.css">
+        <link rel="stylesheet" href=" {{ asset('build/css/app.css') }}">
     {% endblock %}
     <script>
         var P ={{ (jsParams ?? {})|json_encode|raw }};
@@ -36,11 +35,12 @@
             {% if is_granted('SHOW_HOMEWORKS') %}
                 {% set actualHomeworksCount = getActualHomeworksCount() %}
                 {% if actualHomeworksCount %}
-                    <ul class="actual-homeworks-block">
+                    <ul class="actual-homework-block">
                         <li><a href="{{ path('homework_index') }}">У вас есть {{ actualHomeworksCount }} невыполненных
                                 заданий.</a></li>
                         <li>
-                            <button class="hide-homeworks">Скрыть</button>
+
+                            <button class="hide-homework">Скрыть</button>
                         </li>
                     </ul>
                 {% endif %}
@@ -162,48 +162,7 @@
 {% endblock %}
 
 {% block javascripts %}
-    <script src="/js/jquery.min.js"></script>
-    <script src="/js/popper.min.js"></script>
-    <script src="/js/bootstrap.min.js"></script>
-    <script src="/js/custom.js"></script>
-    <script>
-        function setCookie(name, value) {
-            document.cookie = name + "=" + value + '; path=/';
-        }
-
-        function getCookie(name) {
-            var r = document.cookie.match("(^|;) ?" + name + "=([^;]*)(;|$)");
-            if (r) return r[2];
-            else return "";
-        }
-
-        function deleteCookie(name) {
-            var date = new Date(); // Берём текущую дату
-            date.setTime(date.getTime() - 1); // Возвращаемся в "прошлое"
-            document.cookie = name += "=; expires=" + date.toGMTString(); // Устанавливаем cookie пустое значение и срок действия до прошедшего уже времени
-        }
-
-        var hideHomeworksButton = $('.hide-homeworks');
-        var actualHomeworksBlock = $('.actual-homeworks-block');
-        var hideCookie = 'hide-homeworks-block';
-
-        function hideHomeworksBlock() {
-            setCookie(hideCookie, 1);
-            actualHomeworksBlock.css('display', 'none');
-        }
-
-        hideHomeworksButton.click(hideHomeworksBlock);
-
-        if (getCookie(hideCookie)) {
-            hideHomeworksBlock();
-        }
-
-/*
-        var d = {{ user.remainedTime.roundUpDays }};
-        c = d == 0 ? "red" : d <= 3 ? "orange" : d <= 7 ? "yellow" : "green";
-        $(".account-button").css("background", c);
-        */
-    </script>
+    <script src="{{ asset('build/js/app.js') }}"></script>
 {% endblock %}
 </body>
 </html>

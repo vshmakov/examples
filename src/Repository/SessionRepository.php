@@ -84,7 +84,7 @@ where a.id is null and s.lastTime < :dt')
     {
         $where = ['user' => $this->currentUserProvider->getCurrentUserOrGuest()];
 
-        if ($this->currentUserProvider->isGuest($user)) {
+        if ($this->currentUserProvider->isCurrentUserGuest()) {
             $where += ['sid' => $this->sessionMarker->getKey()];
         }
 

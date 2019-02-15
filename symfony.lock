@@ -1,23 +1,11 @@
 {
-    "doctrine/data-fixtures": {
-        "version": "v1.3.1"
-    },
-    "doctrine/doctrine-fixtures-bundle": {
-        "version": "3.0",
+    "symfony/webpack-encore-bundle": {
+        "version": "1.0",
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "master",
-            "version": "3.0",
-            "ref": "fc52d86631a6dfd9fdf3381d0b7e3df2069e51b3"
-        }
-    },
-    "symfony/phpunit-bridge": {
-        "version": "4.1",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "master",
-            "version": "4.1",
-            "ref": "0e548dd90adba18fabd4ef419b14d361fe4d6c74"
+            "version": "1.0",
+            "ref": "248c29c070dcd79e8333c676b0c5e284e3b365b5"
         }
     }
 }

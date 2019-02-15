@@ -11,16 +11,6 @@
 {% endblock %}
 
 {%block javascripts%}
-{{parent()}}
-<script src="/js/jquery.datatables.min.js"></script>
-<script>
-    hideHomeworksBlock();
-    
-    $("table").DataTable({
-        pageLength: 25,
-        //order: [1, "asc"],
-        lengthMenu: [25, 50, 100, 250],
-        language: {{ include("task/language.json.twig") }}
-    });
-</script>
+{#{{parent()}}#}
+    <script src="{{  asset('build/js/homework.js') }}"></script>
 {%endblock%}

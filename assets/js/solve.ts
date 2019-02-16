@@ -1,78 +1,126 @@
-"use strict";
+import $ from "jquery";
+import "./app";
+import Timeout = NodeJS.Timeout;
+import {PARAMETERS} from './constants'
 
-import $ from 'jquery'
-import './app'
+interface Callable {
+    (...parameters: any[]): any;
+}
 
 class Timer {
-    private intervalId: number;
+    private _started = false;
+    private _intervalId: Timeout;
+    private _nextSecondCallback: Callable;
+    private _finishCallback: Callable;
 
-    constructor(remainedTime) {
-        this.remainedTime = remainedTime;
+    public constructor(
+        private _remainedTime: number
+    ) {
     }
 
-    setSecondHandler(callback) {
-        this.secondHandler = callback;
+    public nextSecondCallback(value: Callable): void {
+        this._nextSecondCallback = value;
     }
 
-    setFinishHandler(callback) {
-        this.finishHandler = callback;
+    public finishCallback(value: Callable): void {
+        this._finishCallback = value;
     }
 
-    start() {
-        this.intervalId = setInterval(() => this.timer(), 1000);
-        this.started = true;
+    public start(): void {
+        this._intervalId = setInterval(() => this.timer(), 1000);
+        this._started = true;
     }
 
-    private timer() {
-        this.remainedTime -= 1000;
+    private timer(): void {
+        this._remainedTime -= 1000;
 
-        if (0 >= this.remainedTime && this.started) {
-            clearInterval(this.intervalId);
-            this.started = false;
-            this.finishHandler();
+        if (0 >= this._remainedTime && this._started) {
+            clearInterval(this._intervalId);
+            this._started = false;
+            this._finishCallback();
         }
 
-        this.secondHandler(new Date(this.remainedTime));
+        this._nextSecondCallback(new Date(this._remainedTime));
+    }
+}
+
+const Api = new class {
+    public getData(callback: Callable): void {
+    }
+};
+
+class AttemptData {
+    public constructor(private  _attemptData: any) {
+    }
+
+    public get showAttemptUrl(): string {
+        return PARAMETERS.showAttemptUrl;
+    }
+
+    public get solveData(): object {
+        return {example: "abc"};
+    }
+
+    public get isFinished(): boolean {
+        return this._attemptData.isFinished;
     }
 }
 
 class App {
+    private _form = $('#form');
+    private _input = $('#input');
+    private _submitButton = $('#submit-button');
+    private _example = $('#example');
+    private _exampleNumber = $('#example-number');
+    private _remainedExamplesCount = $('#remained-examples-count');
+    private _errorsCount = $('#errors-count');
+    private _timer = $('#timer');
+
     constructor() {
-        this.refresh(callback => {
-            Api.getData(data => {
-                this.setData(data);
-                this.startTimer();
+        this._refresh((callback: Callable): void => {
+            Api.getData((data: AttemptData): void => {
+                this._setData(data);
+                this._startTimer();
                 callback();
             });
         });
     }
 
-    refresh(initializeCallback) {
-        series([
-            callback => {
-                this.disableForm();
-                callback();
-            },
-            initializeCallback,
-            callback => {
-                this.enableForm();
-                callback();
-            },
-        ]);
+    private _refresh(refresh: Callable): void {
+        this._disableForm();
+        refresh((): void => this._enableForm());
     }
 
-    disableForm() {
-        $(this.input).add(this.submitButton).attr('disabled', true);
-        this.submitButton.html('Пожалуйста, подождите...');
+    private _setData(data: AttemptData): void {
+        if (data.isFinished) {
+            return this._finish(data);
+        }
+
+        for (let field in data.solveData) {
+            this[field].html(data[field]);
+        }
     }
 
-    enableForm() {
-        $(this.input).add(this.submitButton).attr('disabled', false);
-        this.submitButton.html('Ответить');
+    private _finish(data: AttemptData): void {
+        location.href = data.showAttemptUrl;
+    }
+
+    private _startTimer(): void {
+
+    }
+
+    private _disableForm(): void {
+        $(this._input).add(this._submitButton).attr('disabled', true);
+        this._submitButton.html('Пожалуйста, подождите...');
+    }
+
+    private _enableForm(): void {
+        $(this._input).add(this._submitButton).attr('disabled', false);
+        this._submitButton.html('Ответить');
     }
 }
 
-
+/*
 function finishSolving() {
     location.href = P.showAttemptUrl;
 }
@@ -157,3 +205,4 @@ function finishSolving() {
     }),
 
 });
+*/

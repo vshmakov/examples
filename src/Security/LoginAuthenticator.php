@@ -46,7 +46,6 @@ class LoginAuthenticator extends AbstractGuardAuthenticator
 
     public function start(Request $request, AuthenticationException $authException = null)
     {
-        // todo
     }
 
     public function supportsRememberMe()

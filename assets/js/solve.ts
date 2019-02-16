@@ -3,26 +3,26 @@ import "./app";
 import Timeout = NodeJS.Timeout;
 import {PARAMETERS} from './constants'
 
-interface Callable {
-    (...parameters: any[]): any;
+interface EmptyCallback {
+    (): void;
 }
 
 class Timer {
     private _started = false;
     private _intervalId: Timeout;
-    private _nextSecondCallback: Callable;
-    private _finishCallback: Callable;
+    private _nextSecondCallback: (date: Date) => void;
+    private _finishCallback: EmptyCallback;
 
     public constructor(
-        private _remainedTime: number
+        private _remainedTime: Date
     ) {
     }
 
-    public nextSecondCallback(value: Callable): void {
+    public set nextSecondCallback(value: (remainedTime: Date) => void) {
         this._nextSecondCallback = value;
     }
 
-    public finishCallback(value: Callable): void {
+    public set finishCallback(value: () => void) {
         this._finishCallback = value;
     }
 
@@ -31,23 +31,36 @@ class Timer {
         this._started = true;
     }
 
-    private timer(): void {
-        this._remainedTime -= 1000;
+    private
 
-        if (0 >= this._remainedTime && this._started) {
+    timer()
+        :
+        void {
+        let remainedMilliseconds = this._remainedTime.getTime() - 1000;
+
+        if (0 > remainedMilliseconds) {
+            remainedMilliseconds = 0;
+        }
+
+        this._remainedTime = new Date(remainedMilliseconds);
+        this._nextSecondCallback(this._remainedTime);
+
+        if (0 === remainedMilliseconds && this._started) {
             clearInterval(this._intervalId);
             this._started = false;
             this._finishCallback();
         }
-
-        this._nextSecondCallback(new Date(this._remainedTime));
     }
 }
 
 const Api = new class {
-    public getData(callback: Callable): void {
+    public getData(callback: (data: AttemptData) => void): void {
     }
-};
+
+    public answer(answer: number, callback: (data: AttemptData) => void): void {
+
+    };
+}
 
 class AttemptData {
     public constructor(private  _attemptData: any) {
@@ -58,13 +71,31 @@ class AttemptData {
     }
 
     public get solveData(): object {
-        return {example: "abc"};
+        let attemptData = this._attemptData;
+
+        return {
+            example: attemptData.example.string,
+            exampleNumber: attemptData.example.number,
+            remainedExamplesCount: attemptData.remainedExamplesCount,
+            errorsCount: attemptData.errorsCount,
+        };
     }
 
     public get isFinished(): boolean {
         return this._attemptData.isFinished;
     }
+
+    public get remainedTime(): Date {
+        let remainedTime = this._attemptData.limitTime * 1000 - new Date().getTime();
+
+        if (0 > remainedTime) {
+            remainedTime = 0;
+        }
+
+        return new Date(remainedTime);
+    }
 }
+
 
 class App {
     private _form = $('#form');
@@ -77,16 +108,17 @@ class App {
     private _timer = $('#timer');
 
     constructor() {
-        this._refresh((callback: Callable): void => {
+        this._refresh((callback: EmptyCallback): void => {
+            this._form.submit((event): void => this._answer(event));
             Api.getData((data: AttemptData): void => {
                 this._setData(data);
-                this._startTimer();
+                this._startTimer(data);
                 callback();
             });
         });
     }
 
-    private _refresh(refresh: Callable): void {
+    private _refresh(refresh: (callback: EmptyCallback) => void): void {
         this._disableForm();
         refresh((): void => this._enableForm());
     }
@@ -97,16 +129,55 @@ class App {
         }
 
         for (let field in data.solveData) {
-            this[field].html(data[field]);
+            this['_' + field].html(data[field]);
+            this._input.val('');
         }
+    }
+
+    private _answer(event): void {
+        event.preventDefault();
+        let answer = this._input.val();
+        Api.answer(answer, (data: AttemptData) => this._setData(data));
     }
 
     private _finish(data: AttemptData): void {
         location.href = data.showAttemptUrl;
     }
 
-    private _startTimer(): void {
+    private _startTimer(data: AttemptData): void {
+        let timer = new Timer(data.remainedTime);
+        timer.nextSecondCallback = (date: Date): void => this._setTime(date);
+        timer.finishCallback = (): void => this._finish(data);
+        timer.start();
+    }
 
+    private _setTime(date: Date): void {
+        const getTwoNumbersValue = (value: number): string => 10 <= value ? value.toString() : `0${value}`;
+
+        this._timer.html(
+            `${getTwoNumbersValue(date.getMinutes())}:${getTwoNumbersValue(date.getSeconds())}`
+        );
+        this._paintTimer(date);
+    }
+
+    private _paintTimer(date: Date): void {
+        let remainedSeconds = date.getTime() / 1000;
+
+        if (40 < remainedSeconds) {
+            return;
+        }
+
+        let color = 'yellow';
+
+        if (20 >= remainedSeconds) {
+            color = 'orange';
+        }
+
+        if (10 >= remainedSeconds) {
+            color = 'red';
+        }
+
+        this._timer.css('background', color);
     }
 
     private _disableForm(): void {
@@ -119,90 +190,3 @@ class App {
         this._submitButton.html('Ответить');
     }
 }
-
-/*
-function finishSolving() {
-    location.href = P.showAttemptUrl;
-}
-
-({
-    constructor: function () {
-        this.disableForm();
-        var self = this;
-        $.each(["num", "exRem", "str", "errors"], function () {
-            self[this] = $("#" + this);
-        });
-        this.setData(P.attempt);
-        this.form.submit(this.answer.bind(this));
-    },
-
-    form: $('form'),
-    inp: $('form input[type=text]'),
-    submitButton: $('form [type=submit]'),
-
-
-    answer: function (event) {
-        event.preventDefault();
-        if (!this.inp.val()) return;
-        this.disableForm();
-        $.post(P.answerAttemptUrl, {
-            answer: this.inp.val()
-        }, this.getResult.bind(this));
-    },
-
-    getResult: function (data) {
-        if (data.finish === true) return finishSolving();
-        this.setData(data.attempt);
-    },
-
-    setData: function (d) {
-        var o = {
-            num: d.example.number,
-            str: d.example.string,
-            errors: d.errorsCount,
-            exRem: d.remainedExamplesCount
-        };
-        for (var k in o) {
-            this[k].html(o[k]);
-        }
-
-        this.inp.val('');
-        this.enableForm();
-        this.inp.focus().click().select();
-    },
-
-    timer: ({
-        constructor: function () {
-            this.finishTime = P.attempt.limitTime * 1000;
-            this.intId = setInterval(this.setTime.bind(this), 1000);
-        },
-
-        setTime: function () {
-            var remained = (this.finishTime - (new Date().getTime()));
-            if (remained < 0) {
-                clearInterval(this.intId);
-                return finishSolving();
-            }
-
-            var dt = new Date(Math.abs(remained));
-
-            var getTime = function (value) {
-                return (value > 9) ? value : "0" + value;
-            }
-
-            var time = getTime(dt.getMinutes()) + ":" + getTime(dt.getSeconds());
-            this.html(time);
-            this.paint(remained);
-        },
-
-        paint: function (r) {
-            if (r > 40) return;
-            this.css("background",
-                r <= 10 ? "red" : r <= 20 ? "orange" : "yellow");
-        },
-
-        prototype: $('#timeRem'),
-    }),
-
-});
-*/

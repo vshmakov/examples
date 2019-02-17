@@ -6,6 +6,7 @@ use App\Entity\Attempt;
 use App\Repository\ExampleRepository;
 use App\Response\AttemptResponse;
 use App\Response\AttemptResponseProviderInterface;
+use App\Security\Voter\AttemptVoter;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,8 +14,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
- * Class AttemptController.
- *
  * @Route("/api/attempt")
  */
 final class AttemptController
@@ -40,7 +39,7 @@ final class AttemptController
 
     /**
      * @Route("/{id}/solve-data/", name="api_attempt_solve_data")
-     * @IsGranted("VIEW", subject="attempt")
+     * @IsGranted(AttemptVoter::VIEW, subject="attempt")
      */
     public function solveData(Attempt $attempt, AttemptResponseProviderInterface $attemptResponseProvider): AttemptResponse
     {

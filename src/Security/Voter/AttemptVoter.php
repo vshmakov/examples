@@ -3,13 +3,13 @@
 namespace App\Security\Voter;
 
 use App\Entity\Attempt;
+use App\Entity\User\Role;
 use App\Repository\AttemptRepository;
 use App\Repository\ExampleRepository;
 use App\Security\User\CurrentUserProviderInterface;
 use App\Security\User\CurrentUserSessionProviderInterface;
-use App\Service\AuthChecker;
-use App\Service\UserLoader;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Webmozart\Assert\Assert;
 
@@ -18,10 +18,9 @@ final class AttemptVoter extends Voter
     public const VIEW = 'VIEW';
     use BaseTrait;
 
-    private $userLoader;
     private $attemptRepository;
     private $exampleRepository;
-    private $authChecker;
+    private $authorizationChecker;
 
     /** @var CurrentUserProviderInterface */
     private $currentUserProvider;
@@ -30,17 +29,15 @@ final class AttemptVoter extends Voter
     private $currentUserSessionProvider;
 
     public function __construct(
-        UserLoader $userLoader,
         AttemptRepository $attemptRepository,
         ExampleRepository $exampleRepository,
-        AuthChecker $authChecker,
+        AuthorizationCheckerInterface $authorizationChecker,
         CurrentUserProviderInterface $currentUserProvider,
         CurrentUserSessionProviderInterface $currentUserSessionProvider
     ) {
-        $this->userLoader = $userLoader;
         $this->attemptRepository = $attemptRepository;
         $this->exampleRepository = $exampleRepository;
-        $this->authChecker = $authChecker;
+        $this->authorizationChecker = $authorizationChecker;
         $this->currentUserProvider = $currentUserProvider;
         $this->currentUserSessionProvider = $currentUserSessionProvider;
     }
@@ -88,15 +85,14 @@ final class AttemptVoter extends Voter
 
     private function canView()
     {
-        if ($this->authChecker->isGranted('ROLE_ADMIN')) {
+        if ($this->authorizationChecker->isGranted(Role::ADMIN)) {
             return true;
         }
 
         $attempt = $this->subject;
-        $userLoader = $this->userLoader;
-        $user = $userLoader->getUser();
+        $user = $this->currentUserProvider->getCurrentUserOrGuest();
         $author = $attempt->getSession()->getUser();
 
-        return $user === $author or $author->isUserTeacher($user);
+        return $author->isEqualTo($user) or $author->isUserTeacher($user);
     }
 }

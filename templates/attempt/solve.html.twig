@@ -1,40 +1,38 @@
 {% extends 'main.html.twig' %}
 
-{% block title %}Попытка №{{  attemptResponse.number }}{%  endblock %}
+{% block title %}Попытка №{{ attemptResponse.number }}{% endblock %}
 
 {% block actual_homeworks %}{% endblock %}
 
 {% block main %}
     <div class="attempt-solve">
-        <form>
-            <h1>Пример №<span id="num">*</span></h1>
-            <div class="row example-area">
+        <form id="form">
+            <h1>Пример №<span id="example-number">*</span></h1>
+            <div class="example-area">
 <span>
-<b><span id="str">* + *</span> =</b>
-<input type="text" name="" id="" class="{#form-control#}" required="required" pattern="\d+([.]\d+)?">
+<b><span id="example">* + *</span> =</b>
+<input type="text" id="input" required="required" pattern="\d+([.]\d+)?">
 </span>
             </div>
 
-            <button type="submit" class="btn btn-primary btn-lg">Ответить</button>
+            <button type="submit" id="submit-button" class="sbtn-primary btn-lg">Ответить</button>
         </form>
 
         <div class="attempt-solve-statistic">
             <h2>Статистика</h2>
             <ul class="list-group">
-                <li class="list-group-item">Ошибок: <span id="errors">*</span></li>
-                <li class="list-group-item">Осталось времени: <span id="timeRem">*</span></li>
-                <li class="list-group-item">Осталось примеров: <span id="exRem">*</span></li>
-                <li class="list-group-item">Настройки попытки: <a
-                            href="{{ path("attempt_profile", {"id": attempt.id}) }}">{{ attempt.settings.description }}</a></li>
+                <li class="list-group-item">Ошибок: <span id="errors-count">*</span></li>
+                <li class="list-group-item">Осталось времени: <span id="timer">*</span></li>
+                <li class="list-group-item">Осталось примеров: <span id="remained-examples-count">*</span></li>
+                <li class="list-group-item">
+                    Настройки попытки:
+                    <a href="{{ path("attempt_profile", {"id": attempt.id}) }}">{{ attempt.settings.description }}</a>
+                </li>
             </ul>
         </div>
     </div>
 {% endblock %}
 
 {% block javascripts %}
-    {{ parent() }}
-    <script src="/js/helper.js"></script>
-    <script src="/js/app/attempt/solve.js"></script>
-    <script>
-    </script>
+        <script src="{{  asset('build/js/solve.js') }}"></script>
 {% endblock %}

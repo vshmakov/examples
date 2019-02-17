@@ -47,7 +47,7 @@ final class AttemptController extends Controller
     }
 
     /**
-     * @Route("/{id}", name="attempt_solve", requirements={"id": "\d+"})
+     * @Route("/{id}/", name="attempt_solve", requirements={"id": "\d+"})
      * @IsGranted(AttemptVoter::VIEW, subject="attempt")
      */
     public function solve(Attempt $attempt, AttemptResponseProviderInterface $attemptResponseProvider): Response

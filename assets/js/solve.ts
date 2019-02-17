@@ -1,7 +1,11 @@
-import $ from "jquery";
+import * as $ from 'jquery';
 import "./app";
 import Timeout = NodeJS.Timeout;
 import {PARAMETERS} from './constants'
+
+interface AttemptDataCallback {
+    (data: AttemptData): void;
+}
 
 interface EmptyCallback {
     (): void;
@@ -54,11 +58,12 @@ class Timer {
 }
 
 const Api = new class {
-    public getData(callback: (data: AttemptData) => void): void {
+    public getData(callback: AttemptDataCallback): void {
+        $.get(PARAMETERS.solveAttemptDataUrl, {}, (data): void => callback(new AttemptData(data)));
     }
 
-    public answer(answer: number, callback: (data: AttemptData) => void): void {
-
+    public answer(answer: number, callback: AttemptDataCallback): void {
+        $.post(PARAMETERS.answerAttemptUrl, {answer: answer}, (data) => callback(new AttemptData(data)));
     };
 }
 
@@ -70,7 +75,7 @@ class AttemptData {
         return PARAMETERS.showAttemptUrl;
     }
 
-    public get solveData(): object {
+    public get solveData() {
         let attemptData = this._attemptData;
 
         return {
@@ -96,7 +101,6 @@ class AttemptData {
     }
 }
 
-
 class App {
     private _form = $('#form');
     private _input = $('#input');
@@ -108,28 +112,40 @@ class App {
     private _timer = $('#timer');
 
     constructor() {
-        this._refresh((callback: EmptyCallback): void => {
+        this._refresh((setDataCallback: AttemptDataCallback): void => {
             this._form.submit((event): void => this._answer(event));
             Api.getData((data: AttemptData): void => {
-                this._setData(data);
                 this._startTimer(data);
-                callback();
+                setDataCallback(data);
             });
         });
     }
 
-    private _refresh(refresh: (callback: EmptyCallback) => void): void {
-        this._disableForm();
-        refresh((): void => this._enableForm());
+    private _refresh(refresh: (setDataCallback: AttemptDataCallback) => void
+    ):
+        void {
+        this
+            ._disableForm();
+
+        refresh(
+            (data: AttemptData): void => {
+                this._setData(data);
+
+                this._enableForm();
+            }
+        )
+        ;
     }
 
     private _setData(data: AttemptData): void {
-        if (data.isFinished) {
+        if (data.isFinished
+        ) {
             return this._finish(data);
         }
 
-        for (let field in data.solveData) {
-            this['_' + field].html(data[field]);
+        let solveData = data.solveData;
+        for (let field in solveData) {
+            this['_' + field].html(solveData[field]);
             this._input.val('');
         }
     }
@@ -137,7 +153,11 @@ class App {
     private _answer(event): void {
         event.preventDefault();
         let answer = this._input.val();
-        Api.answer(answer, (data: AttemptData) => this._setData(data));
+        this._refresh(
+            (setDataCallback: AttemptDataCallback): void => {
+                Api.answer(answer, (data: AttemptData): void => setDataCallback(data));
+            }
+        );
     }
 
     private _finish(data: AttemptData): void {
@@ -162,7 +182,6 @@ class App {
 
     private _paintTimer(date: Date): void {
         let remainedSeconds = date.getTime() / 1000;
-
         if (40 < remainedSeconds) {
             return;
         }
@@ -190,3 +209,5 @@ class App {
         this._submitButton.html('Ответить');
     }
 }
+
+new App();

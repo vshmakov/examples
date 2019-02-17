@@ -59,8 +59,15 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
     {
         $attempt = $this->findLastByCurrentUser();
 
-        /* @deprecated */
-        return $this->authorizationChecker->isGranted('SOLVE', $attempt) ? $attempt : null;
+        return null !== $attempt && $this->isActual($attempt) ? $attempt : null;
+    }
+
+    private function isActual(Attempt $attempt): bool
+    {
+        $limitTime = $attempt->getLimitTime();
+        $remainedExamplesCount = $this->getRemainedExamplesCount($attempt);
+
+        return 0 < $remainedExamplesCount && time() < $limitTime->getTimestamp();
     }
 
     public function findLastByCurrentUser(): ?Attempt
@@ -388,7 +395,7 @@ where s.user = :user and a.task = :task')
         $exampleRepository = $this->getEntityRepository(Example::class);
         $limitTime = $attempt->getLimitTime();
         $remainedExamplesCount = $this->getRemainedExamplesCount($attempt);
-        $isFinished = 0 === $remainedExamplesCount or time() > $limitTime->getTimestamp();
+        $isFinished = !$this->isActual($attempt);
 
         if (!$isFinished) {
             $example = $exampleRepository->findLastUnansweredByAttemptOrGetNew($attempt);

@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Object\ObjectAccessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -800,6 +801,12 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
      */
     public function isEqualTo(SymfonyUserInterface $user)
     {
-        return $user->getRoles() === $this->getRoles();
+        foreach (['id', 'username', 'roles'] as $field) {
+            if (ObjectAccessor::getValue($this, $field) !== ObjectAccessor::getValue($user, $field)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

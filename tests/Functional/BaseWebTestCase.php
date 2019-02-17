@@ -28,4 +28,16 @@ abstract class BaseWebTestCase extends WebTestCase
 
         return $client;
     }
+
+    /**
+     * @return mixed
+     */
+    protected function ajaxGet(Client $client, string $url)
+    {
+        $client
+            ->xmlHttpRequest('GET', $url);
+
+        return json_decode($client->getResponse()->getContent(), true
+        );
+    }
 }

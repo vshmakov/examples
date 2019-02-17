@@ -36,5 +36,6 @@ final class SolveAttemptTest extends BaseWebTestCase
     {
         $attemptData = self::ajaxGet(self::$unauthenticatedClient, sprintf('/api/attempt/%s/solve-data/', self::$attemptId));
         $this->assertTrue(self::$unauthenticatedClient->getResponse()->isSuccessful());
+        $this->assertContains('isFinished', $attemptData);
     }
 }

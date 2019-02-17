@@ -24,6 +24,8 @@ final class AttemptResponseNormalizer implements NormalizerInterface
         $data = $this->normalizer->normalize($object, $format, $context);
 
         $data['limitTime'] = $object->getLimitTime()->getTimestamp();
+        $data['isFinished'] = $object->isFinished();
+        unset($data['finished']);
 
         return $data;
     }

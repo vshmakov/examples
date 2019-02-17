@@ -121,29 +121,21 @@ class App {
         });
     }
 
-    private _refresh(refresh: (setDataCallback: AttemptDataCallback) => void
-    ):
-        void {
-        this
-            ._disableForm();
-
-        refresh(
-            (data: AttemptData): void => {
-                this._setData(data);
-
-                this._enableForm();
+    private _refresh(refresh: (setDataCallback: AttemptDataCallback) => void): void {
+        this._disableForm();
+        refresh((data: AttemptData): void => {
+            if (data.isFinished) {
+                return this._finish(data);
             }
-        )
-        ;
+
+            this._setData(data);
+            this._enableForm();
+        });
     }
 
     private _setData(data: AttemptData): void {
-        if (data.isFinished
-        ) {
-            return this._finish(data);
-        }
-
         let solveData = data.solveData;
+
         for (let field in solveData) {
             this['_' + field].html(solveData[field]);
             this._input.val('');
@@ -153,11 +145,9 @@ class App {
     private _answer(event): void {
         event.preventDefault();
         let answer = this._input.val();
-        this._refresh(
-            (setDataCallback: AttemptDataCallback): void => {
-                Api.answer(answer, (data: AttemptData): void => setDataCallback(data));
-            }
-        );
+        this._refresh((setDataCallback: AttemptDataCallback): void => {
+            Api.answer(answer, (data: AttemptData): void => setDataCallback(data));
+        });
     }
 
     private _finish(data: AttemptData): void {
@@ -207,6 +197,7 @@ class App {
     private _enableForm(): void {
         $(this._input).add(this._submitButton).attr('disabled', false);
         this._submitButton.html('Ответить');
+        this._input.focus().click().select();
     }
 }
 

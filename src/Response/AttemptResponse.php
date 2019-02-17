@@ -2,43 +2,35 @@
 
 namespace App\Response;
 
-use Symfony\Component\Serializer\Annotation\Groups;
-
 final class AttemptResponse
 {
     /**
      * @var int
-     * @Groups({"attempt"})
      */
     private $number;
 
     /**
      * @var bool
-     * @Groups({"attempt"})
      */
     private $isFinished;
 
     /**
      * @var ExampleResponse|null
-     * @Groups({"attempt"})
      */
     private $example;
 
     /**
      * @var \DateTimeInterface
-     * @Groups({"attempt"})
      */
     private $limitTime;
 
     /**
      * @var int
-     * @Groups({"attempt"})
      */
     private $errorsCount;
 
     /**
      * @var int
-     * @Groups({"attempt"})
      */
     private $remainedExamplesCount;
 

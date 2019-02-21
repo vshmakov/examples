@@ -15,6 +15,7 @@ use Webmozart\Assert\Assert;
 
 final class AttemptVoter extends Voter
 {
+    public const SOLVE = 'SOLVE';
     public const VIEW = 'VIEW';
     use BaseTrait;
 

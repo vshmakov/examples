@@ -257,6 +257,7 @@ abstract class BaseProfile
      * @var string
      *
      * @ORM\Column(type="string", length=255)
+     * @Groups({Group::ATTEMPT})
      */
     protected $description;
 

@@ -13,9 +13,10 @@ class ProfileFixtures extends Fixture implements DependentFixtureInterface
 {
     public const GUEST_PROFILE_DESCRIPTION = 'Тестовый профиль';
 
-    private const GUEST_PROFILE = [
+    public const GUEST_PROFILE = [
         'description' => self::GUEST_PROFILE_DESCRIPTION,
         'isPublic' => true,
+        'examplesCount' => 5,
     ];
 
     private const PUBLIC_PROFILES = [

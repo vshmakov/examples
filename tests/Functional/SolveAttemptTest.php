@@ -2,14 +2,19 @@
 
 namespace App\Tests\Functional;
 
+use App\DataFixtures\Attempt\ProfileFixtures;
 use Symfony\Component\HttpKernel\Client;
 
 final class SolveAttemptTest extends BaseWebTestCase
 {
     /** @var Client */
     private static $unauthenticatedClient;
+
     /** @var int */
     private static $attemptId;
+
+    /** @var array */
+    private static $attemptData;
 
     public static function setupBeforeClass(): void
     {
@@ -32,10 +37,21 @@ final class SolveAttemptTest extends BaseWebTestCase
      * @test
      * @depends guestStartsNewAttempt
      */
+    public function guestGetsAttemptData(): void
+    {
+        self::$attemptData = self::ajaxGet(self::$unauthenticatedClient, sprintf('/api/attempt/%s/solve-data/', self::$attemptId));
+        $this->assertTrue(self::$unauthenticatedClient->getResponse()->isSuccessful());
+
+        $this->assertSame(ProfileFixtures::GUEST_PROFILE_DESCRIPTION, self::$attemptData['settings']['description']);
+        $this->assertSame(ProfileFixtures::GUEST_PROFILE['examplesCount'], self::$attemptData['remainedExamplesCount']);
+        $this->assertContains('isFinished', self::$attemptData);
+    }
+
+    /**
+     * @testt
+     * @depends guestGetsAttemptData
+     */
     public function guestSolvesAttempt(): void
     {
-        $attemptData = self::ajaxGet(self::$unauthenticatedClient, sprintf('/api/attempt/%s/solve-data/', self::$attemptId));
-        $this->assertTrue(self::$unauthenticatedClient->getResponse()->isSuccessful());
-        $this->assertContains('isFinished', $attemptData);
     }
 }

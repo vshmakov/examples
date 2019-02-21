@@ -3,7 +3,8 @@
 namespace App\Response;
 
 use App\Entity\Example;
-use Symfony\Component\Serializer\Annotation\Groups;
+use App\Serializer\Group;
+use  Symfony\Component\Serializer\Annotation\Groups;
 
 final class ExampleResponse
 {
@@ -14,7 +15,7 @@ final class ExampleResponse
 
     /**
      * @var int
-     * @Groups({"attempt"})
+     * @Groups({Group::ATTEMPT})
      */
     private $number;
 
@@ -30,7 +31,7 @@ final class ExampleResponse
     }
 
     /**
-     * @Groups({"attempt"})
+     * @Groups({Group::ATTEMPT})
      */
     public function getString(): string
     {

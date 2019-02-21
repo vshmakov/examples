@@ -409,7 +409,8 @@ where s.user = :user and a.task = :task')
             !$isFinished ? $exampleResponse : null,
             $limitTime,
             $this->getErrorsCount($attempt),
-            $remainedExamplesCount
+            $remainedExamplesCount,
+            $attempt->getSettings()
         );
     }
 }

@@ -4,29 +4,29 @@ namespace App\Controller\Api;
 
 use App\Entity\Attempt;
 use App\Repository\ExampleRepository;
-use App\Response\AttemptResponse;
 use App\Response\AttemptResponseProviderInterface;
 use App\Security\Voter\AttemptVoter;
+use App\Serializer\Group;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * @Route("/api/attempt")
  */
-final class AttemptController
+final class AttemptController extends BaseController
 {
     /**
      * @Route("/{id}/answer", name="api_attempt_answer", methods="POST")
+     * @IsGranted(AttemptVoter::SOLVE, subject="attempt")
      */
-    public function answer(Attempt $attempt, Request $request, ExampleRepository $exampleRepository, EntityManagerInterface $entityManager, AttemptResponseProviderInterface $attemptResponseProvider, NormalizerInterface $normalizer): AttemptResponse
+    public function answer(Attempt $attempt, Request $request, ExampleRepository $exampleRepository, EntityManagerInterface $entityManager, AttemptResponseProviderInterface $attemptResponseProvider): array
     {
         $attemptResponse = $attemptResponseProvider->createAttemptResponse($attempt);
 
         if ($attemptResponse->isFinished()) {
-            return $attemptResponse;
+            return $this->normalize($attemptResponse);
         }
 
         $example = $exampleRepository->findLastUnansweredByAttempt($attempt);
@@ -34,15 +34,28 @@ final class AttemptController
         $example->setAnswer($answer);
         $entityManager->flush();
 
-        return $attemptResponseProvider->createAttemptResponse($attempt);
+        return $this->normalize(
+            $attemptResponseProvider->createAttemptResponse($attempt)
+        );
     }
 
     /**
      * @Route("/{id}/solve-data/", name="api_attempt_solve_data")
      * @IsGranted(AttemptVoter::VIEW, subject="attempt")
      */
-    public function solveData(Attempt $attempt, AttemptResponseProviderInterface $attemptResponseProvider): AttemptResponse
+    public function solveData(Attempt $attempt, AttemptResponseProviderInterface $attemptResponseProvider): array
     {
-        return $attemptResponseProvider->createAttemptResponse($attempt);
+        return $this->normalize(
+            $attemptResponseProvider->createAttemptResponse($attempt)
+        );
+    }
+
+    /**
+     * @param mixed $data
+     */
+    private function normalize($data): array
+    {
+        return $this->getNormalizer()
+            ->normalize($data, null, ['groups' => Group::ATTEMPT]);
     }
 }

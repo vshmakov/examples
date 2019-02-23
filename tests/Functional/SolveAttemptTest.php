@@ -3,6 +3,7 @@
 namespace App\Tests\Functional;
 
 use App\DataFixtures\Attempt\ProfileFixtures;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpKernel\Client;
 
 final class SolveAttemptTest extends BaseWebTestCase
@@ -53,5 +54,38 @@ final class SolveAttemptTest extends BaseWebTestCase
      */
     public function guestSolvesAttempt(): void
     {
+        $nextExample = self::$attemptData['example']['string'];
+        $remainedExamplesCount = self::$attemptData['remainedExamplesCount'];
+
+        while (0 < $remainedExamplesCount) {
+            $answerAttemptData = self::ajaxPost(
+                self::$unauthenticatedClient,
+                sprintf('/api/attempt/%s/answer/', self::$attemptId),
+                ['answer' => $this->solve($nextExample)]
+            );
+            $this->assertTrue(self::$unauthenticatedClient->getResponse()->isSuccessful());
+            $answerRemainedExamplesCount = $answerAttemptData['attempt']['remainedExamplesCount'];
+            $hasNextExample = 0 < $answerRemainedExamplesCount;
+
+            if ($hasNextExample) {
+                $this->assertFalse($answerAttemptData['attempt']['isFinished']);
+                $nextExample = $answerAttemptData['attempt']['example']['string'];
+            } else {
+                $this->assertTrue($answerAttemptData['attempt']['isFinished']);
+                $this->assertNull($answerAttemptData['attempt']['example']);
+            }
+
+            $this->assertTrue($answerAttemptData['isRight']);
+            $this->assertSame($remainedExamplesCount - 1, $answerRemainedExamplesCount);
+            $remainedExamplesCount = $answerRemainedExamplesCount;
+        }
+    }
+
+    private function solve(string $example): float
+    {
+        $expressionLanguage = new ExpressionLanguage();
+        $example = str_replace(':', '/', $example);
+
+        return $expressionLanguage->evaluate($example);
     }
 }

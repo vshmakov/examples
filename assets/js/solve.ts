@@ -63,7 +63,7 @@ const Api = new class {
     }
 
     public answer(answer: number, callback: AttemptDataCallback): void {
-        $.post(PARAMETERS.answerAttemptUrl, {answer: answer}, (data) => callback(new AttemptData(data)));
+        $.post(PARAMETERS.answerAttemptUrl, {answer: answer}, (data) => callback(new AttemptData(data.attempt)));
     };
 }
 

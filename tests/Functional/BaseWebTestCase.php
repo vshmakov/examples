@@ -34,10 +34,18 @@ abstract class BaseWebTestCase extends WebTestCase
      */
     protected function ajaxGet(Client $client, string $url)
     {
-        $client
-            ->xmlHttpRequest('GET', $url);
+        $client->xmlHttpRequest('GET', $url);
 
-        return json_decode($client->getResponse()->getContent(), true
-        );
+        return json_decode($client->getResponse()->getContent(), true);
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function ajaxPost(Client $client, string $url, array $parameters = [])
+    {
+        $client->xmlHttpRequest('POST', $url, $parameters);
+
+        return json_decode($client->getResponse()->getContent(), true);
     }
 }

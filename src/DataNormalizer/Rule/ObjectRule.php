@@ -3,111 +3,48 @@
 namespace App\DataNormalizer\Rule;
 
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 
-class ObjectRule
+final class ObjectRule
 {
-    /**
-     * @var object
-     */
-    private $object;
+    /** @var string */
+    private $checkField;
 
-    /**
-     * @var string
-     */
-    private $fieldName;
+    /** @var string */
+    private $checkExpression;
 
-    /**
-     * @var string
-     */
-    private $ruleExpression;
+    /** @var string */
+    private $defaultExpression;
 
-    /**
-     * @var string
-     */
-    private $defaultValueExpression;
-
-    public function __construct(object $object, string $fieldName, string $ruleExpression, string $defaultValueExpression)
+    public function __construct(string $checkField, string $checkExpression, string $defaultExpression)
     {
-        $this->object = $object;
-        $this->fieldName = $fieldName;
-        $this->ruleExpression = $ruleExpression;
-        $this->defaultValueExpression = $defaultValueExpression;
+        $this->checkField = $checkField;
+        $this->checkExpression = $checkExpression;
+        $this->defaultExpression = $defaultExpression;
     }
 
     /**
-     * @throws \LogicException
+     * @throws \InvalidArgumentException
+     *
+     * @return mixed
      */
-    public function normalize(): void
+    public function evaluate(array $values)
     {
-        if (!$this->isValid()) {
-            $this->createPropertyAccessor()->setValue(
-                $this->object,
-                $this->fieldName,
-                $this->getDefaultValue()
-            );
+        $isValid = $this->isValid($values);
+
+        if ($isValid) {
+            return $values[$this->checkField];
         }
 
-        if (!$this->isValid()) {
-            throw new \LogicException('Default value is not valid');
-        }
+        return self::getExpressionLanguage()->evaluate($this->defaultExpression, $values);
     }
 
-    /**
-     * @return mixed
-     */
-    private function getDefaultValue()
+    public function isValid(array $values): bool
     {
-        return $this->evaluate($this->defaultValueExpression, ['object' => $this->object]);
+        return self::getExpressionLanguage()->evaluate($this->checkExpression, $values);
     }
 
-    /**
-     * @throws \LogicException
-     */
-    public function isValid(): bool
+    private static function getExpressionLanguage(): ExpressionLanguage
     {
-        $isValid = $this->evaluateByObjectField($this->ruleExpression);
-
-        if (!\is_bool($isValid)) {
-            throw new \LogicException(
-                sprintf('Rule expression "%s" das not return bollean value', $this->ruleExpression)
-            );
-        }
-
-        return $isValid;
-    }
-
-    /**
-     * @return mixed
-     */
-    private function evaluateByObjectField(string $expression)
-    {
-        return $this->evaluate($expression, [$this->fieldName => $this->getValue()]);
-    }
-
-    /**
-     * @return mixed
-     */
-    private function evaluate(string $expression, array $properties)
-    {
-        $expressionLanguage = new ExpressionLanguage();
-
-        return $expressionLanguage->evaluate($expression, $properties);
-    }
-
-    /**
-     * @return mixed
-     */
-    private function getValue()
-    {
-        return $this->createPropertyAccessor()->getValue($this->object, $this->fieldName);
-    }
-
-    private function createPropertyAccessor(): PropertyAccessor
-    {
-        return PropertyAccess::createPropertyAccessorBuilder()
-            ->enableExceptionOnInvalidIndex()
-            ->getPropertyAccessor();
+        return new ExpressionLanguage();
     }
 }

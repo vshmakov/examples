@@ -40,10 +40,17 @@ abstract class ObjectAccessor
 
     public static function setValues(object $object, array $values): void
     {
-        $propertyAccessor = self::createPropertyAccessor();
-
         foreach ($values as $key => $value) {
-            $propertyAccessor->setValue($object, $key, $value);
+            self::setValue($object, $key, $value);
         }
+    }
+
+    /**
+     * @param mixed $value
+     */
+    public static function setValue(object $object, string $key, $value): void
+    {
+        $propertyAccessor = self::createPropertyAccessor();
+        $propertyAccessor->setValue($object, $key, $value);
     }
 }

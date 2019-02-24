@@ -5,12 +5,13 @@ namespace App\DataNormalizer\Settings;
 use App\DataNormalizer\Rule\ObjectRule;
 use App\Entity\BaseProfile as Settings;
 use App\Object\ObjectAccessor;
+use Doctrine\Common\Inflector\Inflector;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 final class SolveSettingsNormalizer implements SettingsNormalizerInterface
 {
-    private const CURRENT_FIELD_NAME = 'currentField ';
-    private const  PREVIOUS_FIELD_NAME = 'previousField ';
+    private const CURRENT_FIELD_NAME = 'currentField';
+    private const  PREVIOUS_FIELD_NAME = 'previousField';
 
     /** @var NormalizerInterface */
     private $normalizer;
@@ -43,7 +44,7 @@ final class SolveSettingsNormalizer implements SettingsNormalizerInterface
         $rule = function (string $checkExpression, string $defaultExpression) use ($currentField): ObjectRule {
             return new   ObjectRule($currentField, $checkExpression, $defaultExpression);
         };
-        $graterThanPreviousFieldRule = $rule("$currentField  > $previousField", $previousField);
+        $graterThanPreviousFieldRule = $rule("$currentField > $previousField", $previousField);
         $lessThan = function (string $checkExpression) use ($currentField, $rule): ObjectRule {
             return $rule("$currentField < $checkExpression", $checkExpression);
         };
@@ -55,42 +56,45 @@ final class SolveSettingsNormalizer implements SettingsNormalizerInterface
             $addMax => [$lessThan("$addFMax + $addSMax"), $graterThanPreviousFieldRule],
         ];
 
-        $this->setBasicFieldsRules($rule, $graterThanPreviousFieldRule);
+        $this->setBasicFieldsRules($rules, $graterThanPreviousFieldRule);
         $this->applyRules($settings, $rules, function ($value, string $field, bool $isValid) use ($settings): void {
+            dump($field, $value);
             ObjectAccessor::setValue($settings, $field, $value);
         });
     }
 
-    private function setBasicFieldsRules(array &$rules, callable $graterThanPreviousFieldRule): void
+    private function setBasicFieldsRules(array &$rules, ObjectRule $graterThanPreviousFieldRule): void
     {
+        $basicRules = [];
+
         foreach (['add', 'sub', 'mult', 'div'] as $arithmeticFunctionName) {
             foreach (['f', 's'] as $number) {
                 $createFieldName = function (string $limit) use ($arithmeticFunctionName, $number): string {
-                    return "{$arithmeticFunctionName}_{$number}_{$limit}";
+                    return Inflector::camelize("{$arithmeticFunctionName}_{$number}_{$limit}");
                 };
 
-                $rules = [$createFieldName('min') => [], $createFieldName('max') => [$graterThanPreviousFieldRule]] + $rules;
+                $basicRules += [$createFieldName('min') => [], $createFieldName('max') => [$graterThanPreviousFieldRule]];
             }
         }
+
+        $rules = $basicRules + $rules;
     }
 
     private function applyRules(Settings $settings, array $rules, callable $applyCallback): void
     {
-        $settingsData = $this->normalizer->normalize($settings);
-        $previousFieldValue = null;
-
         foreach ($rules as $field => $fieldRules) {
-            $values = $settingsData + [
-                    self::CURRENT_FIELD_NAME => $settingsData[$field],
-                    self::PREVIOUS_FIELD_NAME => $previousFieldValue,
-                ];
-
             /** @var ObjectRule $rule */
             foreach ($fieldRules as $rule) {
+                $settingsData = $this->normalizer->normalize($settings);
+                $previousFieldValue = isset($previousField) ? $settingsData[$previousField] : null;
+                $values = $settingsData + [
+                        self::CURRENT_FIELD_NAME => $settingsData[$field],
+                        self::PREVIOUS_FIELD_NAME => $previousFieldValue,
+                    ];
                 $applyCallback($rule->evaluate($values), $field, $rule->isValid($values));
             }
 
-            $previousFieldValue = $values[self::CURRENT_FIELD_NAME];
+            $previousField = $field;
         }
     }
 }

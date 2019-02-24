@@ -1,7 +1,7 @@
-import  $ from  'jquery'
-import 'datatables.net-dt'
-import './app'
-import {hideHomeworkBlock} from './homeworkBlock'
+import  $ from  'jquery';
+import 'datatables.net-dt';
+import './app';
+import {hideHomeworkBlock} from './homeworkBlock';
 
 hideHomeworkBlock();
 

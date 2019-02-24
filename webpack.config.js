@@ -11,6 +11,7 @@ Encore
     .addEntry('js/app', './assets/js/app.js')
     .addEntry('js/homework', './assets/js/homework.js')
     .addEntry('js/solve', './assets/js/solve.ts')
+    .addEntry('js/profile', './assets/js/profile.js')
     .addStyleEntry('css/app', './assets/css/app.css')
 
     // will require an extra script tag for runtime.js

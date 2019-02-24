@@ -1,0 +1,8 @@
+Description: Описание
+Examples count: Количество примеров в попытке
+Add perc: Сложение
+Sub perc: Вычитание
+Mult perc: Умножение
+Div perc: Деление
+Add f min: Минимальное первое слагаемое
+Add f max: Максимальное первое слагаемое

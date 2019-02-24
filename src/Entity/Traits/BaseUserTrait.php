@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\Traits;
 
 use App\Entity\User\Role;
 use Doctrine\Common\Collections\ArrayCollection;

@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Traits\BaseTrait;
 use Doctrine\ORM\Mapping as ORM;
 
 /**

@@ -2,10 +2,12 @@
 
 namespace App\Entity;
 
+use App\Entity\Traits\BaseTrait;
 use App\Serializer\Group;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /** @ORM\MappedSuperclass */
 abstract class BaseProfile
@@ -42,6 +44,7 @@ abstract class BaseProfile
      *
      * @ORM\Column(type="integer")
      * @Groups({Group::SETTINGS})
+     * @Assert\GreaterThanOrEqual(propertyPath="addFMin", message="Maximum value must be greater than minimum value")
      */
     protected $addFMax = 3;
 

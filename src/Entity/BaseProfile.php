@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Entity\Traits\BaseTrait;
 use App\Serializer\Group;
+use App\Validator as AppAssert;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -303,6 +304,30 @@ abstract class BaseProfile
         $this->duration = btwVal(30, HOUR - 1, $duration);
 
         return $this;
+    }
+
+    /**
+     * @AppAssert\IntervalBetween(minimum="PT30S", maximum="PT30M")
+     *
+     * @throws \Exception
+     */
+    public function getDurationInterval(): \DateInterval
+    {
+        $duration = new  \DateInterval('PT0S');
+        $duration->i = $this->getMinutes();
+        $duration->s = $this->getSeconds();
+
+        return $duration;
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function setDurationInterval(\DateInterval $duration): void
+    {
+        $this->duration = \DT::createByStart()
+            ->add($duration)
+            ->format('U');
     }
 
     public function getExamplesCount(): ?int

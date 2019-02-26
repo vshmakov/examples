@@ -1,6 +1,6 @@
 <?php
 
-class DT extends DateTime
+final class DT extends DateTime
 {
     public static function createFromFormat($format, $string, $o = null)
     {
@@ -34,12 +34,28 @@ class DT extends DateTime
         return self::createBySub("P{$days}D");
     }
 
-    public static function createByAdd(DateInterval $dateInterval)
+    public static function createFromDateInterval(\DateInterval $interval): self
+    {
+        return self::createByStart()->add($interval);
+    }
+
+    public static function createByAdd(\DateInterval $dateInterval): self
     {
         return (new static())->add(new \DateInterval($dateInterval));
     }
 
-    public static function createFromTimestamp($time)
+    /**
+     * @throws Exception
+     */
+    public static function createByStart(): self
+    {
+        return static::createFromTimestamp(0);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public static function createFromTimestamp(int $time): \DateTimeInterface
     {
         $dt = new static();
 

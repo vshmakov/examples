@@ -2,6 +2,7 @@
 
 namespace App\Object;
 
+use Doctrine\Instantiator\Instantiator;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
@@ -32,7 +33,16 @@ abstract class ObjectAccessor
 
     public static function initialize(string $class, array $data): object
     {
-        $object = new $class();
+        $object = new  $class();
+        self::setValues($object, $data);
+
+        return $object;
+    }
+
+    public static function instantiate(string $class, array $data): object
+    {
+        $instantiator = new Instantiator();
+        $object = $instantiator->instantiate($class);
         self::setValues($object, $data);
 
         return $object;

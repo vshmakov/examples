@@ -118,7 +118,7 @@ where u = :u and a.addTime > :dt')
         return $example;
     }
 
-    public function getSolvingTime(Example $example): \DateTimeInterface
+    public function getSolvingTime(Example $example): ?\DateTimeInterface
     {
         $solvingTime = !$example->isAnswered() ? null
             : $this->globalCache->get(['examples[%s].solvingTime', $example], function () use ($example) {
@@ -133,10 +133,10 @@ order by e.addTime desc')
             );
                 $previousTime = $previousExample ? $previousExample->getAnswerTime() : $example->getAttempt()->getAddTime();
 
-                return $example->getAnswerTime()->getTimestamp() - $previousTime->getTimestamp();
+                return null !== $example->getAnswerTime() ? $example->getAnswerTime()->getTimestamp() - $previousTime->getTimestamp() : null;
             });
 
-        return $this->dts($solvingTime);
+        return null !== $solvingTime ? $this->dts($solvingTime) : null;
     }
 
     public function findByUser(User $user): array

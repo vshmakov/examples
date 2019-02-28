@@ -140,11 +140,6 @@ final class DT extends DateTime
         return $this->getTimeStamp() % MIN;
     }
 
-    public function diff($dt, $absolute = null)
-    {
-        return DTI::createFromDTI(parent::diff($dt, $absolute));
-    }
-
     public function getRoundTimestamp()
     {
         return round($this->format('U.u'));

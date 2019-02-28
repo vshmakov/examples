@@ -89,6 +89,8 @@ final class AttemptController extends Controller
 
     /**
      * @Route("/last", name="attempt_last")
+     *
+     * @todo  functional test
      */
     public function last(AttemptRepository $attemptRepository): Response
     {

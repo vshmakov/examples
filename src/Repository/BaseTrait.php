@@ -14,7 +14,12 @@ trait BaseTrait
         return $this->getEntityManager()->createQuery($dql);
     }
 
-    protected function getValue(Query $query)
+    /**
+     * @deprecated
+     *
+     * @return mixed
+     */
+    private function getValue(Query $query)
     {
         return self::getValueByQuery($query);
     }

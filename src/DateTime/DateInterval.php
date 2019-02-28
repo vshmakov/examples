@@ -19,6 +19,14 @@ final class DateInterval extends \DateInterval
         return self::createFromDateInterval(new  \DateInterval($interval));
     }
 
+    public static function createNormalizedFromDateIntervalString(string $interval): self
+    {
+        $intervalDate = \DT::createFromDateInterval(new \DateInterval($interval));
+        $normalizedInterval = \DT::createByStart()->diff($intervalDate);
+
+        return self::createFromDateInterval($normalizedInterval);
+    }
+
     public function isBetween(\DateInterval $minimum, \DateInterval $maximum): bool
     {
         return $this->getTimestamp() >= self::createFromDateInterval($minimum)->getTimestamp()
@@ -27,6 +35,6 @@ final class DateInterval extends \DateInterval
 
     private function getTimestamp(): int
     {
-        return \DT::createFromDateInterval($this)->getTimestamp();
+        return \DT::createFromDateInterval($this)->getTimestamp() - \DT::createByStart()->getTimestamp();
     }
 }

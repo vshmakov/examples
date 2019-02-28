@@ -66,3 +66,7 @@ services:
             $argumentNameConverter: '@framework_extra_bundle.argument_name_convertor'
 
     Monolog\Formatter\JsonFormatter: ~
+
+    App\Utils\PerformanceMeter:
+        arguments:
+            $appEnv: '@App\Parameter\Environment\AppEnv'

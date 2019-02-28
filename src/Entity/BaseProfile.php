@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\DateTime\DateInterval as DTI;
 use App\Entity\Traits\BaseTrait;
 use App\Serializer\Group;
 use App\Validator as AppAssert;
@@ -261,6 +262,14 @@ abstract class BaseProfile
      * @var string
      *
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotNull
+     * @Assert\NotBlank
+     * @Assert\Length(
+     *     min="3",
+     *     minMessage="Description must contains more than {{ limit }} characters.",
+     *     max="35",
+     *     maxMessage="Description must contains less than {{ limit }} characters."
+     * )
      * @Groups({Group::ATTEMPT})
      */
     protected $description;
@@ -313,11 +322,7 @@ abstract class BaseProfile
      */
     public function getDurationInterval(): \DateInterval
     {
-        $duration = new  \DateInterval('PT0S');
-        $duration->i = $this->getMinutes();
-        $duration->s = $this->getSeconds();
-
-        return $duration;
+        return DTI::createNormalizedFromDateIntervalString("PT{$this->duration}S");
     }
 
     /**
@@ -709,7 +714,7 @@ abstract class BaseProfile
         return $this->description;
     }
 
-    public function setDescription(string $description): self
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
 

@@ -1,7 +1,7 @@
 {% extends 'main.html.twig' %}
 
 {% set cur=user.currentProfile is same as(profile) ? " (текущий)" : "" %}
-{% block title %}{{ profile.title~cur }}{% endblock %}
+{% block title %}{{ profileTitle~cur }}{% endblock %}
 
 {% macro form_block(title, form_fields) %}
     <div>

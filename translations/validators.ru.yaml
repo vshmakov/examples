@@ -1,1 +1,3 @@
 Maximum value must be greater than minimum value: Максимальное значение должно быть больше минимального
+Description must contains more than {{ limit }} characters.: Описание должно содержать более, чем {{ limit }} символа.
+Description must contains less than {{ limit }} characters.: Описание должно содержать менее, чем {{ limit }} символа.

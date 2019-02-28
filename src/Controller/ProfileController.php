@@ -73,7 +73,9 @@ class ProfileController extends Controller
     public function edit(Request $request, Profile $profile, ProfileRepository $profileRepository, UserLoader $userLoader): Response
     {
         $this->denyAccessUnlessGranted('VIEW', $profile);
-        $profile->SetDescription($profileRepository->getTitle($profile));
+        $profileRepository->getNumber($profile);
+        $profileTitle = $profileRepository->getTitle($profile);
+        $profile->SetDescription($profileTitle);
         $canEdit = $this->isGranted('EDIT', $profile);
         $canCopy = $this->isGranted('COPY', $profile);
         $copying = $request->request->has('copy') && $canCopy;
@@ -108,6 +110,7 @@ class ProfileController extends Controller
                 'canEdit' => $canEdit or $canCopy,
             ],
             'profile' => $profile->setEntityRepository($profileRepository),
+            'profileTitle' => $profileTitle,
             'form' => $form->createView(),
         ]);
     }

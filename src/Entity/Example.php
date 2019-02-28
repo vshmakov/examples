@@ -71,7 +71,7 @@ class Example
         return $this->id;
     }
 
-    public function getAttempt(): ? Attempt
+    public function getAttempt(): ?Attempt
     {
         return $this->attempt;
     }
@@ -83,7 +83,7 @@ class Example
         return $this;
     }
 
-    public function getFirst(): ? float
+    public function getFirst(): ?float
     {
         return $this->first;
     }
@@ -95,7 +95,7 @@ class Example
         return $this;
     }
 
-    public function getSign(): ? int
+    public function getSign(): ?int
     {
         return $this->sign;
     }
@@ -107,7 +107,7 @@ class Example
         return $this;
     }
 
-    public function getSecond(): ? float
+    public function getSecond(): ?float
     {
         return $this->second;
     }
@@ -119,7 +119,7 @@ class Example
         return $this;
     }
 
-    public function getAnswer(): ? float
+    public function getAnswer(): ?float
     {
         return $this->answer;
     }
@@ -133,7 +133,7 @@ class Example
         return $this;
     }
 
-    public function isRight(): ? bool
+    public function isRight(): ?bool
     {
         return $this->isRight;
     }
@@ -145,7 +145,7 @@ class Example
         return $this;
     }
 
-    public function getAddTime(): ? \DateTimeInterface
+    public function getAddTime(): ?\DateTimeInterface
     {
         return $this->dt($this->addTime);
     }
@@ -157,9 +157,9 @@ class Example
         return $this;
     }
 
-    public function getAnswerTime(): ? \DateTimeInterface
+    public function getAnswerTime(): ?\DateTimeInterface
     {
-        return $this->dt($this->answerTime);
+        return null !== $this->answerTime ? $this->dt($this->answerTime) : null;
     }
 
     public function setAnswerTime(\DateTimeInterface $answerTime): self

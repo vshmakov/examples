@@ -2,21 +2,21 @@
 
 namespace App\Utils;
 
+use App\Parameter\ChooseInterface;
+use App\Parameter\Environment\AppEnv;
 use Doctrine\Common\Collections\ArrayCollection;
-use Psr\Container\ContainerInterface;
 
-class PerformanceMeter
+final class PerformanceMeter
 {
     private $data;
     private $states;
     private $isDevelopmentEnvironment;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(ChooseInterface $appEnv)
     {
         $this->data = new ArrayCollection();
         $this->states = new ArrayCollection();
-        $environment = $container->getParameter('app_env');
-        $this->isDevelopmentEnvironment = 'dev' === $environment;
+        $this->isDevelopmentEnvironment = $appEnv->is(AppEnv::DEV);
     }
 
     public function start(string $key): self

@@ -4,7 +4,7 @@ namespace App\Parameter\Environment;
 
 use App\Parameter\ChooseInterface;
 
-class AppEnv implements ChooseInterface
+final class AppEnv implements ChooseInterface
 {
     public const PROD = 'prod';
     public const DEV = 'dev';

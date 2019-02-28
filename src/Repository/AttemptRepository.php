@@ -11,6 +11,7 @@ use App\Object\ObjectAccessor;
 use App\Response\AttemptResponse;
 use App\Response\AttemptResponseProviderInterface;
 use App\Response\ExampleResponse;
+use App\Security\User\CurrentUserProviderInterface;
 use App\Security\User\CurrentUserSessionProviderInterface;
 use App\Service\ExampleManager;
 use App\Service\UserLoader;
@@ -28,6 +29,9 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
     private $userLoader;
     private $userRepository;
 
+    /** @var CurrentUserProviderInterface */
+    private $currentUserProvider;
+
     /** @var AuthorizationCheckerInterface */
     private $authorizationChecker;
 
@@ -41,6 +45,7 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
         ExampleRepository $exampleRepository,
         UserLoader $userLoader,
         UserRepository $userRepository,
+        CurrentUserProviderInterface $currentUserProvider,
         AuthorizationCheckerInterface $authorizationChecker,
         LocalCache $localCache,
         CurrentUserSessionProviderInterface $currentUserSessionProvider
@@ -50,6 +55,7 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
         $this->exampleRepository = $exampleRepository;
         $this->userLoader = $userLoader;
         $this->userRepository = $userRepository;
+        $this->currentUserProvider = $currentUserProvider;
         $this->authorizationChecker = $authorizationChecker;
         $this->localCache = $localCache;
         $this->currentUserSessionProvider = $currentUserSessionProvider;
@@ -72,16 +78,25 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
 
     public function findLastByCurrentUser(): ?Attempt
     {
-        $userLoader = $this->userLoader;
-        $where = !$userLoader->isCurrentUserGuest() ? 's.user = :u' : 'a.session = :s';
-        $query = $this->createQuery("select a from App:Attempt a
-join a.session s
-where $where
-order by a.addTime desc");
-        $parameters = !$userLoader->isCurrentUserGuest() ? ['u' => $userLoader->getUser()] : ['s' => $this->currentUserSessionProvider->getCurrentUserSessionOrNew()];
-        $query->setParameters($parameters);
+        $queryBuilder = $this->createQueryBuilder('a')
+            ->select('a');
 
-        return $this->getValue($query);
+        if (!$this->currentUserProvider->isCurrentUserGuest()) {
+            $queryBuilder
+                ->join('a.session', 's')
+                ->where('s.user = :user');
+            $parameters = ['user' => $this->currentUserProvider->getCurrentUserOrGuest()];
+        } else {
+            $queryBuilder->where('a.session = :session');
+            $parameters = ['session' => $this->currentUserSessionProvider->getCurrentUserSessionOrNew()];
+        }
+
+        return $queryBuilder
+            ->orderBy('a.addTime', 'desc')
+            ->getQuery()
+            ->setParameters($parameters)
+            ->setMaxResults(1)
+            ->getOneOrNullResult();
     }
 
     public function getTitle(Attempt $attempt): string
@@ -145,13 +160,14 @@ where e.answer is not null and a = :a
 
     public function countByCurrentUser(): int
     {
-        return $this->getValue(
-            $this->createQuery('select count(a) from App:Attempt a
-join a.session s
-join s.user u
-where u = :u')
-                ->setParameter('u', $this->userLoader->getUser())
-        );
+        return $this->createQueryBuilder('a')
+            ->select('count(a)')
+            ->join('a.session', 's')
+            ->join('s.user', 'u')
+            ->where('u = :currentUser')
+            ->getQuery()
+            ->setParameter('currentUser', $this->currentUserProvider->getCurrentUserOrGuest())
+            ->getSingleScalarResult();
     }
 
     public function findAllByCurrentUser(): array
@@ -312,13 +328,17 @@ where a.task = :task and s.user = :user')
 
     public function countByUserAndTask(User $user, Task $task): int
     {
-        return $this->getValue(
-            $this->createQuery('select count(a) from App:Attempt a
-join a.session s
-where s.user = :user and a.task = :task
-')
-                ->setParameters(['user' => $user, 'task' => $task])
-        );
+        return $this->createQueryBuilder('a')
+            ->select('count(a)')
+            ->join('a.session', 's')
+            ->where('s.user = :user')
+            ->andWhere('a.task = :task')
+            ->getQuery()
+            ->setParameters([
+                'user' => $user,
+                'task' => $task,
+            ])
+            ->getSingleScalarResult();
     }
 
     public function countDoneByCurrentUserAndTask(Task $task): int

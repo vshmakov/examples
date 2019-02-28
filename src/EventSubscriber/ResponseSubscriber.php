@@ -62,7 +62,7 @@ final class ResponseSubscriber implements EventSubscriberInterface
         $currentUserSession = $this->currentUserSessionProvider->getCurrentUserSession();
         $missResponseEvent = $this->session->getFlashBag()->get('missResponseEvent', []);
 
-        if (!$this->request or $missResponseEvent or null === $currentUserSession) {
+        if (!$this->request or $this->request->isMethod('POST') or $missResponseEvent or null === $currentUserSession) {
             return;
         }
 

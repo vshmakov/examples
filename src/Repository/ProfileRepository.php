@@ -9,7 +9,7 @@ use App\Service\UserLoader;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-class ProfileRepository extends ServiceEntityRepository
+final class ProfileRepository extends ServiceEntityRepository
 {
     use BaseTrait;
     private $userLoader;
@@ -58,21 +58,27 @@ where p.isPublic = true
         return $profile->getDescription() ?: 'Профиль №'.$this->getNumber($profile);
     }
 
-    public function countByCurrentAuthor()
+    private function countByCurrentAuthor(): int
     {
         return $this->count(['author' => $this->userLoader->getUser()]);
     }
 
     public function getNumber(Profile $profile)
     {
-        return ($profile->getId()) ? $this->getValue(
-            $this->createQuery('select count(p) from App:Profile p
-where p.author =:a and p.id <= :id')
-                ->setParameters([
-                    'a' => $profile->getAuthor(),
-                    'id' => $p->getId(),
-                ])
-        ) : $this->countByCurrentAuthor() + 1;
+        if (null === $profile->getId()) {
+            return $this->countByCurrentAuthor() + 1;
+        }
+
+        return $this->createQueryBuilder('p')
+            ->select('count(p)')
+            ->where('p.author = :author')
+            ->andWhere('p.id <= :profileId')
+            ->getQuery()
+            ->setParameters([
+                'author' => $profile->getAuthor(),
+                'profileId' => $profile->getId(),
+            ])
+            ->getSingleScalarResult();
     }
 
     public function getNewByCurrentUser()
@@ -94,7 +100,7 @@ where p.author =:a and p.id <= :id')
         return $this->findByAuthor($user->getTeacher());
     }
 
-    public function findOneByCurrentAuthorOrPublicAndSettingsData(BaseProfile $settings): ? Profile
+    public function findOneByCurrentAuthorOrPublicAndSettingsData(BaseProfile $settings): ?Profile
     {
         $where = array_reduce(Profile::getSettingsFields(), function (string $where, string $property): string {
             if ($where) {

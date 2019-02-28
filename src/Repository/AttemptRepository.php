@@ -106,43 +106,61 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
 
     public function getNumber(Attempt $attempt): int
     {
-        return $this->getValue(
-            $this->createQuery('select count(a) from App:Attempt a
-join a.session s
-where s.user = :u and a.addTime <= :dt
-')->setParameters(['u' => $attempt->GetSession()->GetUser(), 'dt' => $attempt->getAddTime()])
-        );
+        return $this->createQueryBuilder('a')
+            ->select('count(a)')
+            ->join('a.session', 's')
+            ->where('s.user = :user')
+            ->andWhere('a.addTime <= :createdAt')
+            ->getQuery()
+            ->setParameters([
+                'user' => $attempt->getSession()->getUser(),
+                'createdAt' => $attempt->getAddTime(),
+            ])
+            ->getSingleScalarResult();
     }
 
     public function getFinishTime(Attempt $attempt): \DateTimeInterface
     {
-        return $this->dt($this->getValue(
-            $this->createQuery('select e.answerTime from App:Attempt a
-join a.examples e
-where a = :att and e.answerTime is not null
-order by e.answerTime desc
-')->setParameter('att', $attempt)
-        )) ?: $attempt->getAddTime();
+        $finishTime = $this->createQueryBuilder('a')
+            ->select('a.answerTime')
+            ->join('a.examples', 'e')
+            ->where('a = :attempt')
+            ->andWhere('e.answerTime is not null')
+            ->orderBy('e.answerTime', 'desc')
+            ->getQuery()
+            ->setParameter('attempt', $attempt)
+            ->setMaxResults(1)
+            ->getOneOrNullResult();
+
+        return null !== $finishTime ? \DT::createFromDT($finishTime) : $attempt->getAddTime();
     }
 
     public function getSolvedExamplesCount(Attempt $attempt): int
     {
-        return $attempt->getSettings()->isDemanding() ? $this->getValue(
-            $this->createQuery('select count(e) from App:Attempt a
-join a.examples e
-where e.isRight = true and a = :a
-')->setParameters(['a' => $attempt])
-        ) : $this->getAnsweredExamplesCount($attempt);
+        if (!$attempt->getSettings()->isDemanding()) {
+            return $this->getAnsweredExamplesCount($attempt);
+        }
+
+        return $this->createQueryBuilder('a')
+            ->select('count(a)')
+            ->join('a.examples', 'e')
+            ->where('a.isRight = true')
+            ->andWhere('a = :attempt')
+            ->getQuery()
+            ->setParameter('attempt', $attempt)
+            ->getSingleScalarResult();
     }
 
     public function getAnsweredExamplesCount(Attempt $attempt): int
     {
-        return $this->getValue(
-            $this->createQuery('select count(e) from App:Attempt a
-join a.examples e
-where e.answer is not null and a = :a
-')->setParameters(['a' => $attempt])
-        );
+        return $this->createQueryBuilder('a')
+            ->select('count(a)')
+            ->join('a.examples', 'e')
+            ->where('e.answer is not null')
+            ->andWhere('a = :attempt')
+            ->getQuery()
+            ->setParameter('attempt', $attempt)
+            ->getSingleScalarResult();
     }
 
     public function getErrorsCount(Attempt $attempt): int
@@ -317,13 +335,19 @@ where a.task = :task and s.user = :user')
 
     public function findLastOneByTaskAndUser(Task $task, User $user): ?Attempt
     {
-        return $this->getValue(
-            $this->createQuery('select a from App:Attempt a
-        join a.session s
-        where a.task = :task and s.user = :user
-        order by a.addTime desc')
-                ->setParameters(['task' => $task, 'user' => $user])
-        );
+        return $this->createQueryBuilder('a')
+            ->select('a')
+            ->join('a.session', 's')
+            ->where('a.task = :task')
+            ->andWhere('s.user = :user')
+            ->orderBy('a.addTime', 'desc')
+            ->getQuery()
+            ->setParameters([
+                'task' => $task,
+                'user' => $user,
+            ])
+            ->setMaxResults(1)
+            ->getOneOrNullResult();
     }
 
     public function countByUserAndTask(User $user, Task $task): int

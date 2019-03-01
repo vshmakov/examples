@@ -16,10 +16,10 @@ class TaskRepository extends ServiceEntityRepository
     private $authChecker;
     private $userLoader;
 
-    public function __construct(RegistryInterface $registry, UserLoader $userLoader, AuthChecker $authChecker)
+    public function __construct(RegistryInterface $registry, UserLoader $currentUserProvider, AuthChecker $authChecker)
     {
         parent::__construct($registry, Task::class);
-        $this->userLoader = $userLoader;
+        $this->userLoader = $currentUserProvider;
         $this->authChecker = $authChecker;
     }
 

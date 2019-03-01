@@ -13,10 +13,10 @@ class TransferRepository extends ServiceEntityRepository
 
     private $userLoader;
 
-    public function __construct(RegistryInterface $registry, UserLoader $userLoader)
+    public function __construct(RegistryInterface $registry, UserLoader $currentUserProvider)
     {
         parent::__construct($registry, Transfer::class);
-        $this->userLoader = $userLoader;
+        $this->userLoader = $currentUserProvider;
     }
 
     public function findUnheldByCurrentUserOrNew()

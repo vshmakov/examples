@@ -14,10 +14,10 @@ class SettingsRepository extends ServiceEntityRepository
     use BaseTrait;
     private $userLoader;
 
-    public function __construct(RegistryInterface $registry, UserLoader $userLoader)
+    public function __construct(RegistryInterface $registry, UserLoader $currentUserProvider)
     {
         parent::__construct($registry, Settings::class);
-        $this->userLoader = $userLoader;
+        $this->userLoader = $currentUserProvider;
     }
 
     public function getNewByCurrentUser(): Settings

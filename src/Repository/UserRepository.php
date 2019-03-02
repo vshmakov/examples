@@ -13,7 +13,7 @@ use App\Utils\Cache\LocalCache;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-class UserRepository extends ServiceEntityRepository
+final class UserRepository extends ServiceEntityRepository
 {
     use BaseTrait;
 
@@ -50,35 +50,34 @@ class UserRepository extends ServiceEntityRepository
 
     public function getAttemptsCount(User $user)
     {
-        return $this->getValue(
-            $this->createQuery('select count(a) from App:User u
-join u.sessions s
-join s.attempts a
-where u = :u')
-                ->setParameter('u', $user)
-        );
+        return $this->createQueryBuilder('u')
+            ->select('count(a)')
+            ->join('u.sessions', 's')
+            ->join('s.attempts', 'a')
+            ->where('u = :user')
+            ->getQuery()
+            ->setParameter('user', $user)
+            ->getSingleScalarResult();
     }
 
     public function getExamplesCount(User $user)
     {
-        return $this->getValue(
-            $this->createQuery('select count(e) from App:User u
-join u.sessions s
-join s.attempts a
-join a.examples e
-where u = :u')
-                ->setParameter('u', $user)
-        );
+        return $this->createQueryBuilder('u')
+            ->select('count(e)')
+            ->join('u.sessions', 's')
+            ->join('s.attempts', 'a')
+            ->join('a.examples', 'e')
+            ->where('u = :user')
+            ->getQuery()
+            ->setParameter('user', $user)
+            ->getSingleScalarResult();
     }
 
-    public function getProfilesCount(User $user)
+    public function getProfilesCount(User $user): int
     {
-        return $this->getValue(
-            $this->createQuery('select count(p) from App:User u
-join u.profiles p
-where u = :u')
-                ->setParameter('u', $user)
-        );
+        return $this->getEntityManager()
+            ->getRepository(Profile::class)
+            ->countByAuthor($user);
     }
 
     public function getGuest()
@@ -180,24 +179,26 @@ where u = :u')
         return $count;
     }
 
-    public function getSolvedExamplesCount(User $user, \DateTimeInterface $dt = null): int
+    public function getSolvedExamplesCount(User $user, \DateTimeInterface $exampleCreatedAt = null): int
     {
-        $andWhere = '';
-        $parameters = ['u' => $user];
+        $queryBuilder = $this->createQueryBuilder('u')
+            ->select('count(e)')
+            ->join('u.sessions', 's')
+            ->join('s.attempts', 'a')
+            ->join('a.examples', 'e')
+            ->where('u = :user')
+            ->andWhere('e.isRight = true');
+        $parameters = ['user' => $user];
 
-        if ($dt) {
-            $andWhere = ' and e.addTime > :dt';
-            $parameters += ['dt' => $dt];
+        if (null !== $exampleCreatedAt) {
+            $queryBuilder->andWhere('e.addTime > :createdAt');
+            $parameters += ['createdAt' => $exampleCreatedAt];
         }
 
-        return $this->getValue(
-            $this->createQuery("select count(e) from App:Example e
-join e.attempt a
-join a.session s
-join s.user u
-where u = :u and e.isRight = true $andWhere")
-                ->setParameters($parameters)
-        );
+        return $queryBuilder
+            ->getQuery()
+            ->setParameters($parameters)
+            ->getSingleScalarResult();
     }
 
     public function clearNotEnabledUsers(\DateTimeInterface $dt)
@@ -219,14 +220,15 @@ where u = :u and e.isRight = true $andWhere")
     public function hasExamples(User $user): bool
     {
         return $this->localCache->get(['users[%s].hasExamples', $user], function () use ($user): bool {
-            return $this->getValue(
-                $this->createQuery('select count(e) from App:Example e
-join e.attempt a
-join a.session s
-join s.user u
-where u = :user')
-                    ->setParameters(['user' => $user])
-            );
+            return $this->createQueryBuilder('u')
+                ->select('count(e)')
+                ->join('u.sessions', 's')
+                ->join('s.attempts', 'a')
+                ->join('a.examples', 'e')
+                ->where('u = :user')
+                ->getQuery()
+                ->setParameter('user', $user)
+                ->getSingleScalarResult();
         });
     }
 

@@ -6,18 +6,23 @@ use App\Entity\Profile;
 use App\Form\ProfileType;
 use App\Repository\ProfileRepository;
 use App\Repository\UserRepository;
+use App\Security\Voter\ProfileVoter;
 use App\Service\UserLoader;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use  Symfony\Component\HttpFoundation\Response;
+use  Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * @Route("/profile")
  */
-class ProfileController extends Controller
+final class ProfileController extends Controller
 {
     use BaseTrait;
+
+    public const  VIEW = 'profile_view';
 
     /**
      * @Route("/", name="profile_index", methods="GET")
@@ -69,49 +74,38 @@ class ProfileController extends Controller
 
     /**
      * @Route("/{id}/edit", name="profile_edit", methods="GET|POST")
+     * @IsGranted(ProfileVoter::EDIT, subject="profile")
      */
-    public function edit(Request $request, Profile $profile, ProfileRepository $profileRepository, UserLoader $userLoader): Response
+    public function edit(Profile $profile, Request $request, ProfileRepository $profileRepository, UserLoader $userLoader): Response
     {
-        $this->denyAccessUnlessGranted('VIEW', $profile);
-
         $profileTitle = $profileRepository->getTitle($profile);
         $profile->SetDescription($profileTitle);
-        $canEdit = $this->isGranted('EDIT', $profile);
-        $canCopy = $this->isGranted('COPY', $profile);
-        $copying = $request->request->has('copy') && $canCopy;
+        $form = $this->createForm(ProfileType::class, $profile);
+        $form->handleRequest($request);
 
-        if ($copying) {
-            ($profile = clone $profile);
-            $profile->setAuthor($userLoader->getUser());
-        }
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->getDoctrine()
+                ->getManager()
+                ->flush();
 
-        $form = $this->buildForm($profile, $copying);
-
-        if ($request->isMethod('POST')) {
-            $inputs = $request->request->get($form->getName());
-
-            if ($copying) {
-                foreach (arr('isPublic author addTime') as $fieldName) {
-                    if (isset($inputs[$fieldName])) {
-                        unset($inputs[$fieldName]);
-                    }
-                }
-            }
-
-            $form->submit($inputs);
-        }
-
-        if (($form->isSubmitted()) && $form->isValid() && ($canEdit or $copying)) {
-            return $this->saveAndRedirect($profile, $form, $userLoader);
+            return $this->redirectToRoute(self::VIEW, ['id' => $profile->getId()]);
         }
 
         return $this->render('profile/edit.html.twig', [
-            'jsParams' => [
-                'canEdit' => $canEdit or $canCopy,
-            ],
-            'profile' => $profile->setEntityRepository($profileRepository),
             'profileTitle' => $profileTitle,
+            'profile' => $profile,
             'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/{id}/", name=ProfileController::VIEW, methods={"GET"})
+     * @IsGranted(ProfileVoter::VIEW, subject="profile")
+     */
+    public function view(Profile $profile, NormalizerInterface $normalizer): Response
+    {
+        return $this->render('profile/view.html.twig', [
+'profile' => $profile,
         ]);
     }
 
@@ -163,7 +157,6 @@ class ProfileController extends Controller
 
     private function saveAndRedirect(Profile $profile, $form, UserLoader $userLoader)
     {
-        $profile->normalize();
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($profile);
         $entityManager->flush();

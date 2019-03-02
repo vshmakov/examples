@@ -29,6 +29,7 @@ abstract class BaseProfile
 
     /**
      * @ORM\Column(type="smallint")
+     * @Assert\GreaterThanOrEqual(3, message="Count of examples must be grater than or equal to {{ limit }}.")
      * @Groups({Group::SETTINGS})
      */
     protected $examplesCount = 5;

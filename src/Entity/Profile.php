@@ -39,7 +39,6 @@ class Profile extends BaseProfile
     {
         parent::__construct();
         $this->users = new ArrayCollection();
-        $this->normalize();
     }
 
     public function getAuthor(): ?User
@@ -142,8 +141,6 @@ class Profile extends BaseProfile
 
     public function getSettings(): array
     {
-        $this->normalize();
-
         return parent::getSettings();
     }
 
@@ -154,7 +151,7 @@ class Profile extends BaseProfile
         $this->isPublic = false;
     }
 
-    public function normalize()
+    private function normalize()
     {
         $this->normalizePercents();
 

@@ -8,9 +8,13 @@ use App\Service\UserLoader;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
-class ProfileVoter extends Voter
+final class ProfileVoter extends Voter
 {
     use BaseTrait;
+
+    public const  VIEW = 'view';
+    public const  EDIT = 'edit';
+
     private $userLoader;
     private $authChecker;
 

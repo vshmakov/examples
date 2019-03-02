@@ -46,7 +46,7 @@ abstract class BaseProfile
      *
      * @ORM\Column(type="integer")
      * @Groups({Group::SETTINGS})
-     * @Assert\GreaterThanOrEqual(propertyPath="addFMin", message="Maximum value must be greater than minimum value")
+     * @Assert\GreaterThanOrEqual(propertyPath="addFMin", message="Maximum value must be greater or equal to minimum value.")
      */
     protected $addFMax = 3;
 
@@ -262,7 +262,6 @@ abstract class BaseProfile
      * @var string
      *
      * @ORM\Column(type="string", length=255)
-     * @Assert\NotNull
      * @Assert\NotBlank
      * @Assert\Length(
      *     min="3",
@@ -330,9 +329,7 @@ abstract class BaseProfile
      */
     public function setDurationInterval(\DateInterval $duration): void
     {
-        $this->duration = \DT::createByStart()
-            ->add($duration)
-            ->format('U');
+        $this->duration = DTI::createFromDateInterval($duration)->getTimestamp();
     }
 
     public function getExamplesCount(): ?int

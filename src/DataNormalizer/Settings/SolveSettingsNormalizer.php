@@ -58,7 +58,6 @@ final class SolveSettingsNormalizer implements SettingsNormalizerInterface
 
         $this->setBasicFieldsRules($rules, $graterThanPreviousFieldRule);
         $this->applyRules($settings, $rules, function ($value, string $field, bool $isValid) use ($settings): void {
-            dump($field, $value);
             ObjectAccessor::setValue($settings, $field, $value);
         });
     }

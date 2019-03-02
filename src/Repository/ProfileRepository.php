@@ -61,7 +61,7 @@ final class ProfileRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
-    public function findByCurrentAuthor(): ?Profile
+    public function findByCurrentAuthor(): array
     {
         return $this->findByAuthor($this->currentUserProvider->getCurrentUserOrGuest());
     }

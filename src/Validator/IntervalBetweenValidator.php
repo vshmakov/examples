@@ -28,8 +28,8 @@ final class IntervalBetweenValidator extends ConstraintValidator
         if (!DTI::createFromDateInterval($value)->isBetween($minimumInterval, $maximumInterval)) {
             $this->context
                 ->buildViolation($constraint->message)
-                //->setParameter('{{ minimum }}', $minimumInterval->format('%I:%S'))
-                //->setParameter('{{ maximum }}', $maximumInterval->format('%I:%S'))
+                ->setParameter('{{ minimum }}', $minimumInterval->format('%I:%S'))
+                ->setParameter('{{ maximum }}', $maximumInterval->format('%I:%S'))
                 ->addViolation()
             ;
         }

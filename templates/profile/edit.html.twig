@@ -1,5 +1,11 @@
 {% extends 'main.html.twig' %}
 
+{%  block _profile_durationInterval_widget %}
+    <div id="{{  form.vars.id }}">
+        {{  form_widget(form.minutes) }}:{{ form_widget(form.seconds) }}
+    </div>
+{%  endblock %}
+
 {% set cur=user.currentProfile is same as(profile) ? " (текущий)" : "" %}
 {% block title %}{{ profileTitle~cur }}{% endblock %}
 
@@ -30,6 +36,8 @@
         <h1>{% block main_heading %}Редактировать профиль <em>{{ cur }}</em>{% endblock %}</h1>
         <div>{{  form_errors(form) }}</div>
 
+        {#{% form_theme form.durationInterval 'profile/form/duration_interval_theme.html.twig' %}#}
+        {% form_theme form _self %}
         {{  form_block('Параметры профиля', [form.description, form.durationInterval]) }}
 {{  form_rest(form) }}
         {#

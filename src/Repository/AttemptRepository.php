@@ -144,7 +144,7 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
         return $this->createQueryBuilder('a')
             ->select('count(a)')
             ->join('a.examples', 'e')
-            ->where('a.isRight = true')
+            ->where('e.isRight = true')
             ->andWhere('a = :attempt')
             ->getQuery()
             ->setParameter('attempt', $attempt)

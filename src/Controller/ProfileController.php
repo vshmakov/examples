@@ -73,7 +73,7 @@ class ProfileController extends Controller
     public function edit(Request $request, Profile $profile, ProfileRepository $profileRepository, UserLoader $userLoader): Response
     {
         $this->denyAccessUnlessGranted('VIEW', $profile);
-        $profileRepository->getNumber($profile);
+
         $profileTitle = $profileRepository->getTitle($profile);
         $profile->SetDescription($profileTitle);
         $canEdit = $this->isGranted('EDIT', $profile);
@@ -101,7 +101,7 @@ class ProfileController extends Controller
             $form->submit($inputs);
         }
 
-        if (($form->isSubmitted()) && ($form->isValid()) && ($canEdit or $copying)) {
+        if (($form->isSubmitted()) && $form->isValid() && ($canEdit or $copying)) {
             return $this->saveAndRedirect($profile, $form, $userLoader);
         }
 

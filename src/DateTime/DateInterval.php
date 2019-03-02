@@ -33,7 +33,7 @@ final class DateInterval extends \DateInterval
             && $this->getTimestamp() <= self::createFromDateInterval($maximum)->getTimestamp();
     }
 
-    private function getTimestamp(): int
+    public function getTimestamp(): int
     {
         return \DT::createFromDateInterval($this)->getTimestamp() - \DT::createByStart()->getTimestamp();
     }

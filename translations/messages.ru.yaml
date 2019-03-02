@@ -1,4 +1,5 @@
 Description: Описание
+Duration interval: Ограничение по времени (мин:сек)
 Examples count: Количество примеров в попытке
 Add perc: Сложение
 Sub perc: Вычитание

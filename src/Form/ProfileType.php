@@ -29,7 +29,7 @@ class ProfileType extends AbstractType
                 'with_years' => false,
                 'with_months' => false,
                 'with_days' => false,
-                'with_minutes' => false,
+                'with_minutes' => true,
                 'with_seconds' => true,
             ])
             ->add('examplesCount')

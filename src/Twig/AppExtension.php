@@ -7,6 +7,7 @@ use App\Repository\AttemptRepository;
 use App\Repository\TaskRepository;
 use App\Repository\UserRepository;
 use App\Security\User\CurrentUserProviderInterface;
+use Doctrine\Common\Inflector\Inflector;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Twig\Extension\AbstractExtension;
@@ -49,6 +50,7 @@ final class AppExtension extends AbstractExtension implements \Twig_Extension_Gl
     {
         return [
             new \Twig_Filter('property', [$this, 'propertyFilter']),
+            new \Twig_Filter('labelString', [$this, 'labelStringFilter']),
         ];
     }
 
@@ -66,6 +68,15 @@ final class AppExtension extends AbstractExtension implements \Twig_Extension_Gl
             'fillIp',
             'getActualHomeworksCount',
         ]);
+    }
+
+    public function labelStringFilter(string $property): string
+    {
+        $snakeCasedProperty = Inflector::tableize($property);
+
+        return ucfirst(
+            str_replace('_', ' ', $snakeCasedProperty)
+        );
     }
 
     public function dt(string $staticMethod, ...$parameters)

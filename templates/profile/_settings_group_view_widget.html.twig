@@ -4,10 +4,17 @@
         <tbody>
         {% for field in fields %}
             <tr>
-                <th>{{ form_label(form[field]) }}</th>
+                <th>{{ field|labelString|trans }}</th>
                 <td>
-                    <div>{{ form_errors(form[field]) }}</div>
-                    <div>{{ form_widget(form[field]) }}</div>
+                    {% if field == 'durationInterval' %}
+                        {{ profile.durationInterval.format('%I:%S') }}
+                    {% elseif field == 'isDemanding' %}
+                        {{ profile.isDemanding ? 'Да' : 'Нет' }}
+                        {%  elseif field in ['addPerc', 'subPerc', 'multPerc', 'divPerc'] %}
+                            {{  attribute(profile, field) }}%
+                    {% else %}
+                        {{ attribute(profile, field) }}
+                    {% endif %}
                 </td>
             </tr>
         {% endfor %}

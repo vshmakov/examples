@@ -1,5 +1,7 @@
-{%  extends 'profile/edit.html.twig' %}
+{%  extends 'main.html.twig' %}
+{%  use 'profile/_view_widget.html.twig' %}
 
-{%  block title %}abcdef{%  endblock %}
+{%  block title %}{{  profile.description }}{%  endblock %}
 
-{%  block a %}{% endblock %}
+{%  set block_template = 'profile/_settings_group_view_widget.html.twig' %}
+

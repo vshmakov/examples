@@ -1,9 +1,12 @@
 Description: Описание
 Duration interval: Ограничение по времени (мин:сек)
 Examples count: Количество примеров в попытке
-Add perc: Сложение
-Sub perc: Вычитание
-Mult perc: Умножение
-Div perc: Деление
+Is demanding: Повторять пример до правильного ответа
+
+Add perc: Процент примеров
+Sub perc: Процент примеров
+Mult perc: Процент примеров
+Div perc: Процент примеров
+
 Add f min: Минимальное первое слагаемое
 Add f max: Максимальное первое слагаемое

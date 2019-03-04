@@ -1,36 +1,5 @@
 <?php
 
-function normPerc(array $percents): array
-{
-    $totalPercents = 0;
-
-    foreach ($percents as $percent) {
-        $totalPercents += abs($percent);
-    }
-
-    if (!$totalPercents) {
-        $totalPercents = 1;
-    }
-
-    $percentsSumm = 0;
-
-    foreach ($percents as $key => $percent) {
-        $percentsSumm += $percents[$key] = round($percent / $totalPercents * 100);
-    }
-
-    foreach (array_reverse($percents) as $key => $percent) {
-        if ($percent) {
-            $percents[$key] += 100 - $percentsSumm;
-
-            return $percents;
-        }
-    }
-
-    $percents[$key] += 100 - $percentsSumm;
-
-    return $percents;
-}
-
 function arr(string $string): array
 {
     $array = explode(' ', $string);

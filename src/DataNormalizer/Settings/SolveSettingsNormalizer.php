@@ -5,7 +5,6 @@ namespace App\DataNormalizer\Settings;
 use App\DataNormalizer\Rule\ObjectRule;
 use App\Entity\BaseProfile as Settings;
 use App\Object\ObjectAccessor;
-use Doctrine\Common\Inflector\Inflector;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 final class SolveSettingsNormalizer implements SettingsNormalizerInterface
@@ -56,27 +55,9 @@ final class SolveSettingsNormalizer implements SettingsNormalizerInterface
             $addMax => [$lessThan("$addFMax + $addSMax"), $graterThanPreviousFieldRule],
         ];
 
-        $this->setBasicFieldsRules($rules, $graterThanPreviousFieldRule);
         $this->applyRules($settings, $rules, function ($value, string $field, bool $isValid) use ($settings): void {
             ObjectAccessor::setValue($settings, $field, $value);
         });
-    }
-
-    private function setBasicFieldsRules(array &$rules, ObjectRule $graterThanPreviousFieldRule): void
-    {
-        $basicRules = [];
-
-        foreach (['add', 'sub', 'mult', 'div'] as $arithmeticFunctionName) {
-            foreach (['f', 's'] as $number) {
-                $createFieldName = function (string $limit) use ($arithmeticFunctionName, $number): string {
-                    return Inflector::camelize("{$arithmeticFunctionName}_{$number}_{$limit}");
-                };
-
-                $basicRules += [$createFieldName('min') => [], $createFieldName('max') => [$graterThanPreviousFieldRule]];
-            }
-        }
-
-        $rules = $basicRules + $rules;
     }
 
     private function applyRules(Settings $settings, array $rules, callable $applyCallback): void

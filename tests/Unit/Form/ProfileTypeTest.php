@@ -14,12 +14,23 @@ use Symfony\Component\Serializer\Serializer;
 
 final class ProfileTypeTest extends TestCase
 {
+    /** @var ProfileType */
+    private $profileType;
+
+    public function setUp(): void
+    {
+        $normalizer = new Serializer([new ObjectNormalizer()], []);
+        $this->profileType = new ProfileType(
+            $this->createMock(AuthorizationCheckerInterface::class),
+            $normalizer
+        );
+    }
+
     /**
      * @test
      */
-    public function testSomething(): void
+    public function eventListenerNormalisesAdditionSolveSettings(): void
     {
-        $normalizer = new Serializer([new ObjectNormalizer()], []);
         /** @var Profile $profile */
         $profile = ObjectAccessor::initialize(Profile::class, [
             'addFMin' => 5,
@@ -27,15 +38,51 @@ final class ProfileTypeTest extends TestCase
             'addSMin' => 5,
             'addSMax' => 5,
             'addMin' => 8,
-            'addMax' => 10,
+            'addMax' => 12,
         ]);
-        $profileType = new ProfileType(
-            $this->createMock(AuthorizationCheckerInterface::class),
-            $normalizer
-        );
+        $this->normalizeSolveSettings($this->profileType, $profile);
 
-        $profileType->normalizeSolveSettings($this->createFormEvent($profile));
         $this->assertSame(10, $profile->getAddMin());
+        $this->assertSame(10, $profile->getAddMax());
+
+        /** @var Profile $profile */
+        $profile = ObjectAccessor::initialize(Profile::class, [
+            'addFMin' => 4,
+            'addFMax' => 6,
+            'addSMin' => 4,
+            'addSMax' => 6,
+            'addMin' => 20,
+            'addMax' => 1,
+        ]);
+        $this->normalizeSolveSettings($this->profileType, $profile);
+
+        $this->assertSame(12, $profile->getAddMin());
+        $this->assertSame(12, $profile->getAddMax());
+    }
+
+    /**
+     * @test
+     */
+    public function eventListenerNormalisesSubtractionSolveSettings(): void
+    {
+        /** @var Profile $profile */
+        $profile = ObjectAccessor::initialize(Profile::class, [
+            'subFMin' => 10,
+            'subFMax' => 10,
+            'subSMin' => 5,
+            'subSMax' => 5,
+            'subMin' => 7,
+            'subMax' => 1,
+            ]);
+        $this->normalizeSolveSettings($this->profileType, $profile);
+
+        $this->assertSame(5, $profile->getSubMin());
+        $this->assertSame(5, $profile->getSubMax());
+    }
+
+    private function normalizeSolveSettings(ProfileType $profileType, Profile $profile): void
+    {
+        $profileType->normalizeSolveSettings($this->createFormEvent($profile));
     }
 
     private function createFormEvent(Profile $profile): FormEvent

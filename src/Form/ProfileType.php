@@ -80,15 +80,21 @@ class ProfileType extends AbstractType
             return $rule("$currentField < $checkExpression", $checkExpression);
         };
 
-        $graterThan = function (string $checkExpression) use ($currentField, $rule): callable {
+        $greaterThan = function (string $checkExpression) use ($currentField, $rule): callable {
             return $rule("$currentField > $checkExpression", $checkExpression);
         };
 
-        $graterThanPreviousFieldRule = $rule("$currentField > $previousField", $previousField);
+        $greaterThanPreviousField = $rule("$currentField > $previousField", $previousField);
 
         $rules = [
-            'addMin' => [$graterThan('addFMin + addSMin'), $lessThan('addFMax + addSMax')],
-            'addMin' => [$lessThan('addFMax + addSMax'), $graterThanPreviousFieldRule],
+            'addMin' => [$greaterThan('addFMin + addSMin'), $additionUpperLimit = $lessThan('addFMax + addSMax')],
+            'addMax' => [$additionUpperLimit, $greaterThanPreviousField],
+            'subMin' => [$greaterThan('subFMin - subSMax'), $subtractionUpperLimit = $lessThan('subFMax - subSMin')],
+            'subMax' => [$subtractionUpperLimit, $greaterThanPreviousField],
+            'multMin' => [$greaterThan('multFMin * multSMin'), $multiplicationUpperLimit = $lessThan('multFMax * multSMax')],
+            'multMax' => [$multiplicationUpperLimit, $greaterThanPreviousField],
+            'divMin' => [$greaterThan('divFMin / divSMax'), $divisionUpperLimit = $lessThan('divFMax / divSMin')],
+            'divMax' => [$divisionUpperLimit, $greaterThanPreviousField],
         ];
 
         $normalizedSettings = [];

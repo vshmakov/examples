@@ -66,7 +66,7 @@ class ProfileType extends AbstractType
 
     public function normalizeSolveSettings(FormEvent $event): void
     {
-        $settingsData = $this->normalizer->normalize($event->getData(), null, ['group' => Group::SETTINGS]);
+        $settingsData = $this->normalizer->normalize($event->getData(), null, ['groups' => Group::SETTINGS]);
         $currentField = 'currentField';
         $previousField = 'previousField';
 

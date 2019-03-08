@@ -5,12 +5,16 @@ namespace App\DataFixtures\Attempt;
 use App\DataFixtures\UserFixtures;
 use App\Entity\Profile;
 use App\Object\ObjectAccessor;
+use App\Profile\NormalizerInterface;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
-class ProfileFixtures extends Fixture implements DependentFixtureInterface
+final class ProfileFixtures extends Fixture implements DependentFixtureInterface
 {
+    /** @var NormalizerInterface */
+    private $normalizer;
+
     public const GUEST_PROFILE_DESCRIPTION = 'Тестовый профиль';
 
     public const GUEST_PROFILE = [
@@ -34,6 +38,11 @@ class ProfileFixtures extends Fixture implements DependentFixtureInterface
             'divPerc' => 0,
         ],
     ];
+
+    public function __construct(NormalizerInterface $normalizer)
+    {
+        $this->normalizer = $normalizer;
+    }
 
     /**
      * {@inheritdoc}
@@ -70,7 +79,7 @@ class ProfileFixtures extends Fixture implements DependentFixtureInterface
                 'isPublic' => true,
             ]);
 
-            $profile->normalize();
+            $this->normalizer->normalize($profile);
             $manager->persist($profile);
         }
     }

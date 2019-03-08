@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Profile;
 use App\Object\ObjectAccessor;
+use App\Profile\NormalizerInterface as ProfileNormalizerInterface;
 use App\Serializer\Group;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Form\AbstractType;
@@ -16,9 +17,9 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Webmozart\Assert\Assert;
+use  Webmozart\Assert\Assert;
 
-class ProfileType extends AbstractType
+class ProfileType extends AbstractType implements ProfileNormalizerInterface
 {
     /** @var AuthorizationCheckerInterface */
     private $authorizationChecker;
@@ -51,8 +52,7 @@ class ProfileType extends AbstractType
             ->add('divPerc')
             ->add('isDemanding', CheckboxType::class, ['required' => false])
             ->add('save', SubmitType::class)
-            ->addEventListener(FormEvents::POST_SUBMIT, [$this, 'normalizePercentData'])
-            ->addEventListener(FormEvents::POST_SUBMIT, [$this, 'normalizeSolveSettings']);
+            ->addEventListener(FormEvents::POST_SUBMIT, [$this, 'normalizerListener']);
 
         foreach (['add', 'sub', 'mult', 'div'] as $k) {
             foreach (['F', 'S', ''] as $n) {
@@ -64,9 +64,27 @@ class ProfileType extends AbstractType
         }
     }
 
-    public function normalizeSolveSettings(FormEvent $event): void
+    public function normalizerListener(FormEvent $event): void
     {
-        $settingsData = $this->normalizer->normalize($event->getData(), null, ['groups' => Group::SETTINGS]);
+        $this->normalize($event->getData());
+    }
+
+    public function normalize(Profile $profile): void
+    {
+        $this->normalizeSolveSettings($profile);
+        $this->normalizePercentData($profile);
+    }
+
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults([
+            'data_class' => Profile::class,
+        ]);
+    }
+
+    private function normalizeSolveSettings(Profile $profile): void
+    {
+        $settingsData = $this->normalizer->normalize($profile, null, ['groups' => Group::SETTINGS]);
         $currentField = 'currentField';
         $previousField = 'previousField';
 
@@ -112,25 +130,17 @@ class ProfileType extends AbstractType
             $previousFieldName = $field;
         }
 
-        ObjectAccessor::setValues($event->getData(), $normalizedSettings);
+        ObjectAccessor::setValues($profile, $normalizedSettings);
     }
 
-    public function normalizePercentData(FormEvent $event): void
+    private function normalizePercentData(Profile $profile): void
     {
-        $profile = $event->getData();
         $percentData = ObjectAccessor::getValues($profile, ['addPerc', 'subPerc', 'multPerc', 'divPerc']);
 
         ObjectAccessor::setValues(
             $profile,
             $this->normalizePercentList($percentData)
         );
-    }
-
-    public function configureOptions(OptionsResolver $resolver)
-    {
-        $resolver->setDefaults([
-            'data_class' => Profile::class,
-        ]);
     }
 
     private function normalizePercentList(array $percentList): array

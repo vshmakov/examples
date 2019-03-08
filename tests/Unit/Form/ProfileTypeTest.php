@@ -6,8 +6,6 @@ use App\Entity\Profile;
 use App\Form\ProfileType;
 use App\Object\ObjectAccessor;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -40,7 +38,7 @@ final class ProfileTypeTest extends TestCase
             'addMin' => 8,
             'addMax' => 12,
         ]);
-        $this->normalizeSolveSettings($this->profileType, $profile);
+        $this->profileType->normalize($profile);
 
         $this->assertSame(10, $profile->getAddMin());
         $this->assertSame(10, $profile->getAddMax());
@@ -54,7 +52,7 @@ final class ProfileTypeTest extends TestCase
             'addMin' => 20,
             'addMax' => 1,
         ]);
-        $this->normalizeSolveSettings($this->profileType, $profile);
+        $this->profileType->normalize($profile);
 
         $this->assertSame(12, $profile->getAddMin());
         $this->assertSame(12, $profile->getAddMax());
@@ -74,7 +72,7 @@ final class ProfileTypeTest extends TestCase
             'subMin' => 7,
             'subMax' => 1,
         ]);
-        $this->normalizeSolveSettings($this->profileType, $profile);
+        $this->profileType->normalize($profile);
 
         $this->assertSame(5, $profile->getSubMin());
         $this->assertSame(5, $profile->getSubMax());
@@ -94,7 +92,7 @@ final class ProfileTypeTest extends TestCase
             'multMin' => 12,
             'multMax' => 11,
         ]);
-        $this->normalizeSolveSettings($this->profileType, $profile);
+        $this->profileType->normalize($profile);
 
         $this->assertSame(12, $profile->getMultMin());
         $this->assertSame(12, $profile->getMultMax());
@@ -114,7 +112,7 @@ final class ProfileTypeTest extends TestCase
             'divMin' => 0,
             'divMax' => 50,
         ]);
-        $this->normalizeSolveSettings($this->profileType, $profile);
+        $this->profileType->normalize($profile);
 
         $this->assertSame(3, $profile->getDivMin());
         $this->assertSame(10, $profile->getDivMax());
@@ -132,21 +130,11 @@ final class ProfileTypeTest extends TestCase
             'multPerc' => 0,
             'divPerc' => 1,
         ]);
-        $this->profileType->normalizePercentData($this->createFormEvent($profile));
+        $this->profileType->normalize($profile);
 
         $this->assertSame(25, $profile->getAddPerc());
         $this->assertSame(50, $profile->getSubPerc());
         $this->assertSame(0, $profile->getMultPerc());
         $this->assertSame(25, $profile->getDivPerc());
-    }
-
-    private function normalizeSolveSettings(ProfileType $profileType, Profile $profile): void
-    {
-        $profileType->normalizeSolveSettings($this->createFormEvent($profile));
-    }
-
-    private function createFormEvent(Profile $profile): FormEvent
-    {
-        return new  FormEvent($this->createMock(FormInterface::class), $profile);
     }
 }

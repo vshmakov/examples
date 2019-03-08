@@ -70,3 +70,5 @@ services:
     App\Utils\PerformanceMeter:
         arguments:
             $appEnv: '@App\Parameter\Environment\AppEnv'
+
+    App\Profile\NormalizerInterface: '@App\Form\ProfileType'

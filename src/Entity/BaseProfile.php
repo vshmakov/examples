@@ -78,7 +78,7 @@ abstract class BaseProfile
      * @ORM\Column(type="integer")
      * @Groups({Group::SETTINGS})
      */
-    protected $addMin = -1;
+    protected $addMin = 0;
 
     /**
      * @var int
@@ -86,7 +86,7 @@ abstract class BaseProfile
      * @ORM\Column(type="integer")
      * @Groups({Group::SETTINGS})
      */
-    protected $addMax = -1;
+    protected $addMax = 100;
 
     /**
      * @var int
@@ -140,7 +140,7 @@ abstract class BaseProfile
      * @ORM\Column(type="integer")
      * @Groups({Group::SETTINGS})
      */
-    protected $subMax = 1000;
+    protected $subMax = 100;
 
     /**
      * @var int
@@ -186,7 +186,7 @@ abstract class BaseProfile
      * @ORM\Column(type="integer")
      * @Groups({Group::SETTINGS})
      */
-    protected $multMin = -1;
+    protected $multMin = 0;
 
     /**
      * @var int
@@ -194,7 +194,7 @@ abstract class BaseProfile
      * @ORM\Column(type="integer")
      * @Groups({Group::SETTINGS})
      */
-    protected $multMax = -1;
+    protected $multMax = 100;
 
     /**
      * @var int
@@ -240,7 +240,7 @@ abstract class BaseProfile
      * @ORM\Column(type="integer")
      * @Groups({Group::SETTINGS})
      */
-    protected $divMin = -1;
+    protected $divMin = 0;
 
     /**
      * @var int
@@ -248,7 +248,7 @@ abstract class BaseProfile
      * @ORM\Column(type="integer")
      * @Groups({Group::SETTINGS})
      */
-    protected $divMax = -1;
+    protected $divMax = 100;
 
     /**
      * @var int

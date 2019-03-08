@@ -2,8 +2,9 @@
 
 namespace App\Controller;
 
-use App\Entity\Profile;
+use  App\Entity\Profile;
 use App\Form\ProfileType;
+use App\Profile\NormalizerInterface as ProfileNormalizerInterface;
 use App\Repository\ProfileRepository;
 use App\Repository\UserRepository;
 use App\Security\Voter\ProfileVoter;
@@ -50,11 +51,12 @@ final class ProfileController extends Controller
     /**
      * @Route("/new", name="profile_new", methods="GET|POST")
      */
-    public function new(Request $request, ProfileRepository $profileRepository, UserLoader $userLoader): Response
+    public function new(Request $request, ProfileRepository $profileRepository, UserLoader $userLoader, ProfileNormalizerInterface $normalizer): Response
     {
         $profile = new Profile();
         $profile->SetDescription($profileRepository->getTitle($profile))
             ->setAuthor($userLoader->getUser());
+        $normalizer->normalize($profile);
         $form = $this->buildForm($profile);
         $form->handleRequest($request);
         $canCreate = $this->isGranted('CREATE', $profile);

@@ -2,21 +2,18 @@
 
 namespace App\Controller\Admin;
 
-use App\Repository\IpRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class AdminController extends Controller
+final class IndexController extends Controller
 {
-    use BaseTrait;
-
     /**
      * @Route("/admin/", name="admin_index")
      */
-    public function index()
+    public function index(EntityManagerInterface $entityManager): Response
     {
-        $entityManager = $this->getEntityManager();
-
         $statistic = [];
         $queries = [
             'ipC' => 'select count(i) from App:Ip i
@@ -37,10 +34,10 @@ where u.addTime > :dt and u.enabled = true',
 
         foreach ($queries as $key => $query) {
             foreach ([1, 3, 7, 14, 30, 60, 90, 180] as $days) {
-                $statistic[$days][$key] = IpRepository::getValueByQuery(
-                    $entityManager->createQuery($query)
-                        ->setParameter('dt', \DT::createBySubDays($days))
-                );
+                $statistic[$days][$key] = $entityManager
+                                        ->createQuery($query)
+                    ->setParameter('dt', \DT::createBySubDays($days))
+                    ->getSingleScalarResult();
             }
         }
 

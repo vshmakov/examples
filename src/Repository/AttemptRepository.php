@@ -119,10 +119,10 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
             ->getSingleScalarResult();
     }
 
-    public function getFinishTime(Attempt $attempt): \DateTimeInterface
+    public function getFinishTime(Attempt $attempt): ?\DateTimeInterface
     {
         $finishTime = $this->createQueryBuilder('a')
-            ->select('a.answerTime')
+            ->select('e.answerTime')
             ->join('a.examples', 'e')
             ->where('a = :attempt')
             ->andWhere('e.answerTime is not null')
@@ -290,8 +290,10 @@ order by a.addTime asc')
 
     public function getSolvedTime(Attempt $attempt): \DateTimeInterface
     {
+        $finishedTime = $this->getFinishTime($attempt);
+
         return $this->dts(
-            $this->getFinishTime($attempt)->getTimestamp() - $attempt->getAddTime()->getTimestamp()
+            null !== $finishedTime ? $finishedTime->getTimestamp() - $attempt->getAddTime()->getTimestamp() : 0
         );
     }
 

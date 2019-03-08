@@ -50,7 +50,7 @@ final class AppExtension extends AbstractExtension implements \Twig_Extension_Gl
     {
         return [
             new \Twig_Filter('property', [$this, 'propertyFilter']),
-            new \Twig_Filter('labelString', [$this, 'labelStringFilter']),
+            new \Twig_Filter('toLabelString', [$this, 'toLabelStringFilter']),
         ];
     }
 
@@ -70,7 +70,7 @@ final class AppExtension extends AbstractExtension implements \Twig_Extension_Gl
         ]);
     }
 
-    public function labelStringFilter(string $property): string
+    public function toLabelStringFilter(string $property): string
     {
         $snakeCasedProperty = Inflector::tableize($property);
 

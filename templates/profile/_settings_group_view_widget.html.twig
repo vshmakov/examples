@@ -4,7 +4,7 @@
         <tbody>
         {% for field in fields %}
             <tr>
-                <th>{{ field|labelString|trans }}</th>
+                <th>{{ field|toLabelString|trans }}</th>
                 <td>
                     {% if field == 'durationInterval' %}
                         {{ profile.durationInterval.format('%I:%S') }}

@@ -2,7 +2,9 @@
 
 namespace App\Response;
 
+use App\Entity\Attempt;
 use App\Entity\Settings;
+use App\Entity\User;
 use App\Serializer\Group;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -10,7 +12,7 @@ final class AttemptResponse
 {
     /**
      * @var int
-     *@Groups({Group::ATTEMPT})
+     * @Groups({Group::ATTEMPT})
      */
     private $number;
 
@@ -27,12 +29,6 @@ final class AttemptResponse
     private $example;
 
     /**
-     * @var \DateTimeInterface
-     * @Groups({Group::ATTEMPT})
-     */
-    private $limitTime;
-
-    /**
      * @var int
      * @Groups({Group::ATTEMPT})
      */
@@ -45,27 +41,24 @@ final class AttemptResponse
     private $remainedExamplesCount;
 
     /**
-     * @var Settings
-     * @Groups({Group::ATTEMPT})
+     * @var Attempt
      */
-    private $settings;
+    private $attempt;
 
     public function __construct(
         int $number,
         bool $isFinished,
         ?ExampleResponse $example,
-        \DateTimeInterface $limitTime,
         int $errorsCount,
         int $remainedExamplesCount,
-        Settings $settings
+        Attempt $attempt
     ) {
         $this->number = $number;
         $this->isFinished = $isFinished;
         $this->example = $example;
-        $this->limitTime = $limitTime;
         $this->errorsCount = $errorsCount;
         $this->remainedExamplesCount = $remainedExamplesCount;
-        $this->settings = $settings;
+        $this->attempt = $attempt;
     }
 
     public function getNumber(): int
@@ -83,9 +76,12 @@ final class AttemptResponse
         return $this->example;
     }
 
+    /**
+     * @Groups({Group::ATTEMPT})
+     */
     public function getLimitTime(): \DateTimeInterface
     {
-        return $this->limitTime;
+        return $this->attempt->getLimitTime();
     }
 
     public function getErrorsCount(): int
@@ -98,8 +94,19 @@ final class AttemptResponse
         return $this->remainedExamplesCount;
     }
 
+    /**
+     * @Groups({Group::ATTEMPT})
+     */
     public function getSettings(): Settings
     {
-        return $this->settings;
+        return $this->attempt->getSettings();
+    }
+
+    /**
+     * @Groups({Group::ATTEMPT})
+     */
+    public function getUser(): User
+    {
+        return $this->attempt->getUser();
     }
 }

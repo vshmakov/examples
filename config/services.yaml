@@ -80,3 +80,7 @@ services:
     App\Parameter\Container\ParametersContainerInterface:
         class: 'App\Parameter\Container\JavascriptParametersContainer'
         public: true
+
+    App\Attempt\Doctrine\UserAttemptsExtension:
+        tags:
+            - { name: api_platform.doctrine.orm.query_extension.collection, priority: 9 }

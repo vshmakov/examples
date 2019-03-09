@@ -2,13 +2,23 @@
 
 namespace App\Entity;
 
+use  ApiPlatform\Core\Annotation\ApiResource;
 use App\Entity\Traits\BaseTrait;
+use App\Serializer\Group;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\AttemptRepository")
+ * @ApiResource(
+ *     normalizationContext={"groups"={Group::ATTEMPT}},
+ *     itemOperations={},
+ *     collectionOperations={
+ *      "get_user_attempts"={"path"="/users/me/attempts", "controller"="App\Controller\Api\UserController::attempts", "method"="GET"}
+ * }
+ *     )
  */
 class Attempt
 {
@@ -129,7 +139,7 @@ class Attempt
         return $this->dts($this->getSettings()->getDuration());
     }
 
-    public function getUser()
+    public function getUser(): ?User
     {
         return $this->getSession()->getUser();
     }

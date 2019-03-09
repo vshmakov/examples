@@ -18,8 +18,8 @@ use App\Service\UserLoader;
 use App\Utils\Cache\LocalCache;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use  Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use  Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 final class AttemptRepository extends ServiceEntityRepository implements AttemptResponseProviderInterface
 {
@@ -188,14 +188,15 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
             ->getSingleScalarResult();
     }
 
-    public function findAllByCurrentUser(): array
+    public function getByUser(User $user): array
     {
-        return $this->createQuery('select a from App:Attempt a
-join a.session s
-join s.user u
-where u = :u
-order by a.addTime asc')
-            ->setParameter('u', $this->userLoader->getUser())
+        return $this->createQueryBuilder('a')
+            ->select('a')
+            ->join('a.session', 's')
+            ->where('s.user = :user')
+            ->orderBy('a.addTime', 'asc')
+            ->getQuery()
+            ->setParameter('user', $user)
             ->getResult();
     }
 
@@ -453,10 +454,9 @@ where s.user = :user and a.task = :task')
             $this->getNumber($attempt),
             $isFinished,
             !$isFinished ? $exampleResponse : null,
-            $limitTime,
             $this->getErrorsCount($attempt),
             $remainedExamplesCount,
-            $attempt->getSettings()
+            $attempt
         );
     }
 }

@@ -1,5 +1,5 @@
 import * as $ from 'jquery';
-import "./app";
+import "../app";
 import Timeout = NodeJS.Timeout;
 import {PARAMETERS} from './constants'
 

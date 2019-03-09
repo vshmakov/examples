@@ -20,16 +20,18 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 final class AttemptController extends Controller
 {
-    use BaseTrait;
+    use CurrentUserProviderTrait, JavascriptParametersTrait;
 
     /**
      * @Route("/", name="attempt_index")
      */
-    public function index(AttemptRepository $attemptRepository): Response
+    public function index(): Response
     {
-        return $this->render('attempt/index.html.twig', [
-            'attempts' => $attemptRepository->findAllByCurrentUser(),
+        $this->setJavascriptParameters([
+            'getAttemptsUrl' => null,
         ]);
+
+        return $this->render('attempt/index.html.twig');
     }
 
     /**

@@ -19,7 +19,7 @@ use App\Utils\Cache\LocalCache;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use  Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 final class AttemptRepository extends ServiceEntityRepository implements AttemptResponseProviderInterface
 {

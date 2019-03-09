@@ -72,3 +72,11 @@ services:
             $appEnv: '@App\Parameter\Environment\AppEnv'
 
     App\Profile\NormalizerInterface: '@App\Form\ProfileType'
+
+    App\Security\User\CurrentUserProviderInterface:
+        class: App\Service\UserLoader
+        public: true
+
+    App\Parameter\Container\ParametersContainerInterface:
+        class: 'App\Parameter\Container\JavascriptParametersContainer'
+        public: true

@@ -5,23 +5,12 @@
 {% endblock %}
 
 {% block main %}
-    <div class="row">
+    <div>
         <h1>Архив попыток</h1>
         {{ include("attempt/index_table.html.twig") }}
     </div>
 {% endblock %}
 
-{%block javascripts%}
-    {{parent()}}
-    <script src="/js/jquery.datatables.min.js"></script>
-    <script>
-        $("table").DataTable({
-            ordering: false,
-            searching: false,
-            data: {{ processAttempts(attempts)|reverse|json_encode|raw }},
-            deferRender: true,
-            pageLength: 50,
-            language: {{ include("attempt/language.json.twig") }}
-        });
-    </script>
-{% endblock %}
+{% block javascripts %}
+    <script src="{{  asset('build/js/attempt/index.js') }}"></script>
+    {% endblock %}

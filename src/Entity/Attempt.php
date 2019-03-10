@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *     normalizationContext={"groups"={Group::ATTEMPT}},
  *     itemOperations={},
  *     collectionOperations={
- *      "get_user_attempts"={"path"="/users/me/attempts", "controller"="App\Controller\Api\UserController::attempts", "method"="GET"}
+ *      "get_user_attempts"={"path"="/users/me/attempts.{_format}", "controller"="App\Controller\Api\UserController::attempts", "method"="GET"}
  * }
  *     )
  */

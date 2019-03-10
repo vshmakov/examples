@@ -6,6 +6,6 @@ api_platform:
     formats:
         jsonld:   ['application/ld+json']
         html:     ['text/html']
-        jsondatatables:   ['application/datatables+json']
+        jsondt:   ['application/dt+json'] #format for datatables.js
 
     enable_swagger_ui: true

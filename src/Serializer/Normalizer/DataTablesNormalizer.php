@@ -2,8 +2,12 @@
 
 namespace App\Serializer\Normalizer;
 
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use App\Request\DataTables\DataTablesRequestProviderInterface;
 use App\Serializer\JsonDatatablesEncoder;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Webmozart\Assert\Assert;
@@ -16,29 +20,44 @@ final class DataTablesNormalizer implements NormalizerInterface
     /** @var DataTablesRequestProviderInterface */
     private $dataTablesRequestProvider;
 
-    public function __construct(ObjectNormalizer $normalizer, DataTablesRequestProviderInterface $dataTablesRequestProvider)
-    {
+    /** @var EntityManagerInterface */
+    private $entityManager;
+    private $requestStack;
+
+    /** @var iterable */
+    private $collectionExtensions;
+
+    public function __construct(
+        ObjectNormalizer $normalizer,
+        DataTablesRequestProviderInterface $dataTablesRequestProvider,
+        EntityManagerInterface $entityManager,
+        RequestStack $requestStack,
+        iterable $collectionExtensions
+    ) {
         $this->normalizer = $normalizer;
         $this->dataTablesRequestProvider = $dataTablesRequestProvider;
+        $this->entityManager = $entityManager;
+        $this->requestStack = $requestStack;
+        $this->collectionExtensions = $collectionExtensions;
     }
 
-    public function normalize($array, $format = null, array $context = []): array
+    public function normalize($collection, $format = null, array $context = []): array
     {
-        Assert::isArray($array, 'jsondatatables format supports only collection operations.');
+        Assert::isIterable($collection, 'jsondatatables format supports only collection operations.');
         Assert::true($this->dataTablesRequestProvider->hasDataTablesRequest(), 'DataTables request is not valid.');
         $data = [];
 
-        foreach ($array as $item) {
+        foreach ($collection as $item) {
             $data[] = $this->normalizer->normalize($item, null, $context);
         }
 
         $dataTablesRequest = $this->dataTablesRequestProvider->getDataTablesRequest();
-        $dataCount = \count($data);
+        $totalRecordsCount = $this->getTotalRecordsCount();
 
         return [
             'draw' => $dataTablesRequest->getDraw(),
-            'recordsTotal' => $dataCount,
-            'recordsFiltered' => $dataCount,
+            'recordsTotal' => $totalRecordsCount,
+            'recordsFiltered' => $totalRecordsCount,
             'data' => $data,
         ];
     }
@@ -46,5 +65,27 @@ final class DataTablesNormalizer implements NormalizerInterface
     public function supportsNormalization($data, $format = null): bool
     {
         return JsonDatatablesEncoder::FORMAT === $format;
+    }
+
+    private function getTotalRecordsCount(): int
+    {
+        $request = $this->requestStack->getMasterRequest();
+        Assert::notNull($request);
+        $queryNameGenerator = new QueryNameGenerator();
+        $resourceClass = $request->attributes->get('_api_resource_class');
+        $operationName = $request->attributes->get('_api_collection_operation_name');
+        $queryBuilder = $this->entityManager
+            ->createQueryBuilder()
+            ->select('count(t)')
+            ->from($resourceClass, 't');
+
+        /** @var QueryCollectionExtensionInterface $extension */
+        foreach ($this->collectionExtensions as $extension) {
+            $extension->applyToCollection($queryBuilder, $queryNameGenerator, $resourceClass, $operationName);
+        }
+
+        return $queryBuilder
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 }

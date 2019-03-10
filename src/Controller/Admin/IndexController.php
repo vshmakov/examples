@@ -35,7 +35,7 @@ where u.addTime > :dt and u.enabled = true',
         foreach ($queries as $key => $query) {
             foreach ([1, 3, 7, 14, 30, 60, 90, 180] as $days) {
                 $statistic[$days][$key] = $entityManager
-                                        ->createQuery($query)
+                    ->createQuery($query)
                     ->setParameter('dt', \DT::createBySubDays($days))
                     ->getSingleScalarResult();
             }

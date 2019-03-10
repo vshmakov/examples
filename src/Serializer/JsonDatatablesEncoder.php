@@ -6,7 +6,7 @@ use Symfony\Component\Serializer\Encoder\EncoderInterface;
 
 final class JsonDatatablesEncoder implements EncoderInterface
 {
-    public const FORMAT = 'jsondatatables';
+    public const FORMAT = 'jsondt';
 
     public function encode($data, $format, array $context = [])
     {

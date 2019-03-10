@@ -84,3 +84,7 @@ services:
     App\Attempt\Doctrine\UserAttemptsExtension:
         tags:
             - { name: api_platform.doctrine.orm.query_extension.collection, priority: 9 }
+
+    App\Serializer\Normalizer\DataTablesNormalizer:
+        arguments:
+            $collectionExtensions: !tagged api_platform.doctrine.orm.query_extension.collection

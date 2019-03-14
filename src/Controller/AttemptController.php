@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\ApiPlatform\Attribute;
 use App\Entity\Attempt;
 use App\Form\SettingsType;
+use App\Parameter\Api\Format;
 use App\Repository\AttemptRepository;
 use App\Repository\ExampleRepository;
 use App\Repository\ProfileRepository;
@@ -28,7 +30,7 @@ final class AttemptController extends Controller
     public function index(): Response
     {
         $this->setJavascriptParameters([
-            'getAttemptsUrl' => null,
+            'getAttemptsUrl' => $this->generateUrl('api_attempts_get_user_attempts_collection', [Attribute::FORMAT => Format::JSONDT]),
         ]);
 
         return $this->render('attempt/index.html.twig');

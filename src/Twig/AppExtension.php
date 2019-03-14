@@ -2,6 +2,7 @@
 
 namespace App\Twig;
 
+use App\Parameter\Container\ParametersContainerInterface;
 use App\Parameter\StringInterface;
 use App\Repository\AttemptRepository;
 use App\Repository\TaskRepository;
@@ -16,17 +17,28 @@ final class AppExtension extends AbstractExtension implements \Twig_Extension_Gl
 {
     use BaseTrait;
     private $userLoader;
-    private $globals = [];
+    private $globals;
     private $entityManager;
     private $attemptRepository;
     private $taskRepository;
     private $userRepository;
 
-    public function __construct(CurrentUserProviderInterface $currentUserProvider, AttemptRepository $attemptRepository, UserRepository $userRepository, EntityManagerInterface $entityManager, TaskRepository $taskRepository, StringInterface $appName)
-    {
+    /** @var ParametersContainerInterface */
+    private $javascriptParametersContainer;
+
+    public function __construct(
+        CurrentUserProviderInterface $currentUserProvider,
+        AttemptRepository $attemptRepository,
+        TaskRepository $taskRepository,
+        UserRepository $userRepository,
+        EntityManagerInterface $entityManager,
+        ParametersContainerInterface $javascriptParametersContainer,
+        StringInterface $appName
+    ) {
         $this->entityManager = $entityManager;
         $this->taskRepository = $taskRepository;
         $this->userLoader = $currentUserProvider;
+        $this->javascriptParametersContainer = $javascriptParametersContainer;
 
         $hasActualAttempt = (bool) $attemptRepository->findLastActualByCurrentUser();
         $user = $currentUserProvider->getCurrentUserOrGuest();
@@ -43,7 +55,9 @@ final class AppExtension extends AbstractExtension implements \Twig_Extension_Gl
 
     public function getGlobals()
     {
-        return $this->globals;
+        return $this->globals + [
+                'javascriptParameters' => $this->javascriptParametersContainer->getParameters(),
+            ];
     }
 
     public function getFilters()
@@ -57,6 +71,7 @@ final class AppExtension extends AbstractExtension implements \Twig_Extension_Gl
     public function getFunctions()
     {
         return $this->prepareFunctions([
+            'getJavascriptParameters',
             'dt',
             'addTimeNumber',
             'sortByAddTime',
@@ -68,6 +83,11 @@ final class AppExtension extends AbstractExtension implements \Twig_Extension_Gl
             'fillIp',
             'getActualHomeworksCount',
         ]);
+    }
+
+    public function getJavascriptParameters(): array
+    {
+        return $this->javascriptParametersContainer->getParameters();
     }
 
     public function toLabelStringFilter(string $property): string

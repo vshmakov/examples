@@ -5,8 +5,8 @@ namespace App\Serializer\Normalizer;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use App\Controller\ApiPlatform\Doctrine\SystemExtensionInterface;
+use App\Parameter\Api\Format;
 use App\Request\DataTables\DataTablesRequestProviderInterface;
-use App\Serializer\JsonDatatablesEncoder;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -64,7 +64,7 @@ final class DataTablesNormalizer implements NormalizerInterface
 
     public function supportsNormalization($data, $format = null): bool
     {
-        return JsonDatatablesEncoder::FORMAT === $format;
+        return Format::JSONDT === $format;
     }
 
     private function getTotalRecordsCount(): int

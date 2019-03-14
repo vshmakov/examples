@@ -3,6 +3,7 @@
 namespace App\Request;
 
 use App\ApiPlatform\Attribute;
+use App\Parameter\Api\Format;
 use App\Parameter\Http\AcceptFormatHeader;
 use App\Request\DataTables\DataTablesRequest;
 use App\Request\DataTables\DataTablesRequestProviderInterface;
@@ -10,7 +11,6 @@ use App\Request\DataTables\DataTablesRequestType;
 use App\Request\Pagination\PaginationRequest;
 use App\Request\Pagination\PaginationRequestProviderInterface;
 use App\Request\Pagination\PaginationRequestType;
-use App\Serializer\JsonDatatablesEncoder;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Webmozart\Assert\Assert;
@@ -52,7 +52,7 @@ final class RequestProvider implements DataTablesRequestProviderInterface, Pagin
             return false;
         }
 
-        return JsonDatatablesEncoder::FORMAT === $request->attributes->get(Attribute::FORMAT)
+        return Format::JSONDT === $request->attributes->get(Attribute::FORMAT)
             or false !== mb_strpos($request->headers->get(AcceptFormatHeader::HEADER_NAME), AcceptFormatHeader::JSONDT);
     }
 

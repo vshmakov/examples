@@ -5,15 +5,15 @@ namespace App\Parameter\Container;
 final class JavascriptParametersContainer implements ParametersContainerInterface
 {
     /** @var array */
-    private $parameters = [];
+    private static $parameters = [];
 
     public function setParameters(array $parameters): void
     {
-        $this->parameters += $parameters;
+        self::$parameters = $parameters;
     }
 
     public function getParameters(): array
     {
-        return $this->parameters;
+        return self::$parameters;
     }
 }

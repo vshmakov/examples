@@ -59,6 +59,7 @@ services:
 
     App\Twig\AppExtension:
         arguments:
+            $javascriptParametersContainer: '@App\Parameter\Container\JavascriptParametersContainer'
             $appName: '@App\Parameter\Environment\AppName'
 
     App\Security\Annotation\IsGrantedListener:

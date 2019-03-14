@@ -4,6 +4,7 @@ namespace App\Serializer\Normalizer;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
+use App\Controller\ApiPlatform\Doctrine\SystemExtensionInterface;
 use App\Request\DataTables\DataTablesRequestProviderInterface;
 use App\Serializer\JsonDatatablesEncoder;
 use Doctrine\ORM\EntityManagerInterface;
@@ -44,7 +45,6 @@ final class DataTablesNormalizer implements NormalizerInterface
     public function normalize($collection, $format = null, array $context = []): array
     {
         Assert::isIterable($collection, 'jsondatatables format supports only collection operations.');
-        Assert::true($this->dataTablesRequestProvider->hasDataTablesRequest(), 'DataTables request is not valid.');
         $data = [];
 
         foreach ($collection as $item) {
@@ -81,7 +81,9 @@ final class DataTablesNormalizer implements NormalizerInterface
 
         /** @var QueryCollectionExtensionInterface $extension */
         foreach ($this->collectionExtensions as $extension) {
-            $extension->applyToCollection($queryBuilder, $queryNameGenerator, $resourceClass, $operationName);
+            if (!($extension instanceof SystemExtensionInterface)) {
+                $extension->applyToCollection($queryBuilder, $queryNameGenerator, $resourceClass, $operationName);
+            }
         }
 
         return $queryBuilder

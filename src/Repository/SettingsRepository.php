@@ -2,41 +2,51 @@
 
 namespace App\Repository;
 
-use App\Entity\BaseProfile;
+use App\Entity\Profile;
 use App\Entity\Settings;
 use App\Entity\User;
-use App\Service\UserLoader;
+use App\Security\User\CurrentUserProviderInterface;
+use App\Serializer\Group;
+use App\Settings\SettingsProviderInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
-class SettingsRepository extends ServiceEntityRepository
+class SettingsRepository extends ServiceEntityRepository implements SettingsProviderInterface
 {
     use BaseTrait;
-    private $userLoader;
+    /** @var CurrentUserProviderInterface */
+    private $currentUserProvider;
 
-    public function __construct(RegistryInterface $registry, UserLoader $currentUserProvider)
+    /** @var ObjectNormalizer */
+    private $normalizer;
+
+    public function __construct(RegistryInterface $registry, CurrentUserProviderInterface $currentUserProvider, ObjectNormalizer $normalizer)
     {
         parent::__construct($registry, Settings::class);
-        $this->userLoader = $currentUserProvider;
+
+        $this->currentUserProvider = $currentUserProvider;
+        $this->normalizer = $normalizer;
     }
 
     public function getNewByCurrentUser(): Settings
     {
-        $currentUser = $this->userLoader->getUser()
+        $currentUser = $this->currentUserProvider->getCurrentUserOrGuest()
             ->setEntityRepository($this->getEntityRepository(User::class));
         $profile = $currentUser->getCurrentProfile();
 
-        return $this->findBySettingsDataOrNew($profile);
+        return $this->getSettingsByProfileOrCreate($profile);
     }
 
-    public function findBySettingsDataOrNew(BaseProfile $profile): Settings
+    public function getSettingsByProfileOrCreate(Profile $profile): Settings
     {
-        if ($settings = $this->findOneBy($profile->getSettings())) {
+        $settingsData = $this->normalizer->normalize($profile, null, ['groups' => Group::SETTINGS]);
+
+        if ($settings = $this->findOneBy($settingsData)) {
             return $settings;
         }
 
-        $settings = new Settings();
-        Settings::copySettings($profile, $settings);
+        $settings = $this->normalizer->denormalize($settingsData, Settings::class);
         $entityManager = $this->getEntityManager();
         $entityManager->persist($settings);
         $entityManager->flush();

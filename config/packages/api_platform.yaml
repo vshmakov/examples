@@ -8,4 +8,6 @@ api_platform:
         html:     ['text/html']
         jsondt:   ['application/dt+json'] #format for datatables.js
 
-    enable_swagger_ui: true
+    collection:
+        pagination:
+            enabled: false

@@ -44,21 +44,18 @@ final class ProfileFixtures extends Fixture implements DependentFixtureInterface
         $this->normalizer = $normalizer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getDependencies()
-    {
-        return [
-            UserFixtures::class,
-        ];
-    }
-
     public function load(ObjectManager $manager): void
     {
         $this->loadGuestProfiles($manager);
         $this->loadPublicProfiles($manager);
         $manager->flush();
+    }
+
+    public function getDependencies()
+    {
+        return [
+            UserFixtures::class,
+        ];
     }
 
     private function loadGuestProfiles(ObjectManager $manager): void

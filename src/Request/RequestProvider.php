@@ -2,13 +2,20 @@
 
 namespace App\Request;
 
+use App\ApiPlatform\Attribute;
+use App\Parameter\Http\AcceptFormatHeader;
 use App\Request\DataTables\DataTablesRequest;
 use App\Request\DataTables\DataTablesRequestProviderInterface;
-use App\Request\DataTables\DataTablesType;
+use App\Request\DataTables\DataTablesRequestType;
+use App\Request\Pagination\PaginationRequest;
+use App\Request\Pagination\PaginationRequestProviderInterface;
+use App\Request\Pagination\PaginationRequestType;
+use App\Serializer\JsonDatatablesEncoder;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Webmozart\Assert\Assert;
 
-final class RequestProvider implements DataTablesRequestProviderInterface
+final class RequestProvider implements DataTablesRequestProviderInterface, PaginationRequestProviderInterface
 {
     /** @var RequestStack */
     private $requestStack;
@@ -29,18 +36,48 @@ final class RequestProvider implements DataTablesRequestProviderInterface
         }
 
         $dataTablesRequest = new DataTablesRequest();
-        $form = $this->formFactory->create(DataTablesType::class, $dataTablesRequest);
-        $form->submit($request->query->all());
+        $form = $this->formFactory->create(DataTablesRequestType::class, $dataTablesRequest);
+        $form->handleRequest($request);
 
-        if (!$form->isSubmitted() or !$form->isValid()) {
+        if (!$this->isDataTablesRequest() or !$form->isSubmitted() or !$form->isValid()) {
             return null;
         }
 
         return $dataTablesRequest;
     }
 
-    public function hasDataTablesRequest(): bool
+    public function isDataTablesRequest(): bool
     {
-        return (bool) $this->getDataTablesRequest();
+        if (!$request = $this->requestStack->getMasterRequest()) {
+            return false;
+        }
+
+        return JsonDatatablesEncoder::FORMAT === $request->attributes->get(Attribute::FORMAT)
+            or false !== mb_strpos($request->headers->get(AcceptFormatHeader::HEADER_NAME), AcceptFormatHeader::JSONDT);
+    }
+
+    public function isDataTablesRequestValid(): ?bool
+    {
+        return $this->isDataTablesRequest() ? (bool) $this->getDataTablesRequest() : null;
+    }
+
+    public function getPaginationRequest(): ?PaginationRequest
+    {
+        $request = $this->requestStack->getMasterRequest();
+        Assert::notNull($request);
+        $paginationRequest = new PaginationRequest();
+        $form = $this->formFactory->create(PaginationRequestType::class, $paginationRequest);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && !$form->isValid()) {
+            return null;
+        }
+
+        return $paginationRequest;
+    }
+
+    public function isPaginationRequestValid(): bool
+    {
+        return (bool) $this->getPaginationRequest();
     }
 }

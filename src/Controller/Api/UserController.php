@@ -2,16 +2,13 @@
 
 namespace App\Controller\Api;
 
-use ApiPlatform\Core\DataProvider\PaginatorInterface;
-use App\Api\PaginatorToArrayTrait;
+use App\Iterator;
 use App\Response\AttemptResponseProviderInterface;
 
 final class UserController
 {
-    use  PaginatorToArrayTrait;
-
-    public function attempts(PaginatorInterface $data, AttemptResponseProviderInterface $attemptResponseProvider): array
+    public function attempts(iterable $data, AttemptResponseProviderInterface $attemptResponseProvider): iterable
     {
-        return array_map([$attemptResponseProvider, 'createAttemptResponse'], $this->paginatorToArray($data));
+        return Iterator::map($data, [$attemptResponseProvider, 'createAttemptResponse']);
     }
 }

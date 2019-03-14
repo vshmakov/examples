@@ -120,7 +120,7 @@ final class TaskController extends AbstractController
         }
 
         if ($form->isValid()) {
-            $settings = $settingsRepository->findBySettingsDataOrNew($profile);
+            $settings = $settingsRepository->getSettingsByProfileOrCreate($profile);
             $task->setSettings($settings);
 
             $em = $this->getDoctrine()->getManager();

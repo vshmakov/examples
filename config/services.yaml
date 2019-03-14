@@ -88,3 +88,15 @@ services:
     App\Serializer\Normalizer\DataTablesNormalizer:
         arguments:
             $collectionExtensions: !tagged api_platform.doctrine.orm.query_extension.collection
+
+    App\DataTables\Doctrine\PaginationExtension:
+        tags:
+            - { name: api_platform.doctrine.orm.query_extension.collection, priority: 9 }
+
+    App\Request\Pagination\PaginationRequestType:
+        arguments:
+            $apiRequestHandler: '@App\Request\ApiRequestHandler'
+
+    App\Request\DataTables\DataTablesRequestType:
+        arguments:
+            $apiRequestHandler: '@App\Request\ApiRequestHandler'

@@ -6,5 +6,7 @@ interface DataTablesRequestProviderInterface
 {
     public function getDataTablesRequest(): ?DataTablesRequest;
 
-    public function hasDataTablesRequest(): bool;
+    public function isDataTablesRequest(): bool;
+
+    public function isDataTablesRequestValid(): ?bool;
 }

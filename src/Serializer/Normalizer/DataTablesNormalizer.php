@@ -8,6 +8,7 @@ use App\Controller\ApiPlatform\Doctrine\SystemExtensionInterface;
 use App\Parameter\Api\Format;
 use App\Request\DataTables\DataTablesRequestProviderInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -28,13 +29,17 @@ final class DataTablesNormalizer implements NormalizerInterface
     /** @var iterable */
     private $collectionExtensions;
 
+    private $container;
+
     public function __construct(
+        ContainerInterface $container,
         ObjectNormalizer $normalizer,
         DataTablesRequestProviderInterface $dataTablesRequestProvider,
         EntityManagerInterface $entityManager,
         RequestStack $requestStack,
         iterable $collectionExtensions
     ) {
+        $this->container = $container;
         $this->normalizer = $normalizer;
         $this->dataTablesRequestProvider = $dataTablesRequestProvider;
         $this->entityManager = $entityManager;
@@ -48,7 +53,9 @@ final class DataTablesNormalizer implements NormalizerInterface
         $data = [];
 
         foreach ($collection as $item) {
-            $data[] = $this->normalizer->normalize($item, null, $context);
+            $data[] = $this->container
+                ->get('serializer')
+                ->normalize($item, null, $context);
         }
 
         $dataTablesRequest = $this->dataTablesRequestProvider->getDataTablesRequest();

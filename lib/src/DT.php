@@ -9,6 +9,11 @@ final class DT extends DateTime
         return ($dt && $dt->getTimestamp() > 0) ? static::createFromDT($dt) : false;
     }
 
+    public static function createByDifferent(\DateTimeInterface $start, \DateTimeInterface $finish): self
+    {
+        return self::createFromDateInterval($start->diff($finish));
+    }
+
     public static function start()
     {
         return static::createFromTimestamp(0);

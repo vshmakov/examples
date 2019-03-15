@@ -1,7 +1,12 @@
 import $ from 'jquery';
 import 'datatables.net-dt';
 
-const DEFAULT_PARAMETERS={};
+const DEFAULT_PARAMETERS={
+    searching:false,
+    ordering:false,
+    deferRender:true,
+    processing:true,
+};
 
 export default function defaultDefinitions(selector, customParameters) {
     let parameters = DEFAULT_PARAMETERS;

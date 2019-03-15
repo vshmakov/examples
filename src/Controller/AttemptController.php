@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\ApiPlatform\Attribute;
+use App\Attempt\AttemptCreatorInterface;
 use App\Entity\Attempt;
 use App\Form\SettingsType;
 use App\Parameter\Api\Format;
@@ -108,10 +109,10 @@ final class AttemptController extends Controller
     /**
      * @Route("/new", name="attempt_new")
      */
-    public function new(AttemptRepository $attemptRepository): RedirectResponse
+    public function new(AttemptCreatorInterface $creator): RedirectResponse
     {
         return $this->redirectToRoute('attempt_solve', [
-            'id' => $attemptRepository->getNewByCurrentUser()->getId(),
+            'id' => $creator->createAttempt()->getId(),
         ]);
     }
 }

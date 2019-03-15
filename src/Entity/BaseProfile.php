@@ -23,14 +23,14 @@ abstract class BaseProfile
 
     /**
      * @ORM\Column(type="smallint")
-     * @Groups({"settings"})
+     * @Groups({Group::SETTINGS, Group::ATTEMPT})
      */
     protected $duration = 180;
 
     /**
      * @ORM\Column(type="smallint")
      * @AppAssert\NumberBetween(minimum=3, maximum=100)
-     * @Groups({Group::SETTINGS})
+     * @Groups({Group::SETTINGS, Group::ATTEMPT})
      */
     protected $examplesCount = 5;
 
@@ -297,7 +297,7 @@ abstract class BaseProfile
      *     max="35",
      *     maxMessage="Description must contains less than {{ limit }} characters."
      * )
-     * @Groups({Group::ATTEMPT})
+     * @Groups({Group::ATTEMPT, Group::SETTINGS})
      */
     protected $description;
 
@@ -313,6 +313,9 @@ abstract class BaseProfile
         $this->addTime = new \DateTime();
     }
 
+    /**
+     * @Groups({Group::ATTEMPT})
+     */
     public function getId()
     {
         return $this->id;

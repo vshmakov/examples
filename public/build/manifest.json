@@ -1,7 +1,8 @@
 {
   "build/css/app.css": "/build/css/app.7ebc99c8.css",
   "build/js/app.js": "/build/js/app.3e74b1c7.js",
+  "build/js/attempt/index.js": "/build/js/attempt/index.7a5616cf.js",
+  "build/js/attempt/solve.js": "/build/js/attempt/solve.11a69fc0.js",
   "build/js/homework.js": "/build/js/homework.945f38f6.js",
-  "build/js/profile.js": "/build/js/profile.5ca32816.js",
-  "build/js/solve.js": "/build/js/solve.d097844f.js"
+  "build/js/profile.js": "/build/js/profile.5ca32816.js"
 }

@@ -2,13 +2,12 @@
 
 namespace App\Controller\Api;
 
+use App\Attempt\AttemptResultProviderInterface;
 use App\Entity\Attempt;
-use App\Repository\ExampleRepository;
 use App\Response\AttemptResponse;
 use App\Response\AttemptResponseProviderInterface;
 use App\Security\Voter\AttemptVoter;
 use App\Serializer\Group;
-use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -22,7 +21,7 @@ final class AttemptController extends BaseController
      * @Route("/{id}/answer/", name="api_attempt_answer", methods="POST")
      * @IsGranted(AttemptVoter::SOLVE, subject="attempt")
      */
-    public function answer(Attempt $attempt, Request $request, ExampleRepository $exampleRepository, EntityManagerInterface $entityManager, AttemptResponseProviderInterface $attemptResponseProvider): array
+    public function answer(Attempt $attempt, Request $request, AttemptResponseProviderInterface $attemptResponseProvider, AttemptResultProviderInterface $attemptResultProvider): array
     {
         $createAnswerAttemptResponseData = function (?bool $isRight, AttemptResponse $attemptResponse): array {
             return $this->normalize([
@@ -36,10 +35,12 @@ final class AttemptController extends BaseController
             return $createAnswerAttemptResponseData(null, $attemptResponse);
         }
 
-        $example = $exampleRepository->findLastUnansweredByAttempt($attempt);
+        $example = $attemptResponse->getExample()->getExample();
         $answer = (float) $request->request->get('answer');
         $example->setAnswer($answer);
-        $entityManager->flush();
+        $this->getDoctrine()
+            ->getManager()
+            ->flush();
 
         return $createAnswerAttemptResponseData(
             $example->isRight(),

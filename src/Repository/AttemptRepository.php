@@ -2,7 +2,10 @@
 
 namespace App\Repository;
 
+use App\Attempt\AttemptCreatorInterface;
+use App\Attempt\AttemptResultProviderInterface;
 use App\Entity\Attempt;
+use App\Entity\Attempt\Result;
 use App\Entity\Example;
 use App\Entity\Settings;
 use App\Entity\Task;
@@ -21,7 +24,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 use  Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-final class AttemptRepository extends ServiceEntityRepository implements AttemptResponseProviderInterface
+final class AttemptRepository extends ServiceEntityRepository implements AttemptCreatorInterface, AttemptResponseProviderInterface, AttemptResultProviderInterface
 {
     use BaseTrait;
 
@@ -200,7 +203,7 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
             ->getResult();
     }
 
-    public function getNewByCurrentUser(): Attempt
+    public function createAttempt(): Attempt
     {
         $attempt = $this->createNewByCurrentUser()
             ->setSettings($this->getEntityRepository(Settings::class)->getNewByCurrentUser());
@@ -208,6 +211,7 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
         $entityManager = $this->getEntityManager();
         $entityManager->persist($attempt);
         $entityManager->flush();
+        $this->updateAttemptResult($attempt);
 
         return $attempt;
     }
@@ -220,6 +224,7 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
 
         $entityManager = $this->getEntityManager();
         $entityManager->persist($attempt);
+        $this->updateAttemptResult($attempt);
         $entityManager->flush();
 
         return $attempt;
@@ -441,7 +446,6 @@ where s.user = :user and a.task = :task')
         /** @var ExampleRepository $exampleRepository */
         $exampleRepository = $this->getEntityRepository(Example::class);
         $limitTime = $attempt->getLimitTime();
-        $remainedExamplesCount = $this->getRemainedExamplesCount($attempt);
         $isFinished = !$this->isActual($attempt);
 
         if (!$isFinished) {
@@ -452,11 +456,26 @@ where s.user = :user and a.task = :task')
 
         return new AttemptResponse(
             $this->getNumber($attempt),
+            $this->getTitle($attempt),
             $isFinished,
             !$isFinished ? $exampleResponse : null,
-            $this->getErrorsCount($attempt),
-            $remainedExamplesCount,
             $attempt
         );
+    }
+
+    public function updateAttemptResult(Attempt $attempt): void
+    {
+        $result = $attempt->getResult() ?? new Result();
+        $this->getEntityManager()->persist($result);
+        $solvedExamplesCount = $this->getSolvedExamplesCount($attempt);
+        $errorsCount = $this->getErrorsCount($attempt);
+        ObjectAccessor::setValues($result, [
+            'solvedExamplesCount' => $solvedExamplesCount,
+            'errorsCount' => $errorsCount,
+            'finishedAt' => $this->getFinishTime($attempt),
+            'rating' => ExampleManager::rating($solvedExamplesCount, $errorsCount),
+        ]);
+        $attempt->setResult($result);
+        $this->getEntityManager()->flush();
     }
 }

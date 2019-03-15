@@ -37,4 +37,9 @@ final class ExampleResponse
     {
         return $this->example->__toString();
     }
+
+    public function getExample(): Example
+    {
+        return $this->example;
+    }
 }

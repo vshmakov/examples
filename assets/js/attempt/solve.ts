@@ -1,7 +1,8 @@
 import * as $ from 'jquery';
 import "../app";
 import Timeout = NodeJS.Timeout;
-import {PARAMETERS} from './constants'
+import {PARAMETERS} from '../constants';
+import getTwoNumberDateParts from '../datetime/getTwoNumberDateParts';
 
 interface AttemptDataCallback {
     (data: AttemptData): void;
@@ -35,11 +36,7 @@ class Timer {
         this._started = true;
     }
 
-    private
-
-    timer()
-        :
-        void {
+    private timer(): void {
         let remainedMilliseconds = this._remainedTime.getTime() - 1000;
 
         if (0 > remainedMilliseconds) {
@@ -81,8 +78,8 @@ class AttemptData {
         return {
             example: attemptData.example.string,
             exampleNumber: attemptData.example.number,
-            remainedExamplesCount: attemptData.remainedExamplesCount,
-            errorsCount: attemptData.errorsCount,
+            remainedExamplesCount: attemptData.result.remainedExamplesCount,
+            errorsCount: attemptData.result.errorsCount,
         };
     }
 
@@ -162,10 +159,9 @@ class App {
     }
 
     private _setTime(date: Date): void {
-        const getTwoNumbersValue = (value: number): string => 10 <= value ? value.toString() : `0${value}`;
-
+        const dateParts = getTwoNumberDateParts(date);
         this._timer.html(
-            `${getTwoNumbersValue(date.getMinutes())}:${getTwoNumbersValue(date.getSeconds())}`
+            `${dateParts.minute}:${dateParts.second}`
         );
         this._paintTimer(date);
     }

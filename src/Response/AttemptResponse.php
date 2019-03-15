@@ -2,7 +2,8 @@
 
 namespace App\Response;
 
-use App\Entity\Attempt;
+use  App\Entity\Attempt;
+use App\Entity\Attempt\Result;
 use App\Entity\Settings;
 use App\Entity\User;
 use App\Serializer\Group;
@@ -29,35 +30,24 @@ final class AttemptResponse
     private $example;
 
     /**
-     * @var int
-     * @Groups({Group::ATTEMPT})
-     */
-    private $errorsCount;
-
-    /**
-     * @var int
-     * @Groups({Group::ATTEMPT})
-     */
-    private $remainedExamplesCount;
-
-    /**
      * @var Attempt
      */
     private $attempt;
 
+    /** @var string */
+    private $title;
+
     public function __construct(
         int $number,
+        string $title,
         bool $isFinished,
         ?ExampleResponse $example,
-        int $errorsCount,
-        int $remainedExamplesCount,
         Attempt $attempt
     ) {
         $this->number = $number;
+        $this->title = $title;
         $this->isFinished = $isFinished;
         $this->example = $example;
-        $this->errorsCount = $errorsCount;
-        $this->remainedExamplesCount = $remainedExamplesCount;
         $this->attempt = $attempt;
     }
 
@@ -84,16 +74,6 @@ final class AttemptResponse
         return $this->attempt->getLimitTime();
     }
 
-    public function getErrorsCount(): int
-    {
-        return $this->errorsCount;
-    }
-
-    public function getRemainedExamplesCount(): int
-    {
-        return $this->remainedExamplesCount;
-    }
-
     /**
      * @Groups({Group::ATTEMPT})
      */
@@ -108,5 +88,37 @@ final class AttemptResponse
     public function getUser(): User
     {
         return $this->attempt->getUser();
+    }
+
+    /**
+     * @Groups({Group::ATTEMPT})
+     */
+    public function getResult(): Result
+    {
+        return $this->attempt->getResult();
+    }
+
+    /**
+     * @Groups({Group::ATTEMPT})
+     */
+    public function getId(): int
+    {
+        return $this->attempt->getId();
+    }
+
+    /**
+     * @Groups({Group::ATTEMPT})
+     */
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+
+    /**
+     * @Groups({Group::ATTEMPT})
+     */
+    public function getCreatedAt(): \DateTimeInterface
+    {
+        return $this->attempt->getAddTime();
     }
 }

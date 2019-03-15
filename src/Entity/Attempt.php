@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use  ApiPlatform\Core\Annotation\ApiResource;
+use App\Entity\Attempt\Result;
 use App\Entity\Traits\BaseTrait;
 use App\Serializer\Group;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -57,6 +58,11 @@ class Attempt
      * @ORM\JoinColumn(nullable=false)
      */
     private $settings;
+
+    /**
+     * @ORM\OneToOne(targetEntity=Result::class, mappedBy="attempt", cascade={"persist", "remove"})
+     */
+    private $result;
 
     public function __construct()
     {
@@ -164,6 +170,23 @@ class Attempt
     public function setSettings(?Settings $settings): self
     {
         $this->settings = $settings;
+
+        return $this;
+    }
+
+    public function getResult(): ?Result
+    {
+        return $this->result;
+    }
+
+    public function setResult(Result $result): self
+    {
+        $this->result = $result;
+
+        // set the owning side of the relation if necessary
+        if ($this !== $result->getAttempt()) {
+            $result->setAttempt($this);
+        }
 
         return $this;
     }

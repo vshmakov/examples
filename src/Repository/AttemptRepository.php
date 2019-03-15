@@ -205,8 +205,10 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
 
     public function createAttempt(): Attempt
     {
+        /** @var SettingsRepository $settingsRepository */
+        $settingsRepository = $this->getEntityRepository(Settings::class);
         $attempt = $this->createNewByCurrentUser()
-            ->setSettings($this->getEntityRepository(Settings::class)->getNewByCurrentUser());
+            ->setSettings($settingsRepository->getNewByCurrentUser());
 
         $entityManager = $this->getEntityManager();
         $entityManager->persist($attempt);

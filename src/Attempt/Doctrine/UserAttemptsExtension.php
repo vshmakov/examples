@@ -28,6 +28,7 @@ final class UserAttemptsExtension implements QueryCollectionExtensionInterface
         $queryBuilder
             ->join(sprintf('%s.session', $attemptAlias), 's')
             ->andWhere('s.user = :user')
+            ->orderBy(sprintf('%s.id', $attemptAlias), 'desc')
             ->setParameter('user', $this->currentUserProvider->getCurrentUserOrGuest());
     }
 }

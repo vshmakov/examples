@@ -10,8 +10,6 @@ use Doctrine\ORM\Query;
  */
 trait BaseTrait
 {
-    use \App\BaseTrait;
-
     /**
      * @deprecated
      */

@@ -19,10 +19,17 @@ final class ExampleResponse
      */
     private $number;
 
-    public function __construct(Example $example, int $number)
+    /** @var \DateTimeInterface|null */
+    private $solvingTime;
+
+    public function __construct(
+        int $number,
+        ?\DateTimeInterface $solvingTime,
+        Example $example)
     {
-        $this->example = $example;
         $this->number = $number;
+        $this->solvingTime = $solvingTime;
+        $this->example = $example;
     }
 
     public function getNumber(): int
@@ -36,6 +43,11 @@ final class ExampleResponse
     public function getString(): string
     {
         return $this->example->__toString();
+    }
+
+    public function getSolvingTime(): ?\DateTimeInterface
+    {
+        return $this->solvingTime;
     }
 
     public function getExample(): Example

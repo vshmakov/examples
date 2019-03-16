@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use  App\DateTime\DateTime as DT;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
@@ -36,7 +37,7 @@ where u.addTime > :dt and u.enabled = true',
             foreach ([1, 3, 7, 14, 30, 60, 90, 180] as $days) {
                 $statistic[$days][$key] = $entityManager
                     ->createQuery($query)
-                    ->setParameter('dt', \DT::createBySubDays($days))
+                    ->setParameter('dt', DT::createBySubDays($days))
                     ->getSingleScalarResult();
             }
         }

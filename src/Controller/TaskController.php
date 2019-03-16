@@ -63,7 +63,7 @@ final class TaskController extends AbstractController
         $task = (new Task())
             ->setAuthor($currentUser)
             ->setContractors($currentUser->getStudents())
-            ->setLimitTime((new \DT())->add(new \DateInterval('P7D')));
+            ->setLimitTime((new \DateTime())->add(new \DateInterval('P7D')));
         $form = $this->createForm(TaskType::class, $task);
         $form->handleRequest($request);
 

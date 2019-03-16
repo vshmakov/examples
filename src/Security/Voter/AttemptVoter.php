@@ -50,7 +50,7 @@ final class AttemptVoter extends Voter
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
     {
-        return $this->checkRight($attribute, $subject->setEntityRepository($this->attemptRepository), $token);
+        return $this->checkRight($attribute, $subject, $token);
     }
 
     private function canSolve()

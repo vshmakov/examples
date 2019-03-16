@@ -7,7 +7,6 @@ use Doctrine\Common\Inflector\Inflector;
 
 trait BaseTrait
 {
-    use \App\BaseTrait;
     private $entityRepository;
 
     public function setER(ServiceEntityRepository $entityRepository): self

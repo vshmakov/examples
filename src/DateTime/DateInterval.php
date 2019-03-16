@@ -2,6 +2,7 @@
 
 namespace App\DateTime;
 
+use  App\DateTime\DateTime as DT;
 use App\Object\ObjectAccessor;
 
 final class DateInterval extends \DateInterval
@@ -21,8 +22,8 @@ final class DateInterval extends \DateInterval
 
     public static function createNormalizedFromDateIntervalString(string $interval): self
     {
-        $intervalDate = \DT::createFromDateInterval(new \DateInterval($interval));
-        $normalizedInterval = \DT::createByStart()->diff($intervalDate);
+        $intervalDate = DT::createFromDateInterval(new \DateInterval($interval));
+        $normalizedInterval = DT::createByStart()->diff($intervalDate);
 
         return self::createFromDateInterval($normalizedInterval);
     }
@@ -35,6 +36,6 @@ final class DateInterval extends \DateInterval
 
     public function getTimestamp(): int
     {
-        return \DT::createFromDateInterval($this)->getTimestamp() - \DT::createByStart()->getTimestamp();
+        return DT::createFromDateInterval($this)->getTimestamp() - \App\DateTime\DateTime::createByStart()->getTimestamp();
     }
 }

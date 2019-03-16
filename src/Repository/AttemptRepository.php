@@ -2,18 +2,18 @@
 
 namespace App\Repository;
 
-use App\Attempt\AttemptCreatorInterface;
+use  App\Attempt\AttemptCreatorInterface;
 use App\Attempt\AttemptResultProviderInterface;
+use App\Attempt\Example\ExampleResponseProviderInterface;
+use App\DateTime\DateTime as DT;
 use App\Entity\Attempt;
 use App\Entity\Attempt\Result;
-use App\Entity\Example;
 use App\Entity\Settings;
 use App\Entity\Task;
 use App\Entity\User;
 use App\Object\ObjectAccessor;
 use App\Response\AttemptResponse;
 use App\Response\AttemptResponseProviderInterface;
-use App\Response\ExampleResponse;
 use App\Security\User\CurrentUserProviderInterface;
 use App\Security\User\CurrentUserSessionProviderInterface;
 use App\Service\ExampleManager;
@@ -43,15 +43,19 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
     /** @var CurrentUserSessionProviderInterface */
     private $currentUserSessionProvider;
 
+    /** @var ExampleResponseProviderInterface */
+    private $exampleResponseProvider;
+
     public function __construct(
         RegistryInterface $registry,
         ExampleRepository $exampleRepository,
         UserLoader $userLoader,
         UserRepository $userRepository,
         CurrentUserProviderInterface $currentUserProvider,
+        CurrentUserSessionProviderInterface $currentUserSessionProvider,
         AuthorizationCheckerInterface $authorizationChecker,
         LocalCache $localCache,
-        CurrentUserSessionProviderInterface $currentUserSessionProvider
+        ExampleResponseProviderInterface $exampleResponseProvider
     ) {
         parent::__construct($registry, Attempt::class);
 
@@ -62,6 +66,7 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
         $this->authorizationChecker = $authorizationChecker;
         $this->localCache = $localCache;
         $this->currentUserSessionProvider = $currentUserSessionProvider;
+        $this->exampleResponseProvider = $exampleResponseProvider;
     }
 
     public function findLastActualByCurrentUser(): ?Attempt
@@ -135,7 +140,7 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
             ->setMaxResults(1)
             ->getOneOrNullResult();
 
-        return null !== $finishTime ? \DT::createFromDT($finishTime) : $attempt->getAddTime();
+        return null !== $finishTime ? \App\DateTime\DateTime::createFromDT($finishTime) : $attempt->getAddTime();
     }
 
     public function getSolvedExamplesCount(Attempt $attempt): int
@@ -279,7 +284,7 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
     {
         $remainedTime = $attempt->getLimitTime()->getTimestamp() - time();
 
-        return $this->dts($remainedTime > 0 ? $remainedTime : 0);
+        return DT::createFromTimestamp($remainedTime > 0 ? $remainedTime : 0);
     }
 
     public function getAllData(Attempt $attempt): array
@@ -300,7 +305,7 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
     {
         $finishedTime = $this->getFinishTime($attempt);
 
-        return $this->dts(
+        return DT::createFromTimestamp(
             null !== $finishedTime ? $finishedTime->getTimestamp() - $attempt->getAddTime()->getTimestamp() : 0
         );
     }
@@ -309,7 +314,7 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
     {
         $count = $this->getSolvedExamplesCount($attempt);
 
-        return $this->dts(
+        return DT::createFromTimestamp(
             $count ? round($this->getSolvedTime($attempt)->getTimestamp() / $count) : 0
         );
     }
@@ -445,22 +450,10 @@ where s.user = :user and a.task = :task')
 
     public function createAttemptResponse(Attempt $attempt): AttemptResponse
     {
-        /** @var ExampleRepository $exampleRepository */
-        $exampleRepository = $this->getEntityRepository(Example::class);
-        $limitTime = $attempt->getLimitTime();
-        $isFinished = !$this->isActual($attempt);
-
-        if (!$isFinished) {
-            $example = $exampleRepository->findLastUnansweredByAttemptOrGetNew($attempt);
-            $exampleNumber = $exampleRepository->getNumber($example);
-            $exampleResponse = new ExampleResponse($example, $exampleNumber);
-        }
-
         return new AttemptResponse(
             $this->getNumber($attempt),
             $this->getTitle($attempt),
-            $isFinished,
-            !$isFinished ? $exampleResponse : null,
+            $this->exampleResponseProvider->createSolvingExampleResponse($attempt),
             $attempt
         );
     }

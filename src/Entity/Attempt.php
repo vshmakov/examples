@@ -3,8 +3,8 @@
 namespace App\Entity;
 
 use  ApiPlatform\Core\Annotation\ApiResource;
+use  App\DateTime\DateTime as DT;
 use App\Entity\Attempt\Result;
-use App\Entity\Traits\BaseTrait;
 use App\Serializer\Group;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -23,8 +23,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
  */
 class Attempt
 {
-    use BaseTrait;
-
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -106,9 +104,14 @@ class Attempt
         return $this;
     }
 
+    public function getCreatedAt(): \DateTimeInterface
+    {
+        return $this->getAddTime();
+    }
+
     public function getAddTime(): ?\DateTimeInterface
     {
-        return $this->dt($this->addTime);
+        return DT::createFromDT($this->addTime);
     }
 
     public function setAddTime(\DateTimeInterface $addTime): self
@@ -137,7 +140,7 @@ class Attempt
 
     public function getLimitTime(): \DateTimeInterface
     {
-        return $this->dts($this->getAddTime()->getTimestamp() + $this->getSettings()->getDuration());
+        return DateTime::createFromTimestamp($this->getAddTime()->getTimestamp() + $this->getSettings()->getDuration());
     }
 
     public function getMaxTime()

@@ -2,17 +2,20 @@
 
 namespace App\Repository;
 
+use  App\Attempt\Example\ExampleResponseProviderInterface;
+use App\DateTime\DateTime as DT;
 use App\Entity\Attempt;
 use App\Entity\Example;
 use App\Entity\Task;
 use App\Entity\User;
+use App\Response\ExampleResponse;
 use App\Service\ExampleManager;
 use App\Service\UserLoader;
 use App\Utils\Cache\GlobalCache;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-class ExampleRepository extends ServiceEntityRepository
+class ExampleRepository extends ServiceEntityRepository implements ExampleResponseProviderInterface
 {
     use BaseTrait;
     private $exampleManager;
@@ -157,7 +160,7 @@ where u = :u and a.addTime > :dt')
                 return null !== $example->getAnswerTime() ? $example->getAnswerTime()->getTimestamp() - $previousTime->getTimestamp() : null;
             });
 
-        return null !== $solvingTime ? $this->dts($solvingTime) : null;
+        return null !== $solvingTime ? DT::createFromTimestamp($solvingTime) : null;
     }
 
     public function findByUser(User $user): array
@@ -206,5 +209,25 @@ join a.session s
 where s.user = :user and a.task = :task')
             ->setParameters(['user' => $user, 'task' => $task])
             ->getResult();
+    }
+
+    public function createExampleResponse(Example $example): ExampleResponse
+    {
+        return new ExampleResponse(
+            $this->getNumber($example),
+            $this->getSolvingTime($example),
+            $example
+        );
+    }
+
+    public function createSolvingExampleResponse(Attempt $attempt): ?ExampleResponse
+    {
+        if (($attempt->getResult()->isFinished())) {
+            return null;
+        }
+
+        return $this->createExampleResponse(
+            $this->findLastUnansweredByAttemptOrGetNew($attempt)
+        );
     }
 }

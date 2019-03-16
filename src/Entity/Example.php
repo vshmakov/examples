@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use  App\DateTime\DateTime as DT;
 use App\Entity\Traits\BaseTrait;
 use App\Service\ExampleManager;
 use Doctrine\ORM\Mapping as ORM;
@@ -147,7 +148,7 @@ class Example
 
     public function getAddTime(): ?\DateTimeInterface
     {
-        return $this->dt($this->addTime);
+        return DT::createFromDT($this->addTime);
     }
 
     public function setAddTime(\DateTimeInterface $addTime): self
@@ -159,7 +160,7 @@ class Example
 
     public function getAnswerTime(): ?\DateTimeInterface
     {
-        return null !== $this->answerTime ? $this->dt($this->answerTime) : null;
+        return null !== $this->answerTime ? DT::createFromDT($this->answerTime) : null;
     }
 
     public function setAnswerTime(\DateTimeInterface $answerTime): self

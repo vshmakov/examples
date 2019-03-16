@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use  App\DateTime\DateTime as DT;
 use App\Entity\Traits\BaseTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -160,7 +161,7 @@ class Task
 
     public function getAddTime(): ? \DateTimeInterface
     {
-        return $this->dt($this->addTime);
+        return DT::createFromDT($this->addTime);
     }
 
     public function setAddTime(\DateTimeInterface $addTime): self
@@ -172,7 +173,7 @@ class Task
 
     public function getLimitTime(): ? \DateTimeInterface
     {
-        return $this->dt($this->limitTime);
+        return DT::createFromDT($this->limitTime);
     }
 
     public function setLimitTime(\DateTimeInterface $limitTime): self

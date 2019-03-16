@@ -2,7 +2,8 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use  ApiPlatform\Core\Annotation\ApiResource;
+use App\DateTime\DateTime as DT;
 use App\Entity\Traits\BaseTrait;
 use App\Entity\Traits\BaseUserTrait;
 use App\Object\ObjectAccessor;
@@ -120,7 +121,7 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
 
     public function getAddTime(): ?\DateTimeInterface
     {
-        return $this->dt($this->addTime);
+        return DT::createFromDT($this->addTime);
     }
 
     public function setAddTime(\DateTimeInterface $addTime): self
@@ -223,7 +224,7 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
 
     public function getLimitTime(): ?\DateTimeInterface
     {
-        return $this->dt($this->limitTime);
+        return DT::createFromDT($this->limitTime);
     }
 
     public function setLimitTime(\DateTimeInterface $limitTime): self
@@ -237,7 +238,7 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
     {
         $d = $this->getLimitTime()->getTimestamp() - time();
 
-        return $this->dts($d > 0 ? $d : 0);
+        return DT::createFromTimestamp($d > 0 ? $d : 0);
     }
 
     /**

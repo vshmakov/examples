@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use  App\DateTime\DateTime as DT;
 use App\Repository\SessionRepository;
 use App\Repository\UserRepository;
 use App\Repository\VisitRepository;
@@ -45,11 +46,11 @@ class CronCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $dt = \DT::createBySubDays(7);
+        $dt = DT::createBySubDays(7);
         $removedSessionsCount = $this->sessionRepository->clearSessions($dt);
-        $dt = \DT::createBySubDays(2);
+        $dt = DT::createBySubDays(2);
         $removedVisitsCount = $this->visitRepository->cleareVisits($dt);
-        $dt = \DT::createBySubDays(10);
+        $dt = DT::createBySubDays(10);
         $removedUsersCount = $this->userRepository->clearNotEnabledUsers($dt);
 
         $io->success(sprintf(

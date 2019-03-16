@@ -206,7 +206,7 @@ where u = :u')
         $entityManager = $this->getEntityManager();
         $users = $entityManager->createQuery('select u from App:User u
         where u.enabled = false and u.addTime < :dt')
-            ->setParameter('dt', \DT::createBySubDays(10))
+            ->setParameter('dt', \App\DateTime\DateTime::createBySubDays(10))
             ->getResult();
 
         foreach ($users as $user) {

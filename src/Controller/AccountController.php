@@ -57,7 +57,7 @@ class AccountController extends Controller
             $limitTime = $user->getLimitTime();
 
             if ($limitTime->isPast()) {
-                $limitTime = new \DT();
+                $limitTime = new \DateTime();
             }
             $user->setLimitTime($limitTime->add(new \DateInterval("P{$month}M")))
                 ->setMoney($remaindMoney);

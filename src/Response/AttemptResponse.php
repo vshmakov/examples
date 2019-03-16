@@ -18,12 +18,6 @@ final class AttemptResponse
     private $number;
 
     /**
-     * @var bool
-     * @Groups({Group::ATTEMPT})
-     */
-    private $isFinished;
-
-    /**
      * @var ExampleResponse|null
      * @Groups({Group::ATTEMPT})
      */
@@ -40,13 +34,11 @@ final class AttemptResponse
     public function __construct(
         int $number,
         string $title,
-        bool $isFinished,
         ?ExampleResponse $example,
         Attempt $attempt
     ) {
         $this->number = $number;
         $this->title = $title;
-        $this->isFinished = $isFinished;
         $this->example = $example;
         $this->attempt = $attempt;
     }
@@ -54,11 +46,6 @@ final class AttemptResponse
     public function getNumber(): int
     {
         return $this->number;
-    }
-
-    public function isFinished(): bool
-    {
-        return $this->isFinished;
     }
 
     public function getExample(): ?ExampleResponse

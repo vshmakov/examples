@@ -2,7 +2,8 @@
 
 namespace App\Entity;
 
-use App\DateTime\DateInterval as DTI;
+use  App\DateTime\DateInterval as DTI;
+use App\DateTime\DateTime as DT;
 use App\Entity\Traits\BaseTrait;
 use App\Serializer\Group;
 use App\Validator as AppAssert;
@@ -323,7 +324,7 @@ abstract class BaseProfile
 
     public function getAddTime(): ?\DateTimeInterface
     {
-        return $this->dt($this->addTime);
+        return DT::createFromDT($this->addTime);
     }
 
     public function setAddTime(\DateTimeInterface $addTime): self

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use  App\DateTime\DateTime as DT;
 use App\Entity\User;
 use App\Entity\User\Role;
 use App\Exception\RequiresTeacherAccessException;
@@ -40,7 +41,7 @@ final class StudentController extends Controller
             'children' => $currentUser->getChildren()->getValues(),
             'userRepository' => $userRepository,
             'DTSubDays' => function (int $day): \DateTimeInterface {
-                return \DT::createBySubDays($day);
+                return DT::createBySubDays($day);
             },
         ]);
     }

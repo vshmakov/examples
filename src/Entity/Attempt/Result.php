@@ -2,6 +2,7 @@
 
 namespace App\Entity\Attempt;
 
+use  App\DateTime\DateTime as DT;
 use  App\Entity\Attempt;
 use App\Serializer\Group;
 use Doctrine\ORM\Mapping as ORM;
@@ -123,6 +124,15 @@ class Result
      */
     public function getSolvingTime(): \DateTimeInterface
     {
-        return \DT::createByDifferent($this->getAttempt()->getAddTime(), $this->getFinishedAt());
+        return DT::createByDifferent($this->getAttempt()->getAddTime(), $this->getFinishedAt());
+    }
+
+    /**
+     * @Groups({Group::ATTEMPT})
+     */
+    public function isFinished(): bool
+    {
+        return time() > $this->getAttempt()->getLimitTime()->getTimestamp()
+            or 0 === $this->getRemainedExamplesCount();
     }
 }

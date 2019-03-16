@@ -4,11 +4,12 @@ namespace App\Controller;
 
 use App\ApiPlatform\Attribute;
 use App\Attempt\AttemptCreatorInterface;
+use App\Attempt\Example\ExampleResponseProviderInterface;
 use App\Entity\Attempt;
 use App\Form\SettingsType;
+use App\Iterator;
 use App\Parameter\Api\Format;
 use App\Repository\AttemptRepository;
-use App\Repository\ExampleRepository;
 use App\Repository\ProfileRepository;
 use App\Response\AttemptResponseProviderInterface;
 use App\Security\Voter\AttemptVoter;
@@ -41,13 +42,12 @@ final class AttemptController extends Controller
      * @Route("/{id}/show", name="attempt_show", requirements={"id": "\d+"})
      * @IsGranted(AttemptVoter::VIEW, subject="attempt")
      */
-    public function show(Attempt $attempt, ExampleRepository $exampleRepository, AttemptRepository $attemptRepository): Response
+    public function show(Attempt $attempt, AttemptResponseProviderInterface $attemptResponseProvider, ExampleResponseProviderInterface $exampleResponseProvider): Response
     {
         return $this->render('attempt/show.html.twig', [
-            'attemptRepository' => $attemptRepository,
-            'att' => $attempt->setEntityRepository($attemptRepository),
-            'examples' => $exampleRepository->findByAttempt($attempt),
-            'exR' => $exampleRepository,
+            'attempt' => $attempt,
+            'attemptResponse' => $attemptResponseProvider->createAttemptResponse($attempt),
+            'exampleResponses' => Iterator::map($attempt->getExamples(), [$exampleResponseProvider, 'createExampleResponse']),
         ]);
     }
 

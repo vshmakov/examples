@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use  App\DateTime\DateTime as DT;
 use App\Entity\Traits\BaseTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -72,7 +73,7 @@ class Session
 
     public function getLastTime()
     {
-        return $this->dt($this->lastTime);
+        return DT::createFromDT($this->lastTime);
     }
 
     public function setLastTime($dt)
@@ -84,7 +85,7 @@ class Session
 
     public function getAddTime(): ?\DateTimeInterface
     {
-        return $this->dt($this->addTime);
+        return DT::createFromDT($this->addTime);
     }
 
     public function setAddTime(\DateTimeInterface $addTime): self

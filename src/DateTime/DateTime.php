@@ -1,6 +1,11 @@
 <?php
 
-final class DT extends DateTime
+namespace App\DateTime;
+
+use DateTime;
+use Exception;
+
+final class DateTime extends DateTime
 {
     public static function createFromFormat($format, $string, $o = null)
     {

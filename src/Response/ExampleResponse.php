@@ -22,13 +22,18 @@ final class ExampleResponse
     /** @var \DateTimeInterface|null */
     private $solvingTime;
 
+    /** @var int|null */
+    private $errorNumber;
+
     public function __construct(
         int $number,
         ?\DateTimeInterface $solvingTime,
+        ?int $errorNumber,
         Example $example)
     {
         $this->number = $number;
         $this->solvingTime = $solvingTime;
+        $this->errorNumber = $errorNumber;
         $this->example = $example;
     }
 
@@ -48,6 +53,11 @@ final class ExampleResponse
     public function getSolvingTime(): ?\DateTimeInterface
     {
         return $this->solvingTime;
+    }
+
+    public function getErrorNumber(): ?int
+    {
+        return $this->errorNumber;
     }
 
     public function getExample(): Example

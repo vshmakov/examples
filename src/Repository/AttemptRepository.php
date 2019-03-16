@@ -127,20 +127,20 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
             ->getSingleScalarResult();
     }
 
-    public function getFinishTime(Attempt $attempt): ?\DateTimeInterface
+    public function getFinishTime(Attempt $attempt): \DateTimeInterface
     {
-        $finishTime = $this->createQueryBuilder('a')
-            ->select('e.answerTime')
-            ->join('a.examples', 'e')
-            ->where('a = :attempt')
-            ->andWhere('e.answerTime is not null')
-            ->orderBy('e.answerTime', 'desc')
-            ->getQuery()
-            ->setParameter('attempt', $attempt)
-            ->setMaxResults(1)
-            ->getOneOrNullResult();
+        $finishTime = $this->getValue(
+            $this->createQueryBuilder('a')
+                ->select('e.answerTime')
+                ->join('a.examples', 'e')
+                ->where('a = :attempt')
+                ->andWhere('e.answerTime is not null')
+                ->orderBy('e.answerTime', 'desc')
+                ->getQuery()
+                ->setParameter('attempt', $attempt)
+        );
 
-        return null !== $finishTime ? \App\DateTime\DateTime::createFromDT($finishTime) : $attempt->getAddTime();
+        return null !== $finishTime ? DT::createFromDT($finishTime) : $attempt->getCreatedAt();
     }
 
     public function getSolvedExamplesCount(Attempt $attempt): int
@@ -461,7 +461,6 @@ where s.user = :user and a.task = :task')
     public function updateAttemptResult(Attempt $attempt): void
     {
         $result = $attempt->getResult() ?? new Result();
-        $this->getEntityManager()->persist($result);
         $solvedExamplesCount = $this->getSolvedExamplesCount($attempt);
         $errorsCount = $this->getErrorsCount($attempt);
         ObjectAccessor::setValues($result, [
@@ -471,6 +470,7 @@ where s.user = :user and a.task = :task')
             'rating' => ExampleManager::rating($solvedExamplesCount, $errorsCount),
         ]);
         $attempt->setResult($result);
+        $this->getEntityManager()->persist($result);
         $this->getEntityManager()->flush();
     }
 }

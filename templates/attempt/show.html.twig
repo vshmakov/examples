@@ -29,8 +29,10 @@
                 <li>Конец попытки: {{ attempt.result.finishedAt }}</li>
                 <li>Затраченное время: {{ attempt.result.solvingTime.minSecFormat }}
                     из {{ attempt.settings.duration.minSecFormat }}</li>
-                <li>Решено примеров: {{ attempt.result.solvedExamplesCount }} из {{ att.examplesCount }}</li>
-                <li>Секунд/пример: {{ attempt.result.timePerExample.timestamp }}</li>
+                <li>Решено примеров: {{ attempt.result.solvedExamplesCount }}
+                    из {{ attempt.settings.examplesCount }}</li>
+                {% set timePerExample = attempt.result.timePerExample %}
+                <li>Секунд/пример: {{ timePerExample is not null ? timePerExample.timestamp : '-' }}</li>
                 <li>Ошибок: {{ attempt.result.errorsCount }}</li>
                 <li>Оценка: {{ attempt.result.rating }}</li>
                 <li>
@@ -68,7 +70,7 @@
                         <td>{{ exampleResponse.number }}</td>
                         <td>{{ example }}</td>
                         <td>{{ example.answer ?? '-' }}</td>
-                        <td>{{ exampleResponse.solvingTime is defined  ? exampleResponse.solvingTime.timestamp : '-' }}</td>
+                        <td>{{ exampleResponse.solvingTime is not null ? exampleResponse.solvingTime.timestamp : '-' }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>

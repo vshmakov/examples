@@ -4,9 +4,10 @@ namespace App\Entity\Attempt;
 
 use  App\DateTime\DateTime as DT;
 use  App\Entity\Attempt;
-use App\Serializer\Group;
+use  App\Serializer\Group;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 
 /**
  * @ORM\Entity
@@ -103,7 +104,7 @@ class Result
 
     public function getFinishedAt(): \DateTimeInterface
     {
-        return $this->finishedAt;
+        return DT::createFromDT($this->finishedAt);
     }
 
     public function setFinishedAt(\DateTimeInterface $finishedAt): void
@@ -129,10 +130,24 @@ class Result
 
     /**
      * @Groups({Group::ATTEMPT})
+     * @SerializedName("isFinished")
      */
     public function isFinished(): bool
     {
         return time() > $this->getAttempt()->getLimitTime()->getTimestamp()
             or 0 === $this->getRemainedExamplesCount();
+    }
+
+    public function getTimePerExample(): ?\DateTimeInterface
+    {
+        $solvedExamplesCount = $this->getSolvedExamplesCount();
+
+        if (0 === $solvedExamplesCount) {
+            return null;
+        }
+
+        return DT::createFromTimestamp(
+            $this->getSolvingTime()->getTimestamp() / $solvedExamplesCount
+        );
     }
 }

@@ -55,7 +55,7 @@ class ExampleRepository extends ServiceEntityRepository implements ExampleRespon
             ->getOneOrNullResult();
     }
 
-    public function getErrorNum(Example $example): ?int
+    private function getErrorNumber(Example $example): ?int
     {
         if (false !== $example->isRight()) {
             return null;
@@ -216,6 +216,7 @@ where s.user = :user and a.task = :task')
         return new ExampleResponse(
             $this->getNumber($example),
             $this->getSolvingTime($example),
+            $this->getErrorNumber($example),
             $example
         );
     }

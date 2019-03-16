@@ -31,7 +31,7 @@ final class AttemptController extends BaseController
         };
         $attemptResponse = $attemptResponseProvider->createAttemptResponse($attempt);
 
-        if ($attemptResponse->isFinished()) {
+        if ($attempt->getResult()->isFinished()) {
             return $createAnswerAttemptResponseData(null, $attemptResponse);
         }
 
@@ -41,6 +41,7 @@ final class AttemptController extends BaseController
         $this->getDoctrine()
             ->getManager()
             ->flush();
+        $attemptResultProvider->updateAttemptResult($attempt);
 
         return $createAnswerAttemptResponseData(
             $example->isRight(),

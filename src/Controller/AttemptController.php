@@ -57,9 +57,7 @@ final class AttemptController extends Controller
      */
     public function solve(Attempt $attempt, AttemptResponseProviderInterface $attemptResponseProvider): Response
     {
-        $attemptResponse = $attemptResponseProvider->createAttemptResponse($attempt);
-
-        if ($attemptResponse->isFinished()) {
+        if ($attempt->getResult()->isFinished()) {
             return $this->redirectToRoute('attempt_show', ['id' => $attempt->getId()]);
         }
 
@@ -70,7 +68,7 @@ final class AttemptController extends Controller
                 'showAttemptUrl' => $this->generateUrl('attempt_show', ['id' => $attempt->getId()]),
             ],
             'attempt' => $attempt,
-            'attemptResponse' => $attemptResponse,
+            'attemptResponse' => $attemptResponseProvider->createAttemptResponse($attempt),
         ]);
     }
 

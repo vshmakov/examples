@@ -108,4 +108,8 @@ final class AttemptResponse
     {
         return $this->attempt->getAddTime();
     }
+
+    public function isFinished(): bool
+    {
+    }
 }

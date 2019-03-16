@@ -84,7 +84,7 @@ class AttemptData {
     }
 
     public get isFinished(): boolean {
-        return this._attemptData.isFinished;
+        return this._attemptData.result.isFinished;
     }
 
     public get remainedTime(): Date {

@@ -334,9 +334,9 @@ abstract class BaseProfile
         return $this;
     }
 
-    public function getDuration(): ?int
+    public function getDuration(): ?\DateTimeInterface
     {
-        return $this->duration;
+        return DT::createFromTimestamp($this->duration);
     }
 
     public function setDuration(int $duration): self

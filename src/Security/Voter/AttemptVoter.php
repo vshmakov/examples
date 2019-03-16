@@ -59,9 +59,7 @@ final class AttemptVoter extends Voter
         $attempt = $this->subject;
 
         return $this->canView()
-            && $this->isCurrentSessionAttempt($attempt)
-            && $attempt->getRemainedExamplesCount() > 0
-            && $attempt->getRemainedTime()->getTimestamp() > 0;
+            && $this->isCurrentSessionAttempt($attempt);
     }
 
     private function isCurrentSessionAttempt(Attempt $attempt): bool

@@ -2,10 +2,10 @@
 
 namespace App\DateTime;
 
-use DateTime;
+use DateTime as BaseDateTime;
 use Exception;
 
-final class DateTime extends DateTime
+final class DateTime extends BaseDateTime
 {
     public static function createFromFormat($format, $string, $o = null)
     {
@@ -29,9 +29,9 @@ final class DateTime extends DateTime
         return static::createFromFormat('Y-m-d H:i:s', $string);
     }
 
-    public static function createFromDT($dt)
+    public static function createFromDT(\DateTimeInterface $dt): self
     {
-        return ($dt instanceof \DateTimeInterface) ? static::createFromTimestamp($dt->getTimestamp()) : null;
+        return self::createFromTimestamp($dt->getTimestamp());
     }
 
     public static function createBySub(string $intervalString)
@@ -65,7 +65,7 @@ final class DateTime extends DateTime
     /**
      * @throws Exception
      */
-    public static function createFromTimestamp(int $time): \DateTimeInterface
+    public static function createFromTimestamp(int $time): self
     {
         $dt = new static();
 

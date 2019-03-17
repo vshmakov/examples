@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Visit;
+use App\Repository\Traits\BaseTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 

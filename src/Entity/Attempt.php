@@ -15,7 +15,10 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @ORM\Entity(repositoryClass="App\Repository\AttemptRepository")
  * @ApiResource(
  *     normalizationContext={"groups"={Group::ATTEMPT}},
- *     itemOperations={},
+ *     itemOperations={
+ *     "get"={"access_control"="is_granted('VIEW', object)"},
+ *   "answer"={"access_control"="is_granted('SOLVE', object)", "path"="/attempts/{id}/answer.{_format}", "controller"="App\Controller\Api\AttemptController::answer", "method"="PUT"}
+ *     },
  *     collectionOperations={
  *      "get_user_attempts"={"path"="/users/me/attempts.{_format}", "controller"="App\Controller\Api\UserController::attempts", "method"="GET"}
  * }

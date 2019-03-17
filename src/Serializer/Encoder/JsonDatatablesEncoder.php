@@ -2,7 +2,7 @@
 
 namespace App\Serializer\Encoder;
 
-use App\Parameter\Api\Format;
+use App\ApiPlatform\Format;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 
 final class JsonDatatablesEncoder implements EncoderInterface

@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Session;
 use App\Entity\User;
 use App\Object\ObjectAccessor;
+use App\Repository\Traits\BaseTrait;
 use App\Security\User\CurrentUserProviderInterface;
 use App\Security\User\CurrentUserSessionProviderInterface;
 use App\Service\SessionMarker;

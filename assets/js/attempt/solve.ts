@@ -60,8 +60,16 @@ const Api = new class {
     }
 
     public answer(answer: number, callback: AttemptDataCallback): void {
-        $.post(PARAMETERS.answerAttemptUrl, {answer: answer}, (data) => callback(new AttemptData(data.attempt)));
-    };
+        $.ajax({
+            method: 'PUT',
+            url: PARAMETERS.answerAttemptUrl,
+            data: JSON.stringify({answer: answer}),
+            processData: false,
+            dataType: 'json',
+            contentType: 'application/json',
+        })
+            .done((data): void => callback(new AttemptData(data.attempt)));
+    }
 }
 
 class AttemptData {

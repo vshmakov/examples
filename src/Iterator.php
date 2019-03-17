@@ -8,7 +8,7 @@ abstract class Iterator
     {
         $result = [];
 
-        foreach ($iterator as $key => $item) {
+        foreach ($iterator as $item) {
             $result[] = $callback($item);
         }
 

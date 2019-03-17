@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Controller\Traits\BaseTrait;
 use App\Entity\User;
 use App\Exception\RequiresStudentAccessException;
 use App\Form\ChildType;

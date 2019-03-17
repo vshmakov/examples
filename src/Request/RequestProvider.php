@@ -3,7 +3,7 @@
 namespace App\Request;
 
 use App\ApiPlatform\Attribute;
-use App\Parameter\Api\Format;
+use App\ApiPlatform\Format;
 use App\Parameter\Http\AcceptFormatHeader;
 use App\Request\DataTables\DataTablesRequest;
 use App\Request\DataTables\DataTablesRequestProviderInterface;

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Controller\Traits\BaseTrait;
 use App\Entity\User;
 use App\Form\ChildType;
 use App\Repository\UserRepository;

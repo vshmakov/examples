@@ -3,15 +3,17 @@
 namespace App\Controller;
 
 use App\ApiPlatform\Attribute;
+use App\ApiPlatform\Format;
 use App\Attempt\AttemptCreatorInterface;
+use App\Attempt\AttemptResponseProviderInterface;
 use App\Attempt\Example\ExampleResponseProviderInterface;
+use App\Controller\Traits\CurrentUserProviderTrait;
+use App\Controller\Traits\JavascriptParametersTrait;
 use App\Entity\Attempt;
 use App\Form\SettingsType;
 use App\Iterator;
-use App\Parameter\Api\Format;
 use App\Repository\AttemptRepository;
 use App\Repository\ProfileRepository;
-use App\Response\AttemptResponseProviderInterface;
 use App\Security\Voter\AttemptVoter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -53,7 +55,7 @@ final class AttemptController extends Controller
 
     /**
      * @Route("/{id}/", name="attempt_solve", requirements={"id": "\d+"})
-     * @IsGranted(AttemptVoter::VIEW, subject="attempt")
+     * @IsGranted(AttemptVoter::SOLVE, subject="attempt")
      */
     public function solve(Attempt $attempt, AttemptResponseProviderInterface $attemptResponseProvider): Response
     {
@@ -61,12 +63,13 @@ final class AttemptController extends Controller
             return $this->redirectToRoute('attempt_show', ['id' => $attempt->getId()]);
         }
 
+        $this->setJavascriptParameters([
+            'solveAttemptDataUrl' => $this->generateUrl('api_attempts_get_item', ['id' => $attempt->getId(), Attribute::FORMAT => Format::JSON]),
+            'answerAttemptUrl' => $this->generateUrl('api_attempts_answer_item', ['id' => $attempt->getId(), Attribute::FORMAT => Format::JSON]),
+            'showAttemptUrl' => $this->generateUrl('attempt_show', ['id' => $attempt->getId()]),
+        ]);
+
         return $this->render('attempt/solve.html.twig', [
-            'jsParams' => [
-                'solveAttemptDataUrl' => $this->generateUrl('api_attempt_solve_data', ['id' => $attempt->getId()]),
-                'answerAttemptUrl' => $this->generateUrl('api_attempt_answer', ['id' => $attempt->getId()]),
-                'showAttemptUrl' => $this->generateUrl('attempt_show', ['id' => $attempt->getId()]),
-            ],
             'attempt' => $attempt,
             'attemptResponse' => $attemptResponseProvider->createAttemptResponse($attempt),
         ]);

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Controller\Traits\BaseTrait;
 use App\Entity\Task;
 use App\Exception\RequiresStudentAccessException;
 use App\Repository\AttemptRepository;

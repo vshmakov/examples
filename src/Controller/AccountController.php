@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Controller\Traits\BaseTrait;
 use App\Form\AccountType;
 use App\Repository\TransferRepository;
 use App\Repository\UserRepository;

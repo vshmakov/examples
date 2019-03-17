@@ -8,6 +8,7 @@ use App\Entity\Attempt;
 use App\Entity\Profile;
 use App\Entity\Task;
 use App\Entity\User;
+use App\Repository\Traits\BaseTrait;
 use App\Service\AuthChecker;
 use App\Utils\Cache\LocalCache;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;

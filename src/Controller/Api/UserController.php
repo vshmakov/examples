@@ -2,8 +2,8 @@
 
 namespace App\Controller\Api;
 
+use App\Attempt\AttemptResponseProviderInterface;
 use App\Iterator;
-use App\Response\AttemptResponseProviderInterface;
 
 final class UserController
 {

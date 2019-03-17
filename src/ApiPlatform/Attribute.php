@@ -4,6 +4,7 @@ namespace App\ApiPlatform;
 
 abstract class Attribute
 {
+    public const  ROUTE = '_route';
     public const  FORMAT = '_format';
     public const  RESOURCE_CLASS = '_api_resource_class';
     public const  COLLECTION_OPERATION_NAME = '_api_collection_operation_name';

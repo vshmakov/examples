@@ -1,12 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Вадим
- * Date: 08.03.2019
- * Time: 18:01.
- */
 
-namespace App\Profile;
+namespace App\Attempt\Profile;
 
 use App\Entity\Profile;
 

@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Ip;
+use App\Repository\Traits\BaseTrait;
 use App\Service\IpInformer;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;

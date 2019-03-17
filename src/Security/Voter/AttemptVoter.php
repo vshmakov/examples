@@ -15,9 +15,10 @@ use Webmozart\Assert\Assert;
 
 final class AttemptVoter extends Voter
 {
+    use BaseTrait;
+
     public const SOLVE = 'SOLVE';
     public const VIEW = 'VIEW';
-    use BaseTrait;
 
     private $attemptRepository;
     private $exampleRepository;

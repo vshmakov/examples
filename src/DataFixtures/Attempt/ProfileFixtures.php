@@ -2,10 +2,10 @@
 
 namespace App\DataFixtures\Attempt;
 
+use App\Attempt\Profile\NormalizerInterface;
 use App\DataFixtures\UserFixtures;
 use App\Entity\Profile;
 use App\Object\ObjectAccessor;
-use App\Profile\NormalizerInterface;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;

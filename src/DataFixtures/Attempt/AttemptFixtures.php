@@ -2,23 +2,66 @@
 
 namespace App\DataFixtures\Attempt;
 
+use App\Attempt\AttemptCreatorInterface;
+use App\Attempt\AttemptResultProviderInterface;
+use App\DataFixtures\PersistTrait;
 use App\DataFixtures\UserFixtures;
-use App\Settings\SettingsProviderInterface;
+use App\Entity\Attempt;
+use App\Entity\Example;
+use App\Object\ObjectAccessor;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
 final class AttemptFixtures extends Fixture implements DependentFixtureInterface
 {
-    /** @var SettingsProviderInterface */
-    private $settingsProvider;
+    use PersistTrait;
+
+    /** @var AttemptCreatorInterface */
+    private $attemptCreator;
+
+    /** @var AttemptResultProviderInterface */
+    private $attemptResultProvider;
+
+    public function __construct(AttemptCreatorInterface $attemptCreator, AttemptResultProviderInterface $attemptResultProvider)
+    {
+        $this->attemptCreator = $attemptCreator;
+        $this->attemptResultProvider = $attemptResultProvider;
+    }
 
     public function load(ObjectManager $manager)
     {
-        // $product = new Product();
-        // $manager->persist($product);
+        $this->manager = $manager;
+
+        for ($i = 1; $i <= 200; ++$i) {
+            $attempt = $this->attemptCreator->createAttempt();
+            $this->persist($attempt);
+
+            while ($attempt->getExamples()->count() < $attempt->getSettings()->getExamplesCount()) {
+                $isEvenExample = 0 === ($attempt->getExamples()->count() + 1) % 2;
+                $this->addExample($attempt, !$isEvenExample);
+            }
+
+            $manager->flush();
+            $this->attemptResultProvider->updateAttemptResult($attempt);
+        }
 
         $manager->flush();
+    }
+
+    private function addExample(Attempt $attempt, bool $isRight): void
+    {
+        /** @var Example $example */
+        $example = ObjectAccessor::initialize(Example::class, [
+            'first' => 2,
+            'sign' => 1,
+            'second' => 3,
+            'answer' => $isRight ? 5 : 6,
+            'isRight' => $isRight,
+            'attempt' => $attempt,
+        ]);
+        $this->persist($example);
+        $attempt->addExample($example);
     }
 
     public function getDependencies()

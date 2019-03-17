@@ -2,12 +2,13 @@
 
 namespace App\Repository;
 
+use App\Attempt\Settings\SettingsProviderInterface;
 use App\Entity\Profile;
 use App\Entity\Settings;
 use App\Entity\User;
+use App\Repository\Traits\BaseTrait;
 use App\Security\User\CurrentUserProviderInterface;
 use App\Serializer\Group;
-use App\Settings\SettingsProviderInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -35,10 +36,10 @@ class SettingsRepository extends ServiceEntityRepository implements SettingsProv
             ->setEntityRepository($this->getEntityRepository(User::class));
         $profile = $currentUser->getCurrentProfile();
 
-        return $this->getSettingsByProfileOrCreate($profile);
+        return $this->getOrCreateSettingsByProfile($profile);
     }
 
-    public function getSettingsByProfileOrCreate(Profile $profile): Settings
+    public function getOrCreateSettingsByProfile(Profile $profile): Settings
     {
         $settingsData = $this->normalizer->normalize($profile, null, ['groups' => Group::SETTINGS]);
 
@@ -52,5 +53,20 @@ class SettingsRepository extends ServiceEntityRepository implements SettingsProv
         $entityManager->flush();
 
         return $settings;
+    }
+
+    public function getOrCreateSettingsByCurrentUserProfile(): Settings
+    {
+        /**
+         * @deprecated
+         *
+         * @var UserRepository
+         */
+        $userRepository = $this->getEntityManager()
+            ->getRepository(User::class);
+
+        return $this->getOrCreateSettingsByProfile(
+            $userRepository->getCurrentProfile($this->currentUserProvider->getCurrentUserOrGuest())
+        );
     }
 }

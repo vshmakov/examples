@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Controller\Traits\BaseTrait;
 use App\Entity\Settings;
 use App\Form\SettingsType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

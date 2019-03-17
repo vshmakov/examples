@@ -4,7 +4,8 @@ api_platform:
     #show_webby: false
 
     formats:
-        jsonld:   ['application/ld+json']
+        #jsonld:   ['application/ld+json']
+        json:     ['application/json']
         html:     ['text/html']
         jsondt:   ['application/dt+json'] #format for datatables.js
 

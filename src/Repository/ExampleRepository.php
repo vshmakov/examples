@@ -8,6 +8,7 @@ use App\Entity\Attempt;
 use App\Entity\Example;
 use App\Entity\Task;
 use App\Entity\User;
+use App\Repository\Traits\BaseTrait;
 use App\Response\ExampleResponse;
 use App\Service\ExampleManager;
 use App\Service\UserLoader;
@@ -79,7 +80,7 @@ class ExampleRepository extends ServiceEntityRepository implements ExampleRespon
         $queryBuilder = $this->createQueryBuilder('e')
             ->select('count(e)')
             ->where('e.attempt = :attempt')
-            ->andWhere('e.addTime < :createdAt');
+            ->andWhere('e.id < :exampleId');
 
         if ($example->getAttempt()->getSettings()->isDemanding()) {
             $queryBuilder->andWhere('e.isRight != false');
@@ -89,7 +90,7 @@ class ExampleRepository extends ServiceEntityRepository implements ExampleRespon
                 ->getQuery()
                 ->setParameters([
                     'attempt' => $example->getAttempt(),
-                    'createdAt' => $example->getAddTime(),
+                    'exampleId' => $example->getId(),
                 ])
                 ->getSingleScalarResult()
             + 1;
@@ -228,6 +229,7 @@ where s.user = :user and a.task = :task')
         }
 
         return $this->createExampleResponse(
+            //TODO
             $this->findLastUnansweredByAttemptOrGetNew($attempt)
         );
     }

@@ -2,9 +2,10 @@
 
 namespace App\Controller;
 
-use  App\Entity\Profile;
+use App\Attempt\Profile\NormalizerInterface as ProfileNormalizerInterface;
+use  App\Controller\Traits\BaseTrait;
+use App\Entity\Profile;
 use App\Form\ProfileType;
-use App\Profile\NormalizerInterface as ProfileNormalizerInterface;
 use App\Repository\ProfileRepository;
 use App\Repository\UserRepository;
 use App\Security\Voter\ProfileVoter;

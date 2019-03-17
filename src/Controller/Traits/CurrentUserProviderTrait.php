@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Traits;
 
 use App\Entity\User;
 use App\Security\User\CurrentUserProviderInterface;

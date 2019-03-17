@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Transfer;
+use App\Repository\Traits\BaseTrait;
 use App\Service\UserLoader;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;

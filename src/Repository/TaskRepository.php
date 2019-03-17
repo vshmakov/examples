@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Attempt;
 use App\Entity\Task;
 use App\Entity\User;
+use App\Repository\Traits\BaseTrait;
 use App\Service\AuthChecker;
 use App\Service\UserLoader;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;

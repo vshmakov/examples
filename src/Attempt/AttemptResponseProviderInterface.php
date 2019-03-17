@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Response;
+namespace App\Attempt;
 
 use App\Entity\Attempt;
+use App\Response\AttemptResponse;
 
 interface AttemptResponseProviderInterface
 {

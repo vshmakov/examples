@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use  App\Attempt\AttemptCreatorInterface;
+use App\Attempt\AttemptResponseProviderInterface;
 use App\Attempt\AttemptResultProviderInterface;
 use App\Attempt\Example\ExampleResponseProviderInterface;
 use App\DateTime\DateTime as DT;
@@ -12,8 +13,9 @@ use App\Entity\Settings;
 use App\Entity\Task;
 use App\Entity\User;
 use App\Object\ObjectAccessor;
+use App\Repository\Traits\BaseTrait;
+use App\Repository\Traits\QueryResultTrait;
 use App\Response\AttemptResponse;
-use App\Response\AttemptResponseProviderInterface;
 use App\Security\User\CurrentUserProviderInterface;
 use App\Security\User\CurrentUserSessionProviderInterface;
 use App\Service\ExampleManager;
@@ -26,7 +28,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 final class AttemptRepository extends ServiceEntityRepository implements AttemptCreatorInterface, AttemptResponseProviderInterface, AttemptResultProviderInterface
 {
-    use BaseTrait;
+    use BaseTrait, QueryResultTrait;
 
     private $exampleRepository;
     private $userLoader;
@@ -467,10 +469,19 @@ where s.user = :user and a.task = :task')
             'solvedExamplesCount' => $solvedExamplesCount,
             'errorsCount' => $errorsCount,
             'finishedAt' => $this->getFinishTime($attempt),
-            'rating' => ExampleManager::rating($solvedExamplesCount, $errorsCount),
         ]);
         $attempt->setResult($result);
+        $this->checkAttempt($attempt);
         $this->getEntityManager()->persist($result);
         $this->getEntityManager()->flush();
+    }
+
+    private function checkAttempt(Attempt $attempt): void
+    {
+        $result = $attempt
+            ->getResult();
+        $result->setRating(
+            ExampleManager::rating($result->getSolvedExamplesCount(), $result->getErrorsCount() + $result->getRemainedExamplesCount())
+        );
     }
 }

@@ -2,9 +2,9 @@
 
 namespace App\Form;
 
+use App\Attempt\Profile\NormalizerInterface as ProfileNormalizerInterface;
 use App\Entity\Profile;
 use App\Object\ObjectAccessor;
-use App\Profile\NormalizerInterface as ProfileNormalizerInterface;
 use App\Serializer\Group;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Form\AbstractType;

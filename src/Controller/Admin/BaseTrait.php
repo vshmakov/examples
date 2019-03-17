@@ -2,7 +2,7 @@
 
 namespace App\Controller\Admin;
 
-use App\Controller\BaseTrait as MainTrait;
+use App\Controller\Traits\BaseTrait as MainTrait;
 
 trait BaseTrait
 {

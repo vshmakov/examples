@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Controller\Traits\BaseTrait;
 use  App\DateTime\DateTime as DT;
 use App\Entity\User;
 use App\Entity\User\Role;

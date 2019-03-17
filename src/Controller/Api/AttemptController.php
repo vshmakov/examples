@@ -2,10 +2,10 @@
 
 namespace App\Controller\Api;
 
+use App\Attempt\AttemptResponseProviderInterface;
 use App\Attempt\AttemptResultProviderInterface;
 use App\Entity\Attempt;
 use App\Response\AttemptResponse;
-use App\Response\AttemptResponseProviderInterface;
 use App\Security\Voter\AttemptVoter;
 use App\Serializer\Group;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -17,35 +17,32 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 final class AttemptController extends BaseController
 {
-    /**
-     * @Route("/{id}/answer/", name="api_attempt_answer", methods="POST")
-     * @IsGranted(AttemptVoter::SOLVE, subject="attempt")
-     */
-    public function answer(Attempt $attempt, Request $request, AttemptResponseProviderInterface $attemptResponseProvider, AttemptResultProviderInterface $attemptResultProvider): array
+    public function answer(Attempt $data, Request $request, AttemptResponseProviderInterface $attemptResponseProvider, AttemptResultProviderInterface $attemptResultProvider): array
     {
         $createAnswerAttemptResponseData = function (?bool $isRight, AttemptResponse $attemptResponse): array {
-            return $this->normalize([
+            return [
                 'isRight' => $isRight,
                 'attempt' => $attemptResponse,
-            ]);
+            ];
         };
-        $attemptResponse = $attemptResponseProvider->createAttemptResponse($attempt);
+        $attemptResponse = $attemptResponseProvider->createAttemptResponse($data);
 
-        if ($attempt->getResult()->isFinished()) {
+        if ($data->getResult()->isFinished()) {
             return $createAnswerAttemptResponseData(null, $attemptResponse);
         }
 
         $example = $attemptResponse->getExample()->getExample();
+
         $answer = (float) $request->request->get('answer');
         $example->setAnswer($answer);
         $this->getDoctrine()
             ->getManager()
             ->flush();
-        $attemptResultProvider->updateAttemptResult($attempt);
+        $attemptResultProvider->updateAttemptResult($data);
 
         return $createAnswerAttemptResponseData(
             $example->isRight(),
-            $attemptResponseProvider->createAttemptResponse($attempt)
+            $attemptResponseProvider->createAttemptResponse($data)
         );
     }
 

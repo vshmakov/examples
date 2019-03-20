@@ -4,7 +4,12 @@
     {{ attemptResponse.title }}
 {% endblock %}
 
+{% block breadcrumbs %}
+{{ include('attempt/breadcrumbs/show.html.twig') }}
+{% endblock %}
+
 {% block main %}
+
     <div>
         {% set task = attempt.task %}
         {% if task is defined and is_granted('SOLVE', task) %}
@@ -37,7 +42,7 @@
                 <li>Оценка: {{ attempt.result.rating }}</li>
                 <li>
                     Настройки попытки:
-                    <a href="{{ path("attempt_profile", {"id": attempt.id}) }}">{{ attempt.settings.description }}</a>
+                    <a href="{{ path("attempt_settings", {"id": attempt.id}) }}">{{ attempt.settings.description }}</a>
                 </li>
             </ul>
         </div>

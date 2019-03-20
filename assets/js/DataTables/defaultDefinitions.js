@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import 'datatables.net-dt';
 
+//TODO page length list
 const DEFAULT_PARAMETERS={
     searching:false,
     ordering:false,

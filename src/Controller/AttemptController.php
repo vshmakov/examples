@@ -10,10 +10,8 @@ use App\Attempt\Example\ExampleResponseProviderInterface;
 use App\Controller\Traits\CurrentUserProviderTrait;
 use App\Controller\Traits\JavascriptParametersTrait;
 use App\Entity\Attempt;
-use App\Form\SettingsType;
 use App\Iterator;
 use App\Repository\AttemptRepository;
-use App\Repository\ProfileRepository;
 use App\Security\Voter\AttemptVoter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -41,7 +39,7 @@ final class AttemptController extends Controller
     }
 
     /**
-     * @Route("/{id}/show", name="attempt_show", requirements={"id": "\d+"})
+     * @Route("/{id}/show/", name="attempt_show", requirements={"id": "\d+"})
      * @IsGranted(AttemptVoter::VIEW, subject="attempt")
      */
     public function show(Attempt $attempt, AttemptResponseProviderInterface $attemptResponseProvider, ExampleResponseProviderInterface $exampleResponseProvider): Response
@@ -76,20 +74,15 @@ final class AttemptController extends Controller
     }
 
     /**
-     * @Route("/{id}/profile", name="attempt_profile")
+     * @Route("/{id}/settings/", name="attempt_settings")
      * @IsGranted(AttemptVoter::VIEW, subject="attempt")
      */
-    public function profile(Attempt $attempt, ProfileRepository $profileRepository, AttemptRepository $attemptRepository): Response
+    public function profile(Attempt $attempt, AttemptResponseProviderInterface $attemptResponseProvider): Response
     {
-        $profile = $attempt->getSettings()->setEntityRepository($profileRepository);
-
-        return $this->render('attempt/profile.html.twig', [
-            'jsParams' => [
-                'canEdit' => false,
-            ],
-            'profile' => $profile,
-            'form' => $this->createForm(SettingsType::class, $profile)->createView(),
-            'att' => $attempt->setEntityRepository($attemptRepository),
+        return $this->render('attempt/settings.html.twig', [
+            'attempt' => $attempt,
+            'settings' => $attempt->getSettings(),
+            'attemptResponse' => $attemptResponseProvider->createAttemptResponse($attempt),
         ]);
     }
 

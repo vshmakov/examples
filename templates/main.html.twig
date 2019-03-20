@@ -134,13 +134,17 @@
             </nav>
         {% endblock nav %}
 
-        <main class="main row">
-            {% block main %}{% endblock %}
+        <div>
+            {% block breadcrumbs %}{% endblock %}
+        </div>
 
-            <p>
-                {% block bottom_links %}{% endblock %}
-            </p>
+        <main>
+            {% block main %}{% endblock %}
         </main>
+
+        <div>
+            {% block bottom_links %}{% endblock %}
+        </div>
 
         {% block guest_auth %}
             {{ include("widget/guest_auth.html.twig", {"h": "h4"}) }}

@@ -1,0 +1,10 @@
+{% extends 'settings/show.html.twig' %}
+
+{% set pageTitle = 'Настройки попытки №'~attemptResponse.number %}
+{% block title %}
+    {{ pageTitle }}
+{% endblock %}
+
+{% block breadcrumbs %}
+    {{ include('attempt/breadcrumbs/settings.html.twig') }}
+{% endblock %}

@@ -39,7 +39,7 @@ let columnsRender = [
     (data): string => `<a href="/attempt/${data.id}/show/">${data.title}</a>`,
     (data): string => standartDateFormatBySeconds(data.createdAt),
     (data): string => standartDateFormatBySeconds(data.result.finishedAt),
-    (data): string => `<a href="/settings/${data.settings.id}/">${data.settings.description}</a>`,
+    (data): string => `<a href="/attempt/${data.id}/settings/">${data.settings.description}</a>`,
     (data): string => `${minutesSecondsDateFormatBySeconds(data.result.solvingTime)} из ${minutesSecondsDateFormatBySeconds(data.settings.duration)}`,
     (data): string => `${data.result.solvedExamplesCount} из ${data.settings.examplesCount}`,
     (data): string => data.result.errorsCount,

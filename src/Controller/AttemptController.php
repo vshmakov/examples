@@ -89,7 +89,7 @@ final class AttemptController extends Controller
     /**
      * @Route("/last/", name="attempt_last")
      */
-    public function last(AttemptProviderInterface $attemptProvider): Response
+    public function last(AttemptProviderInterface $attemptProvider): RedirectResponse
     {
         if ($attempt = $attemptProvider->getLastAttempt()) {
             return $this->redirectToRoute('attempt_solve', ['id' => $attempt->getId()]);
@@ -99,7 +99,7 @@ final class AttemptController extends Controller
     }
 
     /**
-     * @Route("/new", name="attempt_new")
+     * @Route("/new/", name="attempt_new")
      */
     public function new(AttemptCreatorInterface $creator): RedirectResponse
     {

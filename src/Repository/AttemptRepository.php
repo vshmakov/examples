@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use  App\Attempt\AttemptCreatorInterface;
+use App\Attempt\AttemptProviderInterface;
 use App\Attempt\AttemptResponseProviderInterface;
 use App\Attempt\AttemptResultProviderInterface;
 use App\Attempt\Example\ExampleResponseProviderInterface;
@@ -26,7 +27,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 use  Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-final class AttemptRepository extends ServiceEntityRepository implements AttemptCreatorInterface, AttemptResponseProviderInterface, AttemptResultProviderInterface
+final class AttemptRepository extends ServiceEntityRepository implements AttemptCreatorInterface, AttemptProviderInterface, AttemptResponseProviderInterface, AttemptResultProviderInterface
 {
     use BaseTrait, QueryResultTrait;
 
@@ -71,7 +72,7 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
         $this->exampleResponseProvider = $exampleResponseProvider;
     }
 
-    public function findLastActualByCurrentUser(): ?Attempt
+    public function getLastAttempt(): ?Attempt
     {
         $attempt = $this->findLastByCurrentUser();
 

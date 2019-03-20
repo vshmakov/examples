@@ -5,13 +5,13 @@ namespace App\Controller;
 use App\ApiPlatform\Attribute;
 use App\ApiPlatform\Format;
 use App\Attempt\AttemptCreatorInterface;
+use App\Attempt\AttemptProviderInterface;
 use App\Attempt\AttemptResponseProviderInterface;
 use App\Attempt\Example\ExampleResponseProviderInterface;
 use App\Controller\Traits\CurrentUserProviderTrait;
 use App\Controller\Traits\JavascriptParametersTrait;
 use App\Entity\Attempt;
 use App\Iterator;
-use App\Repository\AttemptRepository;
 use App\Security\Voter\AttemptVoter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -87,13 +87,11 @@ final class AttemptController extends Controller
     }
 
     /**
-     * @Route("/last", name="attempt_last")
-     *
-     * @todo  functional test
+     * @Route("/last/", name="attempt_last")
      */
-    public function last(AttemptRepository $attemptRepository): Response
+    public function last(AttemptProviderInterface $attemptProvider): Response
     {
-        if ($attempt = $attemptRepository->findLastActualByCurrentUser()) {
+        if ($attempt = $attemptProvider->getLastAttempt()) {
             return $this->redirectToRoute('attempt_solve', ['id' => $attempt->getId()]);
         }
 

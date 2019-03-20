@@ -40,7 +40,7 @@ final class AppExtension extends AbstractExtension implements \Twig_Extension_Gl
         $this->userLoader = $currentUserProvider;
         $this->javascriptParametersContainer = $javascriptParametersContainer;
 
-        $hasActualAttempt = (bool) $attemptRepository->findLastActualByCurrentUser();
+        $hasActualAttempt = (bool) $attemptRepository->getLastAttempt();
         $user = $currentUserProvider->getCurrentUserOrGuest();
         $user->setEntityRepository($userRepository);
         $this->globals = [

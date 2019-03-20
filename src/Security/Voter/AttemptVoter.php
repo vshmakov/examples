@@ -4,8 +4,6 @@ namespace App\Security\Voter;
 
 use App\Entity\Attempt;
 use App\Entity\User\Role;
-use App\Repository\AttemptRepository;
-use App\Repository\ExampleRepository;
 use App\Security\User\CurrentUserProviderInterface;
 use App\Security\User\CurrentUserSessionProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -20,8 +18,10 @@ final class AttemptVoter extends Voter
     public const SOLVE = 'SOLVE';
     public const VIEW = 'VIEW';
 
-    private $attemptRepository;
-    private $exampleRepository;
+    /** @var Attempt */
+    private $subject;
+
+    /** @var AuthorizationCheckerInterface */
     private $authorizationChecker;
 
     /** @var CurrentUserProviderInterface */
@@ -31,39 +31,54 @@ final class AttemptVoter extends Voter
     private $currentUserSessionProvider;
 
     public function __construct(
-        AttemptRepository $attemptRepository,
-        ExampleRepository $exampleRepository,
         AuthorizationCheckerInterface $authorizationChecker,
         CurrentUserProviderInterface $currentUserProvider,
         CurrentUserSessionProviderInterface $currentUserSessionProvider
     ) {
-        $this->attemptRepository = $attemptRepository;
-        $this->exampleRepository = $exampleRepository;
         $this->authorizationChecker = $authorizationChecker;
         $this->currentUserProvider = $currentUserProvider;
         $this->currentUserSessionProvider = $currentUserSessionProvider;
     }
 
-    protected function supports($attribute, $subject)
+    private function getSupportedAttributes(): array
+    {
+        return [
+            self::VIEW,
+            self::SOLVE,
+        ];
+    }
+
+    protected function supports($attribute, $subject): bool
     {
         return $subject instanceof Attempt;
     }
 
-    protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
+    protected function voteOnAttribute($attribute, $subject, TokenInterface $token): bool
     {
-        return $this->checkRight($attribute, $subject, $token);
+        Assert::oneOf($attribute, self::getSupportedAttributes());
+
+        return $this->voteOnNamedCallback($attribute, $subject, $token);
     }
 
-    private function canSolve()
+    private function canView(): bool
     {
-        /** @var Attempt $attempt */
-        $attempt = $this->subject;
+        if ($this->authorizationChecker->isGranted(Role::ADMIN)) {
+            return true;
+        }
 
+        $currentUser = $this->currentUserProvider->getCurrentUserOrGuest();
+        $author = $this->subject->getSession()->getUser();
+
+        return $currentUser->isEqualTo($author) or $currentUser->isTeacherOf($author);
+    }
+
+    private function canSolve(): bool
+    {
         return $this->canView()
-            && $this->isCurrentSessionAttempt($attempt);
+            && $this->createdByCurrentSessionUser($this->subject);
     }
 
-    private function isCurrentSessionAttempt(Attempt $attempt): bool
+    private function createdByCurrentSessionUser(Attempt $attempt): bool
     {
         if (!$this->currentUserProvider->isCurrentUserGuest()) {
             return true;
@@ -73,26 +88,5 @@ final class AttemptVoter extends Voter
         Assert::notNull($session);
 
         return $this->currentUserSessionProvider->isCurrentUserSession($session);
-    }
-
-    private function canAnswer()
-    {
-        $attempt = $this->subject;
-        $example = $this->exampleRepository->findLastUnansweredByAttempt($attempt);
-
-        return $this->canSolve() && $example;
-    }
-
-    private function canView()
-    {
-        if ($this->authorizationChecker->isGranted(Role::ADMIN)) {
-            return true;
-        }
-
-        $attempt = $this->subject;
-        $user = $this->currentUserProvider->getCurrentUserOrGuest();
-        $author = $attempt->getSession()->getUser();
-
-        return $author->isEqualTo($user) or $author->isUserTeacher($user);
     }
 }

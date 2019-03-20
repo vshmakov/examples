@@ -27,7 +27,7 @@ class UserVoter extends Voter
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
     {
-        return $this->checkRight($attribute, $subject ?? $this->userLoader->getUser(), $token);
+        return $this->voteOnNamedCallback($attribute, $subject ?? $this->userLoader->getUser(), $token);
     }
 
     private function isAccountPaid()

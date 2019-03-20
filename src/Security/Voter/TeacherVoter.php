@@ -27,7 +27,7 @@ class TeacherVoter extends Voter
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
     {
-        return $this->checkRight($attribute, $subject, $token);
+        return $this->voteOnNamedCallback($attribute, $subject, $token);
     }
 
     private function canAppoint(): bool
@@ -36,12 +36,12 @@ class TeacherVoter extends Voter
 
         return $this->canDisappointTeachers()
             && !$this->userLoader->isCurrentUserGuest()
-            && !$this->userLoader->getUser()->isUserTeacher($teacher);
+            && !$this->userLoader->getUser()->isStudentOf($teacher);
     }
 
     private function canDisappoint(): bool
     {
-        return $this->userLoader->getUser()->isUserTeacher($this->subject);
+        return $this->userLoader->getUser()->isStudentOf($this->subject);
     }
 
     private function canDisappointTeachers(): bool

@@ -409,6 +409,7 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
     private $students;
 
     /**
+     * @var User|null
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="students")
      */
     private $teacher;
@@ -567,6 +568,11 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
         return (bool) $this->isTeacher;
     }
 
+    public function isTeacherOf(self $student): bool
+    {
+        return $this->students->contains($student);
+    }
+
     public function setIsTeacher(? bool $isTeacher): self
     {
         $this->isTeacher = $isTeacher;
@@ -622,9 +628,9 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
         return (bool) $this->teacher;
     }
 
-    public function isUserTeacher(self $teacher)
+    public function isStudentOf(self $teacher): bool
     {
-        return $this->teacher === $teacher;
+        return $this->hasTeacher() && $this->teacher->isEqualTo($teacher);
     }
 
     public function fio()

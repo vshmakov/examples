@@ -31,7 +31,7 @@ class SettingsVoter extends Voter
             return $this->voteOnArr($attribute, $subject, $token);
         }
 
-        return $this->checkRight($attribute, $subject, $token);
+        return $this->voteOnNamedCallback($attribute, $subject, $token);
     }
 
     private function canShow(): bool

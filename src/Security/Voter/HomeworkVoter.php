@@ -30,7 +30,7 @@ class HomeworkVoter extends Voter
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
     {
-        return $this->checkRight($attribute, $subject, $token);
+        return $this->voteOnNamedCallback($attribute, $subject, $token);
     }
 
     private function canSolve(): bool

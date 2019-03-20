@@ -39,7 +39,7 @@ final class ProfileVoter extends Voter
             return true;
         }
 
-        return $this->checkRight($attribute, $subject, $token);
+        return $this->voteOnNamedCallback($attribute, $subject, $token);
     }
 
     private function canCreateProfile(): bool
@@ -58,7 +58,7 @@ final class ProfileVoter extends Voter
         $user = $this->userLoader->getUser();
         $author = $profile->getAuthor();
 
-        return $profile->isPublic() or $user === $author or $user->isUserTeacher($author);
+        return $profile->isPublic() or $user === $author or $user->isStudentOf($author);
     }
 
     private function canEdit(): bool

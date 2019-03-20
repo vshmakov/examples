@@ -7,7 +7,7 @@ use App\Iterator;
 
 final class UserController
 {
-    public function attempts(iterable $data, AttemptResponseProviderInterface $attemptResponseProvider): iterable
+    public function attempts(iterable $data, AttemptResponseProviderInterface $attemptResponseProvider): array
     {
         return Iterator::map($data, [$attemptResponseProvider, 'createAttemptResponse']);
     }

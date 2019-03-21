@@ -59,7 +59,8 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
         AuthorizationCheckerInterface $authorizationChecker,
         LocalCache $localCache,
         ExampleResponseProviderInterface $exampleResponseProvider
-    ) {
+    )
+    {
         parent::__construct($registry, Attempt::class);
 
         $this->exampleRepository = $exampleRepository;
@@ -87,7 +88,7 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
         return 0 < $remainedExamplesCount && time() < $limitTime->getTimestamp();
     }
 
-    public function findLastByCurrentUser(): ?Attempt
+    private function findLastByCurrentUser(): ?Attempt
     {
         $queryBuilder = $this->createQueryBuilder('a')
             ->select('a');
@@ -110,12 +111,12 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
             ->getOneOrNullResult();
     }
 
-    public function getTitle(Attempt $attempt): string
+    private function getTitle(Attempt $attempt): string
     {
-        return 'Попытка №'.$this->getNumber($attempt);
+        return 'Попытка №' . $this->getNumber($attempt);
     }
 
-    public function getNumber(Attempt $attempt): int
+    private function getNumber(Attempt $attempt): int
     {
         return $this->createQueryBuilder('a')
             ->select('count(a)')
@@ -130,7 +131,7 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
             ->getSingleScalarResult();
     }
 
-    public function getFinishTime(Attempt $attempt): \DateTimeInterface
+    private function getFinishTime(Attempt $attempt): \DateTimeInterface
     {
         $finishTime = $this->getValue(
             $this->createQueryBuilder('a')
@@ -146,7 +147,7 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
         return null !== $finishTime ? DT::createFromDT($finishTime) : $attempt->getCreatedAt();
     }
 
-    public function getSolvedExamplesCount(Attempt $attempt): int
+    private function getSolvedExamplesCount(Attempt $attempt): int
     {
         if (!$attempt->getSettings()->isDemanding()) {
             return $this->getAnsweredExamplesCount($attempt);
@@ -162,7 +163,7 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
             ->getSingleScalarResult();
     }
 
-    public function getAnsweredExamplesCount(Attempt $attempt): int
+    private function getAnsweredExamplesCount(Attempt $attempt): int
     {
         return $this->createQueryBuilder('a')
             ->select('count(a)')
@@ -174,7 +175,7 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
             ->getSingleScalarResult();
     }
 
-    public function getErrorsCount(Attempt $attempt): int
+    private function getErrorsCount(Attempt $attempt): int
     {
         return $this->exampleRepository->count([
             'attempt' => $attempt,
@@ -182,33 +183,9 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
         ]);
     }
 
-    public function getRating(Attempt $attempt): int
+    private function getRating(Attempt $attempt): int
     {
-        return ExampleManager::rating($attempt->getExamplesCount(), $this->getRongExamplesCount($attempt));
-    }
-
-    public function countByCurrentUser(): int
-    {
-        return $this->createQueryBuilder('a')
-            ->select('count(a)')
-            ->join('a.session', 's')
-            ->join('s.user', 'u')
-            ->where('u = :currentUser')
-            ->getQuery()
-            ->setParameter('currentUser', $this->currentUserProvider->getCurrentUserOrGuest())
-            ->getSingleScalarResult();
-    }
-
-    public function getByUser(User $user): array
-    {
-        return $this->createQueryBuilder('a')
-            ->select('a')
-            ->join('a.session', 's')
-            ->where('s.user = :user')
-            ->orderBy('a.addTime', 'asc')
-            ->getQuery()
-            ->setParameter('user', $user)
-            ->getResult();
+        return ExampleManager::rating($attempt->getExamplesCount(), $this->getWrongExamplesCount($attempt));
     }
 
     public function createAttempt(): Attempt
@@ -226,6 +203,9 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
         return $attempt;
     }
 
+    /**
+     * @deprecated
+     */
     public function getNewByCurrentUserAndTask(Task $task): Attempt
     {
         $attempt = $this->createNewByCurrentUser()
@@ -249,33 +229,6 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
         return $attempt;
     }
 
-    public function hasPreviousExample(Attempt $attempt): bool
-    {
-        return (bool) $this->exampleRepository->findLastByAttempt($attempt);
-    }
-
-    public function getData(Attempt $attempt): ?array
-    {
-        $exampleRepository = $this->exampleRepository;
-
-        if (!$example = $exampleRepository->findLastUnansweredByAttempt($attempt)) {
-            return null;
-        }
-
-        $example->setEntityRepository($exampleRepository);
-        $attempt->setEntityRepository($this);
-
-        return [
-            'ex' => [
-                'num' => $example->getNumber(),
-                'str' => "$example",
-            ],
-            'errors' => $attempt->getErrorsCount(),
-            'exRem' => $attempt->getRemainedExamplesCount(),
-            'limTime' => $attempt->getLimitTime()->getTimestamp(),
-        ];
-    }
-
     public function getRemainedExamplesCount(Attempt $attempt): int
     {
         $count = $attempt->getSettings()->getExamplesCount() - $this->getSolvedExamplesCount($attempt);
@@ -290,20 +243,6 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
         return DT::createFromTimestamp($remainedTime > 0 ? $remainedTime : 0);
     }
 
-    public function getAllData(Attempt $attempt): array
-    {
-        $data = $attempt->setEntityRepository($this)->getData();
-        $propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
-            ->enableMagicCall()
-            ->getPropertyAccessor();
-
-        foreach (arr('title number finishTime solvedExamplesCount answeredExamplesCount errorsCount rating') as $property) {
-            $data[$property] = $propertyAccessor->getValue($attempt, $property);
-        }
-
-        return $data;
-    }
-
     public function getSolvedTime(Attempt $attempt): \DateTimeInterface
     {
         $finishedTime = $this->getFinishTime($attempt);
@@ -313,20 +252,14 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
         );
     }
 
-    public function getAverSolveTime(Attempt $attempt): \DateTimeInterface
-    {
-        $count = $this->getSolvedExamplesCount($attempt);
-
-        return DT::createFromTimestamp(
-            $count ? round($this->getSolvedTime($attempt)->getTimestamp() / $count) : 0
-        );
-    }
-
-    public function getRongExamplesCount(Attempt $attempt): int
+    private function getWrongExamplesCount(Attempt $attempt): int
     {
         return $this->getErrorsCount($attempt) + $attempt->getExamplesCount() - $this->getSolvedExamplesCount($attempt);
     }
 
+    /**
+     * @deprecated
+     */
     public function findByUser(User $user): array
     {
         return $this->createQuery('select a from App:Attempt a
@@ -335,11 +268,6 @@ join s.user u
 where u = ?1')
             ->setParameter(1, $user)
             ->getResult();
-    }
-
-    public function isDone(Attempt $attempt): bool
-    {
-        return $this->getSolvedExamplesCount($attempt) === $attempt->getSettings()->getExamplesCount();
     }
 
     public function findByUserAndTask(User $user, Task $task): array
@@ -472,12 +400,12 @@ where s.user = :user and a.task = :task')
             'finishedAt' => $this->getFinishTime($attempt),
         ]);
         $attempt->setResult($result);
-        $this->checkAttempt($attempt);
+        $this->setRating($attempt);
         $this->getEntityManager()->persist($result);
         $this->getEntityManager()->flush();
     }
 
-    private function checkAttempt(Attempt $attempt): void
+    private function setRating(Attempt $attempt): void
     {
         $result = $attempt
             ->getResult();

@@ -2,7 +2,7 @@
 
 namespace App\Tests\Functional;
 
-use App\DataFixtures\UserFixtures;
+use App\Request\ContentType;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -20,7 +20,7 @@ abstract class BaseWebTestCase extends WebTestCase
         );
     }
 
-    protected static function createAuthenticatedClient(string $username = UserFixtures::STUDENT_USERNAME): Client
+    protected static function createAuthenticatedClient(string $username): Client
     {
         $client = static::createClient([], [
             self::TEST_AUTHENTICATION_HEADER_NAME => $username,
@@ -42,9 +42,16 @@ abstract class BaseWebTestCase extends WebTestCase
     /**
      * @return mixed
      */
-    protected function ajaxPost(Client $client, string $url, array $parameters = [])
+    protected function ajaxPut(Client $client, string $url, array $parameters)
     {
-        $client->xmlHttpRequest('POST', $url, $parameters);
+        $client->xmlHttpRequest(
+            'PUT',
+            $url,
+            [],
+            [],
+            ['CONTENT_TYPE' => ContentType::JSON],
+            json_encode($parameters)
+        );
 
         return json_decode($client->getResponse()->getContent(), true);
     }

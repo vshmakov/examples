@@ -24,7 +24,6 @@ use App\Service\UserLoader;
 use App\Utils\Cache\LocalCache;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
-use  Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 final class AttemptRepository extends ServiceEntityRepository implements AttemptCreatorInterface, AttemptProviderInterface, AttemptResponseProviderInterface, AttemptResultProviderInterface
@@ -59,8 +58,7 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
         AuthorizationCheckerInterface $authorizationChecker,
         LocalCache $localCache,
         ExampleResponseProviderInterface $exampleResponseProvider
-    )
-    {
+    ) {
         parent::__construct($registry, Attempt::class);
 
         $this->exampleRepository = $exampleRepository;
@@ -113,7 +111,7 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
 
     private function getTitle(Attempt $attempt): string
     {
-        return 'Попытка №' . $this->getNumber($attempt);
+        return 'Попытка №'.$this->getNumber($attempt);
     }
 
     private function getNumber(Attempt $attempt): int

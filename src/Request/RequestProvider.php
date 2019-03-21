@@ -4,7 +4,6 @@ namespace App\Request;
 
 use App\ApiPlatform\Attribute;
 use App\ApiPlatform\Format;
-use App\Parameter\Http\AcceptFormatHeader;
 use App\Request\DataTables\DataTablesRequest;
 use App\Request\DataTables\DataTablesRequestProviderInterface;
 use App\Request\DataTables\DataTablesRequestType;
@@ -53,7 +52,7 @@ final class RequestProvider implements DataTablesRequestProviderInterface, Pagin
         }
 
         return Format::JSONDT === $request->attributes->get(Attribute::FORMAT)
-            or false !== mb_strpos($request->headers->get(AcceptFormatHeader::HEADER_NAME), AcceptFormatHeader::JSONDT);
+            or false !== mb_strpos($request->headers->get(ContentType::ACCEPT_HEADER), ContentType::JSONDT);
     }
 
     public function isDataTablesRequestValid(): ?bool

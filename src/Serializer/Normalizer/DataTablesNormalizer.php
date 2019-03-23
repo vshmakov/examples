@@ -4,8 +4,8 @@ namespace App\Serializer\Normalizer;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
+use App\ApiPlatform\Doctrine\SystemExtensionInterface;
 use App\ApiPlatform\Format;
-use App\Controller\ApiPlatform\Doctrine\SystemExtensionInterface;
 use App\Request\DataTables\DataTablesRequestProviderInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Container\ContainerInterface;

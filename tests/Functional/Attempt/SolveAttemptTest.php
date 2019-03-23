@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Tests\Functional;
+namespace App\Tests\Functional\Attempt;
 
 use App\DataFixtures\Attempt\ProfileFixtures;
+use App\Tests\Functional\BaseWebTestCase;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpKernel\Client;
 
@@ -60,7 +61,7 @@ final class SolveAttemptTest extends BaseWebTestCase
         while (1 <= $attemptData['result']['remainedExamplesCount']) {
             $this->assertLessThan(10, $solvedExamplesCount++);
             $answerCallback = 1 !== $solvedExamplesCount ? 'rightAnswer' : 'wrongAnswer';
-            $answerAttemptData = \call_user_func_array([$this, $answerCallback], [$attemptData['example']['string']]);
+            $answerAttemptData = \call_user_func([$this, $answerCallback], $attemptData['example']['string']);
             $attemptData = $answerAttemptData['attempt'];
             $isLastExample = 0 === $attemptData['result']['remainedExamplesCount'];
 
@@ -81,7 +82,7 @@ final class SolveAttemptTest extends BaseWebTestCase
     {
         self::$unauthenticatedClient->request('GET', sprintf('/attempt/%s/', self::$attemptId));
         $this->assertTrue(self::$unauthenticatedClient->getResponse()->isRedirection());
-        $this->assertSame(sprintf('/attempt/%s/show/', self::$attemptId), self::$unauthenticatedClient->getResponse()->headers->get('location'));
+        $this->assertTrue(self::$unauthenticatedClient->getResponse()->isRedirect(sprintf('/attempt/%s/show/', self::$attemptId)));
     }
 
     /**

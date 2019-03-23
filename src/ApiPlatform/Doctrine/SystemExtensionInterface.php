@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\ApiPlatform\Doctrine;
+namespace App\ApiPlatform\Doctrine;
 
 interface SystemExtensionInterface
 {

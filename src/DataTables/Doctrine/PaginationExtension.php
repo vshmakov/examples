@@ -4,7 +4,7 @@ namespace App\DataTables\Doctrine;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
-use App\Controller\ApiPlatform\Doctrine\SystemExtensionInterface;
+use App\ApiPlatform\Doctrine\SystemExtensionInterface;
 use App\Request\DataTables\DataTablesRequestProviderInterface;
 use App\Request\Pagination\PaginationRequestProviderInterface;
 use Doctrine\ORM\QueryBuilder;

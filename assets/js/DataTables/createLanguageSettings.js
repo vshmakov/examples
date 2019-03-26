@@ -14,8 +14,8 @@ export default function createLanguageSettings(parameters) {
         paginate: {
             first: "В начало",
             last: "В конец",
-            next: "Вперед",
-            previous: "Назад",
+            next: "Следующая страница",
+            previous: "Предыдущая страница",
         },
         aria: {
             sortAscending: "",

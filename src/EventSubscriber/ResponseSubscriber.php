@@ -4,6 +4,7 @@ namespace App\EventSubscriber;
 
 use App\Entity\Session;
 use App\Entity\Visit;
+use App\Object\ObjectAccessor;
 use App\Repository\IpRepository;
 use App\Security\User\CurrentUserSessionProviderInterface;
 use App\Service\UserLoader;
@@ -60,9 +61,8 @@ final class ResponseSubscriber implements EventSubscriberInterface
     public function onKernelResponse(FilterResponseEvent $event): void
     {
         $currentUserSession = $this->currentUserSessionProvider->getCurrentUserSession();
-        $missResponseEvent = $this->session->getFlashBag()->get('missResponseEvent', []);
 
-        if (!$this->request or $this->request->isMethod('POST') or $missResponseEvent or null === $currentUserSession) {
+        if (!$this->request or null === $currentUserSession) {
             return;
         }
 
@@ -75,12 +75,12 @@ final class ResponseSubscriber implements EventSubscriberInterface
         $this->updateSession($currentUserSession);
         $this->saveVisit($currentUserSession, $event->getResponse()->getStatusCode());
         $this->saveIp($currentUserSession, $clientIp);
-        $this->entityManager->flush();
     }
 
     private function updateSession(Session $session): void
     {
         $session->setLastTime(new \DateTime());
+        $this->entityManager->flush($session);
     }
 
     private function saveVisit(Session $session, int $statusCode): void
@@ -91,14 +91,16 @@ final class ResponseSubscriber implements EventSubscriberInterface
 
         if ('_wdt' !== $routeName &&
             !$this->authorizationChecker->isGranted('ROLE_ADMIN')) {
-            $visit = (new Visit())
-                ->setUri($uri)
-                ->setRouteName($routeName)
-                ->setMethod($request->getMethod())
-                ->setSession($session)
-                ->setStatusCode($statusCode);
+            $visit = ObjectAccessor::initialize(Visit::class, [
+                'uri' => $uri,
+                'routeName' => $routeName,
+                'method' => $request->getMethod(),
+                'statusCode' => $statusCode,
+                'session' => $session,
+            ]);
 
             $this->entityManager->persist($visit);
+            $this->entityManager->flush($visit);
         }
     }
 
@@ -107,16 +109,18 @@ final class ResponseSubscriber implements EventSubscriberInterface
         $user = $this->userLoader->getUser();
         $ip = $this->ipRepository->findOneByIpOrNew($clientIp);
 
-        if ($ip) {
+        if (null !== $ip) {
             $session->setIp($ip);
+            $this->entityManager->flush($session);
 
             if (!$this->userLoader->isCurrentUserGuest()) {
                 $user->addIp($ip);
+                $this->entityManager->flush($user);
             }
         }
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::RESPONSE => 'onKernelResponse',

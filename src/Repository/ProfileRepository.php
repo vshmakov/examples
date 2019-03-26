@@ -2,6 +2,8 @@
 
 namespace App\Repository;
 
+use App\Attempt\Profile\ProfileProviderInterface;
+use App\DataFixtures\Attempt\ProfileFixtures;
 use App\Entity\BaseProfile;
 use App\Entity\Profile;
 use App\Entity\User;
@@ -12,7 +14,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-final class ProfileRepository extends ServiceEntityRepository
+final class ProfileRepository extends ServiceEntityRepository implements ProfileProviderInterface
 {
     /** @var CurrentUserProviderInterface */
     private $currentUserProvider;
@@ -61,12 +63,12 @@ final class ProfileRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
-    public function findByCurrentAuthor(): array
+    public function getUserProfiles(): array
     {
         return $this->findByAuthor($this->currentUserProvider->getCurrentUserOrGuest());
     }
 
-    public function getTitle(Profile $profile): string
+    private function getTitle(Profile $profile): string
     {
         return $profile->getDescription() ?: 'Профиль №'.$this->getNumber($profile);
     }
@@ -76,7 +78,7 @@ final class ProfileRepository extends ServiceEntityRepository
         return $this->count(['author' => $this->currentUserProvider->getCurrentUserOrGuest()]);
     }
 
-    public function getNumber(Profile $profile): int
+    private function getNumber(Profile $profile): int
     {
         if (null === $profile->getId()) {
             return $this->countByCurrentAuthor() + 1;
@@ -102,7 +104,7 @@ final class ProfileRepository extends ServiceEntityRepository
         ]);
     }
 
-    public function findByCurrentUserTeacher(): array
+    public function getTeacherProfiles(): array
     {
         $user = $this->currentUserProvider->getCurrentUserOrGuest();
 
@@ -113,11 +115,35 @@ final class ProfileRepository extends ServiceEntityRepository
         return $this->findByAuthor($user->getTeacher());
     }
 
+    public function getPublicProfiles(): array
+    {
+        return $this->findBy(['isPublic' => true]);
+    }
+
     public function findOneByCurrentAuthorOrPublicAndSettingsData(BaseProfile $settings): ?Profile
     {
         $parameters = $this->normalizer->normalize($settings, null, ['groups' => Group::SETTINGS]);
 
         return $this->findOneBy(['author' => $this->currentUserProvider->getCurrentUserOrGuest()] + $parameters)
             ?? $this->findOneBy(['isPublic' => true] + $parameters);
+    }
+
+    public function getCurrentProfile(): Profile
+    {
+        $currentUser = $this->currentUserProvider->getCurrentUserOrGuest();
+
+        if (null === $currentUser->getProfile()) {
+            $currentUser->setProfile(
+                $this->findOneBy(['isPublic' => true, 'description' => ProfileFixtures::GUEST_PROFILE])
+            );
+            $this->getEntityManager()->flush($currentUser);
+        }
+
+        return $currentUser->getProfile();
+    }
+
+    public function isCurrentProfile(Profile $profile): bool
+    {
+        return $profile === $this->getCurrentProfile();
     }
 }

@@ -27,7 +27,7 @@ final class AttemptController extends Controller
     use CurrentUserProviderTrait, JavascriptParametersTrait;
 
     /**
-     * @Route("/", name="attempt_index")
+     * @Route("/", name="attempt_index", methods={"GET"})
      */
     public function index(): Response
     {
@@ -39,7 +39,29 @@ final class AttemptController extends Controller
     }
 
     /**
-     * @Route("/{id}/show/", name="attempt_show", requirements={"id": "\d+"})
+     * @Route("/last/", name="attempt_last", methods={"GET"})
+     */
+    public function last(AttemptProviderInterface $attemptProvider): RedirectResponse
+    {
+        if ($attempt = $attemptProvider->getLastAttempt()) {
+            return $this->redirectToRoute('attempt_solve', ['id' => $attempt->getId()]);
+        }
+
+        return $this->redirectToRoute('attempt_index');
+    }
+
+    /**
+     * @Route("/new/", name="attempt_new", methods={"GET"})
+     */
+    public function new(AttemptCreatorInterface $creator): RedirectResponse
+    {
+        return $this->redirectToRoute('attempt_solve', [
+            'id' => $creator->createAttempt()->getId(),
+        ]);
+    }
+
+    /**
+     * @Route("/{id}/show/", name="attempt_show", methods={"GET"})
      * @IsGranted(AttemptVoter::VIEW, subject="attempt")
      */
     public function show(Attempt $attempt, AttemptResponseProviderInterface $attemptResponseProvider, ExampleResponseProviderInterface $exampleResponseProvider): Response
@@ -52,7 +74,7 @@ final class AttemptController extends Controller
     }
 
     /**
-     * @Route("/{id}/", name="attempt_solve", requirements={"id": "\d+"})
+     * @Route("/{id}/", name="attempt_solve", methods={"GET"})
      * @IsGranted(AttemptVoter::SOLVE, subject="attempt")
      */
     public function solve(Attempt $attempt, AttemptResponseProviderInterface $attemptResponseProvider): Response
@@ -74,37 +96,15 @@ final class AttemptController extends Controller
     }
 
     /**
-     * @Route("/{id}/settings/", name="attempt_settings")
+     * @Route("/{id}/settings/", name="attempt_settings", methods={"GET"})
      * @IsGranted(AttemptVoter::VIEW, subject="attempt")
      */
-    public function profile(Attempt $attempt, AttemptResponseProviderInterface $attemptResponseProvider): Response
+    public function settings(Attempt $attempt, AttemptResponseProviderInterface $attemptResponseProvider): Response
     {
         return $this->render('attempt/settings.html.twig', [
             'attempt' => $attempt,
             'settings' => $attempt->getSettings(),
             'attemptResponse' => $attemptResponseProvider->createAttemptResponse($attempt),
-        ]);
-    }
-
-    /**
-     * @Route("/last/", name="attempt_last")
-     */
-    public function last(AttemptProviderInterface $attemptProvider): RedirectResponse
-    {
-        if ($attempt = $attemptProvider->getLastAttempt()) {
-            return $this->redirectToRoute('attempt_solve', ['id' => $attempt->getId()]);
-        }
-
-        return $this->redirectToRoute('attempt_index');
-    }
-
-    /**
-     * @Route("/new/", name="attempt_new")
-     */
-    public function new(AttemptCreatorInterface $creator): RedirectResponse
-    {
-        return $this->redirectToRoute('attempt_solve', [
-            'id' => $creator->createAttempt()->getId(),
         ]);
     }
 }

@@ -73,7 +73,7 @@ final class AppExtension extends AbstractExtension implements \Twig_Extension_Gl
         return $this->prepareFunctions([
             'getJavascriptParameters',
             'dt',
-            'addTimeNumber',
+            'creationTimeNumber',
             'sortByAddTime',
             'sortByDateTime',
             'sortProfiles',
@@ -107,14 +107,14 @@ final class AppExtension extends AbstractExtension implements \Twig_Extension_Gl
         ), $parameters);
     }
 
-    public function addTimeNumber($entity, array $entityList)
+    public function creationTimeNumber($entity, array $entityList): int
     {
         $this->sortByAddTime($entityList);
 
         return array_search($entity, $entityList, true) + 1;
     }
 
-    public function sortByAddTime($entityList)
+    public function sortByAddTime(&$entityList)
     {
         usort($entityList, [$this, 'addTimeSorter']);
 

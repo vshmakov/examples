@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Attempt\Profile\NormalizerInterface as ProfileNormalizerInterface;
+use App\Attempt\Profile\ProfileProviderInterface;
 use  App\Controller\Traits\BaseTrait;
+use App\Controller\Traits\CurrentUserProviderTrait;
 use App\Entity\Profile;
 use App\Form\ProfileType;
 use App\Repository\ProfileRepository;
@@ -22,31 +24,33 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class ProfileController extends Controller
 {
-    use BaseTrait;
-
-    public const  VIEW = 'profile_view';
+    use BaseTrait, CurrentUserProviderTrait;
 
     /**
-     * @Route("/", name="profile_index", methods="GET")
+     * @Route("/", name="profile_index", methods={"GET"})
      */
-    public function index(ProfileRepository $profileRepository, UserLoader $userLoader, UserRepository $userRepository): Response
+    public function index(ProfileProviderInterface $profileProvider): Response
     {
-        $currentUser = $userLoader->getUser();
-        $publicProfiles = $profileRepository->findByIsPublic(true);
-        $userProfiles = $profileRepository->findByCurrentAuthor();
-        $teacherProfiles = $profileRepository->findByCurrentUserTeacher();
+        $publicProfiles = $profileProvider->getPublicProfiles();
+        $teacherProfiles = $profileProvider->getTeacherProfiles();
+        $userProfiles = $profileProvider->getUserProfiles();
+        array_map(function (array &$profiles) use ($profileProvider): void {
+            $this->sortProfiles($profiles, $profileProvider);
+        }, [&$publicProfiles, &$teacherProfiles, &$userProfiles]);
 
         return $this->render('profile/index.html.twig', [
-            'public' => $publicProfiles,
+            'publicProfiles' => $publicProfiles,
             'teacherProfiles' => $teacherProfiles,
-            'profiles' => $userProfiles,
-            'canAppoint' => $can = $this->isGranted('PRIV_APPOINT_PROFILES'),
-            'pR' => $profileRepository,
-            'jsParams' => [
-                'current' => $userRepository->getCurrentProfile($currentUser)->getId(),
-                'canAppoint' => $can,
-            ],
+            'userProfiles' => $userProfiles,
+            'profileProvider' => $profileProvider,
         ]);
+    }
+
+    private function sortProfiles(array &$profiles, ProfileProviderInterface $profileProvider): void
+    {
+        usort($profiles, function (Profile $profile1, Profile $profile2) use ($profileProvider): int {
+            return $profileProvider->isCurrentProfile($profile1) ? -1 : 1;
+        });
     }
 
     /**
@@ -91,7 +95,7 @@ final class ProfileController extends Controller
                 ->getManager()
                 ->flush();
 
-            return $this->redirectToRoute(self::VIEW, ['id' => $profile->getId()]);
+            return $this->redirectToRoute('profile_show', ['id' => $profile->getId()]);
         }
 
         return $this->render('profile/edit.html.twig', [
@@ -102,13 +106,13 @@ final class ProfileController extends Controller
     }
 
     /**
-     * @Route("/{id}/", name=ProfileController::VIEW, methods={"GET"})
+     * @Route("/{id}/", name="profile_show", methods={"GET"})
      * @IsGranted(ProfileVoter::VIEW, subject="profile")
      */
-    public function view(Profile $profile, NormalizerInterface $normalizer): Response
+    public function show(Profile $profile, NormalizerInterface $normalizer): Response
     {
-        return $this->render('profile/view.html.twig', [
-'profile' => $profile,
+        return $this->render('profile/show.html.twig', [
+            'profile' => $profile,
         ]);
     }
 

@@ -33,7 +33,7 @@ final class AttemptFixtures extends Fixture implements DependentFixtureInterface
     {
         $this->manager = $manager;
 
-        for ($i = 1; $i <= 200; ++$i) {
+        for ($i = 1; $i <= 20; ++$i) {
             $attempt = $this->attemptCreator->createAttempt();
             $this->persist($attempt);
 

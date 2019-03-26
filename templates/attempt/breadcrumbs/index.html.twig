@@ -1,6 +1,8 @@
-{% import 'widget/breadcrumbs.html.twig' as widget %}
-
-    {{ widget.breadcrumbs([
-        {'title': 'Главная страница', 'url': path('homepage')},
-        {'title': 'Архив попыток', 'url': path('attempt_index')},
-    ]|merge(breadcrumbs ?? [])) }}
+{{ include(
+    'index/breadcrumbs/index.html.twig',
+    {
+        'breadcrumbs': [
+            {'title': 'Архив попыток', 'url': path('attempt_index')},
+    ]|merge(breadcrumbs ?? [])
+    }
+) }}

@@ -2,18 +2,16 @@
 
 namespace App\Controller;
 
-use App\Controller\Traits\BaseTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class IndexController extends Controller
+final class IndexController extends Controller
 {
-    use BaseTrait;
-
     /**
-     * @Route("/", name="homepage")
+     * @Route("/", name="homepage", methods={"GET"})
      */
-    public function index()
+    public function index(): Response
     {
         return $this->render('index/index.html.twig');
     }

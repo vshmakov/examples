@@ -14,7 +14,8 @@ Encore
     .addEntry('js/attempt/index', './assets/js/attempt/index.ts')
     .addEntry('js/attempt/solve', './assets/js/attempt/solve.ts')
 
-    .addEntry('js/profile', './assets/js/profile.js')
+    .addEntry('js/profile/index', './assets/js/profile/index.js')
+
     .addStyleEntry('css/app', './assets/css/app.css')
 
     // will require an extra script tag for runtime.js

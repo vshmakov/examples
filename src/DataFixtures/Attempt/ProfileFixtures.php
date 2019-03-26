@@ -2,8 +2,9 @@
 
 namespace App\DataFixtures\Attempt;
 
-use App\Attempt\Profile\NormalizerInterface;
+use  App\Attempt\Profile\NormalizerInterface;
 use App\DataFixtures\UserFixtures;
+use App\DateTime\DateTime as DT;
 use App\Entity\Profile;
 use App\Object\ObjectAccessor;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -37,6 +38,19 @@ final class ProfileFixtures extends Fixture implements DependentFixtureInterface
             'multPerc' => 0,
             'divPerc' => 0,
         ],
+        [
+            'description' => 'Умножение в пределах 50',
+            'multFMin' => 2,
+            'multFMax' => 8,
+            'multSMin' => 2,
+            'multSMax' => 8,
+            'multMin' => 9,
+            'multMax' => 50,
+            'addPerc' => 0,
+            'subPerc' => 0,
+            'multPerc' => 100,
+            'divPerc' => 0,
+        ],
     ];
 
     public function __construct(NormalizerInterface $normalizer)
@@ -61,6 +75,7 @@ final class ProfileFixtures extends Fixture implements DependentFixtureInterface
     private function loadGuestProfiles(ObjectManager $manager): void
     {
         $profile = ObjectAccessor::initialize(Profile::class, self::GUEST_PROFILE);
+        $this->setUniqueCreationTime($profile);
         $guest = $this->getReference(UserFixtures::GUEST_USER_REFERENCE);
         $guest->setProfile($profile);
         $profile->setAuthor($guest);
@@ -75,9 +90,17 @@ final class ProfileFixtures extends Fixture implements DependentFixtureInterface
                 'author' => $this->getReference(UserFixtures::ADMIN_USER_REFERENCE),
                 'isPublic' => true,
             ]);
+            $this->setUniqueCreationTime($profile);
 
             $this->normalizer->normalize($profile);
             $manager->persist($profile);
         }
+    }
+
+    private function setUniqueCreationTime(Profile $profile): void
+    {
+        static $seconds = 0;
+        $profile->setAddTime(DT::createFromTimestamp(time() + $seconds));
+        --$seconds;
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Ip;
+use App\Object\ObjectAccessor;
 use App\Repository\Traits\BaseTrait;
 use App\Service\IpInformer;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -17,19 +18,19 @@ class IpRepository extends ServiceEntityRepository
         parent::__construct($registry, Ip::class);
     }
 
-    public function hasOrCreateByIp($ip)
+    public function hasOrCreateByIp($ip): ?Ip
     {
         if (!IpInformer::isIp($ip)) {
-            return false;
+            return null;
         }
 
         $entity = $this->findOneByIp($ip);
 
         if (!$entity) {
-            $entity = (new Ip())->setIp($ip);
+            $entity = ObjectAccessor::initialize(Ip::class, ['ip' => $ip]);
             $entityManager = $this->getEntityManager();
             $entityManager->persist($entity);
-            $entityManager->flush();
+            $entityManager->flush($entity);
         }
 
         return $entity;

@@ -18,6 +18,7 @@ class PagesAreAvailableTest extends BaseWebTestCase
 
     private const ALL_AUTHENTICATED_USERS_ENDPOINTS = [
         '/account/',
+        '/profile/new/',
     ];
 
     private const ADMIN_ENDPOINTS = [
@@ -99,10 +100,7 @@ class PagesAreAvailableTest extends BaseWebTestCase
     public function unauthenticatedUserRedirectsToLoginPage(string $url): void
     {
         self::$unauthenticatedClient->request('GET', $url);
-        $response = self::$unauthenticatedClient->getResponse();
-
-        $this->assertTrue($response->isRedirection());
-        $this->assertRegExp('#/login$#', $response->headers->get('location'));
+        $this->assertRedirectionToLoginPage(self::$unauthenticatedClient);
     }
 
     /**

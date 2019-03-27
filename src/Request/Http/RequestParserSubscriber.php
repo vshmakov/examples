@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Request;
+namespace App\Request\Http;
 
 use ApiPlatform\Core\EventListener\EventPriorities;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;

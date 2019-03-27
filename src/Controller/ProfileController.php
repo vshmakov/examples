@@ -54,7 +54,7 @@ final class ProfileController extends Controller
     }
 
     /**
-     * @Route("/new", name="profile_new", methods="GET|POST")
+     * @Route("/new/", name="profile_new", methods="GET|POST")
      */
     public function new(Request $request, ProfileRepository $profileRepository, UserLoader $userLoader, ProfileNormalizerInterface $normalizer): Response
     {
@@ -80,7 +80,7 @@ final class ProfileController extends Controller
     }
 
     /**
-     * @Route("/{id}/edit", name="profile_edit", methods="GET|POST")
+     * @Route("/{id}/edit/", name="profile_edit", methods="GET|POST")
      * @IsGranted(ProfileVoter::EDIT, subject="profile")
      */
     public function edit(Profile $profile, Request $request, ProfileRepository $profileRepository, UserLoader $userLoader): Response
@@ -117,12 +117,11 @@ final class ProfileController extends Controller
     }
 
     /**
-     * @Route("/{id}/delete", name="profile_delete", methods="DELETE")
+     * @Route("/{id}/delete/", name="profile_delete", methods={"DELETE"})
+     * @IsGranted(ProfileVoter::DELETE, subject="profile")
      */
     public function delete(Request $request, Profile $profile, UserRepository $userRepository): Response
     {
-        $this->denyAccessUnlessGranted('DELETE', $profile);
-
         foreach ($userRepository->findByProfile($profile) as $user) {
             $user->setProfile(null);
         }
@@ -136,7 +135,8 @@ final class ProfileController extends Controller
     }
 
     /**
-     * @Route("/{id}/appoint", name="profile_appoint", methods="GET")
+     * @Route("/{id}/appoint/", name="profile_appoint", methods={"GET"})
+     * @IsGranted(ProfileVoter::APPOINT, subject="profile")
      */
     public function appoint(Profile $profile, UserLoader $userLoader)
     {

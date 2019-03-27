@@ -7,6 +7,7 @@ use App\ApiPlatform\Format;
 use App\Request\DataTables\DataTablesRequest;
 use App\Request\DataTables\DataTablesRequestProviderInterface;
 use App\Request\DataTables\DataTablesRequestType;
+use App\Request\Http\ContentType;
 use App\Request\Pagination\PaginationRequest;
 use App\Request\Pagination\PaginationRequestProviderInterface;
 use App\Request\Pagination\PaginationRequestType;

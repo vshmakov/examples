@@ -9,7 +9,7 @@
 {% block main %}
     <div>
         {% if not is_granted('ROLE_USER') %}
-            <div id="cannot-appoint-profiles-message" class="text-white bg-danger mb-3">
+            <div id="not-able-appoint-profiles-message" class="text-white bg-danger mb-3">
                 <div class="card-header">Внимание!</div>
                 <div class="card-body">
                     <h4 class="card-title">Вы не можете выбирать профили настроек!</h4>
@@ -28,12 +28,6 @@
         <div id="public-profiles">
             {{ list_table("Профили по умолчанию", publicProfiles, profileProvider) }}
         </div>
-
-        {% if is_granted('ROLE_USER') and app.user.hasTeacher %}
-            <div id="teacher-profiles">
-                {{ list_table("Профили учителя", teacherProfiles, profileProvider) }}
-            </div>
-        {% endif %}
 
         <div id="user-profiles">
             {{ list_table("Личные профили", userProfiles, profileProvider) }}

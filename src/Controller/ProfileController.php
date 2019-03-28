@@ -32,15 +32,13 @@ final class ProfileController extends Controller
     public function index(ProfileProviderInterface $profileProvider): Response
     {
         $publicProfiles = $profileProvider->getPublicProfiles();
-        $teacherProfiles = $profileProvider->getTeacherProfiles();
         $userProfiles = $profileProvider->getUserProfiles();
         array_map(function (array &$profiles) use ($profileProvider): void {
             $this->sortProfiles($profiles, $profileProvider);
-        }, [&$publicProfiles, &$teacherProfiles, &$userProfiles]);
+        }, [&$publicProfiles, &$userProfiles]);
 
         return $this->render('profile/index.html.twig', [
             'publicProfiles' => $publicProfiles,
-            'teacherProfiles' => $teacherProfiles,
             'userProfiles' => $userProfiles,
             'profileProvider' => $profileProvider,
         ]);

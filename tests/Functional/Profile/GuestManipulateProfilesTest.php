@@ -36,10 +36,10 @@ final class GuestManipulateProfilesTest extends BaseWebTestCase
      */
     public function guestShowsNoActionsOfProfiles(): void
     {
-        $profilesCrawler = self::$profileIndexCrawler->filter('tbody tr');
-        $profilesCrawler->each(function (Crawler $profileCrawler): void {
-            $this->assertSame('-', $this->getTrimmedText($profileCrawler->filter('.profile-actions')));
-        });
+        self::$profileIndexCrawler->filter('tbody .profile-actions')
+            ->each(function (Crawler $actionsCrawler): void {
+                $this->assertSame('-', $this->getTrimmedText($actionsCrawler));
+            });
     }
 
     /**
@@ -48,7 +48,7 @@ final class GuestManipulateProfilesTest extends BaseWebTestCase
      */
     public function guestHasTestProfileByDefault(): void
     {
-        $defaultGuestProfileCrawler = self::$profileIndexCrawler->filter('#public-profiles tbody tr')->first();
+        $defaultGuestProfileCrawler = self::$profileIndexCrawler->filter('#public-profiles tbody tr:first-child');
         $this->assertSame('Да', $defaultGuestProfileCrawler->filter('.is-current-profile')->text());
         $descriptionCrawler = $defaultGuestProfileCrawler->filter('.profile-description');
         $this->assertSame(ProfileFixtures::GUEST_PROFILE_DESCRIPTION, $this->getTrimmedText($descriptionCrawler));
@@ -110,8 +110,8 @@ final class GuestManipulateProfilesTest extends BaseWebTestCase
      */
     public function guestSeesNotAbleAppointProfilesMessage(): void
     {
-        $canNotAppointProfilesMessageCrawler = self::$profileIndexCrawler->filter('#cannot-appoint-profiles-message');
-        $this->assertNotEmpty($canNotAppointProfilesMessageCrawler);
+        $notAbleAppointProfilesMessageCrawler = self::$profileIndexCrawler->filter('#not-able-appoint-profiles-message');
+        $this->assertNotEmpty($notAbleAppointProfilesMessageCrawler);
     }
 
     private function getTrimmedText(Crawler $crawler): string

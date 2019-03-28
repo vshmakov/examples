@@ -8,8 +8,6 @@ interface ProfileProviderInterface
 {
     public function getPublicProfiles(): array;
 
-    public function getTeacherProfiles(): array;
-
     public function getUserProfiles(): array;
 
     public function getCurrentProfile(): Profile;

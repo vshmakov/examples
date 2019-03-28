@@ -104,17 +104,6 @@ final class ProfileRepository extends ServiceEntityRepository implements Profile
         ]);
     }
 
-    public function getTeacherProfiles(): array
-    {
-        $user = $this->currentUserProvider->getCurrentUserOrGuest();
-
-        if (!$user->hasTeacher()) {
-            return [];
-        }
-
-        return $this->findByAuthor($user->getTeacher());
-    }
-
     public function getPublicProfiles(): array
     {
         return $this->findBy(['isPublic' => true]);

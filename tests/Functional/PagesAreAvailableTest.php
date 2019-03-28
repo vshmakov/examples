@@ -17,8 +17,8 @@ class PagesAreAvailableTest extends BaseWebTestCase
     ];
 
     private const ALL_AUTHENTICATED_USERS_ENDPOINTS = [
-        '/account/',
         '/profile/new/',
+        '/account/',
     ];
 
     private const ADMIN_ENDPOINTS = [
@@ -27,7 +27,7 @@ class PagesAreAvailableTest extends BaseWebTestCase
 
     private const STUDENT_ENDPOINTS = [
         '/teacher/',
-        '/homework/',
+        //'/homework/',
     ];
 
     private const TEACHER_ENDPOINTS = [

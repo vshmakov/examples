@@ -8,7 +8,6 @@ use  App\Controller\Traits\BaseTrait;
 use App\Controller\Traits\CurrentUserProviderTrait;
 use App\Entity\Profile;
 use App\Form\ProfileType;
-use App\Repository\ProfileRepository;
 use App\Repository\UserRepository;
 use App\Security\Voter\CurrentUserVoter;
 use App\Security\Voter\ProfileVoter;
@@ -16,7 +15,6 @@ use App\Service\UserLoader;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use  Symfony\Component\HttpFoundation\Request;
 use  Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -58,7 +56,9 @@ final class ProfileController extends Controller
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            return $this->saveAndAppoint($profile);
+            $this->saveAndAppoint($profile);
+
+            return $this->redirectToRoute('profile_edit', ['id' => $profile->getId()]);
         }
 
         return $this->render('profile/new.html.twig', [
@@ -71,25 +71,32 @@ final class ProfileController extends Controller
      * @Route("/{id}/edit/", name="profile_edit", methods="GET|POST")
      * @IsGranted(ProfileVoter::EDIT, subject="profile")
      */
-    public function edit(Profile $profile, Request $request, ProfileRepository $profileRepository, UserLoader $userLoader): Response
+    public function edit(Profile $profile, Request $request, ProfileProviderInterface $profileProvider): Response
     {
-        $profileTitle = $profileRepository->getTitle($profile);
-        $profile->SetDescription($profileTitle);
+        $profileTitle = $profile->getDescription();
         $form = $this->createForm(ProfileType::class, $profile)
             ->add('copy', SubmitType::class);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()
-                ->getManager()
-                ->flush();
+            $redirectAction = 'profile_show';
 
-            return $this->redirectToRoute('profile_show', ['id' => $profile->getId()]);
+            if ($form->get('copy')->isClicked()) {
+                /** @var Profile $profile */
+                $profile = clone $form->getData();
+                $profile->setAuthor($this->getCurrentUserOrGuest());
+                $redirectAction = 'profile_edit';
+            }
+
+            $this->saveAndAppoint($profile);
+
+            return $this->redirectToRoute($redirectAction, ['id' => $profile->getId()]);
         }
 
         return $this->render('profile/edit.html.twig', [
-            'profileTitle' => $profileTitle,
             'profile' => $profile,
+            'profileTitle' => $profileTitle,
+            'isCurrentProfile' => $profileProvider->isCurrentProfile($profile),
             'form' => $form->createView(),
         ]);
     }
@@ -141,23 +148,24 @@ final class ProfileController extends Controller
     private function sortProfiles(array &$profiles, ProfileProviderInterface $profileProvider): void
     {
         usort($profiles, function (Profile $profile1, Profile $profile2) use ($profileProvider): int {
-            return $profileProvider->isCurrentProfile($profile1) ? -1 : 1;
+            if ($profileProvider->isCurrentProfile($profile2)) {
+                return 1;
+            }
+
+            return $profile1->getCreatedAt()->getTimestamp() <= $profile2->getCreatedAt()->getTimestamp() ? -1 : 1;
         });
     }
 
-    private function saveAndAppoint(Profile $profile): RedirectResponse
+    private function saveAndAppoint(Profile $profile): void
     {
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($profile);
-        $entityManager->flush();
+        $entityManager->flush($profile);
 
         if ($this->isGranted(ProfileVoter::APPOINT, $profile)) {
-            $this->getCurrentUserOrGuest()->setProfile($profile);
-            $entityManager->flush();
+            $currentUser = $this->getCurrentUserOrGuest();
+            $currentUser->setProfile($profile);
+            $entityManager->flush($currentUser);
         }
-
-        return $this->redirectToRoute('profile_edit', [
-            'id' => $profile->getId(),
-        ]);
     }
 }

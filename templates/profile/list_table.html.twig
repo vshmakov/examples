@@ -31,7 +31,7 @@
 
                         {% if is_granted('EDIT', profile) %}
                             {% set hasActions = true %}
-                            <a href="{{ path('profile_edit', {'id': profile.id}) }}">Выбрать</a>
+                            <a href="{{ path('profile_edit', {'id': profile.id}) }}">Редактировать</a>
                         {% endif %}
 
                         {% if is_granted('DELETE', profile) %}

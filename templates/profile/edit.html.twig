@@ -1,7 +1,14 @@
 {% extends 'main.html.twig' %}
-{%  use 'profile/_view_widget.html.twig' %}
+{% use 'profile/_view_widget.html.twig' %}
 
-{% block title %}{{ profileTitle }}{% endblock %}
+{% set currentProfileMessage = isCurrentProfile ? '(Текущий)' : '' %}
+{% block title %}
+    {{ profileTitle }} {{ currentProfileMessage }}
+{% endblock %}
+
+{%  block breadcrumbs %}
+    {{  include('profile/breadcrumbs/edit.html.twig') }}
+{% endblock %}
 
 {% block _profile_duration_widget %}
     <div id="{{ form.vars.id }}">
@@ -11,16 +18,16 @@
 
 {% set block_template = 'profile/_settings_group_edit_widget.html.twig' %}
 
-{%  block before_view %}
+{% block before_view %}
     {{ form_start(form) }}
 
-    <h1>Редактировать профиль </h1>
+    <h1>Редактировать профиль {{ currentProfileMessage }}</h1>
     <div>{{ form_errors(form) }}</div>
 
     {% form_theme form _self %}
-{%  endblock %}
+{% endblock %}
 
-{%  block after_view %}
+{% block after_view %}
     {{ form_rest(form) }}
-    {{  form_end(form) }}
-{%  endblock %}
+    {{ form_end(form) }}
+{% endblock %}

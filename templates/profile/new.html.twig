@@ -1,7 +1,18 @@
-{%extends "profile/edit.html.twig"%}
+{% extends "profile/edit.html.twig" %}
 
-{%block title "Создать профиль"%}
-{%set h1Title="Создать профиль"%}
-{%set canEdit="CREATE"%}
+{% block title %}
+    Создать профиль
+{% endblock %}
 
-{%block delete_button ""%}
+{%  block breadcrumbs %}
+    {{  include('profile/breadcrumbs/new.html.twig') }}
+{% endblock %}
+
+{% block before_view %}
+    {{ form_start(form) }}
+
+    <h1>Создать профиль </h1>
+    <div>{{ form_errors(form) }}</div>
+
+    {% form_theme form _self %}
+{% endblock %}

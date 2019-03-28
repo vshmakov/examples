@@ -14,8 +14,8 @@ final class ProfileVoter extends Voter
 
     public const  VIEW = 'view';
     public const  EDIT = 'edit';
-    public const  APPOINT = 'appoint';
     public const  DELETE = 'delete';
+    public const  APPOINT = 'appoint';
 
     private $userLoader;
     private $authChecker;

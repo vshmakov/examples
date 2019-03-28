@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Attempt\Profile\NormalizerInterface as ProfileNormalizerInterface;
+use App\Attempt\Profile\ProfileInitializerInterface;
 use App\Attempt\Profile\ProfileProviderInterface;
 use  App\Controller\Traits\BaseTrait;
 use App\Controller\Traits\CurrentUserProviderTrait;
@@ -10,14 +10,17 @@ use App\Entity\Profile;
 use App\Form\ProfileType;
 use App\Repository\ProfileRepository;
 use App\Repository\UserRepository;
+use App\Security\Voter\CurrentUserVoter;
 use App\Security\Voter\ProfileVoter;
 use App\Service\UserLoader;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use  Symfony\Component\HttpFoundation\Request;
 use  Symfony\Component\HttpFoundation\Response;
-use  Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Routing\Annotation\Route;
+use  Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * @Route("/profile")
@@ -44,35 +47,22 @@ final class ProfileController extends Controller
         ]);
     }
 
-    private function sortProfiles(array &$profiles, ProfileProviderInterface $profileProvider): void
-    {
-        usort($profiles, function (Profile $profile1, Profile $profile2) use ($profileProvider): int {
-            return $profileProvider->isCurrentProfile($profile1) ? -1 : 1;
-        });
-    }
-
     /**
      * @Route("/new/", name="profile_new", methods="GET|POST")
+     * @IsGranted(CurrentUserVoter::CREATE_PROFILES)
      */
-    public function new(Request $request, ProfileRepository $profileRepository, UserLoader $userLoader, ProfileNormalizerInterface $normalizer): Response
+    public function new(Request $request, ProfileInitializerInterface $profileInitializer): Response
     {
-        $profile = new Profile();
-        $profile->SetDescription($profileRepository->getTitle($profile))
-            ->setAuthor($userLoader->getUser());
-        $normalizer->normalize($profile);
-        $form = $this->buildForm($profile);
+        $profile = $profileInitializer->createProfile();
+        $form = $this->createForm(ProfileType::class, $profile);
         $form->handleRequest($request);
-        $canCreate = $this->isGranted('CREATE', $profile);
 
-        if ($form->isSubmitted() && $form->isValid() && $canCreate) {
-            return $this->saveAndRedirect($profile, $form, $userLoader);
+        if ($form->isSubmitted() && $form->isValid()) {
+            return $this->saveAndAppoint($profile);
         }
 
         return $this->render('profile/new.html.twig', [
-            'jsParams' => [
-                'canEdit' => $canCreate,
-            ],
-            'profile' => $profile->setEntityRepository($profileRepository),
+            'profile' => $profile,
             'form' => $form->createView(),
         ]);
     }
@@ -85,7 +75,8 @@ final class ProfileController extends Controller
     {
         $profileTitle = $profileRepository->getTitle($profile);
         $profile->SetDescription($profileTitle);
-        $form = $this->createForm(ProfileType::class, $profile);
+        $form = $this->createForm(ProfileType::class, $profile)
+            ->add('copy', SubmitType::class);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -147,27 +138,21 @@ final class ProfileController extends Controller
         return $this->redirectToRoute('profile_index');
     }
 
-    private function buildForm(Profile $profile, bool $copying = false)
+    private function sortProfiles(array &$profiles, ProfileProviderInterface $profileProvider): void
     {
-        $form = $this->createForm(ProfileType::class, $profile);
-
-        if ($this->isGranted('ROLE_ADMIN') && !$copying) {
-            $form->add('isPublic')
-                ->add('author')
-                ->add('addTime');
-        }
-
-        return $form;
+        usort($profiles, function (Profile $profile1, Profile $profile2) use ($profileProvider): int {
+            return $profileProvider->isCurrentProfile($profile1) ? -1 : 1;
+        });
     }
 
-    private function saveAndRedirect(Profile $profile, $form, UserLoader $userLoader)
+    private function saveAndAppoint(Profile $profile): RedirectResponse
     {
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($profile);
         $entityManager->flush();
 
-        if ($this->isGranted('APPOINT', $profile)) {
-            $userLoader->getUser()->setProfile($profile);
+        if ($this->isGranted(ProfileVoter::APPOINT, $profile)) {
+            $this->getCurrentUserOrGuest()->setProfile($profile);
             $entityManager->flush();
         }
 

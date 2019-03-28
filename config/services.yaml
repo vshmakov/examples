@@ -72,7 +72,7 @@ services:
         arguments:
             $appEnv: '@App\Parameter\Environment\AppEnv'
 
-    App\Attempt\Profile\NormalizerInterface: '@App\Form\ProfileType'
+    App\Attempt\Profile\ProfileNormalizerInterface: '@App\Form\ProfileType'
 
     App\Security\User\CurrentUserProviderInterface:
         class: App\Service\UserLoader

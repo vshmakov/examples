@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use  App\DateTime\DateInterval as DTI;
 use App\DateTime\DateTime as DT;
 use App\Entity\Traits\BaseTrait;
 use App\Serializer\Group;
@@ -339,34 +338,17 @@ abstract class BaseProfile
         return $this;
     }
 
+    /**
+     * @AppAssert\DateTimeBetween(minimum="PT30S", maximum="PT30M")
+     */
     public function getDuration(): ?\DateTimeInterface
     {
         return DT::createFromTimestamp($this->duration);
     }
 
-    public function setDuration(int $duration): self
+    public function setDuration(\DateTimeInterface $duration): void
     {
-        $this->duration = btwVal(30, HOUR - 1, $duration);
-
-        return $this;
-    }
-
-    /**
-     * @AppAssert\IntervalBetween(minimum="PT30S", maximum="PT30M")
-     *
-     * @throws \Exception
-     */
-    public function getDurationInterval(): \DateInterval
-    {
-        return DTI::createNormalizedFromDateIntervalString("PT{$this->duration}S");
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function setDurationInterval(\DateInterval $duration): void
-    {
-        $this->duration = DTI::createFromDateInterval($duration)->getTimestamp();
+        $this->duration = $duration->getTimestamp();
     }
 
     public function getExamplesCount(): ?int

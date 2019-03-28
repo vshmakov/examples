@@ -1,0 +1,8 @@
+{{ include(
+    'profile/breadcrumbs/index.html.twig',
+    {
+        'breadcrumbs': [
+        {'title': 'Создать профиль', 'url': path('profile_new')},
+        ]|merge(breadcrumbs ?? [])
+    }
+) }}

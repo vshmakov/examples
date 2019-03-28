@@ -4,7 +4,7 @@ namespace App\Attempt\Profile;
 
 use App\Entity\Profile;
 
-interface NormalizerInterface
+interface ProfileNormalizerInterface
 {
     public function normalize(Profile $profile): void;
 }

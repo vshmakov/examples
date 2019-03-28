@@ -7,7 +7,7 @@ use Symfony\Component\Validator\Constraint;
 /**
  * @Annotation
  */
-final class IntervalBetween extends Constraint
+final class DateTimeBetween extends Constraint
 {
     /**
      * @var string

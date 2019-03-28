@@ -3,9 +3,9 @@
 
 {% block title %}{{ profileTitle }}{% endblock %}
 
-{% block _profile_durationInterval_widget %}
+{% block _profile_duration_widget %}
     <div id="{{ form.vars.id }}">
-        {{ form_widget(form.minutes) }}:{{ form_widget(form.seconds) }}
+        {{ form_widget(form.minute) }}:{{ form_widget(form.second) }}
     </div>
 {% endblock %}
 

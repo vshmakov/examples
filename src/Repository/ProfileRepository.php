@@ -2,6 +2,8 @@
 
 namespace App\Repository;
 
+use App\Attempt\Profile\ProfileInitializerInterface;
+use App\Attempt\Profile\ProfileNormalizerInterface;
 use App\Attempt\Profile\ProfileProviderInterface;
 use App\DataFixtures\Attempt\ProfileFixtures;
 use App\Entity\BaseProfile;
@@ -14,7 +16,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-final class ProfileRepository extends ServiceEntityRepository implements ProfileProviderInterface
+final class ProfileRepository extends ServiceEntityRepository implements ProfileInitializerInterface, ProfileProviderInterface
 {
     /** @var CurrentUserProviderInterface */
     private $currentUserProvider;
@@ -22,12 +24,16 @@ final class ProfileRepository extends ServiceEntityRepository implements Profile
     /** @var NormalizerInterface */
     private $normalizer;
 
-    public function __construct(RegistryInterface $registry, CurrentUserProviderInterface $currentUserProvider, NormalizerInterface $normalizer)
+    /** @var ProfileNormalizerInterface */
+    private $profileNormalizer;
+
+    public function __construct(RegistryInterface $registry, CurrentUserProviderInterface $currentUserProvider, NormalizerInterface $normalizer, ProfileNormalizerInterface $profileNormalizer)
     {
         parent::__construct($registry, Profile::class);
 
         $this->currentUserProvider = $currentUserProvider;
         $this->normalizer = $normalizer;
+        $this->profileNormalizer = $profileNormalizer;
     }
 
     public function findOneByAuthor(User $user): ?Profile
@@ -96,12 +102,16 @@ final class ProfileRepository extends ServiceEntityRepository implements Profile
             ->getSingleScalarResult();
     }
 
-    public function getNewByCurrentUser(): Profile
+    public function createProfile(): Profile
     {
-        return ObjectAccessor::initialize(Profile::class, [
-            'description' => $this->getTitle($profile),
+        /** @var Profile $profile */
+        $profile = ObjectAccessor::initialize(Profile::class, [
             'author' => $this->currentUserProvider->getCurrentUserOrGuest(),
         ]);
+        $profile->setDescription($this->getTitle($profile));
+        $this->profileNormalizer->normalize($profile);
+
+        return $profile;
     }
 
     public function getPublicProfiles(): array

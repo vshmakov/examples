@@ -2,15 +2,17 @@
 
 namespace App\Form;
 
-use App\Attempt\Profile\NormalizerInterface as ProfileNormalizerInterface;
+use App\Attempt\Profile\ProfileNormalizerInterface;
 use App\Entity\Profile;
 use App\Object\ObjectAccessor;
 use App\Serializer\Group;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\DateIntervalType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\PercentType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -19,7 +21,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use  Webmozart\Assert\Assert;
 
-class ProfileType extends AbstractType implements ProfileNormalizerInterface
+final class ProfileType extends AbstractType implements ProfileNormalizerInterface
 {
     /** @var AuthorizationCheckerInterface */
     private $authorizationChecker;
@@ -33,34 +35,34 @@ class ProfileType extends AbstractType implements ProfileNormalizerInterface
         $this->normalizer = $normalizer;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('description')
-            ->add('durationInterval', DateIntervalType::class, [
+            ->add('description', TextType::class)
+            ->add('duration', MinuteSecondTimeType::class, [
                 'widget' => 'text',
-                'with_years' => false,
-                'with_months' => false,
-                'with_days' => false,
-                'with_minutes' => true,
-                'with_seconds' => true,
+                'invalid_message' => 'This value should not be blank.',
             ])
-            ->add('examplesCount')
-            ->add('addPerc')
-            ->add('subPerc')
-            ->add('multPerc')
-            ->add('divPerc')
+            ->add('examplesCount', NumberType::class)
             ->add('isDemanding', CheckboxType::class, ['required' => false])
             ->add('save', SubmitType::class)
             ->addEventListener(FormEvents::POST_SUBMIT, [$this, 'normalizerListener']);
 
-        foreach (['add', 'sub', 'mult', 'div'] as $k) {
-            foreach (['F', 'S', ''] as $n) {
-                foreach (['Min', 'Max'] as $m) {
-                    $v = $k.$n.$m;
-                    $builder->add($v);
-                }
-            }
+        $settings = [
+            'addFMin', 'addFMax', 'addSMin', 'addSMax', 'addMin', 'addMax',
+            'subFMin', 'subFMax', 'subSMin', 'subSMax', 'subMin', 'subMax',
+            'multFMin', 'multFMax', 'multSMin', 'multSMax', 'multMin', 'multMax',
+            'divFMin', 'divFMax', 'divSMin', 'divSMax', 'divMin', 'divMax',
+        ];
+
+        foreach ($settings as $percentField) {
+            $builder->add($percentField, NumberType::class);
+        }
+
+        foreach (['addPerc', 'subPerc', 'multPerc', 'divPerc'] as $percentField) {
+            $builder->add($percentField, PercentType::class, [
+                'type' => 'integer',
+            ]);
         }
     }
 

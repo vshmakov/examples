@@ -2,7 +2,7 @@
 
 namespace App\DataFixtures\Attempt;
 
-use  App\Attempt\Profile\NormalizerInterface;
+use  App\Attempt\Profile\ProfileNormalizerInterface;
 use App\DataFixtures\UserFixtures;
 use App\DateTime\DateTime as DT;
 use App\Entity\Profile;
@@ -13,7 +13,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 final class ProfileFixtures extends Fixture implements DependentFixtureInterface
 {
-    /** @var NormalizerInterface */
+    /** @var ProfileNormalizerInterface */
     private $normalizer;
 
     public const GUEST_PROFILE_DESCRIPTION = 'Тестовый профиль';
@@ -53,7 +53,7 @@ final class ProfileFixtures extends Fixture implements DependentFixtureInterface
         ],
     ];
 
-    public function __construct(NormalizerInterface $normalizer)
+    public function __construct(ProfileNormalizerInterface $normalizer)
     {
         $this->normalizer = $normalizer;
     }

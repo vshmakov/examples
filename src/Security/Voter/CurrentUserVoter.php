@@ -4,6 +4,7 @@ namespace App\Security\Voter;
 
 use App\Entity\User;
 use App\Security\User\CurrentUserProviderInterface;
+use App\Security\Voter\Traits\BaseTrait;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
@@ -12,10 +13,10 @@ final class CurrentUserVoter extends Voter
 {
     use BaseTrait;
 
-    public const  CREATE_PROFILES = 'create_profiles';
+    public const  CREATE_PROFILES = 'CREATE_PROFILES';
 
     /** @var User */
-    private $subject;
+    protected $subject;
 
     /** @var CurrentUserProviderInterface */
     private $currentUserProvider;

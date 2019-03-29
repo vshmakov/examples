@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Security\Voter;
+namespace App\Security\Voter\Traits;
 
 use App\Entity\User;
 use Doctrine\Common\Inflector\Inflector;
@@ -8,7 +8,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 trait BaseTrait
 {
-    private $subject;
+    protected $subject;
 
     private function supportsUser($attribute, $subject)
     {

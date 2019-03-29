@@ -2,6 +2,7 @@
 
 namespace App\Security\Voter;
 
+use App\Security\Voter\Traits\BaseTrait;
 use App\Service\AuthChecker;
 use App\Service\UserLoader;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;

@@ -6,20 +6,16 @@ use App\Entity\Attempt;
 use App\Entity\User\Role;
 use App\Security\User\CurrentUserProviderInterface;
 use App\Security\User\CurrentUserSessionProviderInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Webmozart\Assert\Assert;
 
-final class AttemptVoter extends Voter
+final class AttemptVoter extends BaseVoter
 {
-    use BaseTrait;
-
-    public const SOLVE = 'SOLVE';
     public const VIEW = 'VIEW';
+    public const SOLVE = 'SOLVE';
 
     /** @var Attempt */
-    private $subject;
+    protected $subject;
 
     /** @var AuthorizationCheckerInterface */
     private $authorizationChecker;
@@ -40,7 +36,7 @@ final class AttemptVoter extends Voter
         $this->currentUserSessionProvider = $currentUserSessionProvider;
     }
 
-    private function getSupportedAttributes(): array
+    protected static function getSupportedAttributes(): array
     {
         return [
             self::VIEW,
@@ -53,14 +49,7 @@ final class AttemptVoter extends Voter
         return $subject instanceof Attempt;
     }
 
-    protected function voteOnAttribute($attribute, $subject, TokenInterface $token): bool
-    {
-        Assert::oneOf($attribute, self::getSupportedAttributes());
-
-        return $this->voteOnNamedCallback($attribute, $subject, $token);
-    }
-
-    private function canView(): bool
+    protected function canView(): bool
     {
         if ($this->authorizationChecker->isGranted(Role::ADMIN)) {
             return true;
@@ -72,7 +61,7 @@ final class AttemptVoter extends Voter
         return $currentUser->isEqualTo($author) or $currentUser->isTeacherOf($author);
     }
 
-    private function canSolve(): bool
+    protected function canSolve(): bool
     {
         return $this->canView()
             && $this->createdByCurrentSessionUser($this->subject);

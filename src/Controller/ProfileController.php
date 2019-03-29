@@ -15,10 +15,10 @@ use App\Service\UserLoader;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use  Symfony\Component\HttpFoundation\Request;
 use  Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use  Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * @Route("/profile")
@@ -105,11 +105,20 @@ final class ProfileController extends Controller
      * @Route("/{id}/", name="profile_show", methods={"GET"})
      * @IsGranted(ProfileVoter::VIEW, subject="profile")
      */
-    public function show(Profile $profile, NormalizerInterface $normalizer): Response
+    public function show(Profile $profile, ProfileProviderInterface $profileProvider): Response
     {
         return $this->render('profile/show.html.twig', [
             'profile' => $profile,
+            'isCurrentProfile' => $profileProvider->isCurrentProfile($profile),
         ]);
+    }
+
+    /**
+     * @Route("/{id}/copy/", name="profile_copy", methods={"GET"})
+     * @IsGranted(ProfileVoter::COPY, subject="profile")
+     */
+    public function copy(Profile $profile): RedirectResponse
+    {
     }
 
     /**

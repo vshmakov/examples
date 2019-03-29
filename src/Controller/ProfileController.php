@@ -8,10 +8,8 @@ use App\Controller\Traits\CurrentUserProviderTrait;
 use App\Controller\Traits\ProfileTrait;
 use App\Entity\Profile;
 use App\Form\ProfileType;
-use App\Repository\UserRepository;
 use App\Security\Voter\CurrentUserVoter;
 use App\Security\Voter\ProfileVoter;
-use App\Service\UserLoader;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -127,16 +125,11 @@ final class ProfileController extends Controller
      * @Route("/{id}/delete/", name="profile_delete", methods={"DELETE"})
      * @IsGranted(ProfileVoter::DELETE, subject="profile")
      */
-    public function delete(Request $request, Profile $profile, UserRepository $userRepository): Response
+    public function delete(Request $request, Profile $profile): RedirectResponse
     {
-        foreach ($userRepository->findByProfile($profile) as $user) {
-            $user->setProfile(null);
-        }
-
         $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->flush();
         $entityManager->remove($profile);
-        $entityManager->flush();
+        $entityManager->flush($profile);
 
         return $this->redirectToRoute('profile_index');
     }
@@ -145,13 +138,13 @@ final class ProfileController extends Controller
      * @Route("/{id}/appoint/", name="profile_appoint", methods={"GET"})
      * @IsGranted(ProfileVoter::APPOINT, subject="profile")
      */
-    public function appoint(Profile $profile, UserLoader $userLoader)
+    public function appoint(Profile $profile): RedirectResponse
     {
-        if ($this->isGranted('APPOINT', $profile)) {
-            $user = $userLoader->getUser();
-            $user->setProfile($profile);
-            $this->getEntityManager()->flush();
-        }
+        $currentUser = $this->getCurrentUserOrGuest();
+        $currentUser->setProfile($profile);
+        $this->getDoctrine()
+            ->getManager()
+            ->flush($currentUser);
 
         return $this->redirectToRoute('profile_index');
     }

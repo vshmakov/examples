@@ -28,7 +28,8 @@ final class UserRepository extends ServiceEntityRepository
         $this->localCache = $localCache;
     }
 
-    public function getCurrentProfile(User $user)
+    /** @deprecated  */
+    private function getCurrentProfile(User $user)
     {
         $profileRepository = $this->getEntityRepository(Profile::class);
         $profile = $user->getProfile() ?? $profileRepository->findOneByAuthor($user) ?? $profileRepository->findOnePublic();

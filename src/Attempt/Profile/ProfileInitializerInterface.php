@@ -6,5 +6,5 @@ use App\Entity\Profile;
 
 interface ProfileInitializerInterface
 {
-    public function createProfile(): Profile;
+    public function initializeNewProfile(): Profile;
 }

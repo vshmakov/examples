@@ -49,7 +49,7 @@ final class ProfileController extends Controller
      */
     public function new(Request $request, ProfileInitializerInterface $profileInitializer): Response
     {
-        $profile = $profileInitializer->createProfile();
+        $profile = $profileInitializer->initializeNewProfile();
         $form = $this->createForm(ProfileType::class, $profile);
         $form->handleRequest($request);
 

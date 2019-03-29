@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Attempt\Profile\ProfileProviderInterface;
 use  App\Attempt\Settings\SettingsProviderInterface;
 use App\DateTime\DateTime as DT;
 use App\Entity\Profile;
@@ -24,12 +25,16 @@ class SettingsRepository extends ServiceEntityRepository implements SettingsProv
     /** @var ObjectNormalizer */
     private $normalizer;
 
-    public function __construct(RegistryInterface $registry, CurrentUserProviderInterface $currentUserProvider, ObjectNormalizer $normalizer)
+    /** @var ProfileProviderInterface */
+    private $profileProvider;
+
+    public function __construct(RegistryInterface $registry, CurrentUserProviderInterface $currentUserProvider, ObjectNormalizer $normalizer, ProfileProviderInterface $profileProvider)
     {
         parent::__construct($registry, Settings::class);
 
         $this->currentUserProvider = $currentUserProvider;
         $this->normalizer = $normalizer;
+        $this->profileProvider = $profileProvider;
     }
 
     public function getNewByCurrentUser(): Settings
@@ -60,16 +65,8 @@ class SettingsRepository extends ServiceEntityRepository implements SettingsProv
 
     public function getOrCreateSettingsByCurrentUserProfile(): Settings
     {
-        /**
-         * @deprecated
-         *
-         * @var UserRepository
-         */
-        $userRepository = $this->getEntityManager()
-            ->getRepository(User::class);
-
         return $this->getOrCreateSettingsByProfile(
-            $userRepository->getCurrentProfile($this->currentUserProvider->getCurrentUserOrGuest())
+            $this->profileProvider->getCurrentProfile()
         );
     }
 }

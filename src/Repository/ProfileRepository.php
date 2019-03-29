@@ -8,7 +8,6 @@ use App\Attempt\Profile\ProfileProviderInterface;
 use App\DataFixtures\Attempt\ProfileFixtures;
 use App\Entity\BaseProfile;
 use App\Entity\Profile;
-use App\Entity\User;
 use App\Object\ObjectAccessor;
 use App\Security\User\CurrentUserProviderInterface;
 use App\Serializer\Group;
@@ -36,37 +35,23 @@ final class ProfileRepository extends ServiceEntityRepository implements Profile
         $this->profileNormalizer = $profileNormalizer;
     }
 
-    public function findOneByAuthor(User $user): ?Profile
+    public function getCurrentProfile(): Profile
     {
-        return $this->createQueryBuilder('p')
-            ->select('p')
-            ->where('p.author = :user')
-            ->getQuery()
-            ->setParameter('user', $user)
-            ->setMaxResults(1)
-            ->getOneOrNullResult();
+        $currentUser = $this->currentUserProvider->getCurrentUserOrGuest();
+
+        if (null === $currentUser->getProfile()) {
+            $currentUser->setProfile(
+                $this->findOneBy(['isPublic' => true, 'description' => ProfileFixtures::GUEST_PROFILE])
+            );
+            $this->getEntityManager()->flush($currentUser);
+        }
+
+        return $currentUser->getProfile();
     }
 
-    public function findOneByUser(User $user): ?Profile
+    public function isCurrentProfile(Profile $profile): bool
     {
-        return $this->createQueryBuilder('p')
-            ->select('p')
-            ->join('p.users', 'u')
-            ->where('u = :user')
-            ->getQuery()
-            ->setParameter('user', $user)
-            ->setMaxResults(1)
-            ->getOneOrNullResult();
-    }
-
-    public function findOnePublic(): ?Profile
-    {
-        return $this->createQueryBuilder('p')
-            ->select('p')
-            ->where('p.isPublic = true')
-            ->getQuery()
-            ->setMaxResults(1)
-            ->getOneOrNullResult();
+        return $profile === $this->getCurrentProfile();
     }
 
     public function getUserProfiles(): array
@@ -74,11 +59,29 @@ final class ProfileRepository extends ServiceEntityRepository implements Profile
         return $this->findByAuthor($this->currentUserProvider->getCurrentUserOrGuest());
     }
 
+    public function getPublicProfiles(): array
+    {
+        return $this->findBy(['isPublic' => true]);
+    }
+
+    public function initializeNewProfile(): Profile
+    {
+        /** @var Profile $profile */
+        $profile = ObjectAccessor::initialize(Profile::class, [
+            'author' => $this->currentUserProvider->getCurrentUserOrGuest(),
+        ]);
+        $profile->setDescription($this->getTitle($profile));
+        $this->profileNormalizer->normalize($profile);
+
+        return $profile;
+    }
+
     private function getTitle(Profile $profile): string
     {
         return $profile->getDescription() ?: 'Профиль №'.$this->getNumber($profile);
     }
 
+    /** @deprecated */
     private function countByCurrentAuthor(): int
     {
         return $this->count(['author' => $this->currentUserProvider->getCurrentUserOrGuest()]);
@@ -102,47 +105,12 @@ final class ProfileRepository extends ServiceEntityRepository implements Profile
             ->getSingleScalarResult();
     }
 
-    public function createProfile(): Profile
-    {
-        /** @var Profile $profile */
-        $profile = ObjectAccessor::initialize(Profile::class, [
-            'author' => $this->currentUserProvider->getCurrentUserOrGuest(),
-        ]);
-        $profile->setDescription($this->getTitle($profile));
-        $this->profileNormalizer->normalize($profile);
-
-        return $profile;
-    }
-
-    public function getPublicProfiles(): array
-    {
-        return $this->findBy(['isPublic' => true]);
-    }
-
+    /** @deprecated */
     public function findOneByCurrentAuthorOrPublicAndSettingsData(BaseProfile $settings): ?Profile
     {
         $parameters = $this->normalizer->normalize($settings, null, ['groups' => Group::SETTINGS]);
 
         return $this->findOneBy(['author' => $this->currentUserProvider->getCurrentUserOrGuest()] + $parameters)
             ?? $this->findOneBy(['isPublic' => true] + $parameters);
-    }
-
-    public function getCurrentProfile(): Profile
-    {
-        $currentUser = $this->currentUserProvider->getCurrentUserOrGuest();
-
-        if (null === $currentUser->getProfile()) {
-            $currentUser->setProfile(
-                $this->findOneBy(['isPublic' => true, 'description' => ProfileFixtures::GUEST_PROFILE])
-            );
-            $this->getEntityManager()->flush($currentUser);
-        }
-
-        return $currentUser->getProfile();
-    }
-
-    public function isCurrentProfile(Profile $profile): bool
-    {
-        return $profile === $this->getCurrentProfile();
     }
 }

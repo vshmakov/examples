@@ -8,3 +8,7 @@
 {% block breadcrumbs %}
     {{ include('attempt/breadcrumbs/settings.html.twig') }}
 {% endblock %}
+
+{% block before_view %}
+    <h1>{{ pageTitle }}</h1>
+{% endblock %}

@@ -7,10 +7,10 @@ use App\Attempt\AttemptProviderInterface;
 use App\Attempt\AttemptResponseProviderInterface;
 use App\Attempt\AttemptResultProviderInterface;
 use App\Attempt\Example\ExampleResponseProviderInterface;
+use App\Attempt\Settings\SettingsProviderInterface;
 use App\DateTime\DateTime as DT;
 use App\Entity\Attempt;
 use App\Entity\Attempt\Result;
-use App\Entity\Settings;
 use App\Entity\Task;
 use App\Entity\User;
 use App\Object\ObjectAccessor;
@@ -48,6 +48,9 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
     /** @var ExampleResponseProviderInterface */
     private $exampleResponseProvider;
 
+    /** @var SettingsProviderInterface */
+    private $settingsProvider;
+
     public function __construct(
         RegistryInterface $registry,
         ExampleRepository $exampleRepository,
@@ -57,7 +60,8 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
         CurrentUserSessionProviderInterface $currentUserSessionProvider,
         AuthorizationCheckerInterface $authorizationChecker,
         LocalCache $localCache,
-        ExampleResponseProviderInterface $exampleResponseProvider
+        ExampleResponseProviderInterface $exampleResponseProvider,
+        SettingsProviderInterface $settingsProvider
     ) {
         parent::__construct($registry, Attempt::class);
 
@@ -69,6 +73,7 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
         $this->localCache = $localCache;
         $this->currentUserSessionProvider = $currentUserSessionProvider;
         $this->exampleResponseProvider = $exampleResponseProvider;
+        $this->settingsProvider = $settingsProvider;
     }
 
     public function getLastAttempt(): ?Attempt
@@ -188,14 +193,12 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
 
     public function createAttempt(): Attempt
     {
-        /** @var SettingsRepository $settingsRepository */
-        $settingsRepository = $this->getEntityRepository(Settings::class);
-        $attempt = $this->createNewByCurrentUser()
-            ->setSettings($settingsRepository->getNewByCurrentUser());
+        $attempt = $this->createNewByCurrentUser();
+        $attempt->setSettings($this->settingsProvider->getOrCreateSettingsByCurrentUserProfile());
 
         $entityManager = $this->getEntityManager();
         $entityManager->persist($attempt);
-        $entityManager->flush();
+        $entityManager->flush($attempt);
         $this->updateAttemptResult($attempt);
 
         return $attempt;
@@ -399,8 +402,11 @@ where s.user = :user and a.task = :task')
         ]);
         $attempt->setResult($result);
         $this->setRating($attempt);
-        $this->getEntityManager()->persist($result);
-        $this->getEntityManager()->flush();
+
+        $entityManager = $this->getEntityManager();
+        $entityManager->persist($result);
+        $entityManager->flush($attempt);
+        $entityManager->flush($result);
     }
 
     private function setRating(Attempt $attempt): void

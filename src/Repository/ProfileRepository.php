@@ -51,7 +51,7 @@ final class ProfileRepository extends ServiceEntityRepository implements Profile
 
     public function isCurrentProfile(Profile $profile): bool
     {
-        return $profile === $this->getCurrentProfile();
+        return $profile->isEqualTo($this->getCurrentProfile());
     }
 
     public function getUserProfiles(): array

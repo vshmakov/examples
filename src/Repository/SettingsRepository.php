@@ -5,9 +5,7 @@ namespace App\Repository;
 use App\Attempt\Profile\ProfileProviderInterface;
 use  App\Attempt\Settings\SettingsProviderInterface;
 use App\DateTime\DateTime as DT;
-use App\Entity\Profile;
 use App\Entity\Settings;
-use App\Entity\User;
 use App\Object\ObjectAccessor;
 use App\Repository\Traits\BaseTrait;
 use App\Security\User\CurrentUserProviderInterface;
@@ -37,17 +35,9 @@ class SettingsRepository extends ServiceEntityRepository implements SettingsProv
         $this->profileProvider = $profileProvider;
     }
 
-    public function getNewByCurrentUser(): Settings
+    public function getOrCreateSettingsByCurrentUserProfile(): Settings
     {
-        $currentUser = $this->currentUserProvider->getCurrentUserOrGuest()
-            ->setEntityRepository($this->getEntityRepository(User::class));
-        $profile = $currentUser->getCurrentProfile();
-
-        return $this->getOrCreateSettingsByProfile($profile);
-    }
-
-    public function getOrCreateSettingsByProfile(Profile $profile): Settings
-    {
+        $profile = $this->profileProvider->getCurrentProfile();
         $settingsData = $this->normalizer->normalize($profile, null, ['groups' => Group::SETTINGS]);
 
         if ($settings = $this->findOneBy($settingsData)) {
@@ -58,15 +48,8 @@ class SettingsRepository extends ServiceEntityRepository implements SettingsProv
         $settings = ObjectAccessor::initialize(Settings::class, $settingsData);
         $entityManager = $this->getEntityManager();
         $entityManager->persist($settings);
-        $entityManager->flush();
+        $entityManager->flush($settings);
 
         return $settings;
-    }
-
-    public function getOrCreateSettingsByCurrentUserProfile(): Settings
-    {
-        return $this->getOrCreateSettingsByProfile(
-            $this->profileProvider->getCurrentProfile()
-        );
     }
 }

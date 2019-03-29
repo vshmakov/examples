@@ -204,4 +204,9 @@ class Profile extends BaseProfile
     {
         return parent::__toString().' - '.$this->getAuthor()->getUsername();
     }
+
+    public function isEqualTo(self $profile): bool
+    {
+        return $profile->getId() === $this->getId();
+    }
 }

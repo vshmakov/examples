@@ -10,13 +10,18 @@ use App\Attempt\AttemptResponseProviderInterface;
 use App\Attempt\Example\ExampleResponseProviderInterface;
 use App\Controller\Traits\CurrentUserProviderTrait;
 use App\Controller\Traits\JavascriptParametersTrait;
+use App\Controller\Traits\ProfileTrait;
 use App\Entity\Attempt;
+use App\Entity\Profile;
 use App\Iterator;
 use App\Security\Voter\AttemptVoter;
+use App\Security\Voter\ProfileVoter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -24,7 +29,7 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 final class AttemptController extends Controller
 {
-    use CurrentUserProviderTrait, JavascriptParametersTrait;
+    use CurrentUserProviderTrait, JavascriptParametersTrait, ProfileTrait;
 
     /**
      * @Route("/", name="attempt_index", methods={"GET"})
@@ -53,8 +58,23 @@ final class AttemptController extends Controller
     /**
      * @Route("/new/", name="attempt_new", methods={"GET"})
      */
-    public function new(AttemptCreatorInterface $creator): RedirectResponse
+    public function new(Request $request, AttemptCreatorInterface $creator): RedirectResponse
     {
+        $profileParameter = 'profile_id';
+
+        if ($request->query->has($profileParameter)) {
+            $profile = $this->getDoctrine()
+                ->getRepository(Profile::class)
+                ->find($request->query->get($profileParameter));
+
+            if (null === $profile) {
+                throw new NotFoundHttpException();
+            }
+
+            $this->denyAccessUnlessGranted(ProfileVoter::APPOINT, $profile);
+            $this->saveAndAppointProfile($profile);
+        }
+
         return $this->redirectToRoute('attempt_solve', [
             'id' => $creator->createAttempt()->getId(),
         ]);

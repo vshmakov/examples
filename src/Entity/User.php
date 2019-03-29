@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use  ApiPlatform\Core\Annotation\ApiResource;
 use App\DateTime\DateTime as DT;
 use App\Entity\Traits\BaseTrait;
 use App\Entity\Traits\BaseUserTrait;
@@ -19,12 +18,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
- * @ApiResource(
- *     itemOperations={
- *"get"
- *     },
- *     collectionOperations={}
- *     )
  * @UniqueEntity(fields="username", message="Логин занят")
  * @UniqueEntity(fields="email", message="Данный адрес электронной почты уже зарегистрирован")
  */

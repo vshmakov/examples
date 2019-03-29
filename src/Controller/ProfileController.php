@@ -4,8 +4,8 @@ namespace App\Controller;
 
 use App\Attempt\Profile\ProfileInitializerInterface;
 use App\Attempt\Profile\ProfileProviderInterface;
-use  App\Controller\Traits\BaseTrait;
 use App\Controller\Traits\CurrentUserProviderTrait;
+use App\Controller\Traits\ProfileTrait;
 use App\Entity\Profile;
 use App\Form\ProfileType;
 use App\Repository\UserRepository;
@@ -25,7 +25,7 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 final class ProfileController extends Controller
 {
-    use BaseTrait, CurrentUserProviderTrait;
+    use CurrentUserProviderTrait, ProfileTrait;
 
     /**
      * @Route("/", name="profile_index", methods={"GET"})
@@ -56,7 +56,7 @@ final class ProfileController extends Controller
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->saveAndAppoint($profile);
+            $this->saveAndAppointProfile($profile);
 
             return $this->redirectToRoute('profile_edit', ['id' => $profile->getId()]);
         }
@@ -82,13 +82,11 @@ final class ProfileController extends Controller
             $redirectAction = 'profile_show';
 
             if ($form->get('copy')->isClicked()) {
-                /** @var Profile $profile */
-                $profile = clone $form->getData();
-                $profile->setAuthor($this->getCurrentUserOrGuest());
+                $profile = $this->cloneProfile($form->getData());
                 $redirectAction = 'profile_edit';
             }
 
-            $this->saveAndAppoint($profile);
+            $this->saveAndAppointProfile($profile);
 
             return $this->redirectToRoute($redirectAction, ['id' => $profile->getId()]);
         }
@@ -119,6 +117,10 @@ final class ProfileController extends Controller
      */
     public function copy(Profile $profile): RedirectResponse
     {
+        $targetProfile = $this->cloneProfile($profile);
+        $this->saveAndAppointProfile($targetProfile);
+
+        return $this->redirectToRoute('profile_edit', ['id' => $targetProfile->getId()]);
     }
 
     /**
@@ -157,6 +159,10 @@ final class ProfileController extends Controller
     private function sortProfiles(array &$profiles, ProfileProviderInterface $profileProvider): void
     {
         usort($profiles, function (Profile $profile1, Profile $profile2) use ($profileProvider): int {
+            if ($profileProvider->isCurrentProfile($profile1)) {
+                return -1;
+            }
+
             if ($profileProvider->isCurrentProfile($profile2)) {
                 return 1;
             }
@@ -165,16 +171,11 @@ final class ProfileController extends Controller
         });
     }
 
-    private function saveAndAppoint(Profile $profile): void
+    private function cloneProfile(Profile $sourceProfile): Profile
     {
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->persist($profile);
-        $entityManager->flush($profile);
+        $targetProfile = clone $sourceProfile;
+        $targetProfile->setAuthor($this->getCurrentUserOrGuest());
 
-        if ($this->isGranted(ProfileVoter::APPOINT, $profile)) {
-            $currentUser = $this->getCurrentUserOrGuest();
-            $currentUser->setProfile($profile);
-            $entityManager->flush($currentUser);
-        }
+        return $targetProfile;
     }
 }

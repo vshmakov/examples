@@ -2,10 +2,12 @@
 
 namespace App\Repository;
 
-use App\Attempt\Settings\SettingsProviderInterface;
+use  App\Attempt\Settings\SettingsProviderInterface;
+use App\DateTime\DateTime as DT;
 use App\Entity\Profile;
 use App\Entity\Settings;
 use App\Entity\User;
+use App\Object\ObjectAccessor;
 use App\Repository\Traits\BaseTrait;
 use App\Security\User\CurrentUserProviderInterface;
 use App\Serializer\Group;
@@ -47,7 +49,8 @@ class SettingsRepository extends ServiceEntityRepository implements SettingsProv
             return $settings;
         }
 
-        $settings = $this->normalizer->denormalize($settingsData, Settings::class);
+        $settingsData['duration'] = DT::createFromTimestamp($settingsData['duration']);
+        $settings = ObjectAccessor::initialize(Settings::class, $settingsData);
         $entityManager = $this->getEntityManager();
         $entityManager->persist($settings);
         $entityManager->flush();

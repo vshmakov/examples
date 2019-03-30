@@ -5,11 +5,14 @@ namespace App\Tests\Functional\Profile;
 use App\DataFixtures\Attempt\ProfileFixtures;
 use App\Request\Http\Method;
 use App\Tests\Functional\BaseWebTestCase;
+use App\Tests\Functional\Profile\Traits\DOMElementsTrait;
 use  Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Component\DomCrawler\Crawler;
 
 final class GuestManipulateProfilesTest extends BaseWebTestCase
 {
+    use  DOMElementsTrait;
+
     /** @var Client */
     private static $unauthenticatedClient;
 
@@ -24,10 +27,12 @@ final class GuestManipulateProfilesTest extends BaseWebTestCase
     /**
      * @test
      */
-    public function guestEntersToProfileIndexPage(): void
+    public function guestEntersToProfileIndexPage(): Crawler
     {
-        self::$profileIndexCrawler = self::$unauthenticatedClient->request('GET', '/profile/');
+        $profileIndexCrawler = self::$unauthenticatedClient->request('GET', '/profile/');
         $this->assertResponseIsSuccessful(self::$unauthenticatedClient);
+
+        return $profileIndexCrawler;
     }
 
     /**
@@ -46,11 +51,11 @@ final class GuestManipulateProfilesTest extends BaseWebTestCase
      * @test
      * @depends  guestEntersToProfileIndexPage
      */
-    public function guestHasTestProfileByDefault(): void
+    public function guestHasTestProfileByDefault(Crawler $profileIndexPageCrawler): void
     {
-        $defaultGuestProfileCrawler = self::$profileIndexCrawler->filter('#public-profiles tbody tr:first-child');
-        $this->assertSame('Да', $defaultGuestProfileCrawler->filter('.is-current-profile')->text());
-        $descriptionCrawler = $defaultGuestProfileCrawler->filter('.profile-description');
+        $firstPublicProfileCrawler = $this->getFirstPublicProfileCrawler($profileIndexPageCrawler);
+        $this->assertSame('Да', $firstPublicProfileCrawler->filter('.is-current-profile')->text());
+        $descriptionCrawler = $firstPublicProfileCrawler->filter('.profile-description');
         $this->assertSame(ProfileFixtures::GUEST_PROFILE_DESCRIPTION, $this->getTrimmedText($descriptionCrawler));
     }
 
@@ -110,12 +115,7 @@ final class GuestManipulateProfilesTest extends BaseWebTestCase
      */
     public function guestSeesNotAbleAppointProfilesMessage(): void
     {
-        $notAbleAppointProfilesMessageCrawler = self::$profileIndexCrawler->filter('#not-able-appoint-profiles-message');
+        $notAbleAppointProfilesMessageCrawler = $this->getNotAbleAppointProfilesMessageCrawler();
         $this->assertNotEmpty($notAbleAppointProfilesMessageCrawler);
-    }
-
-    private function getTrimmedText(Crawler $crawler): string
-    {
-        return trim($crawler->text());
     }
 }

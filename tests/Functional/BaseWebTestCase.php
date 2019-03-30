@@ -5,6 +5,7 @@ namespace App\Tests\Functional;
 use App\Request\Http\ContentType;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\DomCrawler\Crawler;
 
 abstract class BaseWebTestCase extends WebTestCase
 {
@@ -27,6 +28,11 @@ abstract class BaseWebTestCase extends WebTestCase
             },
             $items
         );
+    }
+
+    protected function getTrimmedText(Crawler $crawler): string
+    {
+        return trim($crawler->text());
     }
 
     protected function assertResponseIsSuccessful(Client $client): void

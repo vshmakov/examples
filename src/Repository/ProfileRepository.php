@@ -81,12 +81,6 @@ final class ProfileRepository extends ServiceEntityRepository implements Profile
         return $profile->getDescription() ?: 'Профиль №'.$this->getNumber($profile);
     }
 
-    /** @deprecated */
-    private function countByCurrentAuthor(): int
-    {
-        return $this->count(['author' => $this->currentUserProvider->getCurrentUserOrGuest()]);
-    }
-
     private function getNumber(Profile $profile): int
     {
         if (null === $profile->getId()) {
@@ -103,6 +97,11 @@ final class ProfileRepository extends ServiceEntityRepository implements Profile
                 'profileId' => $profile->getId(),
             ])
             ->getSingleScalarResult();
+    }
+
+    private function countByCurrentAuthor(): int
+    {
+        return $this->count(['author' => $this->currentUserProvider->getCurrentUserOrGuest()]);
     }
 
     /** @deprecated */

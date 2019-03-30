@@ -23,4 +23,9 @@ trait DOMElementsTrait
     {
         return $profileIndexPageCrawler->filter('a[href="/profile/new/"]');
     }
+
+    private function getProfileDescription(Crawler $profileCrawler): string
+    {
+        return $profileCrawler->filter('.profile-description a')->text();
+    }
 }

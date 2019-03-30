@@ -38,6 +38,16 @@ final class StudentManipulateProfilesTest extends BaseWebTestCase
      * @test
      * @depends  studentEntersToProfileIndexPage
      */
+    public function studentDoesNotSeeNotAbleAppointProfilesMessage(Crawler $profileIndexPageCrawler): void
+    {
+        $notAbleAppointProfilesMessageCrawler = $this->getNotAbleAppointProfilesMessageCrawler($profileIndexPageCrawler);
+        $this->assertEmpty($notAbleAppointProfilesMessageCrawler);
+    }
+
+    /**
+     * @test
+     * @depends  studentEntersToProfileIndexPage
+     */
     public function studentSeesCreateProfileButton(Crawler $profileIndexPageCrawler): Crawler
     {
         $newProfileLinkCrawler = $this->getNewProfileLinkCrawler($profileIndexPageCrawler);
@@ -155,12 +165,17 @@ final class StudentManipulateProfilesTest extends BaseWebTestCase
 
     /**
      * @test
-     * @depends  studentHasTestProfileByDefault
+     * @depends studentHasTestProfileByDefault
      */
-    public function studentDoesNotSeeNotAbleAppointProfilesMessage(Crawler $profileIndexPageCrawler): void
+    public function studentAppointsProfile(Crawler $profileIndexPageCrawler): void
     {
-        $notAbleAppointProfilesMessageCrawler = $this->getNotAbleAppointProfilesMessageCrawler($profileIndexPageCrawler);
-        $this->assertEmpty($notAbleAppointProfilesMessageCrawler);
+        $secondPublicProfile = $profileIndexPageCrawler->filter('#public-profiles tbody tr:nth-child(2)');
+        $description = $this->getProfileDescription($secondPublicProfile);
+        $chooseLink = $secondPublicProfile->selectLink('Выбрать')->link();
+        self::$studentClient->click($chooseLink);
+        $profileIndexPageCrawler = self::$studentClient->followRedirect();
+        $currentProfile = $this->getFirstPublicProfileCrawler($profileIndexPageCrawler);
+        $this->assertSame($description, $this->getProfileDescription($currentProfile));
     }
 
     private function assertCurrentProfile(Crawler $showOrEditPageCrawler): void
@@ -168,11 +183,16 @@ final class StudentManipulateProfilesTest extends BaseWebTestCase
         $this->assertRegExp('#\(Текущий\)#', $showOrEditPageCrawler->filter('h1')->text());
     }
 
-    private function getProfileIdFromRedirectingToEditPage(Client $client): int
+    private function assertRedirectionLocationMatch(string $expression, Client $client): array
     {
         $targetUrl = $client->getResponse()->headers->get('location');
-        $this->assertTrue((bool) preg_match('#/profile/(?<profileId>\d+)/edit/#', $targetUrl, $matches));
+        $this->assertTrue((bool) preg_match($expression, $targetUrl, $matches));
 
-        return $matches['profileId'];
+        return $matches;
+    }
+
+    private function getProfileIdFromRedirectingToEditPage(Client $client): int
+    {
+        return $this->assertRedirectionLocationMatch('#/profile/(?<profileId>\d+)/edit/#', $client)['profileId'];
     }
 }

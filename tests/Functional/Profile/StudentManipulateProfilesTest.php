@@ -9,14 +9,14 @@ use App\Tests\Functional\Profile\Traits\DOMElementsTrait;
 use  Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Component\DomCrawler\Crawler;
 
-final class StudentManipulateProfilesTest extends BaseWebTestCase
+class StudentManipulateProfilesTest extends BaseWebTestCase
 {
     use  DOMElementsTrait;
 
     private const  PROFILE_DESCRIPTION = 'My new profile description';
 
     /** @var Client */
-    private static $studentClient;
+    protected static $studentClient;
 
     public static function setUpBeforeClass(): void
     {

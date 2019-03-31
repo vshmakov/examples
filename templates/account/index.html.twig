@@ -1,62 +1,54 @@
-{%extends "main.html.twig"%}
+{% extends "main.html.twig" %}
 
-{%block title "Профиль"%}
+{% block title %}
+    Мой профиль
+{% endblock %}
 
-{%block main%}
-<h1>Профиль</h1>
-{%set u=app.user%}
-<table>
-	<tr>
-		<td>Фамилия</td>
-		<td>{{u.lastName ?? "-"}}</td>
-	</tr>
-	<tr>
-		<td>Имя</td>
-		<td>{{u.firstName ?? "-"}}</td>
-	</tr>
-	<tr>
-		<td>Отчество</td>
-		<td>{{u.fatherName ?? "-"}}</td>
-	</tr>
-	<tr>
-		<td>Логин</td>
-		<td>{{u.login ?: "-"?? "-"}}</td>
-	</tr>
-	{#
-	<tr>
-		<td>Электронная почта</td>
-		<td>{{u.email ?? "-"}}</td>
-	</tr>
-	#}
-	<tr>
-		<td>Статус</td>
-		<td>{{u.isTeacher ? "Учитель" : "Ученик"}}</td>
-	</tr>
-	{%if u.isTeacher%}
-	<tr>
-		<td>Количество учеников</td>
-		<td>{{u.students.count}}</td>
-	</tr>
-	{%endif%}
-	{%if u.hasTeacher %}
-	<tr>
-		<td>Выбранный учитель</td>
-		<td>{{u.teacher ? u.teacher.fio : '-'}}</td>
-	</tr>
-	{%endif%}
-</table>
+{%  block breadcrumbs %}
+    {{  include('account/breadcrumbs/index.html.twig') }}
+{% endblock %}
 
-<div>
-	{% if is_granted('EDIT_ACCOUNT') %}
-	<a href="{{path("account_edit")}}">Редактировать профиль</a>
-	{% endif %}
+{% block main %}
+    <h1>Профиль</h1>
+    {% set currentUser = app.user %}
+    <table class="table table-info">
+        <tr>
+            <th>Фамилия</th>
+            <td>{{ currentUser.lastName ?? "-" }}</td>
+        </tr>
+        <tr>
+            <th>Имя</th>
+            <td>{{ currentUser.firstName ?? "-" }}</td>
+        </tr>
+        <tr>
+            <th>Отчество</th>
+            <td>{{ currentUser.fatherName ?? "-" }}</td>
+        </tr>
+        <tr>
+            <th>Логин</th>
+            <td>{{ currentUser.login ?: "-"?? "-" }}</td>
+        </tr>
+        <tr>
+            <th>Статус</th>
+            <td>{{ currentUser.isTeacher ? "Учитель" : "Ученик" }}</td>
+        </tr>
+        {% if currentUser.isTeacher %}
+            <tr>
+                <th>Количество учеников</th>
+                <td>{{ currentUser.students.count }}</td>
+            </tr>
+        {% endif %}
+        {% if currentUser.hasTeacher %}
+            <tr>
+                <th>Выбранный учитель</th>
+                <td>{{ currentUser.teacher.fio }}</td>
+            </tr>
+        {% endif %}
+    </table>
 
-	{% if is_granted('SHOW_STUDENTS') %}
-	<a href="{{path("student_index")}}">Список учеников</a>
-	{% endif %}
-
-	{% if is_granted('SHOW_TEACHERS') %}
-	<a href="{{path("teacher_index")}}">Выбрать учителя</a>
-	{% endif %}
-</div>
-{%endblock%}
+    <div>
+        {% if is_granted('ROLE_USER') %}
+            <a href="{{ path("account_edit") }}" role="button" class="btn btn-warning">Редактировать профиль</a>
+        {% endif %}
+            </div>
+{% endblock %}

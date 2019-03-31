@@ -3,21 +3,21 @@
 {% block title %}Control panel{% endblock %}
 
 {% block body %}
-<table>
-<tr>
-<th>Days</th>
-<th>New ips</th>
-<th>New visites</th>
-<th>New attempts</th>
-<th>New users</th>
-</tr>
-{%for k, r in d%}
-<tr>
-<td>{{k}}</td>
-{%for c in r%}
-<td>{{c}}</td>
-{%endfor%}
-</tr>
-{%endfor%}
-</table>
+    <table>
+        <tr>
+            <th>Days</th>
+            <th>New ips</th>
+            <th>New visites</th>
+            <th>New attempts</th>
+            <th>New users</th>
+        </tr>
+        {% for k, r in d %}
+            <tr>
+                <td>{{ k }}</td>
+                {% for c in r %}
+                    <td>{{ c }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
 {% endblock %}

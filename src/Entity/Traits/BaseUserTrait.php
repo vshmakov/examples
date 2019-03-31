@@ -15,7 +15,7 @@ trait BaseUserTrait
      * @var string
      *
      * @ORM\Column(name="username", type="string", length=180, nullable=true)
-     * @Assert\NotBlank(message="Имя не должно быть пустым")
+     * @Assert\NotBlank(message="Логин не должен быть пустым")
      * @Assert\Regex(
      *     pattern="/^[a-z][a-z0-9\._\-]+[a-z0-9]$/",
      *     message="Логин должен начинаться с буквы, заканчиваться буквой или цифрой  и может содержать только строчные латинские символы, цифры, а также ._-"

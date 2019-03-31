@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\DateTime\DateTime as DT;
-use App\Entity\Traits\BaseTrait;
 use App\Serializer\Group;
 use App\Validator as AppAssert;
 use Doctrine\ORM\Mapping as ORM;
@@ -14,8 +13,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 /** @ORM\MappedSuperclass */
 abstract class BaseProfile
 {
-    use BaseTrait;
-
     /**
      * @ORM\Column(type="datetime")
      */

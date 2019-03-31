@@ -23,7 +23,9 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class User implements UserInterface, GroupableInterface, EquatableInterface
 {
-    use BaseTrait, BaseUserTrait;
+    use BaseUserTrait;
+    //TODO remove
+    use BaseTrait;
 
     /**
      * @ORM\Id()

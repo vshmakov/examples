@@ -19,6 +19,7 @@ final class UserFixtures extends Fixture
     public const ADMIN_USERNAME = 'admin';
     public const STUDENT_USERNAME = 'student';
     public const TEACHER_USERNAME = 'teacher';
+    public const SIMPLE_USER_USERNAME = 'simple_user';
 
     private const GUEST_USER = [
         'username' => self::GUEST_USERNAME,
@@ -47,6 +48,13 @@ final class UserFixtures extends Fixture
         'roles' => ['ROLE_TEACHER'],
     ];
 
+    private const SIMPLE_USER = [
+        'username' => self::SIMPLE_USER_USERNAME,
+        'email' => 'simple_user@exmasters.ru',
+        'plainPassword' => 123,
+        'roles' => ['ROLE_STUDENT'],
+    ];
+
     /** @var UserPasswordEncoderInterface */
     private $userPasswordEncoder;
 
@@ -58,7 +66,8 @@ final class UserFixtures extends Fixture
     public function load(ObjectManager $manager)
     {
         $this->loadGuest($manager);
-        $this->loadUsers($manager);
+        $this->loadUsersWithReference($manager);
+        $this->loadUsersWithOutReference($manager);
         $manager->flush();
     }
 
@@ -69,17 +78,29 @@ final class UserFixtures extends Fixture
         $manager->persist($guest);
     }
 
-    private function loadUsers(ObjectManager $manager): void
+    private function loadUsersWithReference(ObjectManager $manager): void
     {
         foreach ([self::ADMIN_USER_REFERENCE => self::ADMIN_USER, self::STUDENT_USER_REFERENCE => self::STUDENT_USER, self::TEACHER_USER_REFERENCE => self::TEACHER_USER] as $reference => $userData) {
-            $user = ObjectAccessor::initialize(User::class, $userData);
-            ObjectAccessor::setValues($user, [
-                'enabled' => true,
-                'password' => $this->userPasswordEncoder->encodePassword($user, $user->getPlainPassword()),
-            ]);
-
+            $user = $this->initializeUser($userData);
             $this->addReference($reference, $user);
             $manager->persist($user);
         }
+    }
+
+    private function loadUsersWithOutReference(ObjectManager $manager): void
+    {
+        $user = $this->initializeUser(self::SIMPLE_USER);
+        $manager->persist($user);
+    }
+
+    private function initializeUser(array $data): User
+    {
+        $user = ObjectAccessor::initialize(User::class, $data);
+        ObjectAccessor::setValues($user, [
+            'enabled' => true,
+            'password' => $this->userPasswordEncoder->encodePassword($user, $user->getPlainPassword()),
+        ]);
+
+        return $user;
     }
 }

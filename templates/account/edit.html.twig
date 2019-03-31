@@ -2,15 +2,18 @@
 
 {% block title %}
     Редактировать профиль
-{%  endblock %}
+{% endblock %}
 
-{%  block breadcrumbs %}
-    {{  include('account/breadcrumbs/edit.html.twig') }}
+{% block breadcrumbs %}
+    {{ include('account/breadcrumbs/edit.html.twig') }}
 {% endblock %}
 
 {% block main %}
     <h1>Редактировать профиль</h1>
     {{ form_start(form) }}
+    <div class="account-username-input">
+        {{ form_row(form.username) }}
+    </div>
     {{ form_widget(form) }}
     {{ form_end(form) }}
 {% endblock %}

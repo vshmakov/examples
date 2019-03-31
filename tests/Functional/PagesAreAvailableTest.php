@@ -6,7 +6,7 @@ use App\DataFixtures\UserFixtures;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Component\HttpFoundation\Response;
 
-class PagesAreAvailableTest extends BaseWebTestCase
+final class PagesAreAvailableTest extends BaseWebTestCase
 {
     private const FREE_ENDPOINTS = [
         '/',
@@ -19,6 +19,7 @@ class PagesAreAvailableTest extends BaseWebTestCase
     private const ALL_AUTHENTICATED_USERS_ENDPOINTS = [
         '/profile/new/',
         '/account/',
+        '/account/edit/',
     ];
 
     private const ADMIN_ENDPOINTS = [

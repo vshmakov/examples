@@ -85,7 +85,7 @@ class StudentManipulateProfilesTest extends BaseWebTestCase
      * @test
      * @depends  studentCreatesNewProfile
      */
-    public function studentCopysProfile(int $newProfileId): Crawler
+    public function studentCopiesProfile(int $newProfileId): Crawler
     {
         $editProfilePageCrawler = self::$studentClient->followRedirect();
         $editProfileForm = $editProfilePageCrawler->selectButton('Копировать')->form();
@@ -101,7 +101,7 @@ class StudentManipulateProfilesTest extends BaseWebTestCase
 
     /**
      * @test
-     * @depends  studentCopysProfile
+     * @depends  studentCopiesProfile
      */
     public function studentSavesCopiedProfile(Crawler $copiedProfileEditPageCrawler): Crawler
     {

@@ -16,9 +16,6 @@ final class GuestManipulateProfilesTest extends BaseWebTestCase
     /** @var Client */
     private static $unauthenticatedClient;
 
-    /** @var Crawler */
-    private static $profileIndexCrawler;
-
     public static function setUpBeforeClass(): void
     {
         self::$unauthenticatedClient = self::createClient();
@@ -39,9 +36,9 @@ final class GuestManipulateProfilesTest extends BaseWebTestCase
      * @test
      * @depends  guestEntersToProfileIndexPage
      */
-    public function guestShowsNoActionsOfProfiles(): void
+    public function guestShowsNoActionsOfProfiles(Crawler $profileIndexPageCrawler): void
     {
-        self::$profileIndexCrawler->filter('tbody .profile-actions')
+        $profileIndexPageCrawler->filter('tbody .profile-actions')
             ->each(function (Crawler $actionsCrawler): void {
                 $this->assertSame('-', $this->getTrimmedText($actionsCrawler));
             });
@@ -63,10 +60,9 @@ final class GuestManipulateProfilesTest extends BaseWebTestCase
      * @test
      * @depends  guestEntersToProfileIndexPage
      */
-    public function guestShowsProfiles(): void
+    public function guestShowsProfiles(Crawler $profileIndexPageCrawler): void
     {
-        self::$profileIndexCrawler
-            ->filter('tbody .profile-description a')
+        $profileIndexPageCrawler->filter('tbody .profile-description a')
             ->each(function (Crawler $showProfileLinkCrawler): void {
                 self::$unauthenticatedClient->click($showProfileLinkCrawler->link());
                 $this->assertResponseIsSuccessful(self::$unauthenticatedClient);
@@ -87,9 +83,9 @@ final class GuestManipulateProfilesTest extends BaseWebTestCase
      * @depends      guestEntersToProfileIndexPage
      * @dataProvider manipulateProfileActionsProvider
      */
-    public function guestCanNotManipulateProfiles(string $url, string $method): void
+    public function guestCanNotManipulateProfiles(string $url, string $method, Crawler $profileIndexPageCrawler): void
     {
-        $showProfileLink = self::$profileIndexCrawler->filter('#public-profiles tbody tr:nth-child(2) a');
+        $showProfileLink = $profileIndexPageCrawler->filter('#public-profiles tbody tr:nth-child(2) a');
         $this->assertNotSame(ProfileFixtures::GUEST_PROFILE_DESCRIPTION, $this->getTrimmedText($showProfileLink));
         $showProfileUrl = $showProfileLink->attr('href');
         $this->assertTrue((bool) preg_match('#/profile/(?<profileId>\d+)/#', $showProfileUrl, $matches));
@@ -103,9 +99,9 @@ final class GuestManipulateProfilesTest extends BaseWebTestCase
      * @test
      * @depends  guestEntersToProfileIndexPage
      */
-    public function guestDoesNotSeeCreateProfileButton(): void
+    public function guestDoesNotSeeCreateProfileButton(Crawler $profileIndexPageCrawler): void
     {
-        $newProfileLinkCrawler = self::$profileIndexCrawler->filter('a[href="/profile/new/"]');
+        $newProfileLinkCrawler = $profileIndexPageCrawler->filter('a[href="/profile/new/"]');
         $this->assertEmpty($newProfileLinkCrawler);
     }
 
@@ -113,9 +109,9 @@ final class GuestManipulateProfilesTest extends BaseWebTestCase
      * @test
      * @depends  guestEntersToProfileIndexPage
      */
-    public function guestSeesNotAbleAppointProfilesMessage(): void
+    public function guestSeesNotAbleAppointProfilesMessage(Crawler $profileIndexPageCrawler): void
     {
-        $notAbleAppointProfilesMessageCrawler = $this->getNotAbleAppointProfilesMessageCrawler();
+        $notAbleAppointProfilesMessageCrawler = $this->getNotAbleAppointProfilesMessageCrawler($profileIndexPageCrawler);
         $this->assertNotEmpty($notAbleAppointProfilesMessageCrawler);
     }
 }

@@ -6,9 +6,6 @@ use Symfony\Component\DomCrawler\Crawler;
 
 trait DOMElementsTrait
 {
-    /** @var Crawler */
-    private static $profileIndexCrawler;
-
     private function getNotAbleAppointProfilesMessageCrawler(Crawler $profileIndexPageCrawler): Crawler
     {
         return $profileIndexPageCrawler->filter('#not-able-appoint-profiles-message');

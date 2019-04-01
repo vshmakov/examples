@@ -6,12 +6,12 @@ use App\Controller\Traits\BaseTrait;
 use  App\DateTime\DateTime as DT;
 use App\Entity\User;
 use App\Entity\User\Role;
-use App\Exception\RequiresTeacherAccessException;
 use App\Repository\AttemptRepository;
 use App\Repository\ExampleRepository;
 use App\Repository\UserRepository;
 use App\Security\Annotation as AppSecurity;
 use App\Service\UserLoader;
+use App\User\Teacher\Exception\RequiresTeacherAccessException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Routing\Annotation\Route;
 

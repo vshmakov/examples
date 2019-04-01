@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\DateTime\DateTime as DT;
 use App\Entity\User;
 use App\Object\ObjectAccessor;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -42,7 +43,21 @@ final class UserFixtures extends Fixture
 
     private const TEACHER_USER = [
         'username' => self::TEACHER_USERNAME,
+        'firstName' => 'Иван',
+        'fatherName' => 'Иванович',
+        'lastName' => 'Иванов',
         'email' => 'teacher@exmasters.ru',
+        'plainPassword' => 123,
+        'isTeacher' => true,
+        'roles' => ['ROLE_TEACHER'],
+    ];
+
+    private const SECOND_TEACHER_USER = [
+        'username' => 'second_teacher',
+        'firstName' => 'Петр',
+        'fatherName' => 'Петрович',
+        'lastName' => 'Петров',
+        'email' => 'second_teacher@exmasters.ru',
         'plainPassword' => 123,
         'isTeacher' => true,
         'roles' => ['ROLE_TEACHER'],
@@ -66,8 +81,13 @@ final class UserFixtures extends Fixture
     public function load(ObjectManager $manager)
     {
         $this->loadGuest($manager);
-        $this->loadUsersWithReference($manager);
         $this->loadUsersWithOutReference($manager);
+        $this->loadUsersWithReference($manager);
+
+        /** @var User $student */
+        $student = $this->getReference(self::STUDENT_USER_REFERENCE);
+        $student->setTeacher($this->getReference(self::TEACHER_USER_REFERENCE));
+
         $manager->flush();
     }
 
@@ -89,16 +109,21 @@ final class UserFixtures extends Fixture
 
     private function loadUsersWithOutReference(ObjectManager $manager): void
     {
-        $user = $this->initializeUser(self::SIMPLE_USER);
-        $manager->persist($user);
+        foreach ([self::SECOND_TEACHER_USER, self::SIMPLE_USER] as $userData) {
+            $user = $this->initializeUser($userData);
+            $manager->persist($user);
+        }
     }
 
     private function initializeUser(array $data): User
     {
+        static $step = 0;
+
         $user = ObjectAccessor::initialize(User::class, $data);
         ObjectAccessor::setValues($user, [
             'enabled' => true,
             'password' => $this->userPasswordEncoder->encodePassword($user, $user->getPlainPassword()),
+            'registrationTime' => DT::createFromTimestamp(time() - $step++),
         ]);
 
         return $user;

@@ -119,11 +119,21 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
         return DT::createFromDT($this->addTime);
     }
 
+    public function getRegistrationTime(): \DateTimeInterface
+    {
+        return $this->getAddTime();
+    }
+
     public function setAddTime(\DateTimeInterface $addTime): self
     {
         $this->addTime = $addTime;
 
         return $this;
+    }
+
+    public function setRegistrationTime(\DateTimeInterface $registrationTime): void
+    {
+        $this->setAddTime($registrationTime);
     }
 
     /**

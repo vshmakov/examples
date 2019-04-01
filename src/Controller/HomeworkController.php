@@ -4,11 +4,11 @@ namespace App\Controller;
 
 use App\Controller\Traits\BaseTrait;
 use App\Entity\Task;
-use App\Exception\RequiresStudentAccessException;
 use App\Repository\AttemptRepository;
 use App\Repository\ExampleRepository;
 use App\Repository\TaskRepository;
 use App\Security\Annotation as AppSecurity;
+use App\User\Student\Exception\RequiresStudentAccessException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;

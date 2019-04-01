@@ -2,55 +2,34 @@
 
 namespace App\Repository;
 
-use App\DataFixtures\Attempt\ProfileFixtures;
 use App\DataFixtures\UserFixtures;
 use App\Entity\Attempt;
 use App\Entity\Profile;
 use App\Entity\Task;
 use App\Entity\User;
-use App\Repository\Traits\BaseTrait;
-use App\Service\AuthChecker;
+use App\Object\ObjectAccessor;
+use App\User\Teacher\TeacherProviderInterface;
 use App\Utils\Cache\LocalCache;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-final class UserRepository extends ServiceEntityRepository
+final class UserRepository extends ServiceEntityRepository implements TeacherProviderInterface
 {
-    use BaseTrait;
+    /** @var AuthorizationCheckerInterface */
+    private $authorizationChecker;
 
-    private $authChecker;
     private $localCache;
 
-    public function __construct(RegistryInterface $registry, AuthChecker $authChecker, LocalCache $localCache)
+    public function __construct(RegistryInterface $registry, AuthorizationCheckerInterface $authorizationChecker, LocalCache $localCache)
     {
         parent::__construct($registry, User::class);
-        $this->authChecker = $authChecker;
+
+        $this->authorizationChecker = $authorizationChecker;
         $this->localCache = $localCache;
     }
 
-    /** @deprecated  */
-    private function getCurrentProfile(User $user)
-    {
-        $profileRepository = $this->getEntityRepository(Profile::class);
-        $profile = $user->getProfile() ?? $profileRepository->findOneByAuthor($user) ?? $profileRepository->findOnePublic();
-        $testProfileDescription = ProfileFixtures::GUEST_PROFILE_DESCRIPTION;
-
-        if (!$profile) {
-            $profile = $profileRepository->getNewByCurrentUser()
-                ->setDescription($testProfileDescription)
-                ->setIsPublic(true)
-                ->setAuthor($this->getGuest());
-
-            $entityManager = $this->getEntityManager();
-            $entityManager->persist($profile);
-            $entityManager->flush();
-        }
-
-        return $this->authChecker->isGranted('PRIV_APPOINT_PROFILES', $user) ? $profile
-            : $profileRepository->findOneBy(['description' => $testProfileDescription, 'isPublic' => true]);
-    }
-
-    public function getAttemptsCount(User $user)
+    private function getAttemptsCount(User $user)
     {
         return $this->createQueryBuilder('u')
             ->select('count(a)')
@@ -62,7 +41,7 @@ final class UserRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
-    public function getExamplesCount(User $user)
+    private function getExamplesCount(User $user)
     {
         return $this->createQueryBuilder('u')
             ->select('count(e)')
@@ -75,14 +54,14 @@ final class UserRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
-    public function getProfilesCount(User $user): int
+    private function getProfilesCount(User $user): int
     {
         return $this->getEntityManager()
             ->getRepository(Profile::class)
             ->countByAuthor($user);
     }
 
-    public function getGuest()
+    public function getGuest(): User
     {
         static $user = false;
         $guestUsername = UserFixtures::GUEST_USERNAME;
@@ -104,20 +83,21 @@ final class UserRepository extends ServiceEntityRepository
         return $user;
     }
 
-    public function getNew()
+    private function getNew(): User
     {
-        return (new User())
-            ->setEnabled(true);
+        return ObjectAccessor::initialize(User::class, [
+            'enabled' => true,
+        ]);
     }
 
-    public function findOneByUloginCredentials($credentials)
+    private function findOneByUloginCredentials($credentials): ?User
     {
         extract($credentials);
 
         return $this->findOneBy(['network' => $network, 'networkId' => $uid]);
     }
 
-    public function findOneByUloginCredentialsOrNew($credentials)
+    public function findOneByUloginCredentialsOrNew($credentials): User
     {
         extract($credentials);
 
@@ -203,7 +183,7 @@ where u = :u')
             ->getSingleScalarResult();
     }
 
-    public function clearNotEnabledUsers(\DateTimeInterface $dt)
+    public function clearNotEnabledUsers(\DateTimeInterface $dt): int
     {
         $entityManager = $this->getEntityManager();
         $users = $entityManager->createQuery('select u from App:User u
@@ -255,5 +235,10 @@ where u = :u')
         }
 
         return $finishedUsersCount;
+    }
+
+    public function getTeachers(): array
+    {
+        return $this->findByIsTeacher(true);
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Exception;
+namespace App\User\Teacher\Exception;
 
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 

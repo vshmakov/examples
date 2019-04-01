@@ -1,15 +1,14 @@
 <?php
 
-namespace App\EventSubscriber;
+namespace App\User\Teacher\Exception;
 
-use App\Exception\RequiresTeacherAccessException;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-final class RequiresTeacherAccessExceptionSubscriber implements EventSubscriberInterface
+class RequiresTeacherAccessExceptionSubscriber implements EventSubscriberInterface
 {
     /** @var EngineInterface */
     private $templating;
@@ -21,11 +20,25 @@ final class RequiresTeacherAccessExceptionSubscriber implements EventSubscriberI
 
     public function onKernelException(GetResponseForExceptionEvent $event): void
     {
-        if ($event->getException() instanceof RequiresTeacherAccessException) {
-            $response = $this->templating->renderResponse('exception/requires_teacher_access_exception.html.twig');
-            $response->setStatusCode(Response::HTTP_FORBIDDEN);
-            $event->setResponse($response);
+        $supportedException = $this->getSupportedException();
+
+        if (!$event->getException() instanceof $supportedException) {
+            return;
         }
+
+        $response = $this->templating->renderResponse($this->getTemplate());
+        $response->setStatusCode(Response::HTTP_FORBIDDEN);
+        $event->setResponse($response);
+    }
+
+    protected function getSupportedException(): string
+    {
+        return RequiresTeacherAccessException::class;
+    }
+
+    protected function getTemplate(): string
+    {
+        return 'exception/requires_teacher_access_exception.html.twig';
     }
 
     public static function getSubscribedEvents()

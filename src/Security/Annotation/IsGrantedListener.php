@@ -24,7 +24,7 @@ final class IsGrantedListener implements EventSubscriberInterface
         $this->authorizationChecker = $authorizationChecker;
     }
 
-    public function onKernelControllerArguments(FilterControllerArgumentsEvent $event)
+    public function onKernelControllerArguments(FilterControllerArgumentsEvent $event): void
     {
         $request = $event->getRequest();
 
@@ -82,11 +82,10 @@ final class IsGrantedListener implements EventSubscriberInterface
         return $argsString;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
-        return [KernelEvents::CONTROLLER_ARGUMENTS => 'onKernelControllerArguments'];
+        return [
+            KernelEvents::CONTROLLER_ARGUMENTS => ['onKernelControllerArguments', -1],
+        ];
     }
 }

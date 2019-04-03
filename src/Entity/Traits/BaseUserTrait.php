@@ -3,6 +3,7 @@
 namespace App\Entity\Traits;
 
 use App\Entity\User\Role;
+use App\Validator\Group as ValidationGroup;
 use Doctrine\Common\Collections\ArrayCollection;
 use FOS\UserBundle\Model\GroupInterface;
 
@@ -15,10 +16,11 @@ trait BaseUserTrait
      * @var string
      *
      * @ORM\Column(name="username", type="string", length=180, nullable=true)
-     * @Assert\NotBlank(message="Логин не должен быть пустым")
+     * @Assert\NotBlank(message="Логин не должен быть пустым", groups={ValidationGroup::ACCOUNT, ValidationGroup::STUDENT})
      * @Assert\Regex(
      *     pattern="/^[a-z][a-z0-9\._\-]+[a-z0-9]$/",
-     *     message="Логин должен начинаться с буквы, заканчиваться буквой или цифрой  и может содержать только строчные латинские символы, цифры, а также ._-"
+     *     message="Логин должен начинаться с буквы, заканчиваться буквой или цифрой  и может содержать только строчные латинские символы, цифры, а также ._-",
+     *     groups={ValidationGroup::ACCOUNT}
      * )
      */
     private $username;
@@ -285,7 +287,9 @@ trait BaseUserTrait
             $roles[] = Role::STUDENT;
         }
 
-        return array_unique($roles);
+        sort($roles);
+
+        return array_values(array_unique($roles));
     }
 
     /**

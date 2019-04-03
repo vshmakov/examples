@@ -18,7 +18,7 @@ class RequiresTeacherAccessExceptionSubscriber implements EventSubscriberInterfa
         $this->templating = $templating;
     }
 
-    public function onKernelException(GetResponseForExceptionEvent $event): void
+    final public function onKernelException(GetResponseForExceptionEvent $event): void
     {
         $supportedException = $this->getSupportedException();
 
@@ -41,7 +41,7 @@ class RequiresTeacherAccessExceptionSubscriber implements EventSubscriberInterfa
         return 'exception/requires_teacher_access_exception.html.twig';
     }
 
-    public static function getSubscribedEvents()
+    final public static function getSubscribedEvents()
     {
         return [
             KernelEvents::EXCEPTION => 'onKernelException',

@@ -101,3 +101,8 @@ services:
     App\Request\DataTables\DataTablesRequestType:
         arguments:
             $apiRequestHandler: '@App\Request\ApiRequestHandler'
+
+    App\Security\User\CurrentUserUpdatesUsernameSubscriber:
+        factory: 'App\Security\User\CurrentUserUpdatesUsernameSubscriber::factory'
+        tags:
+            - { name: doctrine.event_subscriber, connection: default }

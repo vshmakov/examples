@@ -5,23 +5,27 @@ namespace App\Repository;
 use App\Entity\Attempt;
 use App\Entity\Task;
 use App\Entity\User;
-use App\Repository\Traits\BaseTrait;
-use App\Service\AuthChecker;
-use App\Service\UserLoader;
+use App\Security\User\CurrentUserProviderInterface;
+use App\Task\TaskProviderInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Webmozart\Assert\Assert;
 
-class TaskRepository extends ServiceEntityRepository
+final class TaskRepository extends ServiceEntityRepository implements TaskProviderInterface
 {
-    use BaseTrait;
-    private $authChecker;
-    private $userLoader;
+    /** @var CurrentUserProviderInterface */
+    private $currentUserProvider;
 
-    public function __construct(RegistryInterface $registry, UserLoader $currentUserProvider, AuthChecker $authChecker)
+    /** @var AuthorizationCheckerInterface */
+    private $authorizationChecker;
+
+    public function __construct(RegistryInterface $registry, CurrentUserProviderInterface $currentUserProvider, AuthorizationCheckerInterface $authorizationChecker)
     {
         parent::__construct($registry, Task::class);
-        $this->userLoader = $currentUserProvider;
-        $this->authChecker = $authChecker;
+
+        $this->currentUserProvider = $currentUserProvider;
+        $this->authorizationChecker = $authorizationChecker;
     }
 
     public function isDoneByUser(Task $task, User $user): bool
@@ -41,16 +45,17 @@ class TaskRepository extends ServiceEntityRepository
 
     public function findHomeworkByCurrentUser(): array
     {
-        return $this->createQuery('select t from App:Task t
+        return $this->getEntityManager()
+            ->createQuery('select t from App:Task t
         join t.contractors c
         where c = :user')
-            ->setParameters(['user' => $this->userLoader->getUser()])
+            ->setParameters(['user' => $this->currentUserProvider->getCurrentUserOrGuest()])
             ->getResult();
     }
 
     public function isDoneByCurrentUser(Task $task): bool
     {
-        return $this->isDoneByUser($task, $this->userLoader->getUser());
+        return $this->isDoneByUser($task, $this->currentUserProvider->getCurrentUserOrGuest());
     }
 
     public function getFinishedUsersCount(Task $task): int
@@ -61,7 +66,7 @@ class TaskRepository extends ServiceEntityRepository
 
     public function findByCurrentAuthor(): array
     {
-        return $this->findByAuthor($this->userLoader->getUser());
+        return $this->findByAuthor($this->currentUserProvider->getCurrentUserOrGuest());
     }
 
     public function isActual(Task $task): bool
@@ -74,13 +79,19 @@ class TaskRepository extends ServiceEntityRepository
     public function countActualHomeworksByCurrentUser(): int
     {
         return \count(array_filter($this->findHomeworkByCurrentUser(), function (Task $homework): bool {
-            return $this->authChecker->isGranted('SOLVE', $homework);
+            return $this->authorizationChecker->isGranted('SOLVE', $homework);
         }));
     }
 
-    public function findActualByAuthor(User $author): array
+    /**
+     * @throws \InvalidArgumentException if current user has no teacher
+     */
+    public function getActualTasksOfCurrentTeacher(): array
     {
-        return array_filter($this->findByAuthor($author), function (Task $task): bool {
+        $currentUser = $this->currentUserProvider->getCurrentUserOrGuest();
+        Assert::true($currentUser->hasTeacher());
+
+        return array_filter($this->findByAuthor($currentUser->getTeacher()), function (Task $task): bool {
             return $this->isActual($task);
         });
     }

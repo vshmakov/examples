@@ -5,11 +5,12 @@ namespace App\Controller;
 use App\Controller\Traits\CurrentUserProviderTrait;
 use  App\Entity\User;
 use App\Entity\User\Role;
-use App\Form\ChildType;
-use App\Repository\TaskRepository;
+use App\Form\StudentType;
 use App\Security\Annotation as AppSecurity;
+use App\Task\TaskProviderInterface;
 use App\User\Student\Exception\RequiresStudentAccessException;
 use App\User\Teacher\TeacherProviderInterface;
+use App\Validator\Group;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\FormError;
@@ -41,46 +42,44 @@ final class TeacherController extends Controller
     }
 
     /**
-     * @Route("/{id}/appoint/", name="teacher_appoint", methods={"GET"})
+     * @Route("/{id}/appoint/", name="teacher_appoint", methods={"GET", "POST"})
      */
-    public function appoint(User $teacher, ValidatorInterface $validator, Request $request, TaskRepository $taskRepository): Response
+    public function appoint(User $teacher, Request $request, ValidatorInterface $validator, TaskProviderInterface $taskProvider): Response
     {
-        $this->denyAccessUnlessGranted('APPOINT', $teacher);
-        $currentUser = $this->currentUser;
+        $currentUser = $this->getCurrentUserOrGuest();
         $currentUser->cleanSocialUsername();
-        $errors = $validator->validate($currentUser, null, ['child']);
+        $errors = $validator->validate($currentUser, null, Group::STUDENT);
 
         if (!\count($errors)) {
             $currentUser->setTeacher($teacher);
 
-            foreach ($taskRepository->findActualByAuthor($teacher) as $homework) {
-                $currentUser->addHomework($homework);
+            foreach ($taskProvider->getActualTasksOfCurrentTeacher() as $task) {
+                $currentUser->addHomework($task);
             }
 
-            $this->getEntityManager()->flush();
+            $this->getDoctrine()
+                ->getManager()
+                ->flush($currentUser);
 
             return $this->redirectToRoute('account_index');
         }
 
-        $form = $this->createForm(ChildType::class, $currentUser);
-        $form->remove('isTeacher');
+        $form = $this->createForm(StudentType::class, $currentUser);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->getEntityManager()->flush();
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $this->getDoctrine()
+                    ->getManager()
+                    ->flush($currentUser);
 
-            return $this->redirectToRoute('teacher_appoint', [
-                'id' => $teacher->getId(),
-            ]);
-        }
-
-        if (!$form->isSubmitted()) {
+                return $this->redirectToRoute('teacher_appoint', ['id' => $teacher->getId()]);
+            }
+        } else {
             foreach ($errors as $error) {
                 $form->addError(new FormError($error->getMessage()));
             }
         }
-
-        $this->missResponseEvent();
 
         return $this->render('teacher/edit.html.twig', [
             'form' => $form->createView(),

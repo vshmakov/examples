@@ -4,6 +4,7 @@ namespace App\DataFixtures;
 
 use App\DateTime\DateTime as DT;
 use App\Entity\User;
+use App\Entity\User\Role;
 use App\Object\ObjectAccessor;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -49,7 +50,7 @@ final class UserFixtures extends Fixture
         'email' => 'teacher@exmasters.ru',
         'plainPassword' => 123,
         'isTeacher' => true,
-        'roles' => ['ROLE_TEACHER'],
+        'roles' => [Role::TEACHER],
     ];
 
     private const SECOND_TEACHER_USER = [
@@ -94,8 +95,8 @@ final class UserFixtures extends Fixture
     private function loadGuest(ObjectManager $manager): void
     {
         $guest = ObjectAccessor::initialize(User::class, self::GUEST_USER);
-        $this->addReference(self::GUEST_USER_REFERENCE, $guest);
         $manager->persist($guest);
+        $this->addReference(self::GUEST_USER_REFERENCE, $guest);
     }
 
     private function loadUsersWithReference(ObjectManager $manager): void

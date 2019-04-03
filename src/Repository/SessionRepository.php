@@ -47,7 +47,7 @@ final class SessionRepository extends ServiceEntityRepository implements Current
 
         $entityManager = $this->getEntityManager();
         $entityManager->persist($session);
-        $entityManager->flush();
+        $entityManager->flush($session);
 
         return $session;
     }

@@ -6,6 +6,7 @@ use App\DateTime\DateTime as DT;
 use App\Entity\Traits\BaseTrait;
 use App\Entity\Traits\BaseUserTrait;
 use App\Object\ObjectAccessor;
+use App\Validator\Group as ValidationGroup;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -362,22 +363,22 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Assert\NotBlank(message="Имя не должно быть пустым", groups={"account", "child"})
+     * @Assert\NotBlank(message="Имя не должно быть пустым", groups={ValidationGroup::ACCOUNT, ValidationGroup::STUDENT})
      * @Assert\Length(
      * min = 2,
      * minMessage = "Ваше имя должно содержать как минимум {{ limit }} символа",
-     *groups={"account", "child"}
+     *groups={ValidationGroup::ACCOUNT, ValidationGroup::STUDENT}
      * )
      */
     private $firstName;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Assert\NotBlank(message="Фамилия не должна быть пустой", groups={"account", "child"})
+     * @Assert\NotBlank(message="Фамилия не должна быть пустой", groups={ValidationGroup::ACCOUNT, ValidationGroup::STUDENT})
      * @Assert\Length(
      * min = 2,
      * minMessage = "Ваша фамилия должна содержать как минимум {{ limit }} символа",
-     * groups={"account", "child"}
+     * groups={ValidationGroup::ACCOUNT, ValidationGroup::STUDENT}
      * )
      */
     private $lastName;
@@ -394,11 +395,11 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Assert\NotBlank(message="Отчество не должно быть пустым", groups={"account"})
+     * @Assert\NotBlank(message="Отчество не должно быть пустым", groups={ValidationGroup::ACCOUNT, ValidationGroup::STUDENT})
      * @Assert\Length(
      * min = 4,
      * minMessage = "Ваше отчество должно содержать как минимум {{ limit }} символа",
-     * groups={"account"}
+     * groups={ValidationGroup::ACCOUNT, ValidationGroup::STUDENT}
      * )
      */
     private $fatherName;
@@ -416,6 +417,7 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
     /**
      * @var User|null
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="students")
+     * @ORM\JoinColumn(onDelete="set null")
      */
     private $teacher;
 
@@ -797,14 +799,12 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
         return $this->homework;
     }
 
-    public function addHomework(Task $homework): self
+    public function addHomework(Task $homework): void
     {
         if (!$this->homework->contains($homework)) {
             $this->homework[] = $homework;
             $homework->addContractor($this);
         }
-
-        return $this;
     }
 
     public function removeHomework(Task $homework): self

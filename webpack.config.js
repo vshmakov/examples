@@ -9,12 +9,13 @@ Encore
     //.setManifestKeyPrefix('build/')
 
     .addEntry('js/app', './assets/js/app.js')
-    .addEntry('js/homework', './assets/js/homework.js')
 
     .addEntry('js/attempt/index', './assets/js/attempt/index.ts')
     .addEntry('js/attempt/solve', './assets/js/attempt/solve.ts')
 
     .addEntry('js/profile/index', './assets/js/profile/index.js')
+    .addEntry('js/homework', './assets/js/homework.js')
+    .addEntry('js/teacher/index', './assets/js/teacher/index.js')
 
     .addStyleEntry('css/app', './assets/css/app.css')
 

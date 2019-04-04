@@ -82,13 +82,13 @@ final class UserEditsAccountTest extends BaseWebTestCase
      */
     public function userMovesBackOriginalUsername(): void
     {
-        $client = self::createAuthenticatedClient(self::TEMPORARY_USERNAME);
-        $editAccountPageCrawler = $client->request(Method::GET, '/account/edit/');
+        $newUsernameClient = self::createAuthenticatedClient(self::TEMPORARY_USERNAME);
+        $editAccountPageCrawler = $newUsernameClient->request(Method::GET, '/account/edit/');
         $editAccountForm = $this->getEditAccountForm($editAccountPageCrawler);
-        $client->submit($editAccountForm, [
+        $newUsernameClient->submit($editAccountForm, [
             'account[username]' => UserFixtures::SIMPLE_USER_USERNAME,
         ]);
-        $this->assertRedirectionToAccountIndexPage($client);
+        $this->assertRedirectionToAccountIndexPage($newUsernameClient);
         $this->userEntersToAccountIndexPage();
     }
 

@@ -213,14 +213,6 @@ class StudentManipulateProfilesTest extends BaseWebTestCase
         $this->assertRegExp('#\(Текущий\)#', $showOrEditPageCrawler->filter('h1')->text());
     }
 
-    private function assertRedirectionLocationMatch(string $expression, Client $client): array
-    {
-        $targetUrl = $client->getResponse()->headers->get('location');
-        $this->assertTrue((bool) preg_match($expression, $targetUrl, $matches));
-
-        return $matches;
-    }
-
     private function getProfileIdFromRedirectingToEditPage(Client $client): int
     {
         return $this->assertRedirectionLocationMatch('#/profile/(?<profileId>\d+)/edit/#', $client)['profileId'];

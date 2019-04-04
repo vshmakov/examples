@@ -46,6 +46,14 @@ abstract class BaseWebTestCase extends WebTestCase
         $this->assertRegExp('#/login$#', $client->getResponse()->headers->get('location'));
     }
 
+    protected function assertRedirectionLocationMatch(string $expression, Client $client): array
+    {
+        $targetUrl = $client->getResponse()->headers->get('location');
+        $this->assertTrue((bool) preg_match($expression, $targetUrl, $matches));
+
+        return $matches;
+    }
+
     /**
      * @return mixed
      */

@@ -10,6 +10,7 @@
 
 {% block main %}
     <h1>Профиль</h1>
+
     {% set currentUser = app.user %}
     <table class="table table-info">
         <tr>
@@ -39,7 +40,7 @@
             </tr>
         {% endif %}
         {% if currentUser.hasTeacher %}
-            <tr>
+            <tr id="account-teacher">
                 <th>Выбранный учитель</th>
                 <td>{{ currentUser.teacher.fio }}</td>
             </tr>

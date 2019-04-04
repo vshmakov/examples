@@ -3,72 +3,43 @@
 namespace App\Security\Voter;
 
 use App\Entity\User;
-use App\Security\Voter\Traits\BaseTrait;
-use App\Service\AuthChecker;
-use App\Service\UserLoader;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+use App\Entity\User\Role;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class UserVoter extends Voter
+final class UserVoter extends BaseVoter
 {
-    use BaseTrait;
-    private $userLoader;
-    private $authChecker;
+    public const  APPOINT_TEACHER = 'APPOINT_TEACHER';
 
-    public function __construct(UserLoader $userLoader, AuthChecker $authChecker)
+    /** @var User */
+    protected $subject;
+
+    /** @var AuthorizationCheckerInterface */
+    private $authorizationChecker;
+
+    public function __construct(AuthorizationCheckerInterface $authorizationChecker)
     {
-        $this->userLoader = $userLoader;
-        $this->authChecker = $authChecker;
+        $this->authorizationChecker = $authorizationChecker;
     }
 
-    protected function supports($attribute, $subject)
+    protected function supports($attribute, $subject): bool
     {
-        return ($subject instanceof User or null === $subject) && $this->hasHandler($attribute);
+        return $subject instanceof User;
     }
 
-    protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
+    protected static function getSupportedAttributes(): array
     {
-        return $this->voteOnNamedCallback($attribute, $subject ?? $this->userLoader->getUser(), $token);
+        return [
+            self::APPOINT_TEACHER,
+        ];
     }
 
-    private function isAccountPaid()
+    protected function canAppointTeacher(): bool
     {
-        return !$this->userLoader->isCurrentUserGuest();
+        return$this->authorizationChecker->isGranted(Role::USER) && $this->subject->isTeacher();
     }
 
-    private function hasPrivAppointProfiles()
+    protected function canLoginAs(): bool
     {
-        return $this->authChecker->isGranted('ROLE_USER', $this->subject);
-    }
-
-    private function canCreateChildren()
-    {
-        return !$this->authChecker->isGranted('ROLE_CHILD');
-    }
-
-    private function canLogin()
-    {
-        return $this->authChecker->isGranted('ROLE_SUPER_ADMIN');
-    }
-
-    private function canShowTasks(): bool
-    {
-        $authChecker = $this->authChecker;
-
-        return $authChecker->isGranted('ROLE_USER') && !$authChecker->isGranted('ROLE_CHILD')
-            && $this->userLoader->getUser()->isTeacher();
-    }
-
-    private function canShowHomeworks(): bool
-    {
-        $currentUser = $this->userLoader->getUser();
-
-        return $this->authChecker->isGranted('ROLE_USER')
-            && (!$currentUser->isTeacher() or $currentUser->getHomework()->count());
-    }
-
-    private function canCreateTasks(): bool
-    {
-        return $this->canShowTasks();
+        return $this->authorizationChecker->isGranted(Role::SUPER_ADMIN);
     }
 }

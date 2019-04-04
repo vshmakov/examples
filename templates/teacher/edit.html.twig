@@ -4,6 +4,10 @@
     Требуется заполнить профиль
 {% endblock %}
 
+{%  block breadcrumbs %}
+    {{  include('teacher/breadcrumbs/edit.html.twig') }}
+{% endblock %}
+
 {% block main %}
     <h1>Пожалуйста, заполните профиль</h1>
     {{ form_start(form) }}

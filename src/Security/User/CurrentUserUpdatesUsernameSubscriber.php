@@ -8,7 +8,6 @@ use Doctrine\Common\Persistence\Event\LifecycleEventArgs;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -26,15 +25,15 @@ final class CurrentUserUpdatesUsernameSubscriber implements EventSubscriber
     /** @var SessionInterface */
     private $session;
 
-    /** @var Request|null */
-    private $request;
+    /** @var bool */
+    private $isHttpRequest;
 
-    private function __construct(callable $isCurrentUser, TokenStorageInterface $tokenStorage, SessionInterface $session, RequestStack $requestStack)
+    private function __construct(callable $isCurrentUser, TokenStorageInterface $tokenStorage, SessionInterface $session, bool $isHttpRequest)
     {
         $this->isCurrentUser = $isCurrentUser;
         $this->tokenStorage = $tokenStorage;
         $this->session = $session;
-        $this->request = $requestStack->getMasterRequest();
+        $this->isHttpRequest = $isHttpRequest;
     }
 
     public static function factory(ContainerInterface $container, TokenStorageInterface $tokenStorage, SessionInterface $session, RequestStack $requestStack): self
@@ -43,12 +42,12 @@ final class CurrentUserUpdatesUsernameSubscriber implements EventSubscriber
             return $container->get(CurrentUserProviderInterface::class)->isCurrentUser($user);
         };
 
-        return new self($isCurrentUser, $tokenStorage, $session, $requestStack);
+        return new self($isCurrentUser, $tokenStorage, $session, null !== $requestStack->getMasterRequest());
     }
 
     public function postUpdate(LifecycleEventArgs $eventArgs): void
     {
-        if (null === $this->request) {
+        if (!$this->isHttpRequest) {
             return;
         }
 

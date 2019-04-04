@@ -3,10 +3,11 @@
 namespace App\Controller;
 
 use App\Controller\Traits\CurrentUserProviderTrait;
-use  App\Entity\User;
-use App\Entity\User\Role;
+use App\Entity\User;
+use  App\Entity\User\Role;
 use App\Form\StudentType;
 use App\Security\Annotation as AppSecurity;
+use App\Security\Voter\UserVoter;
 use App\Task\TaskProviderInterface;
 use App\User\Student\Exception\RequiresStudentAccessException;
 use App\User\Teacher\TeacherProviderInterface;
@@ -43,6 +44,7 @@ final class TeacherController extends Controller
 
     /**
      * @Route("/{id}/appoint/", name="teacher_appoint", methods={"GET", "POST"})
+     * @IsGranted(UserVoter::APPOINT_TEACHER, subject="teacher")
      */
     public function appoint(User $teacher, Request $request, ValidatorInterface $validator, TaskProviderInterface $taskProvider): Response
     {
@@ -91,9 +93,11 @@ final class TeacherController extends Controller
      */
     public function disappoint(): Response
     {
-        $this->denyAccessUnlessGranted('DISAPPOINT_TEACHERS');
-        $this->currentUser->setTeacher(null);
-        $this->getEntityManager()->flush();
+        $currentUser = $this->getCurrentUserOrGuest();
+        $currentUser->setTeacher(null);
+        $this->getDoctrine()
+            ->getManager()
+            ->flush($currentUser);
 
         return $this->redirectToRoute('account_index');
     }

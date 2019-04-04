@@ -32,7 +32,7 @@ final class PagesAreAvailableTest extends BaseWebTestCase
     ];
 
     private const TEACHER_ENDPOINTS = [
-        '/student/',
+        //'/student/',
         '/task/',
     ];
 

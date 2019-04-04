@@ -93,11 +93,11 @@ trait BaseUserTrait
     private $passwordRequestedAt;
 
     /**
-     * @var array
+     * @var array|null
      *
      * @ORM\Column(name="roles", type="array", length=0, nullable=false)
      */
-    private $roles = [];
+    private $roles;
 
     /**
      * @return string

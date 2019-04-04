@@ -101,13 +101,13 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
         $this->limitTime = (new \DateTime())->add(new \DateInterval("P{$l}D"));
         $this->addTime = new \DateTime();
         $this->codes = new ArrayCollection();
-        $this->money = DEFAULT_MONEY;
         $this->ips = new ArrayCollection();
         $this->transfers = new ArrayCollection();
         $this->students = new ArrayCollection();
         $this->children = new ArrayCollection();
         $this->tasks = new ArrayCollection();
         $this->homework = new ArrayCollection();
+        $this->roles = [];
     }
 
     public function getId()
@@ -823,6 +823,12 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
     public function isEqualTo(SymfonyUserInterface $user)
     {
         foreach (['id', 'username', 'roles'] as $field) {
+            if (null === $this->roles && 'roles' === $field) {
+                //this user is unserialized and has no roles
+                //We don't compare roles field
+                continue;
+            }
+
             if (ObjectAccessor::getValue($this, $field) !== ObjectAccessor::getValue($user, $field)) {
                 return false;
             }

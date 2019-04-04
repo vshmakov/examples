@@ -11,6 +11,8 @@ abstract class BaseVoter extends Voter
 {
     use BaseTrait;
 
+    protected $subject;
+
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token): bool
     {
         $this->assertInSupportedAttributes($attribute);

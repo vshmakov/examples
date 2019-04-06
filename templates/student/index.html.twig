@@ -1,53 +1,15 @@
 {% extends "main.html.twig" %}
 
 {% block title %}
-Список учеников
+    Список учеников
 {% endblock %}
 
 {% block main %}
-{% from "student/index_table.html.twig" import index_table as table %}
+    {% from "student/list_table.html.twig" import list_table %}
 
-{{ table("Список учеников", students, userRepository) }}
-{{ table("Список созданных учеников", children, userRepository) }}
-
-<p>
-<a href="{{path("child_new")}}" role="button" class="="btn">Создать нового ученика</a>
-</p>
+    {{ list_table ("Список учеников", students, userRepository) }}
 {% endblock %}
 
 {% block javascripts %}
-{{ parent() }}
-<script src="/js/jquery.datatables.min.js"></script>
-<script>
-    $("table").DataTable({
-        pageLength: 50,
-        //order: [1, "asc"],
-        lengthMenu: [
-            25, 50, 100, 250
-        ],
-        language: {
-            "decimal": "",
-            "emptyTable": "Учеников пока нет",
-            "info": "Показано с _START_ по _END_ из _TOTAL_ учеников",
-            "infoEmpty": "Показано с _START_ по _END_ из _TOTAL_ учеников",
-            "infoFiltered": "(Отфильтровано из _MAX_ учеников)",
-            "infoPostFix": "",
-            "thousands": ",",
-            "lengthMenu": "Показать _MENU_ учеников на странице",
-            "loadingRecords": "Идёт загрузка...",
-            "search": "Найти ученика:",
-            "zeroRecords": "Соответствующих записей не найдено",
-            "paginate": {
-                "first": "В начало",
-                "last": "В конец",
-                "next": "Вперед",
-                "previous": "Назад"
-            },
-            "aria": {
-                "sortAscending": ": Нажмите, чтобы отсортировать по возрастанию",
-                "sortDescending": ": Нажмите, чтобы отсортировать по убыванию"
-            }
-        }
-    });
-</script>
+    <script src="{{ asset('build/js/student/index.js') }}"></script>
 {% endblock %}

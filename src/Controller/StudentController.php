@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Controller\Traits\BaseTrait;
+use App\Controller\Traits\CurrentUserProviderTrait;
 use  App\DateTime\DateTime as DT;
 use App\Entity\User;
 use App\Entity\User\Role;
@@ -13,6 +14,7 @@ use App\Security\Annotation as AppSecurity;
 use App\Service\UserLoader;
 use App\User\Teacher\Exception\RequiresTeacherAccessException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -21,29 +23,16 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 final class StudentController extends Controller
 {
-    use BaseTrait;
-    private $currentUser;
-
-    public function __construct(UserRepository $userRepository, UserLoader $userLoader)
-    {
-        $this->currentUser = $userLoader->getUser()
-            ->setEntityRepository($userRepository);
-    }
+    use  CurrentUserProviderTrait;
 
     /**
      * @Route("/", name="student_index")
      */
-    public function index(UserRepository $userRepository)
+    public function index(): Response
     {
-        $currentUser = $this->currentUser;
 
         return $this->render('student/index.html.twig', [
-            'students' => $currentUser->getRealStudents()->getValues(),
-            'children' => $currentUser->getChildren()->getValues(),
-            'userRepository' => $userRepository,
-            'DTSubDays' => function (int $day): \DateTimeInterface {
-                return DT::createBySubDays($day);
-            },
+            'students' => $this->getCurrentUserOrGuest()->getRealStudents(),
         ]);
     }
 

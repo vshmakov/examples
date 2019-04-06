@@ -154,4 +154,14 @@ final class DateTime extends BaseDateTime
     {
         return round($this->format('U.u'));
     }
+
+    public function isEqualTo(\DateTimeInterface $dateTime): bool
+    {
+        return $dateTime->getTimestamp() === $this->getTimestamp();
+    }
+
+    public function isGreaterThan(\DateTimeInterface $dateTime): bool
+    {
+        return $this->getTimestamp() > $dateTime->getTimestamp();
+    }
 }

@@ -4,10 +4,14 @@
     Список учеников
 {% endblock %}
 
+{%  block breadcrumbs %}
+    {{  include('student/breadcrumbs/index.html.twig') }}
+{% endblock %}
+
 {% block main %}
     {% from "student/list_table.html.twig" import list_table %}
 
-    {{ list_table ("Список учеников", students, userRepository) }}
+    {{ list_table ("Список учеников", students, userEvaluator) }}
 {% endblock %}
 
 {% block javascripts %}

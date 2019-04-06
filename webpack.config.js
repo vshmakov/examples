@@ -16,6 +16,7 @@ Encore
     .addEntry('js/profile/index', './assets/js/profile/index.js')
     .addEntry('js/homework', './assets/js/homework.js')
     .addEntry('js/teacher/index', './assets/js/teacher/index.js')
+    .addEntry('js/student/index', './assets/js/student/index.js')
 
     .addStyleEntry('css/app', './assets/css/app.css')
 

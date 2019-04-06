@@ -37,6 +37,9 @@ final class UserFixtures extends Fixture
 
     private const STUDENT_USER = [
         'username' => self::STUDENT_USERNAME,
+        'firstName' => 'Виктор',
+        'fatherName' => 'Викторович',
+        'lastName' => 'Викторов',
         'email' => 'student@exmasters.ru',
         'plainPassword' => 123,
         'roles' => ['ROLE_STUDENT'],

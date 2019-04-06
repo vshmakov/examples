@@ -3,19 +3,28 @@
 namespace App\Repository;
 
 use App\DataFixtures\UserFixtures;
+use App\DateTime\DateTime as DT;
 use App\Entity\Attempt;
 use App\Entity\Profile;
 use App\Entity\Task;
 use App\Entity\User;
 use App\Object\ObjectAccessor;
 use App\User\Teacher\TeacherProviderInterface;
+use App\User\UserEvaluatorInterface;
 use App\Utils\Cache\LocalCache;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Webmozart\Assert\Assert;
 
-final class UserRepository extends ServiceEntityRepository implements TeacherProviderInterface
+final class UserRepository extends ServiceEntityRepository implements TeacherProviderInterface, UserEvaluatorInterface
 {
+    private const  SOLVED_EXAMPLES_STANDARDS = [
+        3 => [1 => 1, 2 => 3, 3 => 5, 4 => 15, 5 => 30],
+        7 => [1 => 1, 2 => 3, 3 => 5, 4 => 10, 5 => 20],
+        90 => [1 => 1, 2 => 3, 3 => 5, 4 => 10, 5 => 15],
+    ];
+
     /** @var AuthorizationCheckerInterface */
     private $authorizationChecker;
 
@@ -240,5 +249,51 @@ where u = :u')
     public function getTeachers(): array
     {
         return $this->findByIsTeacher(true);
+    }
+
+    public function getActivityCoefficient(User $user): int
+    {
+        $assessments = [];
+
+        foreach (self::SOLVED_EXAMPLES_STANDARDS as $lastDays => $standardList) {
+            $examplesCount = $this->getAverageRightExamplesCount($lastDays, $user);
+            $assessments[] = $this->putAssessment($examplesCount, $standardList);
+        }
+
+        return max($assessments);
+    }
+
+    private function getAverageRightExamplesCount(int $days, User $user): int
+    {
+        Assert::greaterThan($days, 0);
+        $rightExamplesCount = $this->createQueryBuilder('u')
+            ->select('count(e)')
+            ->join('u.sessions', 's')
+            ->join('s.attempts', 'a')
+            ->join('a.examples', 'e')
+            ->where('u = :user')
+            ->andWhere('e.isRight = true')
+            ->andWhere('e.addTime >= :solvedAt')
+            ->setParameters([
+                'user' => $user,
+                'solvedAt' => DT::createBySubDays($days),
+            ])
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return (int) ($rightExamplesCount / $days);
+    }
+
+    private function putAssessment(int $result, array $standardList): int
+    {
+        $assessment = 0;
+
+        foreach ($standardList as $key => $standard) {
+            if ($result >= $standard) {
+                $assessment = $key;
+            }
+        }
+
+        return $assessment;
     }
 }

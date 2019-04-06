@@ -1,9 +1,10 @@
 {
-  "build/css/app.css": "/build/css/app.57ba32fe.css",
-  "build/js/app.js": "/build/js/app.cc98f0b9.js",
-  "build/js/attempt/index.js": "/build/js/attempt/index.24f78002.js",
-  "build/js/attempt/solve.js": "/build/js/attempt/solve.a3487456.js",
-  "build/js/homework.js": "/build/js/homework.dd771856.js",
-  "build/js/profile/index.js": "/build/js/profile/index.d4df7435.js",
-  "build/js/teacher/index.js": "/build/js/teacher/index.1cfddf63.js"
+  "build/css/app.css": "/build/css/app.dcc37950.css",
+  "build/js/app.js": "/build/js/app.3e74b1c7.js",
+  "build/js/attempt/index.js": "/build/js/attempt/index.2528dfe2.js",
+  "build/js/attempt/solve.js": "/build/js/attempt/solve.58a60922.js",
+  "build/js/homework.js": "/build/js/homework.945f38f6.js",
+  "build/js/profile/index.js": "/build/js/profile/index.db5624bd.js",
+  "build/js/student/index.js": "/build/js/student/index.7a148715.js",
+  "build/js/teacher/index.js": "/build/js/teacher/index.8c713b99.js"
 }

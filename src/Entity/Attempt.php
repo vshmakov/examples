@@ -112,9 +112,14 @@ class Attempt
         return $this->getAddTime();
     }
 
-    public function getAddTime(): ?\DateTimeInterface
+    public function getAddTime(): ?DT
     {
         return DT::createFromDT($this->addTime);
+    }
+
+    public function getStartedAt(): DT
+    {
+        return $this->getAddTime();
     }
 
     public function setAddTime(\DateTimeInterface $addTime): self

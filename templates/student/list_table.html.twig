@@ -23,10 +23,8 @@
                 <td>{{ student.username }}</td>
                 {% set attempt = student.attempts.last %}
                 <td>{{ attempt ? attempt.startedAt : "-" }}</td>
+                <td class="activity">{{ userEvaluator.getActivityCoefficient(student) }}</td>
                 <td>
-                    {{  userEvaluator.getActivityCoefficient(student) }}
-                </td>
-                                <td>
                     <a href="{{ path("student_attempts", {"id": student.id}) }}">Посмотреть список попыток</a>
                     <a href="{{ path("student_examples", {"id": student.id}) }}">Посмотреть список примеров</a>
                 </td>

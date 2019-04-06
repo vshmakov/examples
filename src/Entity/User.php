@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\DataFixtures\UserFixtures;
 use App\DateTime\DateTime as DT;
 use App\Entity\Traits\BaseTrait;
 use App\Entity\Traits\BaseUserTrait;
@@ -815,6 +816,19 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
         }
 
         return $this;
+    }
+
+    public function getLastAttempt(): ?Attempt
+    {
+        \Webmozart\Assert\Assert::notSame(UserFixtures::GUEST_USERNAME, $this->getUsername());
+        /** @var Session|null $session */
+        $session = $this->getSessions()->first();
+
+        if (null === $session) {
+            return null;
+        }
+
+        return $session->getAttempts()->last();
     }
 
     /**

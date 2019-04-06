@@ -3,6 +3,7 @@ import {PARAMETERS} from '../constants';
 import defaultDefinitions from '../DataTables/defaultDefinitions';
 import createLanguageSettings from '../DataTables/createLanguageSettings';
 import getTwoNumberDateParts from '../datetime/getTwoNumberDateParts';
+import  styleRating from  '../styleRating';
 
 function standartDateFormatBySeconds(seconds: number): string {
     let date = new Date(seconds * 1000);
@@ -15,24 +16,6 @@ function minutesSecondsDateFormatBySeconds(seconds: number): string {
     let dateParts  =getTwoNumberDateParts(new Date(seconds * 1000));
 
     return `${dateParts .minute}:${dateParts .second}`;
-}
-
-function styleRating(rating: number): string {
-    let color = 'red';
-
-    switch (rating) {
-        case  5:
-            color = 'green';
-            break;
-        case            4        :
-            color = 'yellow';
-            break;
-        case            3:
-            color = 'orange';
-            break;
-    }
-
-    return `<span style="background: ${color};">${rating}</span>`;
 }
 
 let columnsRender = [

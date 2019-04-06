@@ -2,17 +2,14 @@
 
 namespace App\Controller;
 
-use App\Controller\Traits\BaseTrait;
 use App\Controller\Traits\CurrentUserProviderTrait;
-use  App\DateTime\DateTime as DT;
 use App\Entity\User;
 use App\Entity\User\Role;
 use App\Repository\AttemptRepository;
 use App\Repository\ExampleRepository;
-use App\Repository\UserRepository;
 use App\Security\Annotation as AppSecurity;
-use App\Service\UserLoader;
 use App\User\Teacher\Exception\RequiresTeacherAccessException;
+use App\User\UserEvaluatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -28,11 +25,14 @@ final class StudentController extends Controller
     /**
      * @Route("/", name="student_index")
      */
-    public function index(): Response
+    public function index(UserEvaluatorInterface $userEvaluator): Response
     {
+        $students = $this->getCurrentUserOrGuest()->getRealStudents()->getValues();
+        $this->sortStudents($students);
 
         return $this->render('student/index.html.twig', [
-            'students' => $this->getCurrentUserOrGuest()->getRealStudents(),
+            'students' => $students,
+            'userEvaluator' => $userEvaluator,
         ]);
     }
 
@@ -60,5 +60,17 @@ final class StudentController extends Controller
             'student' => $student,
             'examples' => $exampleRepository->findByUser($student),
         ]);
+    }
+
+    private function sortStudents(array &$students): void
+    {
+        usort($students, function (User $student1, User $student2): int {
+            $attempt1 = $student1->getLastAttempt();
+            $attempt2 = $student2->getLastAttempt();
+
+            if (null !== $attempt1 && null !== $attempt2 && !$attempt1->getStartedAt()->isEqualTo($attempt2->getCreatedAt())) {
+                return $attempt1->getStartedAt()->isGreaterThan($attempt2->getStartedAt()) ? 1 : -1;
+            }
+        });
     }
 }

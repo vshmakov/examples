@@ -2,8 +2,9 @@
 
 namespace App\Repository;
 
-use  App\Attempt\Example\ExampleResponseProviderInterface;
-use App\DateTime\DateTime as DT;
+use App\Attempt\AttemptResponseProviderInterface;
+use App\Attempt\Example\ExampleResponseProviderInterface;
+use  App\DateTime\DateTime as DT;
 use App\Entity\Attempt;
 use App\Entity\Example;
 use App\Entity\Task;
@@ -14,6 +15,7 @@ use App\Service\ExampleManager;
 use App\Service\UserLoader;
 use App\Utils\Cache\GlobalCache;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Psr\Container\ContainerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class ExampleRepository extends ServiceEntityRepository implements ExampleResponseProviderInterface
@@ -23,12 +25,21 @@ class ExampleRepository extends ServiceEntityRepository implements ExampleRespon
     private $userLoader;
     private $globalCache;
 
-    public function __construct(RegistryInterface $registry, ExampleManager $exampleManager, UserLoader $userLoader, GlobalCache $globalCache)
-    {
+    /** @var ContainerInterface */
+    private $container;
+
+    public function __construct(
+        RegistryInterface $registry,
+        ExampleManager $exampleManager,
+        UserLoader $userLoader,
+        GlobalCache $globalCache,
+        ContainerInterface $container
+    ) {
         parent::__construct($registry, Example::class);
         $this->exampleManager = $exampleManager;
         $this->userLoader = $userLoader;
         $this->globalCache = $globalCache;
+        $this->container = $container;
     }
 
     public function findLastUnansweredByAttempt(Attempt $attempt): ?Example
@@ -218,7 +229,8 @@ where s.user = :user and a.task = :task')
             $this->getNumber($example),
             $this->getSolvingTime($example),
             $this->getErrorNumber($example),
-            $example
+            $example,
+            [$this->container->get(AttemptResponseProviderInterface::class), 'createAttemptResponse']
         );
     }
 
@@ -229,7 +241,7 @@ where s.user = :user and a.task = :task')
         }
 
         return $this->createExampleResponse(
-            //TODO
+        //TODO
             $this->findLastUnansweredByAttemptOrGetNew($attempt)
         );
     }

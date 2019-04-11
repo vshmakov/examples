@@ -48,6 +48,22 @@ final class AttemptResponse
         return $this->number;
     }
 
+    /**
+     * @Groups({Group::ATTEMPT, Group::EXAMPLE})
+     */
+    public function getId(): int
+    {
+        return $this->attempt->getId();
+    }
+
+    /**
+     * @Groups({Group::ATTEMPT, Group::EXAMPLE})
+     */
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+
     public function getExample(): ?ExampleResponse
     {
         return $this->example;
@@ -62,7 +78,7 @@ final class AttemptResponse
     }
 
     /**
-     * @Groups({Group::ATTEMPT})
+     * @Groups({Group::ATTEMPT, Group::EXAMPLE})
      */
     public function getSettings(): Settings
     {
@@ -88,28 +104,8 @@ final class AttemptResponse
     /**
      * @Groups({Group::ATTEMPT})
      */
-    public function getId(): int
-    {
-        return $this->attempt->getId();
-    }
-
-    /**
-     * @Groups({Group::ATTEMPT})
-     */
-    public function getTitle(): string
-    {
-        return $this->title;
-    }
-
-    /**
-     * @Groups({Group::ATTEMPT})
-     */
     public function getCreatedAt(): \DateTimeInterface
     {
         return $this->attempt->getAddTime();
-    }
-
-    public function isFinished(): bool
-    {
     }
 }

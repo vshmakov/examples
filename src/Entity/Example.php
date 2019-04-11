@@ -2,18 +2,25 @@
 
 namespace App\Entity;
 
-use  App\DateTime\DateTime as DT;
-use App\Entity\Traits\BaseTrait;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Annotation\ApiResource;
+use App\ApiPlatform\Filter\ExampleUserFilter;
+use App\DateTime\DateTime as DT;
+use  App\Serializer\Group;
 use App\Service\ExampleManager;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ExampleRepository")
+ * @ApiResource(
+ *     normalizationContext={"groups"={Group::EXAMPLE}},
+ *     itemOperations={"get"},
+ *     collectionOperations={"get"}
+ * )
+ * @ApiFilter(ExampleUserFilter::class)
  */
 class Example
 {
-    use BaseTrait;
-
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()

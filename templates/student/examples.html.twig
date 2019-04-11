@@ -1,23 +1,18 @@
-{% extends "student/base.html.twig" %}
+{% extends 'main.html.twig' %}
 
-{% block title "Архив примеров ("~student.LFName~")" %}
+{% block title %}
+    Архив примеров ({{ student.LFName }})
+{% endblock %}
+
+{%  block breadcrumbs %}
+    {{  include('student/breadcrumbs/examples.html.twig') }}
+{% endblock %}
 
 {% block main %}
-<h1>Архив примеров</h1>
-{{ include('student/examples_table.html.twig') }}
+    <h1>Архив примеров</h1>
+    {{ include('student/examples_table.html.twig') }}
 {% endblock %}
 
 {% block javascripts %}
-{{ parent() }}
-<script src="/js/jquery.datatables.min.js"></script>
-<script>
-$("table").DataTable({
-searching: false,
-sorting: false,
-data: {{processExamples(examples)|reverse|json_encode|raw}},
-deferRender: true,
-pageLength: 50,
-language: {{include("example/language.json.twig")}}
-});
-</script>
+    <script src="{{ asset('build/js/student/examples.js') }}"></script>
 {% endblock %}

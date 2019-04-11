@@ -112,3 +112,8 @@ services:
     App\Serializer\Encoder\JsonDatatablesEncoder:
         arguments:
             $applicationEnvironment: '@App\Parameter\Environment\AppEnv'
+
+
+    App\Attempt\AttemptResponseProviderInterface:
+        class: 'App\Repository\AttemptRepository'
+        public: true

@@ -89,7 +89,7 @@ final class TeacherController extends Controller
     }
 
     /**
-     * @Route("/disappoint", name="teacher_disappoint")
+     * @Route("/disappoint/", name="teacher_disappoint", methods={"GET"})
      */
     public function disappoint(): Response
     {

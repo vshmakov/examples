@@ -6,11 +6,11 @@ use App\ApiPlatform\Attribute;
 use App\ApiPlatform\Format;
 use App\Attempt\EventSubscriber\FilterUserSubscriber;
 use App\Attempt\EventSubscriber\ShowAttemptsCollectionSubscriber;
+use App\Attempt\Examples\EventSubscriber\ShowExamplesCollectionSubscriber;
 use App\Controller\Traits\CurrentUserProviderTrait;
 use App\Controller\Traits\JavascriptParametersTrait;
 use App\Entity\User;
 use App\Entity\User\Role;
-use App\Repository\ExampleRepository;
 use App\Security\Annotation as AppSecurity;
 use App\Security\Voter\UserVoter;
 use App\User\Teacher\Exception\RequiresTeacherAccessException;
@@ -29,7 +29,7 @@ final class StudentController extends Controller
     use  CurrentUserProviderTrait, JavascriptParametersTrait;
 
     /**
-     * @Route("/", name="student_index")
+     * @Route("/", name="student_index", methods={"GET"})
      */
     public function index(UserEvaluatorInterface $userEvaluator): Response
     {
@@ -43,7 +43,7 @@ final class StudentController extends Controller
     }
 
     /**
-     * @Route("/{id}/attempts/", name="student_attempts")
+     * @Route("/{id}/attempts/", name="student_attempts", methods={"GET"})
      * @IsGranted(UserVoter::SHOW_SOLVING_RESULTS, subject="student")
      */
     public function attempts(User $student): Response
@@ -58,15 +58,17 @@ final class StudentController extends Controller
     }
 
     /**
-     * @Route("/{id}/examples", name="student_examples")
+     * @Route("/{id}/examples/", name="student_examples", methods={"GET"})
+     * @IsGranted(UserVoter::SHOW_SOLVING_RESULTS, subject="student")
      */
-    public function examples(User $student, ExampleRepository $exampleRepository)
+    public function examples(User $student): Response
     {
-        $this->denyAccessUnlessGranted('SHOW_EXAMPLES', $student);
+        $this->setJavascriptParameters([
+            'getExamplesUrl' => $this->generateUrl(ShowExamplesCollectionSubscriber::ROUTE, [FilterUserSubscriber::FIELD => $student->getUsername(), Attribute::FORMAT => Format::JSONDT]),
+        ]);
 
         return $this->render('student/examples.html.twig', [
             'student' => $student,
-            'examples' => $exampleRepository->findByUser($student),
         ]);
     }
 

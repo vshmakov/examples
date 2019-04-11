@@ -294,7 +294,7 @@ abstract class BaseProfile
      *     max="35",
      *     maxMessage="Description must contains less than {{ limit }} characters."
      * )
-     * @Groups({Group::ATTEMPT, Group::SETTINGS})
+     * @Groups({Group::ATTEMPT, Group::SETTINGS, Group::EXAMPLE})
      */
     protected $description;
 

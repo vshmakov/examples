@@ -3,13 +3,10 @@ import "../app";
 import Timeout = NodeJS.Timeout;
 import {PARAMETERS} from '../constants';
 import getTwoNumberDateParts from '../datetime/getTwoNumberDateParts';
+import  EmptyCallback from '../Callable/EmptyCallback';
 
 interface AttemptDataCallback {
     (data: AttemptData): void;
-}
-
-interface EmptyCallback {
-    (): void;
 }
 
 class Timer {

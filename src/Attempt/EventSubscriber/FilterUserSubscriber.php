@@ -3,6 +3,7 @@
 namespace App\Attempt\EventSubscriber;
 
 use ApiPlatform\Core\EventListener\EventPriorities;
+use App\Attempt\Examples\EventSubscriber\ShowExamplesCollectionSubscriber;
 use App\Entity\User;
 use App\Security\User\CurrentUserProviderInterface;
 use App\Security\Voter\UserVoter;
@@ -15,11 +16,16 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+//TODO rename and move
 final class FilterUserSubscriber implements EventSubscriberInterface
 {
     use  RouteTrait;
 
     public const  FIELD = 'username';
+    private const SUPPORTED_ROUTES = [
+        ShowAttemptsCollectionSubscriber::ROUTE,
+        ShowExamplesCollectionSubscriber::ROUTE,
+    ];
 
     /** @var CurrentUserProviderInterface */
     private $currentUserProvider;
@@ -39,7 +45,7 @@ final class FilterUserSubscriber implements EventSubscriberInterface
 
     public function onKernelView(GetResponseForControllerResultEvent $event): void
     {
-        if (!$this->isRoute(ShowAttemptsCollectionSubscriber::ROUTE, $event)) {
+        if (!$this->inRoutes(self::SUPPORTED_ROUTES, $event)) {
             return;
         }
 

@@ -3,6 +3,7 @@
 namespace App\Request\DataTables;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -21,7 +22,7 @@ final class BadRequestHttpExceptionSubscriber implements EventSubscriberInterfac
     public function onKernelException(GetResponseForExceptionEvent $event): void
     {
         if ($this->dataTablesRequestProvider->isDataTablesRequest() && $event->getException() instanceof BadRequestHttpException) {
-            $event->setResponse(new Response(null, Response::HTTP_BAD_REQUEST));
+            $event->setResponse(new JsonResponse(['error' => $event->getException()->getMessage()], Response::HTTP_BAD_REQUEST));
         }
     }
 

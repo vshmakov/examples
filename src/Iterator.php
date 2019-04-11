@@ -14,4 +14,19 @@ abstract class Iterator
 
         return $result;
     }
+
+    public static function uniqueClass(iterable $collection): array
+    {
+        $uniqueItems = [];
+
+        foreach ($collection as $item) {
+            $className = \get_class($item);
+
+            if (!isset($uniqueItems[$className])) {
+                $uniqueItems[$className] = $item;
+            }
+        }
+
+        return $uniqueItems;
+    }
 }

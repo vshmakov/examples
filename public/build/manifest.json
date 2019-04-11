@@ -1,10 +1,11 @@
 {
   "build/css/app.css": "/build/css/app.dcc37950.css",
   "build/js/app.js": "/build/js/app.3e74b1c7.js",
-  "build/js/attempt/index.js": "/build/js/attempt/index.2528dfe2.js",
+  "build/js/attempt/index.js": "/build/js/attempt/index.0a7e7a03.js",
   "build/js/attempt/solve.js": "/build/js/attempt/solve.58a60922.js",
   "build/js/homework.js": "/build/js/homework.945f38f6.js",
-  "build/js/profile/index.js": "/build/js/profile/index.db5624bd.js",
-  "build/js/student/index.js": "/build/js/student/index.7a148715.js",
-  "build/js/teacher/index.js": "/build/js/teacher/index.8c713b99.js"
+  "build/js/profile/index.js": "/build/js/profile/index.6d4ab842.js",
+  "build/js/student/attempts.js": "/build/js/student/attempts.55256fce.js",
+  "build/js/student/index.js": "/build/js/student/index.80d30963.js",
+  "build/js/teacher/index.js": "/build/js/teacher/index.9672390b.js"
 }

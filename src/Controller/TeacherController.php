@@ -122,7 +122,7 @@ final class TeacherController extends Controller
                 return $studentsCount1 > $studentsCount2 ? -1 : 1;
             }
 
-            return $teacher1->getRegistrationTime()->getTimestamp() <= $teacher2->getRegistrationTime()->getTimestamp() ? -1 : 1;
+            return $teacher1->getRegisteredAt()->getTimestamp() <= $teacher2->getRegisteredAt()->getTimestamp() ? -1 : 1;
         });
     }
 }

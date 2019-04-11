@@ -116,12 +116,12 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
         return $this->id;
     }
 
-    public function getAddTime(): ?\DateTimeInterface
+    public function getAddTime(): ?DT
     {
         return DT::createFromDT($this->addTime);
     }
 
-    public function getRegistrationTime(): \DateTimeInterface
+    public function getRegisteredAt(): DT
     {
         return $this->getAddTime();
     }
@@ -838,7 +838,7 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
     {
         foreach (['id', 'username', 'roles'] as $field) {
             if (null === $this->roles && 'roles' === $field) {
-                //this user is unserialized and has no roles
+                //this user created from serialization and has no roles
                 //We don't compare roles field
                 continue;
             }

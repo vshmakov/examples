@@ -4,15 +4,16 @@ namespace App\Attempt\EventSubscriber;
 
 use ApiPlatform\Core\EventListener\EventPriorities;
 use App\Attempt\AttemptResponseProviderInterface;
+use App\Iterator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-final class ShowAttemptSubscriber implements EventSubscriberInterface
+final class ShowAttemptsCollectionSubscriber implements EventSubscriberInterface
 {
-    use RouteTrait;
+    use  RouteTrait;
 
-    private const  ROUTE = 'api_attempts_get_item';
+    public const  ROUTE = 'api_attempts_get_collection';
 
     /** @var AttemptResponseProviderInterface */
     private $attemptResponseProvider;
@@ -28,10 +29,8 @@ final class ShowAttemptSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $attempt = $event->getControllerResult();
-
         $event->setControllerResult(
-            $this->attemptResponseProvider->createAttemptResponse($attempt)
+            array_reverse(Iterator::map($event->getControllerResult(), [$this->attemptResponseProvider, 'createAttemptResponse']))
         );
     }
 

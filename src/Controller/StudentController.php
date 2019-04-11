@@ -2,14 +2,20 @@
 
 namespace App\Controller;
 
+use App\ApiPlatform\Attribute;
+use App\ApiPlatform\Format;
+use App\Attempt\EventSubscriber\FilterUserSubscriber;
+use App\Attempt\EventSubscriber\ShowAttemptsCollectionSubscriber;
 use App\Controller\Traits\CurrentUserProviderTrait;
+use App\Controller\Traits\JavascriptParametersTrait;
 use App\Entity\User;
 use App\Entity\User\Role;
-use App\Repository\AttemptRepository;
 use App\Repository\ExampleRepository;
 use App\Security\Annotation as AppSecurity;
+use App\Security\Voter\UserVoter;
 use App\User\Teacher\Exception\RequiresTeacherAccessException;
 use App\User\UserEvaluatorInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -20,7 +26,7 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 final class StudentController extends Controller
 {
-    use  CurrentUserProviderTrait;
+    use  CurrentUserProviderTrait, JavascriptParametersTrait;
 
     /**
      * @Route("/", name="student_index")
@@ -37,14 +43,16 @@ final class StudentController extends Controller
     }
 
     /**
-     * @Route("/{id}/attempts", name="student_attempts")
+     * @Route("/{id}/attempts/", name="student_attempts")
+     * @IsGranted(UserVoter::SHOW_SOLVING_RESULTS, subject="student")
      */
-    public function attempts(User $student, AttemptRepository $attemptRepository)
+    public function attempts(User $student): Response
     {
-        $this->denyAccessUnlessGranted('SHOW_ATTEMPTS', $student);
+        $this->setJavascriptParameters([
+            'getAttemptsUrl' => $this->generateUrl(ShowAttemptsCollectionSubscriber::ROUTE, [FilterUserSubscriber::FIELD => $student->getUsername(), Attribute::FORMAT => Format::JSONDT]),
+        ]);
 
         return $this->render('student/attempts.html.twig', [
-            'attempts' => $attemptRepository->findByUser($student),
             'student' => $student,
         ]);
     }
@@ -71,6 +79,16 @@ final class StudentController extends Controller
             if (null !== $attempt1 && null !== $attempt2 && !$attempt1->getStartedAt()->isEqualTo($attempt2->getCreatedAt())) {
                 return $attempt1->getStartedAt()->isGreaterThan($attempt2->getStartedAt()) ? 1 : -1;
             }
+
+            if (null !== $attempt1 && null === $attempt2) {
+                return -1;
+            }
+
+            if (null !== $attempt2 && null === $attempt1) {
+                return 1;
+            }
+
+            return $student1->getRegisteredAt()->isGreaterThan($student2->getRegisteredAt()) ? -1 : 1;
         });
     }
 }

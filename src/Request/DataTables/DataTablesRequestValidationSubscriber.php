@@ -24,7 +24,7 @@ final class DataTablesRequestValidationSubscriber implements EventSubscriberInte
     public function onKernelRequest(GetResponseEvent $event): void
     {
         if ($this->dataTablesRequestProvider->isDataTablesRequest() && !$this->dataTablesRequestProvider->isDataTablesRequestValid()) {
-            throw new  BadRequestHttpException();
+            throw new  BadRequestHttpException('DataTables request is not valid');
         }
     }
 

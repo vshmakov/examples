@@ -7,6 +7,8 @@ use App\ApiPlatform\Format;
 use App\Attempt\AttemptCreatorInterface;
 use App\Attempt\AttemptProviderInterface;
 use App\Attempt\AttemptResponseProviderInterface;
+use App\Attempt\EventSubscriber\FilterUserSubscriber;
+use App\Attempt\EventSubscriber\ShowAttemptsCollectionSubscriber;
 use App\Attempt\Example\ExampleResponseProviderInterface;
 use App\Controller\Traits\CurrentUserProviderTrait;
 use App\Controller\Traits\JavascriptParametersTrait;
@@ -37,7 +39,7 @@ final class AttemptController extends Controller
     public function index(): Response
     {
         $this->setJavascriptParameters([
-            'getAttemptsUrl' => $this->generateUrl('api_attempts_get_user_attempts_collection', [Attribute::FORMAT => Format::JSONDT]),
+            'getAttemptsUrl' => $this->generateUrl(ShowAttemptsCollectionSubscriber::ROUTE, [FilterUserSubscriber::FIELD => $this->getCurrentUserOrGuest()->getUsername(), Attribute::FORMAT => Format::JSONDT]),
         ]);
 
         return $this->render('attempt/index.html.twig');

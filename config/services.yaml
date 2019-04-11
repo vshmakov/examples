@@ -89,6 +89,7 @@ services:
     App\Serializer\Normalizer\DataTablesNormalizer:
         arguments:
             $collectionExtensions: !tagged api_platform.doctrine.orm.query_extension.collection
+            $collectionFilters: !tagged api_platform.filter
 
     App\DataTables\Doctrine\PaginationExtension:
         tags:
@@ -106,3 +107,8 @@ services:
         factory: 'App\Security\User\CurrentUserUpdatesUsernameSubscriber::factory'
         tags:
             - { name: doctrine.event_subscriber, connection: default }
+
+
+    App\Serializer\Encoder\JsonDatatablesEncoder:
+        arguments:
+            $applicationEnvironment: '@App\Parameter\Environment\AppEnv'

@@ -7,6 +7,8 @@ const DEFAULT_PARAMETERS={
     ordering:false,
     deferRender:true,
     processing:true,
+    pageLength: 50,
+    lengthMenu: [25, 50, 100, 250],
 };
 
 export default function defaultDefinitions(selector, customParameters) {

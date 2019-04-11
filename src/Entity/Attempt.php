@@ -2,7 +2,9 @@
 
 namespace App\Entity;
 
-use  ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Annotation\ApiResource;
+use  App\ApiPlatform\Filter\UserFilter;
 use  App\DateTime\DateTime as DT;
 use App\Entity\Attempt\Result;
 use App\Serializer\Group;
@@ -20,9 +22,10 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *   "answer"={"access_control"="is_granted('SOLVE', object)", "path"="/attempts/{id}/answer.{_format}", "controller"="App\Controller\Api\AttemptController::answer", "method"="PUT"}
  *     },
  *     collectionOperations={
- *      "get_user_attempts"={"path"="/users/me/attempts.{_format}", "controller"="App\Controller\Api\UserController::attempts", "method"="GET"}
- * }
+ * "get"
+ *     }
  *     )
+ * @ApiFilter(UserFilter::class)
  */
 class Attempt
 {

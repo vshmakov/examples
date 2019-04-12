@@ -117,3 +117,7 @@ services:
     App\Attempt\AttemptResponseProviderInterface:
         class: 'App\Repository\AttemptRepository'
         public: true
+
+    App\Attempt\Example\EventSubscriber\ShowExamplesCollectionSubscriber:
+        arguments:
+            $userNumberProvider: '@App\Attempt\Example\Number\UserNumberProvider'

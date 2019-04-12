@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Attempt\AttemptResponseProviderInterface;
 use App\Attempt\Example\ExampleResponseProviderInterface;
+use App\Attempt\Example\Number\NumberProviderInterface;
 use  App\DateTime\DateTime as DT;
 use App\Entity\Attempt;
 use App\Entity\Example;
@@ -18,7 +19,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Psr\Container\ContainerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-class ExampleRepository extends ServiceEntityRepository implements ExampleResponseProviderInterface
+class ExampleRepository extends ServiceEntityRepository implements ExampleResponseProviderInterface, NumberProviderInterface
 {
     use BaseTrait;
     private $exampleManager;
@@ -223,10 +224,10 @@ where s.user = :user and a.task = :task')
             ->getResult();
     }
 
-    public function createExampleResponse(Example $example): ExampleResponse
+    public function createExampleResponse(Example $example, NumberProviderInterface $numberProvider = null): ExampleResponse
     {
         return new ExampleResponse(
-            $this->getNumber($example),
+            null !== $numberProvider ? $numberProvider->getNumber($example) : $this->getNumber($example),
             $this->getSolvingTime($example),
             $this->getErrorNumber($example),
             $example,

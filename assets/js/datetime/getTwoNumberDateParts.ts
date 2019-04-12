@@ -1,4 +1,4 @@
-export default function getTwoNumberDateParts(date:Date){
+export default function getTwoNumberDateParts(date: Date) {
     const getTwoNumbersValue = (value: number): string => 10 <= value ? value.toString() : `0${value}`;
     let parts = {
         second: date.getSeconds(),
@@ -6,6 +6,7 @@ export default function getTwoNumberDateParts(date:Date){
         hour: date.getHours(),
         day: date.getDate(),
         month: date.getMonth() + 1,
+        year: date.getFullYear(),
     };
 
     for (let key  in parts) {

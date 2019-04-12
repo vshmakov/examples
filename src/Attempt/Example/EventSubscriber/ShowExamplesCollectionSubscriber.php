@@ -1,11 +1,14 @@
 <?php
 
-namespace App\Attempt\Examples\EventSubscriber;
+namespace App\Attempt\Example\EventSubscriber;
 
 use ApiPlatform\Core\EventListener\EventPriorities;
 use App\Attempt\EventSubscriber\RouteTrait;
 use App\Attempt\Example\ExampleResponseProviderInterface;
+use App\Attempt\Example\Number\NumberProviderInterface;
+use App\Entity\Example;
 use App\Iterator;
+use App\Response\ExampleResponse;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -19,9 +22,13 @@ final class ShowExamplesCollectionSubscriber implements EventSubscriberInterface
     /** @var ExampleResponseProviderInterface */
     private $exampleResponseProvider;
 
-    public function __construct(ExampleResponseProviderInterface $exampleResponseProvider)
+    /** @var NumberProviderInterface */
+    private $userNumberProvider;
+
+    public function __construct(ExampleResponseProviderInterface $exampleResponseProvider, NumberProviderInterface $userNumberProvider)
     {
         $this->exampleResponseProvider = $exampleResponseProvider;
+        $this->userNumberProvider = $userNumberProvider;
     }
 
     public function onKernelView(GetResponseForControllerResultEvent $event): void
@@ -31,7 +38,9 @@ final class ShowExamplesCollectionSubscriber implements EventSubscriberInterface
         }
 
         $event->setControllerResult(
-            array_reverse(Iterator::map($event->getControllerResult(), [$this->exampleResponseProvider, 'createExampleResponse']))
+            array_reverse(Iterator::map($event->getControllerResult(), function (Example $example): ExampleResponse {
+                return $this->exampleResponseProvider->createExampleResponse($example, $this->userNumberProvider);
+            }))
         );
     }
 

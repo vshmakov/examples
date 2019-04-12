@@ -87,7 +87,7 @@ final class ExampleResponse
      */
     public function getSolvedAt(): ?\DateTimeInterface
     {
-        return $this->example->getAnswerTime();
+        return $this->example->getCreatedAt();
     }
 
     public function getErrorNumber(): ?int

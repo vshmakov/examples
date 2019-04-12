@@ -6,7 +6,7 @@ use App\ApiPlatform\Attribute;
 use App\ApiPlatform\Format;
 use App\Attempt\EventSubscriber\FilterUserSubscriber;
 use App\Attempt\EventSubscriber\ShowAttemptsCollectionSubscriber;
-use App\Attempt\Examples\EventSubscriber\ShowExamplesCollectionSubscriber;
+use App\Attempt\Example\EventSubscriber\ShowExamplesCollectionSubscriber;
 use App\Controller\Traits\CurrentUserProviderTrait;
 use App\Controller\Traits\JavascriptParametersTrait;
 use App\Entity\User;

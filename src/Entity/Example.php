@@ -158,6 +158,11 @@ class Example
         return DT::createFromDT($this->addTime);
     }
 
+    public function getCreatedAt(): \DateTimeInterface
+    {
+        return $this->getAddTime();
+    }
+
     public function setAddTime(\DateTimeInterface $addTime): self
     {
         $this->addTime = $addTime;

@@ -3,7 +3,7 @@
 namespace App\Attempt\EventSubscriber;
 
 use ApiPlatform\Core\EventListener\EventPriorities;
-use App\Attempt\Examples\EventSubscriber\ShowExamplesCollectionSubscriber;
+use App\Attempt\Example\EventSubscriber\ShowExamplesCollectionSubscriber;
 use App\Entity\User;
 use App\Security\User\CurrentUserProviderInterface;
 use App\Security\Voter\UserVoter;

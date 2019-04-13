@@ -20,7 +20,7 @@
                     {{ student.lastName }}
                     {{ student.firstName }}
                 </td>
-                <td>{{ student.username }}</td>
+                <td class="username">{{ student.username }}</td>
                 {% set attempt = student.attempts.last %}
                 <td>{{ attempt ? attempt.startedAt.timeStamp : "-" }}</td>
                 <td class="activity">{{ userEvaluator.getActivityCoefficient(student) }}</td>

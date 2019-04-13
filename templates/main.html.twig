@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html>
 
+<html lang="ru">
 <head>
     {% block meta %}
         <meta name="description" content="3000 примеров по математике">
@@ -31,139 +31,159 @@
     {% block body %}
         <div class="container">
 
-        {% block actual_homeworks %}
-            {% if is_granted('SHOW_HOMEWORKS') %}
-                {% set actualHomeworksCount = getActualHomeworksCount() %}
-                {% if actualHomeworksCount %}
-                    <ul class="actual-homework-block">
-                        <li><a href="{{ path('homework_index') }}">У вас есть {{ actualHomeworksCount }} невыполненных
-                                заданий.</a></li>
-                        <li>
+            {% block actual_homeworks %}
+                {% if is_granted('SHOW_HOMEWORKS') %}
+                    {% set actualHomeworksCount = getActualHomeworksCount() %}
+                    {% if actualHomeworksCount %}
+                        <ul class="actual-homework-block">
+                            <li><a href="{{ path('homework_index') }}">У вас есть {{ actualHomeworksCount }}
+                                    невыполненных
+                                    заданий.</a></li>
+                            <li>
 
-                            <button class="hide-homework">Скрыть</button>
-                        </li>
-                    </ul>
+                                <button class="hide-homework">Скрыть</button>
+                            </li>
+                        </ul>
+                    {% endif %}
                 {% endif %}
-            {% endif %}
-        {% endblock %}
-        {% block nav %}
-            <nav class="navbar navbar-expand-lg {#navbar-dark bg-primary#} main-menu">
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01"
-                        aria-controls="navbarColor01"
-                        aria-expanded="false" aria-label="Открыть меню">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+            {% endblock %}
 
-                <div class="collapse navbar-collapse" id="navbarColor01">
-                    <ul class="navbar-nav mr-auto">
-                        {% macro item(r, t) %}
+            {% block nav %}
+                <nav class="navbar navbar-expand-lg main-menu">
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01"
+                            aria-controls="navbarColor01"
+                            aria-expanded="false" aria-label="Открыть меню">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="navbarColor01">
+                        <ul class="navbar-nav mr-auto">
                             <li class="nav-item">
-                                <a class="nav-link"
-                                   href="{{ path(r) }}">{{ t }} {#<span class="sr-only">(current)</span>#}</a>
+                                <a class="nav-link" href="{{ path('homepage') }}">
+                                    На главную
+                                </a>
                             </li>
-                        {% endmacro %}
 
-                        {% from _self import item as item %}
-                        {{ item("homepage", "На главную") }}
-                        {{ item("attempt_index", "Архив попыток") }}
-                        {% if hasActualAttempt %}
-                            {{ item("attempt_last", "Последняя попытка") }}
-                        {% endif %}
-                        {{ item("attempt_new", "Новая попытка") }}
-                        {{ item("profile_index", "Профили настроек") }}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('attempt_index') }}">
+                                    Архив попыток
+                                </a>
+                            </li>
 
-                        {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle account-button" data-toggle="dropdown" href="#"
-                                   role="button"
-                                   aria-haspopup="true" aria-expanded="false">Аккаунт</a>
-                                <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="{{ path("account_index") }}">Просмотреть профиль</a>
-                                    {% if is_granted('SHOW_STUDENTS') %}
-                                        <a class="dropdown-item" href="{{ path("student_index") }}">Ученики</a>
-                                    {% endif %}
-                                    {% if is_granted('SHOW_TASKS') %}
-                                        <a class="dropdown-item" href="{{ path("task_index") }}">Задания</a>
-                                    {% endif %}
-                                    {% if is_granted('SHOW_HOMEWORKS') %}
-                                        <a class="dropdown-item" href="{{ path("homework_index") }}">Домашнее
-                                            задание</a>
-                                    {% endif %}
-                                    {% if is_granted('SHOW_TEACHERS') %}
-                                        <a class="dropdown-item" href="{{ path("teacher_index") }}">Выбрать учителя</a>
-                                    {% endif %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('profile_index') }}">
+                                    Профили настроек
+                                </a>
+                            </li>
 
-                                    {#
-                                    <a class="dropdown-item" href="{{path("account_recharge")}}">Пополнить счёт <em>({{user.money}} рублей)</em></a>
-                                    <a class="dropdown-item" href="{{path("account_pay")}}">
-                                      Оплатить сервис
-                                      {%if not user.limitTime.isPast%}
-                                      <em>({{user.remainedTime.roundDays}} дн.)</em>
-                                      {%endif%}
+                            {% if hasActualAttempt %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ path('attempt_last') }}">
+                                        Вернуться к последней попытке
                                     </a>
-                                    #}
-                                </div>
-                            </li>
-
-
-                            {% if is_granted("ROLE_ADMIN") %}
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button"
-                                       aria-haspopup="true"
-                                       aria-expanded="false">Панель управления</a>
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="{{ path("admin_index") }}">Статистика</a>
-                                        <a class="dropdown-item" href="{{ path("user_index") }}">Пользователи</a>
-                                        <a class="dropdown-item" href="{{ path("session_index") }}">Сессии</a>
-                                        <a class="dropdown-item" href="{{ path("ip_index") }}">Ip-адреса</a>
-                                        <a class="dropdown-item" href="{{ path("visit_index") }}">Посещения</a>
-                                        <a class="dropdown-item" href="{{ path("transfer_index") }}">Платежи</a>
-                                    </div>
                                 </li>
                             {% endif %}
+
                             <li class="nav-item">
-                                <a onclick="return confirm('Вы действительно хотите выйти?')" class="nav-link"
-                                   href="{{ path("fos_user_security_logout") }}">Выход</a>
+                                <a class="nav-link" href="{{ path('attempt_new') }}">
+                                    Начать новую попытку
+                                </a>
                             </li>
-                        {% else %}
-                            {{ item("fos_user_security_login", "Вход") }}
-                            {{ item("fos_user_registration_register", "Регистрация") }}
-                        {% endif %}
-                    </ul>
-                </div>
+
+                            {% if is_granted('ROLE_USER') %}
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle account-button" data-toggle="dropdown" href="#"
+                                       role="button"
+                                       aria-haspopup="true" aria-expanded="false">Аккаунт</a>
+
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="{{ path("account_index") }}">Просмотреть
+                                            профиль</a>
+
+                                        {% if is_granted('ROLE_TEACHER') %}
+                                            <a class="dropdown-item" href="{{ path("student_index") }}">Список
+                                                учеников</a>
+                                            <a class="dropdown-item" href="{{ path("task_index") }}">Домашнее
+                                                задание</a>
+                                        {% endif %}
+
+                                        {% if is_granted('SHOW_HOMEWORKS') %}
+                                            <a class="dropdown-item" href="{{ path("homework_index") }}">
+                                                Домашнее задание
+                                            </a>
+                                        {% endif %}
+
+                                        {% if is_granted('ROLE_STUDENT') %}
+                                            <a class="dropdown-item" href="{{ path("teacher_index") }}">Выбрать
+                                                учителя</a>
+                                        {% endif %}
+                                    </div>
+                                </li>
+
+                                {% if is_granted("ROLE_ADMIN") %}
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#"
+                                           role="button"
+                                           aria-haspopup="true"
+                                           aria-expanded="false">Панель управления</a>
+                                        <div class="dropdown-menu">
+                                            <a class="dropdown-item" href="{{ path("admin_index") }}">Статистика</a>
+                                            <a class="dropdown-item" href="{{ path("user_index") }}">Пользователи</a>
+                                            <a class="dropdown-item" href="{{ path("session_index") }}">Сессии</a>
+                                            <a class="dropdown-item" href="{{ path("ip_index") }}">Ip-адреса</a>
+                                            <a class="dropdown-item" href="{{ path("visit_index") }}">Посещения</a>
+                                            <a class="dropdown-item" href="{{ path("transfer_index") }}">Платежи</a>
+                                        </div>
+                                    </li>
+                                {% endif %}
+
+                                <li class="nav-item">
+                                    <a onclick="return confirm('Вы действительно хотите выйти?')" class="nav-link"
+                                       href="{{ path("fos_user_security_logout") }}">
+                                        Выход
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ path('fos_user_security_login') }}">
+                                        Войти
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ path('fos_user_registration_register') }}">
+                                        Зарегистрироваться
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </nav>
+            {% endblock nav %}
+
+            <nav>
+                {% block breadcrumbs %}{% endblock %}
             </nav>
-        {% endblock nav %}
 
-        <div>
-            {% block breadcrumbs %}{% endblock %}
+            <main>
+                {% block main %}{% endblock %}
+            </main>
+
+            {# TODO refactor#}
+            {% block guest_auth %}
+                {{ include("widget/guest_auth.html.twig", {"h": "h4"}) }}
+            {% endblock %}
         </div>
-
-        <main>
-            {% block main %}{% endblock %}
-        </main>
-
-        <div>
-            {% block bottom_links %}{% endblock %}
-        </div>
-
-        {% block guest_auth %}
-            {{ include("widget/guest_auth.html.twig", {"h": "h4"}) }}
-        {% endblock %}
     {% endblock body %}
-    </div>
 
     <footer class="{#navbar-fixed-bottom#}">
-        <div class="row">
+        <div>
             {% set y=date()|date("Y") %}
             <em>
                 © {{ y != 2018 ? "2018 - " : "" }} {{ y }}, VSH-Studio
             </em>
-            <p>
-                Обратная связь: <a href="mailto:{{ FEEDBACK_EMAIL }}">{{ FEEDBACK_EMAIL }}</a>
-            </p>
         </div>
     </footer>
-{% endblock %}
+{% endblock page %}
 
 {% block javascripts %}
     <script src="{{ asset('build/js/app.js') }}"></script>

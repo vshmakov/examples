@@ -3,8 +3,8 @@
 namespace App\Tests\Functional;
 
 use App\Request\Http\ContentType;
-use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\BrowserKit\Client;
 use Symfony\Component\DomCrawler\Crawler;
 
 abstract class BaseWebTestCase extends WebTestCase

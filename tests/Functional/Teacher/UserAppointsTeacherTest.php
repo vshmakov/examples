@@ -5,7 +5,7 @@ namespace App\Tests\Functional\Teacher;
 use App\DataFixtures\UserFixtures;
 use App\Request\Http\Method;
 use App\Tests\Functional\BaseWebTestCase;
-use  Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Component\BrowserKit\Client;
 use Symfony\Component\DomCrawler\Crawler;
 
 final class UserAppointsTeacherTest extends BaseWebTestCase
@@ -15,7 +15,7 @@ final class UserAppointsTeacherTest extends BaseWebTestCase
 
     public static function setUpBeforeClass(): void
     {
-        self::$userClient = self::createAuthenticatedClient(UserFixtures::SIMPLE_USER_USERNAME);
+        self::$userClient = self::createAuthenticatedClient(UserFixtures::SECOND_USER_USERNAME);
     }
 
     /**
@@ -48,6 +48,7 @@ final class UserAppointsTeacherTest extends BaseWebTestCase
     public function userFillsAccount(Crawler $needFillAccountPageCrawler): Crawler
     {
         $this->assertResponseIsSuccessful(self::$userClient);
+
         $accountForm = $needFillAccountPageCrawler->selectButton('Сохранить')->form();
         self::$userClient->submit($accountForm, [
             'student[firstName]' => 'my_first_name',

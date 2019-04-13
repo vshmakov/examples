@@ -22,6 +22,7 @@ final class UserFixtures extends Fixture
     public const STUDENT_USERNAME = 'student';
     public const TEACHER_USERNAME = 'teacher';
     public const SIMPLE_USER_USERNAME = 'simple_user';
+    public const SECOND_USER_USERNAME = 'second_user';
 
     private const GUEST_USER = [
         'username' => self::GUEST_USERNAME,
@@ -74,6 +75,13 @@ final class UserFixtures extends Fixture
         'roles' => ['ROLE_STUDENT'],
     ];
 
+    private const SECOND_USER = [
+        'username' => self::SECOND_USER_USERNAME,
+        'email' => 'second_user@exmasters.ru',
+        'plainPassword' => 123,
+        'roles' => ['ROLE_STUDENT'],
+    ];
+
     /** @var UserPasswordEncoderInterface */
     private $userPasswordEncoder;
 
@@ -113,7 +121,7 @@ final class UserFixtures extends Fixture
 
     private function loadUsersWithOutReference(ObjectManager $manager): void
     {
-        foreach ([self::SECOND_TEACHER_USER, self::SIMPLE_USER] as $userData) {
+        foreach ([self::SECOND_TEACHER_USER, self::SIMPLE_USER, self::SECOND_USER] as $userData) {
             $user = $this->initializeUser($userData);
             $manager->persist($user);
         }

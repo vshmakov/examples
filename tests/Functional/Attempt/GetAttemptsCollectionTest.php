@@ -2,14 +2,14 @@
 
 namespace App\Tests\Functional\Attempt;
 
-use App\ApiPlatform\Format;
+use App\DataFixtures\UserFixtures;
 use App\Tests\Functional\BaseWebTestCase;
+use Symfony\Component\BrowserKit\Client;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Client;
 
 final class GetAttemptsCollectionTest extends BaseWebTestCase
 {
-    private const  GET_USER_ATTEMPTS_COLLECTION_ROUTE = '/api/users/me/attempts.%s';
+    private const  GET_USER_ATTEMPTS_COLLECTION_ROUTE = '/api/attempts.jsondt';
 
     /** @var Client */
     private static $unauthenticatedClient;
@@ -22,33 +22,19 @@ final class GetAttemptsCollectionTest extends BaseWebTestCase
     /**
      * @test
      */
-    public function guestGetsJsonAttemptsCollection(): void
+    public function guestGetsJsondtAttemptsCollection(): void
     {
-        self::ajaxGet(self::$unauthenticatedClient, sprintf(self::GET_USER_ATTEMPTS_COLLECTION_ROUTE, Format::JSON));
-        $this->assertTrue(self::$unauthenticatedClient->getResponse()->isSuccessful());
+        self::ajaxGet(self::$unauthenticatedClient, self::GET_USER_ATTEMPTS_COLLECTION_ROUTE, ['draw' => 1, 'username' => UserFixtures::GUEST_USERNAME]);
+        $this->assertResponseIsSuccessful(self::$unauthenticatedClient);
     }
 
     /**
      * @test
+     * @depends  guestGetsJsondtAttemptsCollection
      */
     public function guestGetsBadRequestHttpExceptionWithOutSendingDraw(): void
     {
-        self::ajaxGet(self::$unauthenticatedClient, sprintf(self::GET_USER_ATTEMPTS_COLLECTION_ROUTE, Format::JSONDT));
+        self::ajaxGet(self::$unauthenticatedClient, self::GET_USER_ATTEMPTS_COLLECTION_ROUTE);
         $this->assertSame(Response::HTTP_BAD_REQUEST, self::$unauthenticatedClient->getResponse()->getStatusCode());
-    }
-
-    /**
-     * @test
-     */
-    public function guestGetsJsondtAttemptsCollection(): void
-    {
-        $draw = 12345;
-        $selectAttemptsCount = 3;
-        $dataTablesResponse = self::ajaxGet(self::$unauthenticatedClient, sprintf(self::GET_USER_ATTEMPTS_COLLECTION_ROUTE, Format::JSONDT), ['draw' => $draw, 'start' => 0, 'length' => $selectAttemptsCount]);
-
-        $this->assertTrue(self::$unauthenticatedClient->getResponse()->isSuccessful());
-        $this->assertSame($draw, $dataTablesResponse['draw']);
-        $this->assertGreaterThan($selectAttemptsCount, $dataTablesResponse['recordsTotal'], "Database must contains greater than $selectAttemptsCount attempts");
-        $this->assertSame($selectAttemptsCount, \count($dataTablesResponse['data']));
     }
 }

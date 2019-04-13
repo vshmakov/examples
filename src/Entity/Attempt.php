@@ -4,7 +4,7 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
-use  App\ApiPlatform\Filter\UserFilter;
+use  App\ApiPlatform\Filter\AttemptUserFilter;
 use  App\DateTime\DateTime as DT;
 use App\Entity\Attempt\Result;
 use App\Serializer\Group;
@@ -25,7 +25,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * "get"
  *     }
  *     )
- * @ApiFilter(UserFilter::class)
+ * @ApiFilter(AttemptUserFilter::class)
  */
 class Attempt
 {

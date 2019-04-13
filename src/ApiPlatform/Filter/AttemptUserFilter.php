@@ -8,8 +8,7 @@ use App\Attempt\EventSubscriber\FilterUserSubscriber;
 use App\Entity\Attempt;
 use Doctrine\ORM\QueryBuilder;
 
-//TODO rename
-final class UserFilter extends AbstractContextAwareFilter
+final class AttemptUserFilter extends AbstractContextAwareFilter
 {
     protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null): void
     {

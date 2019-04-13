@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Attempt\EventSubscriber;
+namespace App\ApiPlatform\Filter;
 
 use ApiPlatform\Core\EventListener\EventPriorities;
+use App\Attempt\EventSubscriber\RouteTrait;
+use App\Attempt\EventSubscriber\ShowAttemptsCollectionSubscriber;
 use App\Attempt\Example\EventSubscriber\ShowExamplesCollectionSubscriber;
 use App\Entity\User;
 use App\Security\User\CurrentUserProviderInterface;
@@ -16,8 +18,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-//TODO rename and move
-final class FilterUserSubscriber implements EventSubscriberInterface
+final class FilterUserValidationSubscriber implements EventSubscriberInterface
 {
     use  RouteTrait;
 

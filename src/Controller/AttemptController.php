@@ -3,11 +3,11 @@
 namespace App\Controller;
 
 use App\ApiPlatform\Attribute;
+use App\ApiPlatform\Filter\FilterUserValidationSubscriber;
 use App\ApiPlatform\Format;
 use App\Attempt\AttemptCreatorInterface;
 use App\Attempt\AttemptProviderInterface;
 use App\Attempt\AttemptResponseProviderInterface;
-use App\Attempt\EventSubscriber\FilterUserSubscriber;
 use App\Attempt\EventSubscriber\ShowAttemptsCollectionSubscriber;
 use App\Attempt\Example\ExampleResponseProviderInterface;
 use App\Controller\Traits\CurrentUserProviderTrait;
@@ -39,7 +39,7 @@ final class AttemptController extends Controller
     public function index(): Response
     {
         $this->setJavascriptParameters([
-            'getAttemptsUrl' => $this->generateUrl(ShowAttemptsCollectionSubscriber::ROUTE, [FilterUserSubscriber::FIELD => $this->getCurrentUserOrGuest()->getUsername(), Attribute::FORMAT => Format::JSONDT]),
+            'getAttemptsUrl' => $this->generateUrl(ShowAttemptsCollectionSubscriber::ROUTE, [FilterUserValidationSubscriber::FIELD => $this->getCurrentUserOrGuest()->getUsername(), Attribute::FORMAT => Format::JSONDT]),
         ]);
 
         return $this->render('attempt/index.html.twig');

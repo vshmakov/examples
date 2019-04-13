@@ -3,8 +3,8 @@
 namespace App\Controller;
 
 use App\ApiPlatform\Attribute;
+use App\ApiPlatform\Filter\FilterUserValidationSubscriber;
 use App\ApiPlatform\Format;
-use App\Attempt\EventSubscriber\FilterUserSubscriber;
 use App\Attempt\EventSubscriber\ShowAttemptsCollectionSubscriber;
 use App\Attempt\Example\EventSubscriber\ShowExamplesCollectionSubscriber;
 use App\Controller\Traits\CurrentUserProviderTrait;
@@ -49,7 +49,7 @@ final class StudentController extends Controller
     public function attempts(User $student): Response
     {
         $this->setJavascriptParameters([
-            'getAttemptsUrl' => $this->generateUrl(ShowAttemptsCollectionSubscriber::ROUTE, [FilterUserSubscriber::FIELD => $student->getUsername(), Attribute::FORMAT => Format::JSONDT]),
+            'getAttemptsUrl' => $this->generateUrl(ShowAttemptsCollectionSubscriber::ROUTE, [FilterUserValidationSubscriber::FIELD => $student->getUsername(), Attribute::FORMAT => Format::JSONDT]),
         ]);
 
         return $this->render('student/attempts.html.twig', [
@@ -64,7 +64,7 @@ final class StudentController extends Controller
     public function examples(User $student): Response
     {
         $this->setJavascriptParameters([
-            'getExamplesUrl' => $this->generateUrl(ShowExamplesCollectionSubscriber::ROUTE, [FilterUserSubscriber::FIELD => $student->getUsername(), Attribute::FORMAT => Format::JSONDT]),
+            'getExamplesUrl' => $this->generateUrl(ShowExamplesCollectionSubscriber::ROUTE, [FilterUserValidationSubscriber::FIELD => $student->getUsername(), Attribute::FORMAT => Format::JSONDT]),
         ]);
 
         return $this->render('student/examples.html.twig', [

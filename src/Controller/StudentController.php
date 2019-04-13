@@ -79,7 +79,7 @@ final class StudentController extends Controller
             $attempt2 = $student2->getLastAttempt();
 
             if (null !== $attempt1 && null !== $attempt2 && !$attempt1->getStartedAt()->isEqualTo($attempt2->getCreatedAt())) {
-                return $attempt1->getStartedAt()->isGreaterThan($attempt2->getStartedAt()) ? 1 : -1;
+                return $attempt1->getStartedAt()->isGreaterThan($attempt2->getStartedAt()) ? -1 : 1;
             }
 
             if (null !== $attempt1 && null === $attempt2) {

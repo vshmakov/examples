@@ -20,6 +20,8 @@
             <th>Количество учеников</th>
             <th>Дата регистрации</th>
             <th>Действия</th>
+        </tr>
+        </thead>
         <tbody>
         {% for number, teacher in teachers %}
             <tr>
@@ -27,7 +29,7 @@
                 <td>{{ teacher.fio }}</td>
                 <td>{{ teacher.username ?? "-" }}</td>
                 <td>{{ teacher.realStudents.count }}</td>
-                <td>{{ teacher.registrationTime.dateFormat }}</td>
+                <td>{{ teacher.registeredAt.dateFormat }}</td>
                 <td>
                     {% if not app.user.isStudentOf(teacher) %}
                         <a href="{{ path("teacher_appoint", {"id": teacher.id}) }}">Выбрать</a>
@@ -38,9 +40,7 @@
             </tr>
         {% endfor %}
         </tbody>
-        </tr>
-        </thead>
-    </table>
+            </table>
 {% endblock %}
 
 {% block javascripts %}

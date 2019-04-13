@@ -20,6 +20,7 @@ use Webmozart\Assert\Assert;
 final class UserRepository extends ServiceEntityRepository implements TeacherProviderInterface, UserEvaluatorInterface
 {
     private const  SOLVED_EXAMPLES_STANDARDS = [
+        1 => [1 => 1, 2 => 5, 3 => 10, 4 => 25, 5 => 50],
         3 => [1 => 1, 2 => 3, 3 => 5, 4 => 15, 5 => 30],
         7 => [1 => 1, 2 => 3, 3 => 5, 4 => 10, 5 => 20],
         90 => [1 => 1, 2 => 3, 3 => 5, 4 => 10, 5 => 15],

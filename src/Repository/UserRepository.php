@@ -233,20 +233,6 @@ where u = :u')
             ->getResult();
     }
 
-    public function getFinishedCountByTask(Task $task): int
-    {
-        $finishedUsersCount = 0;
-        $taskRepository = $this->getEntityRepository(Task::class);
-
-        foreach ($task->getContractors()->toArray() as $user) {
-            if ($taskRepository->isDoneByUser($task, $user)) {
-                ++$finishedUsersCount;
-            }
-        }
-
-        return $finishedUsersCount;
-    }
-
     public function getTeachers(): array
     {
         return $this->findByIsTeacher(true);

@@ -2,19 +2,17 @@
 
 namespace App\Entity;
 
-use  App\DateTime\DateTime as DT;
-use App\Entity\Traits\BaseTrait;
+use App\DateTime\DateTime as DT;
+use  App\Repository\TaskRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\TaskRepository")
+ * @ORM\Entity(repositoryClass=TaskRepository::class)
  */
 class Task
 {
-    use BaseTrait;
-
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -66,12 +64,12 @@ class Task
         $this->addTime = new \DateTime();
     }
 
-    public function getId(): ? int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getAuthor(): ? User
+    public function getAuthor(): ?User
     {
         return $this->author;
     }
@@ -147,7 +145,7 @@ class Task
         return $this;
     }
 
-    public function getTimesCount(): ? int
+    public function getTimesCount(): ?int
     {
         return $this->timesCount;
     }
@@ -159,7 +157,7 @@ class Task
         return $this;
     }
 
-    public function getAddTime(): ? \DateTimeInterface
+    public function getAddTime(): ?\DateTimeInterface
     {
         return DT::createFromDT($this->addTime);
     }
@@ -171,7 +169,7 @@ class Task
         return $this;
     }
 
-    public function getLimitTime(): ? \DateTimeInterface
+    public function getLimitTime(): ?\DateTimeInterface
     {
         return DT::createFromDT($this->limitTime);
     }

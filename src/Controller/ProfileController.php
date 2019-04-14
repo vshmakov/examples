@@ -31,7 +31,7 @@ final class ProfileController extends Controller
     public function index(ProfileProviderInterface $profileProvider): Response
     {
         $publicProfiles = $profileProvider->getPublicProfiles();
-        $userProfiles = $profileProvider->getUserProfiles();
+        $userProfiles = $profileProvider->getCurrentUserProfiles();
         array_map(function (array &$profiles) use ($profileProvider): void {
             $this->sortProfiles($profiles, $profileProvider);
         }, [&$publicProfiles, &$userProfiles]);

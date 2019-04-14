@@ -6,7 +6,7 @@ use App\Controller\Traits\BaseTrait;
 use App\Entity\Task;
 use App\Repository\AttemptRepository;
 use App\Repository\ExampleRepository;
-use App\Repository\TaskRepository;
+use App\Repository\HomeworkRepository;
 use App\Security\Annotation as AppSecurity;
 use App\User\Student\Exception\RequiresStudentAccessException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,7 +24,7 @@ class HomeworkController extends AbstractController
     /**
      * @Route("/", name="homework_index")
      */
-    public function index(TaskRepository $taskRepository, AttemptRepository $attemptRepository): Response
+    public function index(HomeworkRepository $taskRepository, AttemptRepository $attemptRepository): Response
     {
         $this->denyAccessUnlessGranted('SHOW_HOMEWORKS');
 

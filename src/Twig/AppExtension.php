@@ -5,7 +5,7 @@ namespace App\Twig;
 use App\Parameter\Container\ParametersContainerInterface;
 use App\Parameter\StringInterface;
 use App\Repository\AttemptRepository;
-use App\Repository\TaskRepository;
+use App\Repository\HomeworkRepository;
 use App\Repository\UserRepository;
 use App\Security\User\CurrentUserProviderInterface;
 use Doctrine\Common\Inflector\Inflector;
@@ -29,7 +29,7 @@ final class AppExtension extends AbstractExtension implements \Twig_Extension_Gl
     public function __construct(
         CurrentUserProviderInterface $currentUserProvider,
         AttemptRepository $attemptRepository,
-        TaskRepository $taskRepository,
+        HomeworkRepository $taskRepository,
         UserRepository $userRepository,
         EntityManagerInterface $entityManager,
         ParametersContainerInterface $javascriptParametersContainer,
@@ -74,7 +74,7 @@ final class AppExtension extends AbstractExtension implements \Twig_Extension_Gl
             'getJavascriptParameters',
             'dt',
             'creationTimeNumber',
-            'sortByAddTime',
+            'sortByCreationTime',
             'sortByDateTime',
             'sortProfiles',
             'sortTeachers',
@@ -114,7 +114,7 @@ final class AppExtension extends AbstractExtension implements \Twig_Extension_Gl
         return array_search($entity, $entityList, true) + 1;
     }
 
-    public function sortByAddTime(&$entityList)
+    public function sortByCreationTime($entityList)
     {
         usort($entityList, [$this, 'addTimeSorter']);
 

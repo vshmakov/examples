@@ -1,51 +1,65 @@
-{% macro list_table(title, profiles, profileProvider) %}
-    <div>
-        <h1>{{ title }}</h1>
+{% set profiles = sortByCreationTime(profiles) %}
 
-        <table class="table table-striped tbl-bordered">
-            <thead class="thead-dark">
-            <tr>
-                <th>Номер</th>
-                <th>Описание</th>
-                <th>Время создания</th>
-                <th>Текущий профиль</th>
+<div>
+    <h1>{{ title }}</h1>
+
+    <table class="table table-info">
+        <thead>
+        <tr>
+            <th>Номер</th>
+            <th>Описание</th>
+            <th>Время создания</th>
+            <th>Текущий профиль</th>
+            {% block right_table_headers %}
                 <th>Действия</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for number, profile in profiles %}
+            {% endblock %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for number, profile in profiles if profileProvider.isCurrentProfile(profile) %}
+            {% block row %}
                 <tr>
-                    <td>{{ creationTimeNumber(profile, profiles) }}</td>
+                    <td>{{ number + 1 }}</td>
                     <td class="profile-description">
                         <a href="{{ path('profile_show', {'id': profile.id}) }}">{{ profile.description }}</a>
                     </td>
                     <td>{{ profile.createdAt }}</td>
-                    <td class="is-current-profile">{{ profileProvider.isCurrentProfile(profile) ? 'Да' : 'Нет' }}</td>
-                    <td class="profile-actions">
-                        {% set hasActions = false %}
-
-                        {% if is_granted('APPOINT', profile) and not profileProvider.isCurrentProfile(profile) %}
-                            {% set hasActions = true %}
-                            <a href="{{ path('profile_appoint', {'id': profile.id}) }}">Выбрать</a>
-                        {% endif %}
-
-                        {% if is_granted('EDIT', profile) %}
-                            {% set hasActions = true %}
-                            <a href="{{ path('profile_edit', {'id': profile.id}) }}">Редактировать</a>
-                        {% endif %}
-
-                        {% if is_granted('DELETE', profile) %}
-                            {% set hasActions = true %}
-                            {{ include('profile/_delete_form.html.twig') }}
-                        {% endif %}
-
-                        {% if not hasActions %}
-                            -
-                        {% endif %}
+                    <td class="is-current-profile">
+                        {{ profileProvider.isCurrentProfile(profile) ? 'Да' : 'Нет' }}
                     </td>
+                    {% block right_table_body %}
+                        <td class="profile-actions">
+                            {% set hasActions = false %}
+
+                            {% if is_granted('APPOINT', profile) and not profileProvider.isCurrentProfile(profile) %}
+                                {% set hasActions = true %}
+                                <a href="{{ path('profile_appoint', {'id': profile.id}) }}">Выбрать</a>
+                            {% endif %}
+
+                            {% if is_granted('EDIT', profile) %}
+                                {% set hasActions = true %}
+                                <a href="{{ path('profile_edit', {'id': profile.id}) }}">Редактировать</a>
+                            {% endif %}
+
+                            {% if is_granted('DELETE', profile) %}
+                                {% set hasActions = true %}
+                                {{ include('profile/_delete_form.html.twig') }}
+                            {% endif %}
+
+                            {% if not hasActions %}
+                                -
+                            {% endif %}
+                        </td>
+                    {% endblock %}
                 </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
-{% endmacro %}
+            {% endblock %}
+        {% endfor %}
+
+        {% for number, profile in profiles if not profileProvider.isCurrentProfile(profile) %}
+            {{ block('row') }}
+        {% endfor %}
+
+
+        </tbody>
+    </table>
+</div>

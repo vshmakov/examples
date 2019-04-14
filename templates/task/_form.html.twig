@@ -1,10 +1,29 @@
 {{ form_start(form) }}
-{{ form_widget(form) }}
+{%  for field in ['timesCount', 'addTime', 'limitTime'] %}
+{{ form_row(form[field]) }}
+{%  endfor %}
 
-{% from "profile/list_table.html.twig" import list_table as profileTable %}
+{% embed 'profile/list_table.html.twig' with {'title': 'Профили по умолчанию', 'profiles': publicProfiles} %}
+    {% block right_table_headers %}
+    <th>Выбрать</th>
+    {% endblock %}
 
-{{ profileTable("Профили по умолчанию", publicProfiles, profileRepository, false) }}
-{{ profileTable("Личные профили", profiles, profileRepository, false) }}
+    {% block right_table_body %}
+    <td>
+        <input type="radio" name="task[profile]" value="{{  profile.id }}" {{ profileProvider.isCurrentProfile(profile) ? 'checked' : '' }}>
+    </td>
+    {% endblock %}
+{% endembed %}
 
-<button class="btn">{{ button_label|default('Сохранить') }}</button>
+{% embed 'profile/list_table.html.twig' with {'title': 'Личные профили', 'profiles': userProfiles} %}
+    {% block right_table_headers %}
+        <th>Выбрать</th>
+    {% endblock %}
+
+    {% block right_table_body %}
+        <td>
+            <input type="radio" name="{{  form.profile.vars.full_name }}" value="{{  profile.id }}" {{ profileProvider.isCurrentProfile(profile) ? 'checked' : '' }}>
+        </td>
+    {% endblock %}
+{% endembed %}
 {{ form_end(form) }}

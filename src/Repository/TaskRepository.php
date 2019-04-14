@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Entity\Attempt;
+use App\Attempt\AttemptProviderInterface;
 use App\Entity\Task;
 use App\Entity\User;
 use App\Security\User\CurrentUserProviderInterface;
@@ -20,79 +20,60 @@ final class TaskRepository extends ServiceEntityRepository implements TaskProvid
     /** @var AuthorizationCheckerInterface */
     private $authorizationChecker;
 
-    public function __construct(RegistryInterface $registry, CurrentUserProviderInterface $currentUserProvider, AuthorizationCheckerInterface $authorizationChecker)
+    /** @var AttemptProviderInterface */
+    private $attemptProvider;
+
+    public function __construct(RegistryInterface $registry, CurrentUserProviderInterface $currentUserProvider, AuthorizationCheckerInterface $authorizationChecker, AttemptProviderInterface $attemptProvider)
     {
         parent::__construct($registry, Task::class);
 
         $this->currentUserProvider = $currentUserProvider;
         $this->authorizationChecker = $authorizationChecker;
+        $this->attemptProvider = $attemptProvider;
     }
 
-    public function isDoneByUser(Task $task, User $user): bool
+    public function getActualTasksOfCurrentUser(): array
     {
-        $attemptRepository = $this->getEntityRepository(Attempt::class);
-        $userAttempts = $attemptRepository->findByUserAndTask($user, $task);
-        $outstandingAttemptsCount = array_reduce($userAttempts, function (int $outstandingAttemptsCount, Attempt $attempt) use ($attemptRepository): int {
-            if ($attemptRepository->isDone($attempt)) {
-                --$outstandingAttemptsCount;
-            }
-
-            return $outstandingAttemptsCount;
-        }, $task->getTimesCount());
-
-        return 0 === $outstandingAttemptsCount;
+        return array_filter($this->findByCurrentAuthor(), [$this, 'isActual']);
     }
 
-    public function findHomeworkByCurrentUser(): array
+    public function getArchiveTasksOfCurrentUser(): array
     {
-        return $this->getEntityManager()
-            ->createQuery('select t from App:Task t
-        join t.contractors c
-        where c = :user')
-            ->setParameters(['user' => $this->currentUserProvider->getCurrentUserOrGuest()])
-            ->getResult();
+        return array_filter($this->findByCurrentAuthor(), function (Task $task): bool {
+            return !$this->isActual($task);
+        });
     }
 
-    public function isDoneByCurrentUser(Task $task): bool
+    private function findByCurrentAuthor(): array
     {
-        return $this->isDoneByUser($task, $this->currentUserProvider->getCurrentUserOrGuest());
+        $currentUser = $this->currentUserProvider->getCurrentUserOrGuest();
+        Assert::true($currentUser->isTeacher(), 'There is impossible to get task of not teacher user');
+
+        return $this->findByAuthor($currentUser);
     }
 
-    public function getFinishedUsersCount(Task $task): int
-    {
-        return $this->getEntityRepository(User::class)
-            ->getFinishedCountByTask($task);
-    }
-
-    public function findByCurrentAuthor(): array
-    {
-        return $this->findByAuthor($this->currentUserProvider->getCurrentUserOrGuest());
-    }
-
-    public function isActual(Task $task): bool
+    private function isActual(Task $task): bool
     {
         return time() > $task->getAddTime()->getTimestamp()
             && time() < $task->getLimitTime()->getTimestamp()
-            && $this->getEntityRepository(User::class)->getFinishedCountByTask($task) < $task->getContractors()->count();
+            && $this->getSolvedUsersCount($task) < $task->getContractors()->count();
     }
 
-    public function countActualHomeworksByCurrentUser(): int
+    private function getSolvedUsersCount(Task $task): int
     {
-        return \count(array_filter($this->findHomeworkByCurrentUser(), function (Task $homework): bool {
-            return $this->authorizationChecker->isGranted('SOLVE', $homework);
-        }));
+        $solvedUsersCount = 0;
+
+        foreach ($task->getContractors()->toArray() as $user) {
+            if ($this->isDoneByUser($task, $user)) {
+                ++$solvedUsersCount;
+            }
+        }
+
+        return $solvedUsersCount;
     }
 
-    /**
-     * @throws \InvalidArgumentException if current user has no teacher
-     */
-    public function getActualTasksOfCurrentTeacher(): array
+    private function isDoneByUser(Task $task, User $user): bool
     {
-        $currentUser = $this->currentUserProvider->getCurrentUserOrGuest();
-        Assert::true($currentUser->hasTeacher());
-
-        return array_filter($this->findByAuthor($currentUser->getTeacher()), function (Task $task): bool {
-            return $this->isActual($task);
-        });
+        return $task->getTimesCount() === $this->attemptProvider->getDoneAttemptsCount($task, $user);
     }
 }

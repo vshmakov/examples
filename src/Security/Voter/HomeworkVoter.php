@@ -3,7 +3,7 @@
 namespace App\Security\Voter;
 
 use App\Entity\Task;
-use App\Repository\TaskRepository;
+use App\Repository\HomeworkRepository;
 use App\Security\Voter\Traits\BaseTrait;
 use App\Service\AuthChecker;
 use App\Service\UserLoader;
@@ -17,7 +17,7 @@ class HomeworkVoter extends Voter
     private $authChecker;
     private $taskRepository;
 
-    public function __construct(UserLoader $userLoader, AuthChecker $authChecker, TaskRepository $taskRepository)
+    public function __construct(UserLoader $userLoader, AuthChecker $authChecker, HomeworkRepository $taskRepository)
     {
         $this->userLoader = $userLoader;
         $this->authChecker = $authChecker;

@@ -4,5 +4,7 @@ namespace App\Task;
 
 interface TaskProviderInterface
 {
-    public function getActualTasksOfCurrentTeacher(): array;
+    public function getActualTasksOfCurrentUser(): array;
+
+    public function getArchiveTasksOfCurrentUser(): array;
 }

@@ -9,13 +9,13 @@ use App\Attempt\AttemptResultProviderInterface;
 use App\Attempt\Example\ExampleResponseProviderInterface;
 use App\Attempt\Settings\SettingsProviderInterface;
 use App\DateTime\DateTime as DT;
+use App\Doctrine\QueryResult;
 use App\Entity\Attempt;
 use App\Entity\Attempt\Result;
 use App\Entity\Task;
 use App\Entity\User;
 use App\Object\ObjectAccessor;
 use App\Repository\Traits\BaseTrait;
-use App\Repository\Traits\QueryResultTrait;
 use App\Response\AttemptResponse;
 use App\Security\User\CurrentUserProviderInterface;
 use App\Security\User\CurrentUserSessionProviderInterface;
@@ -28,7 +28,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 final class AttemptRepository extends ServiceEntityRepository implements AttemptCreatorInterface, AttemptProviderInterface, AttemptResponseProviderInterface, AttemptResultProviderInterface
 {
-    use BaseTrait, QueryResultTrait;
+    use BaseTrait;
 
     private $exampleRepository;
     private $userLoader;
@@ -136,7 +136,7 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
 
     private function getFinishTime(Attempt $attempt): \DateTimeInterface
     {
-        $finishTime = $this->getValue(
+        $finishTime = QueryResult::value(
             $this->createQueryBuilder('a')
                 ->select('e.answerTime')
                 ->join('a.examples', 'e')
@@ -271,15 +271,6 @@ where u = ?1')
             ->getResult();
     }
 
-    public function findByUserAndTask(User $user, Task $task): array
-    {
-        return $this->createQuery('select a from App:Attempt a
-join a.session s
-where a.task = :task and s.user = :user')
-            ->setParameters(['task' => $task, 'user' => $user])
-            ->getResult();
-    }
-
     public function findLastOneByTaskAndUser(Task $task, User $user): ?Attempt
     {
         return $this->createQueryBuilder('a')
@@ -378,6 +369,29 @@ join a.session s
 where s.user = :user and a.task = :task')
             ->setParameters(['user' => $this->userLoader->getUser(), 'task' => $task])
             ->getResult();
+    }
+
+    public function getDoneAttemptsCount(Task $task, User $user): int
+    {
+        $attempts = $this->createQueryBuilder('a')
+            ->join('a.session', 's')
+            ->where('a.task = :task')
+            ->andWhere('s.user = :user')
+            ->getQuery()
+            ->setParameters([
+                'task' => $task,
+                'user' => $user,
+            ])
+            ->getResult();
+
+        return array_reduce($attempts, function (int $doneAttemptsCount, Attempt $attempt): int {
+            return $this->isDone($attempt) ? $doneAttemptsCount + 1 : $doneAttemptsCount;
+        }, 0);
+    }
+
+    private function isDone(Attempt $attempt): bool
+    {
+        return 0 === $attempt->getResult()->getRemainedExamplesCount();
     }
 
     public function createAttemptResponse(Attempt $attempt): AttemptResponse

@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Attempt\Profile\ProfileProviderInterface;
 use  App\Attempt\Settings\SettingsProviderInterface;
 use App\DateTime\DateTime as DT;
+use App\Entity\Profile;
 use App\Entity\Settings;
 use App\Object\ObjectAccessor;
 use App\Repository\Traits\BaseTrait;
@@ -37,7 +38,11 @@ class SettingsRepository extends ServiceEntityRepository implements SettingsProv
 
     public function getOrCreateSettingsByCurrentUserProfile(): Settings
     {
-        $profile = $this->profileProvider->getCurrentProfile();
+        return $this->getOrCreateSettingsByProfile($this->profileProvider->getCurrentProfile());
+    }
+
+    public function getOrCreateSettingsByProfile(Profile $profile): Settings
+    {
         $settingsData = $this->normalizer->normalize($profile, null, ['groups' => Group::SETTINGS]);
 
         if ($settings = $this->findOneBy($settingsData)) {

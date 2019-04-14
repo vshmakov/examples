@@ -2,23 +2,26 @@
 
 namespace App\Controller;
 
+use App\Attempt\Profile\ProfileProviderInterface;
+use App\Attempt\Settings\SettingsProviderInterface;
+use App\Controller\Traits\CurrentUserProviderTrait;
 use App\Entity\Task;
 use App\Entity\User;
 use App\Entity\User\Role;
 use App\Form\TaskType;
+use App\Object\ObjectAccessor;
 use App\Repository\AttemptRepository;
 use App\Repository\ExampleRepository;
+use App\Repository\HomeworkRepository;
 use App\Repository\ProfileRepository;
 use App\Repository\SettingsRepository;
-use App\Repository\TaskRepository;
 use App\Repository\UserRepository;
 use App\Security\Annotation as AppSecurity;
 use App\Service\UserLoader;
+use App\Task\TaskProviderInterface;
 use App\User\Teacher\Exception\RequiresTeacherAccessException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\Form;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -27,66 +30,60 @@ use Symfony\Component\Routing\Annotation\Route;
  * @Route("/task")
  * @AppSecurity\IsGranted(Role::TEACHER, exception=RequiresTeacherAccessException::class)
  */
-final class TaskController extends AbstractController
+final class TaskController extends Controller
 {
+    use CurrentUserProviderTrait;
+
     /**
      * @Route("/", name="task_index", methods="GET")
      */
-    public function index(TaskRepository $taskRepository): Response
+    public function index(TaskProviderInterface $taskProvider): Response
     {
-        $tasks = array_reduce(
-            $taskRepository->findByCurrentAuthor(),
-            function (array $data, Task $task) use ($taskRepository): array {
-                $group = $taskRepository->isActual($task) ? 'actualTasks' : 'archiveTasks';
-                $data[$group][] = $task;
-
-                return $data;
-            },
-            ['actualTasks' => [], 'archiveTasks' => []]
-        );
-
         return $this->render('task/index.html.twig', [
-                'taskRepository' => $taskRepository,
-            ]
-            + $tasks);
+            'actual' => $taskProvider->getActualTasksOfCurrentUser(),
+            'archive' => $taskProvider->getArchiveTasksOfCurrentUser(),
+        ]);
     }
 
     /**
-     * @Route("/new", name="task_new", methods="GET|POST")
+     * @Route("/new/", name="task_new", methods={"GET", "POST"})
      */
-    public function new(Request $request, UserLoader $userLoader, ProfileRepository $profileRepository, UserRepository $userRepository, SettingsRepository $settingsRepository): Response
+    public function new(Request $request, SettingsProviderInterface $settingsProvider, ProfileProviderInterface $profileProvider): Response
     {
-        $this->denyAccessUnlessGranted('CREATE_TASKS');
-
-        $currentUser = $userLoader->getUser()
-            ->setEntityRepository($userRepository);
-        $task = (new Task())
-            ->setAuthor($currentUser)
-            ->setContractors($currentUser->getStudents())
-            ->setLimitTime((new \DateTime())->add(new \DateInterval('P7D')));
+        $currentUser = $this->getCurrentUserOrGuest();
+        $task = ObjectAccessor::initialize(Task::class, [
+            'author' => $currentUser,
+            'contractors' => $currentUser->getStudents(),
+            'limitTime' => (new \DateTime())->add(new \DateInterval('P7D')),
+        ]);
+        $publicProfiles = $profileProvider->getPublicProfiles();
+        $userProfiles = $profileProvider->getCurrentUserProfiles();
         $form = $this->createForm(TaskType::class, $task);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $redirectResponse = $this->processForm($form, $request, $profileRepository, $settingsRepository)) {
-            return $redirectResponse;
+        if ($form->isSubmitted() && $form->isValid()) {
+            $objectManager = $this->getDoctrine()->getManager();
+            $objectManager->persist($task);
+            $objectManager->flush($task);
+
+            return $this->redirectToRoute('task_index');
         }
 
+        $form->remove('profile');
+
         return $this->render('task/new.html.twig', [
-            'jsParams' => [
-                'current' => $currentUser->getCurrentProfile()->getId(),
-            ],
             'task' => $task,
             'form' => $form->createView(),
-            'publicProfiles' => $profileRepository->findByIsPublic(true),
-            'profiles' => $profileRepository->findByAuthor($currentUser),
-            'profileRepository' => $profileRepository,
+            'profileProvider' => $profileProvider,
+            'publicProfiles' => $publicProfiles,
+            'userProfiles' => $userProfiles,
         ]);
     }
 
     /**
      * @Route("/{id}", name="task_show", methods="GET")
      */
-    public function show(Task $task, UserRepository $userRepository, TaskRepository $taskRepository, AttemptRepository $attemptRepository): Response
+    public function show(Task $task, UserRepository $userRepository, HomeworkRepository $taskRepository, AttemptRepository $attemptRepository): Response
     {
         $this->denyAccessUnlessGranted('SHOW', $task);
 
@@ -106,33 +103,6 @@ final class TaskController extends AbstractController
         ]);
     }
 
-    private function processForm(Form $form, Request $request, ProfileRepository $profileRepository, SettingsRepository $settingsRepository): ?RedirectResponse
-    {
-        $task = $form->getData();
-        $profile = $profileRepository->find($request->request->get('profile_id', ''));
-
-        if (!$profile) {
-            throw $this->createNotFoundException();
-        }
-
-        if (!$this->isGranted('USE', $profile)) {
-            throw $this->createAccessDeniedException();
-        }
-
-        if ($form->isValid()) {
-            $settings = $settingsRepository->getOrCreateSettingsByProfile($profile);
-            $task->setSettings($settings);
-
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($task);
-            $em->flush();
-
-            return $this->redirectToRoute('task_index');
-        }
-
-        return null;
-    }
-
     /**
      * @Route("/{id}/edit", name="task_edit", methods="GET|POST")
      */
@@ -145,7 +115,7 @@ final class TaskController extends AbstractController
         $form = $this->createForm(TaskType::class, $task);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $redirectResponse = $this->processForm($form, $request, $profileRepository, $settingsRepository)) {
+        if ($form->isSubmitted() && $redirectResponse = $this->saveAndRedirect($form, $request, $profileRepository, $settingsRepository)) {
             return $redirectResponse;
         }
 

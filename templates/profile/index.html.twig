@@ -7,8 +7,7 @@
 {% endblock %}
 
 {% block main %}
-    <div>
-        {% if not is_granted('ROLE_USER') %}
+            {% if not is_granted('ROLE_USER') %}
             <div id="not-able-appoint-profiles-message" class="text-white bg-danger mb-3">
                 <div class="card-header">Внимание!</div>
                 <div class="card-body">
@@ -24,13 +23,12 @@
             </div>
         {% endif %}
 
-        {% from "profile/list_table.html.twig" import list_table %}
-        <div id="public-profiles">
-            {{ list_table("Профили по умолчанию", publicProfiles, profileProvider) }}
+                <div id="public-profiles">
+            {%  embed 'profile/list_table.html.twig' with {'title': 'Профили по умолчанию', 'profiles': publicProfiles}%}{% endembed %}
         </div>
 
         <div id="user-profiles">
-            {{ list_table("Личные профили", userProfiles, profileProvider) }}
+            {%  embed 'profile/list_table.html.twig' with {'title': 'Личные профили', 'profiles': userProfiles}%}{% endembed %}
         </div>
 
         {% if is_granted('ROLE_USER') %}
@@ -40,8 +38,7 @@
                 </a>
             </div>
         {% endif %}
-    </div>
-{% endblock %}
+    {% endblock %}
 
 {% block javascripts %}
     <script src="{{ asset('build/js/profile/index.js') }}"></script>

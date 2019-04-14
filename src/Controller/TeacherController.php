@@ -8,7 +8,7 @@ use  App\Entity\User\Role;
 use App\Form\StudentType;
 use App\Security\Annotation as AppSecurity;
 use App\Security\Voter\UserVoter;
-use App\Task\TaskProviderInterface;
+use App\Task\Homework\HomeworkProviderInterface;
 use App\User\Student\Exception\RequiresStudentAccessException;
 use App\User\Teacher\TeacherProviderInterface;
 use App\Validator\Group;
@@ -46,7 +46,7 @@ final class TeacherController extends Controller
      * @Route("/{id}/appoint/", name="teacher_appoint", methods={"GET", "POST"})
      * @IsGranted(UserVoter::APPOINT_TEACHER, subject="teacher")
      */
-    public function appoint(User $teacher, Request $request, ValidatorInterface $validator, TaskProviderInterface $taskProvider): Response
+    public function appoint(User $teacher, Request $request, ValidatorInterface $validator, HomeworkProviderInterface $homeworkProvider): Response
     {
         $currentUser = $this->getCurrentUserOrGuest();
         $currentUser->cleanSocialUsername();
@@ -55,7 +55,7 @@ final class TeacherController extends Controller
         if (!\count($errors)) {
             $currentUser->setTeacher($teacher);
 
-            foreach ($taskProvider->getActualTasksOfCurrentTeacher() as $task) {
+            foreach ($homeworkProvider->getActualHomeworkOfCurrentUserTeacher() as $task) {
                 $currentUser->addHomework($task);
             }
 

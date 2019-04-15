@@ -12,6 +12,7 @@ use Doctrine\Common\Inflector\Inflector;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
 
 final class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsInterface
 {
@@ -63,8 +64,7 @@ final class AppExtension extends AbstractExtension implements \Twig_Extension_Gl
     public function getFilters()
     {
         return [
-            new \Twig_Filter('property', [$this, 'propertyFilter']),
-            new \Twig_Filter('toLabelString', [$this, 'toLabelStringFilter']),
+            new TwigFilter('toLabelString', [$this, 'toLabelStringFilter']),
         ];
     }
 
@@ -73,15 +73,8 @@ final class AppExtension extends AbstractExtension implements \Twig_Extension_Gl
         return $this->prepareFunctions([
             'getJavascriptParameters',
             'dt',
-            'creationTimeNumber',
             'sortByCreationTime',
             'sortByDateTime',
-            'sortProfiles',
-            'sortTeachers',
-            'sortStudents',
-            'sortContractors',
-            'fillIp',
-            'getActualHomeworksCount',
         ]);
     }
 
@@ -225,11 +218,6 @@ final class AppExtension extends AbstractExtension implements \Twig_Extension_Gl
         $value = $objectOrArray ? $propertyAccessor->getValue($objectOrArray, $property) : null;
 
         return false !== $default ? $value ?: $default : $value;
-    }
-
-    public function sortContractors(array $contractors): array
-    {
-        return $contractors;
     }
 
     public function getActualHomeworksCount(): int

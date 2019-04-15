@@ -21,6 +21,7 @@ class Task
     private $id;
 
     /**
+     * @var User
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="tasks")
      * @ORM\JoinColumn(nullable=false)
      */
@@ -181,9 +182,9 @@ class Task
         return $this;
     }
 
-    public function isAuthor(User $author): bool
+    public function isCreatedBy(User $author): bool
     {
-        return $this->author === $author;
+        return $this->author->isEqualTo($author);
     }
 
     public function getSettings(): ?Settings
@@ -196,5 +197,10 @@ class Task
         $this->settings = $settings;
 
         return $this;
+    }
+
+    public function getTotalExamplesCount(): int
+    {
+        return $this->getSettings()->getExamplesCount() * $this->getTimesCount();
     }
 }

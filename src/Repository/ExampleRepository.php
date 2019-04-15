@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Attempt\AttemptResponseProviderInterface;
+use App\Attempt\Example\ExampleProviderInterface;
 use App\Attempt\Example\ExampleResponseProviderInterface;
 use App\Attempt\Example\Number\NumberProviderInterface;
 use  App\DateTime\DateTime as DT;
@@ -10,7 +11,6 @@ use App\Entity\Attempt;
 use App\Entity\Example;
 use App\Entity\Task;
 use App\Entity\User;
-use App\Repository\Traits\BaseTrait;
 use App\Response\ExampleResponse;
 use App\Service\ExampleManager;
 use App\Service\UserLoader;
@@ -19,9 +19,8 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Psr\Container\ContainerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-class ExampleRepository extends ServiceEntityRepository implements ExampleResponseProviderInterface, NumberProviderInterface
+final class ExampleRepository extends ServiceEntityRepository implements ExampleProviderInterface, ExampleResponseProviderInterface, NumberProviderInterface
 {
-    use BaseTrait;
     private $exampleManager;
     private $userLoader;
     private $globalCache;
@@ -245,5 +244,22 @@ where s.user = :user and a.task = :task')
         //TODO
             $this->findLastUnansweredByAttemptOrGetNew($attempt)
         );
+    }
+
+    public function getRightExamplesCount(User $contractor, Task $task): int
+    {
+        return $this->createQueryBuilder('e')
+            ->select('count(e)')
+            ->join('e.attempt', 'a')
+            ->join('a.session', 's')
+            ->where('s.user = :user')
+            ->andWhere('a.task = :task')
+            ->andWhere('e.isRight = true')
+            ->getQuery()
+            ->setParameters([
+                'user' => $contractor,
+                'task' => $task,
+            ])
+            ->getSingleScalarResult();
     }
 }

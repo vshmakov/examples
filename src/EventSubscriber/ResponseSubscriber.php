@@ -6,8 +6,8 @@ use App\Entity\Session;
 use App\Entity\Visit;
 use App\Object\ObjectAccessor;
 use App\Repository\IpRepository;
+use App\Security\User\CurrentUserProviderInterface;
 use App\Security\User\CurrentUserSessionProviderInterface;
-use App\Service\UserLoader;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,8 +22,8 @@ final class ResponseSubscriber implements EventSubscriberInterface
     /** @var Request|null */
     private $request;
 
-    /** @var UserLoader */
-    private $userLoader;
+    /** @var CurrentUserProviderInterface */
+    private $currentUserProvider;
 
     /** @var AuthorizationCheckerInterface */
     private $authorizationChecker;
@@ -43,7 +43,7 @@ final class ResponseSubscriber implements EventSubscriberInterface
     public function __construct(
         CurrentUserSessionProviderInterface $currentUserSessionProvider,
         RequestStack $requestStack,
-        UserLoader $userLoader,
+        CurrentUserProviderInterface $currentUserProvider,
         IpRepository $ipRepository,
         AuthorizationCheckerInterface $authorizationChecker,
         SessionInterface $session,
@@ -53,7 +53,7 @@ final class ResponseSubscriber implements EventSubscriberInterface
         $this->currentUserSessionProvider = $currentUserSessionProvider;
         $this->ipRepository = $ipRepository;
         $this->request = $requestStack->getMasterRequest();
-        $this->userLoader = $userLoader;
+        $this->currentUserProvider = $currentUserProvider;
         $this->authorizationChecker = $authorizationChecker;
         $this->entityManager = $entityManager;
     }
@@ -106,14 +106,14 @@ final class ResponseSubscriber implements EventSubscriberInterface
 
     private function saveIp(Session $session, string $clientIp): void
     {
-        $user = $this->userLoader->getUser();
+        $user = $this->currentUserProvider->getCurrentUserOrGuest();
         $ip = $this->ipRepository->findOneByIpOrNew($clientIp);
 
         if (null !== $ip) {
             $session->setIp($ip);
             $this->entityManager->flush($session);
 
-            if (!$this->userLoader->isCurrentUserGuest()) {
+            if (!$this->currentUserProvider->isCurrentUserGuest()) {
                 $user->addIp($ip);
                 $this->entityManager->flush($user);
             }

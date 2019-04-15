@@ -4,10 +4,11 @@ namespace App\Service;
 
 use App\DataFixtures\UserFixtures;
 use App\Entity\User;
-use App\Repository\UserRepository;
 use App\Security\User\CurrentUserProviderInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Webmozart\Assert\Assert;
 
 /**
  * @deprecated
@@ -15,15 +16,15 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 final class UserLoader implements CurrentUserProviderInterface
 {
-    private $user;
-    private $userRepository;
+    /** @var TokenStorageInterface */
     private $tokenStorage;
+    /** @var EntityManagerInterface */
+    private $entityManager;
 
-    public function __construct(UserRepository $userRepository, TokenStorageInterface $tokenStorage)
+    public function __construct(TokenStorageInterface $tokenStorage, EntityManagerInterface $entityManager)
     {
-        $this->userRepository = $userRepository;
         $this->tokenStorage = $tokenStorage;
-        $this->user = $this->getUserFromToken();
+        $this->entityManager = $entityManager;
     }
 
     public function getUser(): User
@@ -33,17 +34,22 @@ final class UserLoader implements CurrentUserProviderInterface
 
     public function isCurrentUserGuest(): bool
     {
-        return !($this->user instanceof UserInterface);
+        return !$this->getUserFromToken() instanceof UserInterface;
     }
 
-    public function getGuest(): User
+    private function getGuest(): User
     {
-        return $this->userRepository->getGuest();
+        $guestUser = $this->entityManager
+            ->getRepository(User::class)
+            ->findByUsername(UserFixtures::GUEST_USERNAME);
+        Assert::notNull($guestUser, 'There is no guest user in database');
+
+        return $guestUser;
     }
 
     public function getCurrentUserOrGuest(): User
     {
-        return !$this->isCurrentUserGuest() ? $this->user : $this->getGuest();
+        return !$this->isCurrentUserGuest() ? $this->getUserFromToken() : $this->getGuest();
     }
 
     public function isCurrentUser(User $user): bool

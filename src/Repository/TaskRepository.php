@@ -4,12 +4,11 @@ namespace App\Repository;
 
 use App\Attempt\AttemptProviderInterface;
 use App\Entity\Task;
-use App\Entity\User;
 use App\Security\User\CurrentUserProviderInterface;
+use App\Task\Contractor\ContractorProviderInterface;
 use App\Task\TaskProviderInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Webmozart\Assert\Assert;
 
 final class TaskRepository extends ServiceEntityRepository implements TaskProviderInterface
@@ -17,19 +16,16 @@ final class TaskRepository extends ServiceEntityRepository implements TaskProvid
     /** @var CurrentUserProviderInterface */
     private $currentUserProvider;
 
-    /** @var AuthorizationCheckerInterface */
-    private $authorizationChecker;
+    /** @var ContractorProviderInterface */
+    private $contractorProvider;
 
-    /** @var AttemptProviderInterface */
-    private $attemptProvider;
-
-    public function __construct(RegistryInterface $registry, CurrentUserProviderInterface $currentUserProvider, AuthorizationCheckerInterface $authorizationChecker, AttemptProviderInterface $attemptProvider)
+    public function __construct(RegistryInterface $registry, CurrentUserProviderInterface $currentUserProvider, AttemptProviderInterface $attemptProvider, ContractorProviderInterface $contractorProvider)
     {
         parent::__construct($registry, Task::class);
 
         $this->currentUserProvider = $currentUserProvider;
-        $this->authorizationChecker = $authorizationChecker;
         $this->attemptProvider = $attemptProvider;
+        $this->contractorProvider = $contractorProvider;
     }
 
     public function getActualTasksOfCurrentUser(): array
@@ -56,24 +52,6 @@ final class TaskRepository extends ServiceEntityRepository implements TaskProvid
     {
         return time() > $task->getAddTime()->getTimestamp()
             && time() < $task->getLimitTime()->getTimestamp()
-            && $this->getSolvedUsersCount($task) < $task->getContractors()->count();
-    }
-
-    private function getSolvedUsersCount(Task $task): int
-    {
-        $solvedUsersCount = 0;
-
-        foreach ($task->getContractors()->toArray() as $user) {
-            if ($this->isDoneByUser($task, $user)) {
-                ++$solvedUsersCount;
-            }
-        }
-
-        return $solvedUsersCount;
-    }
-
-    private function isDoneByUser(Task $task, User $user): bool
-    {
-        return $task->getTimesCount() === $this->attemptProvider->getDoneAttemptsCount($task, $user);
+            && $this->contractorProvider->getSolvedContractorsCount($task) < $task->getContractors()->count();
     }
 }

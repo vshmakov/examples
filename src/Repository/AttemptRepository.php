@@ -12,35 +12,25 @@ use App\DateTime\DateTime as DT;
 use App\Doctrine\QueryResult;
 use App\Entity\Attempt;
 use App\Entity\Attempt\Result;
+use App\Entity\Example;
 use App\Entity\Task;
 use App\Entity\User;
 use App\Object\ObjectAccessor;
-use App\Repository\Traits\BaseTrait;
 use App\Response\AttemptResponse;
 use App\Security\User\CurrentUserProviderInterface;
 use App\Security\User\CurrentUserSessionProviderInterface;
 use App\Service\ExampleManager;
 use App\Service\UserLoader;
-use App\Utils\Cache\LocalCache;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Symfony\Bridge\Doctrine\RegistryInterface;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 final class AttemptRepository extends ServiceEntityRepository implements AttemptCreatorInterface, AttemptProviderInterface, AttemptResponseProviderInterface, AttemptResultProviderInterface
 {
-    use BaseTrait;
-
-    private $exampleRepository;
     private $userLoader;
-    private $userRepository;
 
     /** @var CurrentUserProviderInterface */
     private $currentUserProvider;
-
-    /** @var AuthorizationCheckerInterface */
-    private $authorizationChecker;
-
-    private $localCache;
 
     /** @var CurrentUserSessionProviderInterface */
     private $currentUserSessionProvider;
@@ -53,24 +43,16 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
 
     public function __construct(
         RegistryInterface $registry,
-        ExampleRepository $exampleRepository,
         UserLoader $userLoader,
-        UserRepository $userRepository,
         CurrentUserProviderInterface $currentUserProvider,
         CurrentUserSessionProviderInterface $currentUserSessionProvider,
-        AuthorizationCheckerInterface $authorizationChecker,
-        LocalCache $localCache,
         ExampleResponseProviderInterface $exampleResponseProvider,
         SettingsProviderInterface $settingsProvider
     ) {
         parent::__construct($registry, Attempt::class);
 
-        $this->exampleRepository = $exampleRepository;
         $this->userLoader = $userLoader;
-        $this->userRepository = $userRepository;
         $this->currentUserProvider = $currentUserProvider;
-        $this->authorizationChecker = $authorizationChecker;
-        $this->localCache = $localCache;
         $this->currentUserSessionProvider = $currentUserSessionProvider;
         $this->exampleResponseProvider = $exampleResponseProvider;
         $this->settingsProvider = $settingsProvider;
@@ -80,27 +62,26 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
     {
         $attempt = $this->findLastByCurrentUser();
 
-        return null !== $attempt && $this->isActual($attempt) ? $attempt : null;
-    }
-
-    private function isActual(Attempt $attempt): bool
-    {
-        $limitTime = $attempt->getLimitTime();
-        $remainedExamplesCount = $this->getRemainedExamplesCount($attempt);
-
-        return 0 < $remainedExamplesCount && time() < $limitTime->getTimestamp();
+        return null !== $attempt && !$attempt->getResult()->isFinished() ? $attempt : null;
     }
 
     private function findLastByCurrentUser(): ?Attempt
     {
+        return $this->createGetLastAttemptQueryBuilder($this->currentUserProvider->getCurrentUserOrGuest())
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    private function createGetLastAttemptQueryBuilder(User $user): QueryBuilder
+    {
         $queryBuilder = $this->createQueryBuilder('a')
             ->select('a');
 
-        if (!$this->currentUserProvider->isCurrentUserGuest()) {
+        if (!$this->currentUserProvider->isGuest($user)) {
             $queryBuilder
                 ->join('a.session', 's')
                 ->where('s.user = :user');
-            $parameters = ['user' => $this->currentUserProvider->getCurrentUserOrGuest()];
+            $parameters = ['user' => $user];
         } else {
             $queryBuilder->where('a.session = :session');
             $parameters = ['session' => $this->currentUserSessionProvider->getCurrentUserSessionOrNew()];
@@ -108,10 +89,8 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
 
         return $queryBuilder
             ->orderBy('a.addTime', 'desc')
-            ->getQuery()
             ->setParameters($parameters)
-            ->setMaxResults(1)
-            ->getOneOrNullResult();
+            ->setMaxResults(1);
     }
 
     private function getTitle(Attempt $attempt): string
@@ -180,10 +159,12 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
 
     private function getErrorsCount(Attempt $attempt): int
     {
-        return $this->exampleRepository->count([
-            'attempt' => $attempt,
-            'isRight' => false,
-        ]);
+        return $this->getEntityManager()
+            ->getRepository(Example::class)
+            ->count([
+                'attempt' => $attempt,
+                'isRight' => false,
+            ]);
     }
 
     private function getRating(Attempt $attempt): int
@@ -308,15 +289,6 @@ where u = ?1')
         return \count($this->findDoneByCurrentUserAndTask($task));
     }
 
-    public function findDoneByUserAndTask(User $user, Task $task): array
-    {
-        $attempts = $this->findByUserAndTask($user, $task);
-
-        return array_filter($attempts, function (Attempt $attempt): bool {
-            return $this->isDone($attempt);
-        });
-    }
-
     public function getDoneAverageRatingByCurrentUserAndTask(Task $task): ?float
     {
         return $this->getDoneAverageRatingByUserAndTask($this->userLoader->getUser(), $task);
@@ -430,5 +402,32 @@ where s.user = :user and a.task = :task')
         $result->setRating(
             ExampleManager::rating($result->getSolvedExamplesCount(), $result->getErrorsCount() + $result->getRemainedExamplesCount())
         );
+    }
+
+    public function getContractorLastAttempt(User $contractor, Task $task): ?Attempt
+    {
+        return $this->createGetLastAttemptQueryBuilder($contractor)
+            ->andWhere('a.task = :task')
+            ->getQuery()
+            ->setParameter('task', $task)
+            ->getOneOrNullResult();
+    }
+
+    public function getContractorDoneAttempts(User $contractor, Task $task): array
+    {
+        $attempts = $this->createQueryBuilder('a')
+            ->join('a.session', 's')
+            ->where('s.user = :user')
+            ->andWhere('a.task = :task')
+            ->getQuery()
+            ->setParameters([
+                'user' => $contractor,
+                'task' => $task,
+            ])
+            ->getResult();
+
+        return array_filter($attempts, function (Attempt $attempt): bool {
+            return $attempt->isDone();
+        });
     }
 }

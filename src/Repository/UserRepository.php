@@ -2,6 +2,8 @@
 
 namespace App\Repository;
 
+use App\Attempt\AttemptProviderInterface;
+use App\Attempt\Example\ExampleProviderInterface;
 use App\DataFixtures\UserFixtures;
 use App\DateTime\DateTime as DT;
 use App\Entity\Attempt;
@@ -9,6 +11,9 @@ use App\Entity\Profile;
 use App\Entity\Task;
 use App\Entity\User;
 use App\Object\ObjectAccessor;
+use App\Response\ContractorResponse;
+use App\Task\Contractor\ContractorProviderInterface;
+use App\Task\Contractor\ContractorResponseProviderInterface;
 use App\User\Teacher\TeacherProviderInterface;
 use App\User\UserEvaluatorInterface;
 use App\Utils\Cache\LocalCache;
@@ -17,7 +22,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Webmozart\Assert\Assert;
 
-final class UserRepository extends ServiceEntityRepository implements TeacherProviderInterface, UserEvaluatorInterface
+final class UserRepository extends ServiceEntityRepository implements TeacherProviderInterface, ContractorProviderInterface, ContractorResponseProviderInterface, UserEvaluatorInterface
 {
     private const  SOLVED_EXAMPLES_STANDARDS = [
         1 => [1 => 1, 2 => 5, 3 => 10, 4 => 25, 5 => 50],
@@ -31,12 +36,25 @@ final class UserRepository extends ServiceEntityRepository implements TeacherPro
 
     private $localCache;
 
-    public function __construct(RegistryInterface $registry, AuthorizationCheckerInterface $authorizationChecker, LocalCache $localCache)
-    {
+    /** @var AttemptProviderInterface */
+    private $attemptProvider;
+
+    /** @var ExampleProviderInterface */
+    private $exampleProvider;
+
+    public function __construct(
+        RegistryInterface $registry,
+        AuthorizationCheckerInterface $authorizationChecker,
+        LocalCache $localCache,
+        AttemptProviderInterface $attemptProvider,
+        ExampleProviderInterface $exampleProvider
+    ) {
         parent::__construct($registry, User::class);
 
         $this->authorizationChecker = $authorizationChecker;
         $this->localCache = $localCache;
+        $this->attemptProvider = $attemptProvider;
+        $this->exampleProvider = $exampleProvider;
     }
 
     private function getAttemptsCount(User $user)
@@ -282,5 +300,61 @@ where u = :u')
         }
 
         return $assessment;
+    }
+
+    public function getSolvedTaskContractors(Task $task): array
+    {
+        return array_filter($task->getContractors()->toArray(), function (User $contractor) use ($task): bool {
+            return $this->isDoneByUser($task, $contractor);
+        });
+    }
+
+    public function getNotSolvedTaskContractors(Task $task): array
+    {
+        return array_filter($task->getContractors()->toArray(), function (User $contractor) use ($task): bool {
+            return !$this->isDoneByUser($task, $contractor);
+        });
+    }
+
+    public function getSolvedContractorsCount(Task $task): int
+    {
+        return \count($this->getSolvedTaskContractors($task));
+    }
+
+    private function isDoneByUser(Task $task, User $user): bool
+    {
+        return $task->getTimesCount() === $this->attemptProvider->getDoneAttemptsCount($task, $user);
+    }
+
+    public function createContractorResponse(User $contractor, Task $task): ContractorResponse
+    {
+        return ObjectAccessor::initialize(ContractorResponse::class, [
+            'contractor' => $contractor,
+            'task' => $task,
+            'lastAttempt' => $this->attemptProvider->getContractorLastAttempt($contractor, $task),
+            'rightExamplesCount' => $this->exampleProvider->getRightExamplesCount($contractor, $task),
+            'rating' => $this->getTaskRating($contractor, $task),
+        ]);
+    }
+
+    /**
+     * @param User $user
+     * @param Task $task
+     *
+     * @return int
+     */
+    public function getTaskRating(User $user, Task $task): ?int
+    {
+        $attempts = $this->attemptProvider->getContractorDoneAttempts($user, $task);
+
+        if (empty($attempts)) {
+            return null;
+        }
+
+        return round(
+            array_reduce($attempts, function (float $rating, Attempt $attempt) use ($attempts): float {
+                return $rating + $attempt->getResult()->getRating() / \count($attempts);
+            }, 0)
+        );
     }
 }

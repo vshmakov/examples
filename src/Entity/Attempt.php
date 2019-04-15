@@ -199,4 +199,9 @@ class Attempt
 
         return $this;
     }
+
+    public function isDone(): bool
+    {
+        return 0 === $this->getResult()->getRemainedExamplesCount();
+    }
 }

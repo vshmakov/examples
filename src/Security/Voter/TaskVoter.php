@@ -3,45 +3,54 @@
 namespace App\Security\Voter;
 
 use App\Entity\Task;
-use App\Security\Voter\Traits\BaseTrait;
-use App\Service\AuthChecker;
-use App\Service\UserLoader;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+use App\Security\User\CurrentUserProviderInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class TaskVoter extends Voter
+final class TaskVoter extends BaseVoter
 {
-    use BaseTrait;
-    private $userLoader;
-    private $authChecker;
+    public const  SHOW = 'SHOW';
+    public const  EDIT = 'EDIT';
+    public const  DELETE = 'DELETE';
 
-    public function __construct(UserLoader $userLoader, AuthChecker $authChecker)
+    /** @var Task */
+    protected $subject;
+
+    /** @var CurrentUserProviderInterface */
+    private $currentUserProvider;
+
+    /** @var AuthorizationCheckerInterface */
+    private $authorizationChecker;
+
+    public function __construct(CurrentUserProviderInterface $currentUserProvider, AuthorizationCheckerInterface $authorizationChecker)
     {
-        $this->userLoader = $userLoader;
-        $this->authChecker = $authChecker;
+        $this->currentUserProvider = $currentUserProvider;
+        $this->authorizationChecker = $authorizationChecker;
     }
 
     protected function supports($attribute, $subject)
     {
-        return $subject instanceof Task && $this->hasHandler($attribute);
+        return $subject instanceof Task && $this->inSupportedAttributes($attribute);
     }
 
-    protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
+    protected static function getSupportedAttributes(): array
     {
-        return $this->voteOnNamedCallback($attribute, $subject, $token);
+        return [
+            self::SHOW,
+            self::EDIT,
+        ];
     }
 
-    private function canShow(): bool
+    protected function canShow(): bool
     {
-        return $this->subject->isAuthor($this->userLoader->getUser());
+        return $this->subject->isCreatedBy($this->currentUserProvider->getUser());
     }
 
-    private function canEdit(): bool
+    protected function canEdit(): bool
     {
         return $this->canShow();
     }
 
-    private function canDelete(): bool
+    protected function canDelete(): bool
     {
         return $this->canShow();
     }

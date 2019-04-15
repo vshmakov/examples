@@ -12,15 +12,19 @@ use App\Form\TaskType;
 use App\Object\ObjectAccessor;
 use App\Repository\AttemptRepository;
 use App\Repository\ExampleRepository;
-use App\Repository\HomeworkRepository;
 use App\Repository\ProfileRepository;
 use App\Repository\SettingsRepository;
 use App\Repository\UserRepository;
+use App\Response\ContractorResponse;
 use App\Security\Annotation as AppSecurity;
+use App\Security\Voter\TaskVoter;
 use App\Service\UserLoader;
+use App\Task\Contractor\ContractorProviderInterface;
+use App\Task\Contractor\ContractorResponseProviderInterface;
 use App\Task\TaskProviderInterface;
 use App\User\Teacher\Exception\RequiresTeacherAccessException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -81,25 +85,19 @@ final class TaskController extends Controller
     }
 
     /**
-     * @Route("/{id}", name="task_show", methods="GET")
+     * @Route("/{id}/", name="task_show", methods="GET")
+     * @IsGranted(TaskVoter::SHOW, subject="task")
      */
-    public function show(Task $task, UserRepository $userRepository, HomeworkRepository $taskRepository, AttemptRepository $attemptRepository): Response
+    public function show(Task $task, ContractorProviderInterface $contractorProvider, ContractorResponseProviderInterface $contractorResponseProvider): Response
     {
-        $this->denyAccessUnlessGranted('SHOW', $task);
-
-        $contractors = $userRepository->findByHomework($task);
-        $finishedTaskContractors = $notFinishedTaskContractors = [];
-
-        foreach ($contractors as $contractor) {
-            $group = $taskRepository->isDoneByUser($task, $contractor) ? 'finishedTaskContractors' : 'notFinishedTaskContractors';
-            ($$group)[] = $contractor;
-        }
+        $createContractorResponse = function (User $contractor) use ($task, $contractorResponseProvider): ContractorResponse {
+            return $contractorResponseProvider->createContractorResponse($contractor, $task);
+        };
 
         return $this->render('task/show.html.twig', [
             'task' => $task,
-            'finishedTaskContractors' => $finishedTaskContractors,
-            'notFinishedTaskContractors' => $notFinishedTaskContractors,
-            'attemptRepository' => $attemptRepository,
+            'solvedTaskContractors' => array_map($createContractorResponse, $contractorProvider->getSolvedTaskContractors($task)),
+            'notSolvedTaskContractors' => array_map($createContractorResponse, $contractorProvider->getNotSolvedTaskContractors($task)),
         ]);
     }
 

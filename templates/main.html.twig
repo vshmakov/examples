@@ -30,24 +30,6 @@
 {% block page %}
     {% block body %}
         <div class="container">
-
-            {% block actual_homeworks %}
-                {% if is_granted('SHOW_HOMEWORKS') %}
-                    {% set actualHomeworksCount = getActualHomeworksCount() %}
-                    {% if actualHomeworksCount %}
-                        <ul class="actual-homework-block">
-                            <li><a href="{{ path('homework_index') }}">У вас есть {{ actualHomeworksCount }}
-                                    невыполненных
-                                    заданий.</a></li>
-                            <li>
-
-                                <button class="hide-homework">Скрыть</button>
-                            </li>
-                        </ul>
-                    {% endif %}
-                {% endif %}
-            {% endblock %}
-
             {% block nav %}
                 <nav class="navbar navbar-expand-lg main-menu">
                     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01"

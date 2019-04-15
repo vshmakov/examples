@@ -6,10 +6,10 @@ use Twig\TwigFunction;
 
 trait BaseTrait
 {
-    protected function prepareFunctions($functions)
+    private function prepareFunctions($functions)
     {
         return array_map(
-            function ($function) {
+            function (string $function): TwigFunction {
                 return new TwigFunction($function, [$this, $function]);
             },
             $functions

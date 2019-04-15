@@ -20,6 +20,11 @@ abstract class BaseVoter extends Voter
         return $this->voteOnNamedCallback($attribute, $subject, $token);
     }
 
+    protected function inSupportedAttributes(string $attribute): bool
+    {
+        return \in_array($attribute, static::getSupportedAttributes(), true);
+    }
+
     private function assertInSupportedAttributes(string $attribute): void
     {
         $supportedAttributes = static::getSupportedAttributes();

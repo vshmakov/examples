@@ -11,6 +11,7 @@ final class TaskVoter extends BaseVoter
     public const  SHOW = 'SHOW';
     public const  EDIT = 'EDIT';
     public const  DELETE = 'DELETE';
+    public const  SOLVE = 'SOLVE';
 
     /** @var Task */
     protected $subject;
@@ -29,14 +30,14 @@ final class TaskVoter extends BaseVoter
 
     protected function supports($attribute, $subject)
     {
-        return $subject instanceof Task && $this->inSupportedAttributes($attribute);
+        return $subject instanceof Task;
     }
 
     protected static function getSupportedAttributes(): array
     {
         return [
             self::SHOW,
-            self::EDIT,
+            self::SOLVE,
         ];
     }
 
@@ -53,5 +54,10 @@ final class TaskVoter extends BaseVoter
     protected function canDelete(): bool
     {
         return $this->canShow();
+    }
+
+    protected function canSolve(): bool
+    {
+        return $this->subject->getContractors()->contains($this->currentUserProvider->getCurrentUserOrGuest());
     }
 }

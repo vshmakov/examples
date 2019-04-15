@@ -20,7 +20,7 @@ use App\Security\Annotation as AppSecurity;
 use App\Security\Voter\TaskVoter;
 use App\Service\UserLoader;
 use App\Task\Contractor\ContractorProviderInterface;
-use App\Task\Contractor\ContractorResponseProviderInterface;
+use App\Task\Contractor\ContractorResponseFactoryInterface;
 use App\Task\TaskProviderInterface;
 use App\User\Teacher\Exception\RequiresTeacherAccessException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
@@ -88,7 +88,7 @@ final class TaskController extends Controller
      * @Route("/{id}/", name="task_show", methods="GET")
      * @IsGranted(TaskVoter::SHOW, subject="task")
      */
-    public function show(Task $task, ContractorProviderInterface $contractorProvider, ContractorResponseProviderInterface $contractorResponseProvider): Response
+    public function show(Task $task, ContractorProviderInterface $contractorProvider, ContractorResponseFactoryInterface $contractorResponseProvider): Response
     {
         $createContractorResponse = function (User $contractor) use ($task, $contractorResponseProvider): ContractorResponse {
             return $contractorResponseProvider->createContractorResponse($contractor, $task);

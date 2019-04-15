@@ -12,7 +12,7 @@
     </tr>
     </thead>
     <tbody>
-    {% for number, contractorResponse in contractors %}
+    {% for number, contractorResponse in sortByDateTime(contractors, 'lastAttempt.startedAt')|reverse %}
         {% set contractor = contractorResponse.contractor %}
         <tr>
             <td>{{ number+1 }}</td>
@@ -20,7 +20,7 @@
                 {{ contractor.lastName }} {{ contractor.firstName }}
             </td>
             <td>
-                {{ contractorResponse.lastAttempt is not null ? contractorResponse.lastAttempt.timestamp : '-' }}
+                {{ contractorResponse.lastAttempt is not null ? contractorResponse.lastAttempt.startedAt.timestamp : '-' }}
             </td>
             <td>
                 {{ contractorResponse.rightExamplesCount }} из {{ contractorResponse.task.totalExamplesCount }}

@@ -3,6 +3,7 @@
 namespace App\Object;
 
 use Doctrine\Instantiator\Instantiator;
+use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
@@ -22,6 +23,18 @@ abstract class ObjectAccessor
     public static function getValue($objectOrArray, string $field)
     {
         return self::createPropertyAccessor()->getValue($objectOrArray, $field);
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public static function getNullableTraversedValue($object_, string $property)
+    {
+        try {
+            return self::getValue($object_, $property);
+        } catch (UnexpectedTypeException $exception) {
+            return null;
+        }
     }
 
     private static function createPropertyAccessor(): PropertyAccessor

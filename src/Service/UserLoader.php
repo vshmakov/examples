@@ -41,7 +41,7 @@ final class UserLoader implements CurrentUserProviderInterface
     {
         $guestUser = $this->entityManager
             ->getRepository(User::class)
-            ->findByUsername(UserFixtures::GUEST_USERNAME);
+            ->findOneByUsername(UserFixtures::GUEST_USERNAME);
         Assert::notNull($guestUser, 'There is no guest user in database');
 
         return $guestUser;

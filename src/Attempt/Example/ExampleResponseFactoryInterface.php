@@ -7,7 +7,7 @@ use App\Entity\Attempt;
 use App\Entity\Example;
 use App\Response\ExampleResponse;
 
-interface ExampleResponseProviderInterface
+interface ExampleResponseFactoryInterface
 {
     public function createExampleResponse(Example $example, NumberProviderInterface $numberProvider = null): ExampleResponse;
 

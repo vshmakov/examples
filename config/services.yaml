@@ -114,7 +114,11 @@ services:
             $applicationEnvironment: '@App\Parameter\Environment\AppEnv'
 
 
-    App\Attempt\AttemptResponseProviderInterface:
+    App\Attempt\AttemptResponseFactoryInterface:
+        class: 'App\Repository\AttemptRepository'
+        public: true
+
+    App\Attempt\AttemptProviderInterface:
         class: 'App\Repository\AttemptRepository'
         public: true
 

@@ -2,11 +2,11 @@
 
 namespace App\Repository;
 
-use  App\Attempt\AttemptCreatorInterface;
+use  App\Attempt\AttemptFactoryInterface;
 use App\Attempt\AttemptProviderInterface;
-use App\Attempt\AttemptResponseProviderInterface;
+use App\Attempt\AttemptResponseFactoryInterface;
 use App\Attempt\AttemptResultProviderInterface;
-use App\Attempt\Example\ExampleResponseProviderInterface;
+use App\Attempt\Example\ExampleResponseFactoryInterface;
 use App\Attempt\Settings\SettingsProviderInterface;
 use App\DateTime\DateTime as DT;
 use App\Doctrine\QueryResult;
@@ -25,7 +25,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-final class AttemptRepository extends ServiceEntityRepository implements AttemptCreatorInterface, AttemptProviderInterface, AttemptResponseProviderInterface, AttemptResultProviderInterface
+final class AttemptRepository extends ServiceEntityRepository implements AttemptFactoryInterface, AttemptProviderInterface, AttemptResponseFactoryInterface, AttemptResultProviderInterface
 {
     private $userLoader;
 
@@ -35,7 +35,7 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
     /** @var CurrentUserSessionProviderInterface */
     private $currentUserSessionProvider;
 
-    /** @var ExampleResponseProviderInterface */
+    /** @var ExampleResponseFactoryInterface */
     private $exampleResponseProvider;
 
     /** @var SettingsProviderInterface */
@@ -46,7 +46,7 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
         UserLoader $userLoader,
         CurrentUserProviderInterface $currentUserProvider,
         CurrentUserSessionProviderInterface $currentUserSessionProvider,
-        ExampleResponseProviderInterface $exampleResponseProvider,
+        ExampleResponseFactoryInterface $exampleResponseProvider,
         SettingsProviderInterface $settingsProvider
     ) {
         parent::__construct($registry, Attempt::class);
@@ -62,7 +62,7 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
     {
         $attempt = $this->findLastByCurrentUser();
 
-        return null !== $attempt && !$attempt->getResult()->isFinished() ? $attempt : null;
+        return null !== $attempt && null !== $attempt->getResult() && !$attempt->getResult()->isFinished() ? $attempt : null;
     }
 
     private function findLastByCurrentUser(): ?Attempt
@@ -185,19 +185,18 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
         return $attempt;
     }
 
-    /**
-     * @deprecated
-     */
-    public function getNewByCurrentUserAndTask(Task $task): Attempt
+    public function createTaskAttempt(Task $task): Attempt
     {
-        $attempt = $this->createNewByCurrentUser()
-            ->setTask($task)
-            ->setSettings($task->getSettings());
+        $attempt = $this->createNewByCurrentUser();
+        ObjectAccessor::setValues($attempt, [
+            'task' => $task,
+            'settings' => $task->getSettings(),
+        ]);
 
         $entityManager = $this->getEntityManager();
         $entityManager->persist($attempt);
+        $entityManager->flush($attempt);
         $this->updateAttemptResult($attempt);
-        $entityManager->flush();
 
         return $attempt;
     }
@@ -357,7 +356,7 @@ where s.user = :user and a.task = :task')
             ->getResult();
 
         return array_reduce($attempts, function (int $doneAttemptsCount, Attempt $attempt): int {
-            return $this->isDone($attempt) ? $doneAttemptsCount + 1 : $doneAttemptsCount;
+            return $attempt->isDone() ? $doneAttemptsCount + 1 : $doneAttemptsCount;
         }, 0);
     }
 

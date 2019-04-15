@@ -2,7 +2,7 @@
 
 namespace App\DataFixtures\Attempt;
 
-use App\Attempt\AttemptCreatorInterface;
+use App\Attempt\AttemptFactoryInterface;
 use App\Attempt\AttemptResultProviderInterface;
 use App\DataFixtures\PersistTrait;
 use App\DataFixtures\UserFixtures;
@@ -17,13 +17,13 @@ final class AttemptFixtures extends Fixture implements DependentFixtureInterface
 {
     use PersistTrait;
 
-    /** @var AttemptCreatorInterface */
+    /** @var AttemptFactoryInterface */
     private $attemptCreator;
 
     /** @var AttemptResultProviderInterface */
     private $attemptResultProvider;
 
-    public function __construct(AttemptCreatorInterface $attemptCreator, AttemptResultProviderInterface $attemptResultProvider)
+    public function __construct(AttemptFactoryInterface $attemptCreator, AttemptResultProviderInterface $attemptResultProvider)
     {
         $this->attemptCreator = $attemptCreator;
         $this->attemptResultProvider = $attemptResultProvider;

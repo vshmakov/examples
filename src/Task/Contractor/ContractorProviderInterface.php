@@ -11,4 +11,6 @@ interface ContractorProviderInterface
     public function getSolvedContractorsCount(Task $task): int;
 
     public function getNotSolvedTaskContractors(Task $task): array;
+
+    public function isDoneByCurrentContractor(Task $task): bool;
 }

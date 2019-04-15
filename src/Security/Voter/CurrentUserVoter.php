@@ -4,16 +4,13 @@ namespace App\Security\Voter;
 
 use App\Entity\User;
 use App\Security\User\CurrentUserProviderInterface;
-use App\Security\Voter\Traits\BaseTrait;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
-final class CurrentUserVoter extends Voter
+final class CurrentUserVoter extends BaseVoter
 {
-    use BaseTrait;
-
     public const  CREATE_PROFILES = 'CREATE_PROFILES';
+    public const  SHOW_HOMEWORK = 'SHOW_HOMEWORK';
 
     /** @var User */
     protected $subject;
@@ -30,23 +27,31 @@ final class CurrentUserVoter extends Voter
         $this->authorizationChecker = $authorizationChecker;
     }
 
+    protected static function getSupportedAttributes(): array
+    {
+        return [
+            self::CREATE_PROFILES,
+            self::SHOW_HOMEWORK,
+        ];
+    }
+
     protected function supports($attribute, $subject)
     {
-        return null === $subject && $this->supportsAttribute($attribute);
+        return null === $subject && $this->inSupportedAttributes($attribute);
     }
 
-    private function supportsAttribute(string $attribute): bool
+    protected function voteOnAttribute($attribute, $subject, TokenInterface $token): bool
     {
-        return \in_array($attribute, [self::CREATE_PROFILES], true);
+        return parent::voteOnAttribute($attribute, $this->currentUserProvider->getCurrentUserOrGuest(), $token);
     }
 
-    protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
-    {
-        return $this->voteOnNamedCallback($attribute, $subject, $token);
-    }
-
-    private function canCreateProfiles(): bool
+    protected function canCreateProfiles(): bool
     {
         return $this->authorizationChecker->isGranted(User\Role::USER);
+    }
+
+    protected function canShowHomework(): bool
+    {
+        return $this->subject->hasTeacher();
     }
 }

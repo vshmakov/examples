@@ -4,7 +4,7 @@ namespace App\Attempt\Example\EventSubscriber;
 
 use ApiPlatform\Core\EventListener\EventPriorities;
 use App\Attempt\EventSubscriber\RouteTrait;
-use App\Attempt\Example\ExampleResponseProviderInterface;
+use App\Attempt\Example\ExampleResponseFactoryInterface;
 use App\Attempt\Example\Number\NumberProviderInterface;
 use App\Entity\Example;
 use App\Iterator;
@@ -19,13 +19,13 @@ final class ShowExamplesCollectionSubscriber implements EventSubscriberInterface
 
     public const  ROUTE = 'api_examples_get_collection';
 
-    /** @var ExampleResponseProviderInterface */
+    /** @var ExampleResponseFactoryInterface */
     private $exampleResponseProvider;
 
     /** @var NumberProviderInterface */
     private $userNumberProvider;
 
-    public function __construct(ExampleResponseProviderInterface $exampleResponseProvider, NumberProviderInterface $userNumberProvider)
+    public function __construct(ExampleResponseFactoryInterface $exampleResponseProvider, NumberProviderInterface $userNumberProvider)
     {
         $this->exampleResponseProvider = $exampleResponseProvider;
         $this->userNumberProvider = $userNumberProvider;

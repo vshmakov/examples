@@ -202,6 +202,6 @@ class Attempt
 
     public function isDone(): bool
     {
-        return 0 === $this->getResult()->getRemainedExamplesCount();
+        return null !== $this->getResult() && 0 === $this->getResult()->getRemainedExamplesCount();
     }
 }

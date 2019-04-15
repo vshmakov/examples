@@ -2,15 +2,17 @@
 
 namespace App\Repository;
 
-use App\Attempt\AttemptResponseProviderInterface;
+use App\Attempt\AttemptProviderInterface;
+use App\Attempt\AttemptResponseFactoryInterface;
 use App\Attempt\Example\ExampleProviderInterface;
-use App\Attempt\Example\ExampleResponseProviderInterface;
+use App\Attempt\Example\ExampleResponseFactoryInterface;
 use App\Attempt\Example\Number\NumberProviderInterface;
 use  App\DateTime\DateTime as DT;
 use App\Entity\Attempt;
 use App\Entity\Example;
 use App\Entity\Task;
 use App\Entity\User;
+use App\Object\ObjectAccessor;
 use App\Response\ExampleResponse;
 use App\Service\ExampleManager;
 use App\Service\UserLoader;
@@ -19,7 +21,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Psr\Container\ContainerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-final class ExampleRepository extends ServiceEntityRepository implements ExampleProviderInterface, ExampleResponseProviderInterface, NumberProviderInterface
+final class ExampleRepository extends ServiceEntityRepository implements ExampleProviderInterface, ExampleResponseFactoryInterface, NumberProviderInterface
 {
     private $exampleManager;
     private $userLoader;
@@ -112,14 +114,13 @@ final class ExampleRepository extends ServiceEntityRepository implements Example
         return $this->findLastUnansweredByAttempt($attempt) ?? $this->getNew($attempt);
     }
 
-    public function getNew(Attempt $attempt): Example
+    private function getNew(Attempt $attempt): Example
     {
-        $example = (new Example())
-            ->setAttempt($attempt);
-
+        /** @var Example $example */
+        $example = ObjectAccessor::initialize(Example::class, ['attempt' => $attempt]);
         $lastExample = $this->findLastByAttempt($attempt);
 
-        if ($attempt->getSettings()->isDemanding() && $lastExample && !$lastExample->isRight()) {
+        if ($attempt->getSettings()->isDemanding() && null !== $lastExample && !$lastExample->isRight()) {
             $example->setFirst($lastExample->getFirst())
                 ->setSecond($lastExample->getSecond())
                 ->setSign($lastExample->getSign());
@@ -127,7 +128,8 @@ final class ExampleRepository extends ServiceEntityRepository implements Example
             ($settings = $attempt->getSettings()->getSettings());
             $exampleManager = $this->exampleManager;
             $sign = $exampleManager->getRandomSign($settings);
-            $previousExamples = $this->createQuery('select e from App:Example e
+            $previousExamples = $this->getEntityManager()
+                ->createQuery('select e from App:Example e
 join e.attempt a
 join a.session s
 join s.user u
@@ -146,7 +148,7 @@ where u = :u and a.addTime > :dt')
 
         $entityManager = $this->getEntityManager();
         $entityManager->persist($example);
-        $entityManager->flush();
+        $entityManager->flush($example);
 
         return $example;
     }
@@ -230,8 +232,18 @@ where s.user = :user and a.task = :task')
             $this->getSolvingTime($example),
             $this->getErrorNumber($example),
             $example,
-            [$this->container->get(AttemptResponseProviderInterface::class), 'createAttemptResponse']
+            [$this->getAttemptResponseFactory(), 'createAttemptResponse']
         );
+    }
+
+    private function getAttemptResponseFactory(): AttemptResponseFactoryInterface
+    {
+        return $this->container->get(AttemptResponseFactoryInterface::class);
+    }
+
+    private function getAttemptProvider(): AttemptProviderInterface
+    {
+        return $this->container->get(AttemptProviderInterface::class);
     }
 
     public function createSolvingExampleResponse(Attempt $attempt): ?ExampleResponse
@@ -253,12 +265,12 @@ where s.user = :user and a.task = :task')
             ->join('e.attempt', 'a')
             ->join('a.session', 's')
             ->where('s.user = :user')
-            ->andWhere('a.task = :task')
+            ->andWhere('a in (:attempts)')
             ->andWhere('e.isRight = true')
             ->getQuery()
             ->setParameters([
                 'user' => $contractor,
-                'task' => $task,
+                'attempts' => $this->getAttemptProvider()->getContractorDoneAttempts($contractor, $task),
             ])
             ->getSingleScalarResult();
     }

@@ -3,7 +3,7 @@
 namespace App\Attempt\EventSubscriber;
 
 use ApiPlatform\Core\EventListener\EventPriorities;
-use App\Attempt\AttemptResponseProviderInterface;
+use App\Attempt\AttemptResponseFactoryInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -14,10 +14,10 @@ final class ShowAttemptSubscriber implements EventSubscriberInterface
 
     private const  ROUTE = 'api_attempts_get_item';
 
-    /** @var AttemptResponseProviderInterface */
+    /** @var AttemptResponseFactoryInterface */
     private $attemptResponseProvider;
 
-    public function __construct(AttemptResponseProviderInterface $attemptResponseProvider)
+    public function __construct(AttemptResponseFactoryInterface $attemptResponseProvider)
     {
         $this->attemptResponseProvider = $attemptResponseProvider;
     }

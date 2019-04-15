@@ -2,6 +2,7 @@
 
 namespace App\Twig;
 
+use App\Object\ObjectAccessor;
 use App\Parameter\Container\ParametersContainerInterface;
 use App\Parameter\StringInterface;
 use App\Repository\AttemptRepository;
@@ -145,21 +146,25 @@ final class AppExtension extends AbstractExtension implements \Twig_Extension_Gl
         return addTimeSorter($e1, $e2);
     }
 
-    public function sortByDateTime(array $entityList, string $dtProperty = 'addTime'): array
+    public function sortByDateTime(array $entityList, string $dateTimeProperty): array
     {
-        $propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
-            ->enableExceptionOnInvalidIndex()
-            ->getPropertyAccessor();
+        usort($entityList, function ($entity1, $entity2) use ($dateTimeProperty): int {
+            $time1 = ObjectAccessor::getNullableTraversedValue($entity1, "$dateTimeProperty.timestamp");
+            $time2 = ObjectAccessor::getNullableTraversedValue($entity2, "$dateTimeProperty.timestamp");
 
-        usort($entityList, function ($e1, $e2) use ($propertyAccessor, $dtProperty): int {
-            $t1 = $propertyAccessor->getValue($e1, "$dtProperty.timestamp");
-            $t2 = $propertyAccessor->getValue($e2, "$dtProperty.timestamp");
-
-            if ($t1 === $t2) {
+            if ($time1 === $time2) {
                 return 0;
             }
 
-            return $t1 > $t2 ? 1 : -1;
+            if (null === $time1) {
+                return -1;
+            }
+
+            if (null === $time2) {
+                return 1;
+            }
+
+            return $time1 > $time2 ? 1 : -1;
         });
 
         return $entityList;

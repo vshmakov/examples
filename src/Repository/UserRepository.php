@@ -12,8 +12,9 @@ use App\Entity\Task;
 use App\Entity\User;
 use App\Object\ObjectAccessor;
 use App\Response\ContractorResponse;
+use App\Security\User\CurrentUserProviderInterface;
 use App\Task\Contractor\ContractorProviderInterface;
-use App\Task\Contractor\ContractorResponseProviderInterface;
+use App\Task\Contractor\ContractorResponseFactoryInterface;
 use App\User\Teacher\TeacherProviderInterface;
 use App\User\UserEvaluatorInterface;
 use App\Utils\Cache\LocalCache;
@@ -22,7 +23,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Webmozart\Assert\Assert;
 
-final class UserRepository extends ServiceEntityRepository implements TeacherProviderInterface, ContractorProviderInterface, ContractorResponseProviderInterface, UserEvaluatorInterface
+final class UserRepository extends ServiceEntityRepository implements TeacherProviderInterface, ContractorProviderInterface, ContractorResponseFactoryInterface, UserEvaluatorInterface
 {
     private const  SOLVED_EXAMPLES_STANDARDS = [
         1 => [1 => 1, 2 => 5, 3 => 10, 4 => 25, 5 => 50],
@@ -30,6 +31,9 @@ final class UserRepository extends ServiceEntityRepository implements TeacherPro
         7 => [1 => 1, 2 => 3, 3 => 5, 4 => 10, 5 => 20],
         90 => [1 => 1, 2 => 3, 3 => 5, 4 => 10, 5 => 15],
     ];
+
+    /** @var CurrentUserProviderInterface */
+    private $currentUserProvider;
 
     /** @var AuthorizationCheckerInterface */
     private $authorizationChecker;
@@ -44,6 +48,7 @@ final class UserRepository extends ServiceEntityRepository implements TeacherPro
 
     public function __construct(
         RegistryInterface $registry,
+        CurrentUserProviderInterface $currentUserProvider,
         AuthorizationCheckerInterface $authorizationChecker,
         LocalCache $localCache,
         AttemptProviderInterface $attemptProvider,
@@ -51,6 +56,7 @@ final class UserRepository extends ServiceEntityRepository implements TeacherPro
     ) {
         parent::__construct($registry, User::class);
 
+        $this->currentUserProvider = $currentUserProvider;
         $this->authorizationChecker = $authorizationChecker;
         $this->localCache = $localCache;
         $this->attemptProvider = $attemptProvider;
@@ -324,6 +330,11 @@ where u = :u')
     private function isDoneByUser(Task $task, User $user): bool
     {
         return $task->getTimesCount() === $this->attemptProvider->getDoneAttemptsCount($task, $user);
+    }
+
+    public function isDoneByCurrentContractor(Task $task): bool
+    {
+        return $this->isDoneByUser($task, $this->currentUserProvider->getCurrentUserOrGuest());
     }
 
     public function createContractorResponse(User $contractor, Task $task): ContractorResponse

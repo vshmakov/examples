@@ -55,7 +55,7 @@ final class TeacherController extends Controller
         if (!\count($errors)) {
             $currentUser->setTeacher($teacher);
 
-            foreach ($homeworkProvider->getActualHomeworkOfCurrentUserTeacher() as $task) {
+            foreach ($homeworkProvider->getActualHomework() as $task) {
                 $currentUser->addHomework($task);
             }
 

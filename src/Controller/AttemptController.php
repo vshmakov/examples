@@ -5,11 +5,11 @@ namespace App\Controller;
 use App\ApiPlatform\Attribute;
 use App\ApiPlatform\Filter\FilterUserValidationSubscriber;
 use App\ApiPlatform\Format;
-use App\Attempt\AttemptCreatorInterface;
+use App\Attempt\AttemptFactoryInterface;
 use App\Attempt\AttemptProviderInterface;
-use App\Attempt\AttemptResponseProviderInterface;
+use App\Attempt\AttemptResponseFactoryInterface;
 use App\Attempt\EventSubscriber\ShowAttemptsCollectionSubscriber;
-use App\Attempt\Example\ExampleResponseProviderInterface;
+use App\Attempt\Example\ExampleResponseFactoryInterface;
 use App\Controller\Traits\CurrentUserProviderTrait;
 use App\Controller\Traits\JavascriptParametersTrait;
 use App\Controller\Traits\ProfileTrait;
@@ -60,7 +60,7 @@ final class AttemptController extends Controller
     /**
      * @Route("/new/", name="attempt_new", methods={"GET"})
      */
-    public function new(Request $request, AttemptCreatorInterface $creator): RedirectResponse
+    public function new(Request $request, AttemptFactoryInterface $creator): RedirectResponse
     {
         $profileParameter = 'profile_id';
 
@@ -86,7 +86,7 @@ final class AttemptController extends Controller
      * @Route("/{id}/show/", name="attempt_show", methods={"GET"})
      * @IsGranted(AttemptVoter::VIEW, subject="attempt")
      */
-    public function show(Attempt $attempt, AttemptResponseProviderInterface $attemptResponseProvider, ExampleResponseProviderInterface $exampleResponseProvider): Response
+    public function show(Attempt $attempt, AttemptResponseFactoryInterface $attemptResponseProvider, ExampleResponseFactoryInterface $exampleResponseProvider): Response
     {
         return $this->render('attempt/show.html.twig', [
             'attempt' => $attempt,
@@ -99,7 +99,7 @@ final class AttemptController extends Controller
      * @Route("/{id}/", name="attempt_solve", methods={"GET"})
      * @IsGranted(AttemptVoter::SOLVE, subject="attempt")
      */
-    public function solve(Attempt $attempt, AttemptResponseProviderInterface $attemptResponseProvider): Response
+    public function solve(Attempt $attempt, AttemptResponseFactoryInterface $attemptResponseProvider): Response
     {
         if ($attempt->getResult()->isFinished()) {
             return $this->redirectToRoute('attempt_show', ['id' => $attempt->getId()]);
@@ -121,7 +121,7 @@ final class AttemptController extends Controller
      * @Route("/{id}/settings/", name="attempt_settings", methods={"GET"})
      * @IsGranted(AttemptVoter::VIEW, subject="attempt")
      */
-    public function settings(Attempt $attempt, AttemptResponseProviderInterface $attemptResponseProvider): Response
+    public function settings(Attempt $attempt, AttemptResponseFactoryInterface $attemptResponseProvider): Response
     {
         return $this->render('attempt/settings.html.twig', [
             'attempt' => $attempt,

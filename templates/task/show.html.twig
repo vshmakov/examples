@@ -1,11 +1,16 @@
 {% extends 'main.html.twig' %}
 
+{%  set task = taskResult.task %}
 {% block title %}
-    Задание ({{ task.settings.description }})
+    Домашнее задание ({{ task.settings.description }})
+{% endblock %}
+
+{%  block breadcrumbs %}
+    {{  include('task/breadcrumbs/show.html.twig') }}
 {% endblock %}
 
 {% block main %}
-    <h1>Задание</h1>
+    {{  parent() }}
 
     <table class="table table-light">
         <tbody>
@@ -25,13 +30,17 @@
             <th>Время окончания</th>
             <td>{{ task.limitTime }}</td>
         </tr>
+        <tr>
+            <th>Процент выполнения</th>
+            <td>{{  taskResult.donePercent }}%</td>
+        </tr>
         </tbody>
     </table>
 
     <h1>Ученики</h1>
 
-    {% include 'task/contractors_table.html.twig' with {'title': 'Не выполнившие домашнее задание', 'contractors': notSolvedTaskContractors} %}
-    {% include 'task/contractors_table.html.twig' with {'title': 'Выполнившие домашнее задание', 'contractors': solvedTaskContractors} %}
+    {% include 'task/contractors_table.html.twig' with {'title': 'Не закончившие выполнение', 'contractors': notSolvedTaskContractors} %}
+    {% include 'task/contractors_table.html.twig' with {'title': 'Закончившие выполнение', 'contractors': solvedTaskContractors} %}
 {% endblock %}
 
 {% block javascripts %}

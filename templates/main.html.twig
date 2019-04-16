@@ -147,7 +147,9 @@
             </nav>
 
             <main>
-                {% block main %}{% endblock %}
+                {% block main %}
+                    <h1>{{  block('title') }}</h1>
+                {% endblock %}
             </main>
 
             {# TODO refactor#}

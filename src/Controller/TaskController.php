@@ -63,15 +63,13 @@ final class TaskController extends Controller
             'contractors' => $currentUser->getStudents(),
             'limitTime' => (new \DateTime())->add(new \DateInterval('P7D')),
         ]);
-        $publicProfiles = $profileProvider->getPublicProfiles();
-        $userProfiles = $profileProvider->getCurrentUserProfiles();
         $form = $this->createForm(TaskType::class, $task);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $objectManager = $this->getDoctrine()->getManager();
-            $objectManager->persist($task);
-            $objectManager->flush($task);
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($task);
+            $entityManager->flush($task);
 
             return $this->redirectToRoute('task_index');
         }
@@ -82,8 +80,8 @@ final class TaskController extends Controller
             'task' => $task,
             'form' => $form->createView(),
             'profileProvider' => $profileProvider,
-            'publicProfiles' => $publicProfiles,
-            'userProfiles' => $userProfiles,
+            'publicProfiles' => $profileProvider->getPublicProfiles(),
+            'userProfiles' => $profileProvider->getCurrentUserProfiles(),
         ]);
     }
 
@@ -91,16 +89,16 @@ final class TaskController extends Controller
      * @Route("/{id}/", name="task_show", methods="GET")
      * @IsGranted(TaskVoter::SHOW, subject="task")
      */
-    public function show(Task $task, ContractorProviderInterface $contractorProvider, ContractorResultFactoryInterface $contractorResponseProvider): Response
+    public function show(Task $task, ContractorProviderInterface $contractorProvider, ContractorResultFactoryInterface $contractorResultFactory, TaskResultFactoryInterface $taskResultFactory): Response
     {
-        $createContractorResponse = function (User $contractor) use ($task, $contractorResponseProvider): ContractorResult {
-            return $contractorResponseProvider->createContractorResult($contractor, $task);
+        $createContractorResult = function (User $contractor) use ($task, $contractorResultFactory): ContractorResult {
+            return $contractorResultFactory->createContractorResult($contractor, $task);
         };
 
         return $this->render('task/show.html.twig', [
-            'task' => $task,
-            'solvedTaskContractors' => array_map($createContractorResponse, $contractorProvider->getSolvedTaskContractors($task)),
-            'notSolvedTaskContractors' => array_map($createContractorResponse, $contractorProvider->getNotSolvedTaskContractors($task)),
+            'taskResult' => $taskResultFactory->createTaskResult($task),
+            'solvedTaskContractors' => array_map($createContractorResult, $contractorProvider->getSolvedTaskContractors($task)),
+            'notSolvedTaskContractors' => array_map($createContractorResult, $contractorProvider->getNotSolvedTaskContractors($task)),
         ]);
     }
 

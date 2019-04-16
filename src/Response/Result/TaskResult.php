@@ -16,6 +16,11 @@ final class TaskResult
      */
     private $doneContractorsCount;
 
+    /**
+     * @var int
+     */
+    private $donePercent;
+
     public function getTask(): Task
     {
         return $this->task;
@@ -34,5 +39,15 @@ final class TaskResult
     public function setDoneContractorsCount(int $doneContractorsCount): void
     {
         $this->doneContractorsCount = $doneContractorsCount;
+    }
+
+    public function getDonePercent(): int
+    {
+        return $this->donePercent;
+    }
+
+    public function setDonePercent(int $donePercent): void
+    {
+        $this->donePercent = $donePercent;
     }
 }

@@ -3,7 +3,9 @@
 namespace App\Repository;
 
 use App\Attempt\AttemptProviderInterface;
+use App\Attempt\Example\ExampleProviderInterface;
 use App\Entity\Task;
+use App\Entity\User;
 use App\Object\ObjectAccessor;
 use App\Response\Result\TaskResult;
 use App\Security\User\CurrentUserProviderInterface;
@@ -22,13 +24,22 @@ final class TaskRepository extends ServiceEntityRepository implements TaskProvid
     /** @var ContractorProviderInterface */
     private $contractorProvider;
 
-    public function __construct(RegistryInterface $registry, CurrentUserProviderInterface $currentUserProvider, AttemptProviderInterface $attemptProvider, ContractorProviderInterface $contractorProvider)
-    {
+    /** @var ExampleProviderInterface */
+    private $exampleProvider;
+
+    public function __construct(
+        RegistryInterface $registry,
+        CurrentUserProviderInterface $currentUserProvider,
+        AttemptProviderInterface $attemptProvider,
+        ContractorProviderInterface $contractorProvider,
+        ExampleProviderInterface $exampleProvider
+    ) {
         parent::__construct($registry, Task::class);
 
         $this->currentUserProvider = $currentUserProvider;
         $this->attemptProvider = $attemptProvider;
         $this->contractorProvider = $contractorProvider;
+        $this->exampleProvider = $exampleProvider;
     }
 
     public function getActualTasksOfCurrentUser(): array
@@ -63,6 +74,22 @@ final class TaskRepository extends ServiceEntityRepository implements TaskProvid
         return ObjectAccessor::initialize(TaskResult::class, [
             'task' => $task,
             'doneContractorsCount' => $this->contractorProvider->getSolvedContractorsCount($task),
+            'donePercent' => $this->getDonePercent($task),
         ]);
+    }
+
+    private function getDonePercent(Task $task): int
+    {
+        $contractorsCount = $task->getContractors()->count();
+
+        return round(
+            array_reduce($task->getContractors()->toArray(), function (int $donePercent, User $contractor) use ($task, $contractorsCount): float {
+                if (0 === $contractorsCount) {
+                    return 0;
+                }
+
+                return $donePercent + $this->exampleProvider->getRightExamplesCount($contractor, $task) / $task->getTotalExamplesCount() / $contractorsCount * 100;
+            }, 0)
+        );
     }
 }

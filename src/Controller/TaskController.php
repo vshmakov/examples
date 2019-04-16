@@ -12,13 +12,9 @@ use App\Form\TaskType;
 use App\Object\ObjectAccessor;
 use App\Repository\AttemptRepository;
 use App\Repository\ExampleRepository;
-use App\Repository\ProfileRepository;
-use App\Repository\SettingsRepository;
-use App\Repository\UserRepository;
 use App\Response\Result\ContractorResult;
 use App\Security\Annotation as AppSecurity;
 use App\Security\Voter\TaskVoter;
-use App\Service\UserLoader;
 use App\Task\Contractor\ContractorProviderInterface;
 use App\Task\Contractor\ContractorResultFactoryInterface;
 use App\Task\TaskProviderInterface;
@@ -80,6 +76,7 @@ final class TaskController extends Controller
             'task' => $task,
             'form' => $form->createView(),
             'profileProvider' => $profileProvider,
+            'currentProfile' => $profileProvider->getCurrentProfile(),
             'publicProfiles' => $profileProvider->getPublicProfiles(),
             'userProfiles' => $profileProvider->getCurrentUserProfiles(),
         ]);
@@ -103,30 +100,29 @@ final class TaskController extends Controller
     }
 
     /**
-     * @Route("/{id}/edit", name="task_edit", methods="GET|POST")
+     * @Route("/{id}/edit/", name="task_edit", methods={"GET", "POST"})
+     * @IsGranted(TaskVoter::EDIT, subject="task")
      */
-    public function edit(Request $request, Task $task, ProfileRepository $profileRepository, UserRepository $userRepository, UserLoader $userLoader, SettingsRepository $settingsRepository): Response
+    public function edit(Request $request, Task $task, ProfileProviderInterface $profileProvider): Response
     {
-        $this->denyAccessUnlessGranted('EDIT', $task);
-
-        $currentUser = $userLoader->getUser()
-            ->setEntityRepository($userRepository);
         $form = $this->createForm(TaskType::class, $task);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $redirectResponse = $this->saveAndRedirect($form, $request, $profileRepository, $settingsRepository)) {
-            return $redirectResponse;
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->getDoctrine()
+                ->getManager()
+                ->flush($task);
+
+            return $this->redirectToRoute('task_index');
         }
 
         return $this->render('task/edit.html.twig', [
-            'jsParams' => [
-                'current' => ($profileRepository->findOneByCurrentAuthorOrPublicAndSettingsData($task->getSettings()) ?? $currentUser->getCurrentProfile())->getId(),
-            ],
             'task' => $task,
             'form' => $form->createView(),
-            'publicProfiles' => $profileRepository->findByIsPublic(true),
-            'profiles' => $profileRepository->findByAuthor($currentUser),
-            'profileRepository' => $profileRepository,
+            'profileProvider' => $profileProvider,
+            'currentProfile' => $profileProvider->getSettingsOrDefaultProfile($task->getSettings()),
+            'publicProfiles' => $profileProvider->getPublicProfiles(),
+            'userProfiles' => $profileProvider->getCurrentUserProfiles(),
         ]);
     }
 

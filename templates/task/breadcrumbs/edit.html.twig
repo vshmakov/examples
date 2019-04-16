@@ -1,8 +1,8 @@
 {{ include(
-    'profile/breadcrumbs/show.html.twig',
+    'task/breadcrumbs/index.html.twig',
     {
         'breadcrumbs': [
-        {'title': 'Редактировать профиль', 'url': path('profile_edit', {'id': profile.id})},
+        {'title': 'Редактировать домашнее задание'},
         ]|merge(breadcrumbs ?? [])
     }
 ) }}

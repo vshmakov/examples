@@ -3,6 +3,6 @@ import defaultDefinitions from '../DataTables/defaultDefinitions';
 import createLanguageSettings from '../DataTables/createLanguageSettings';
 
 defaultDefinitions("table", {
-    pageLength: 25,
+    searching: true,
     language: createLanguageSettings({from: "профилей"}),
 });

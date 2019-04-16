@@ -4,12 +4,13 @@
   "build/js/attempt/index.js": "/build/js/attempt/index.011c7d0e.js",
   "build/js/attempt/solve.js": "/build/js/attempt/solve.23a0c439.js",
   "build/js/homework.js": "/build/js/homework.945f38f6.js",
-  "build/js/profile/index.js": "/build/js/profile/index.532e52b4.js",
+  "build/js/profile/index.js": "/build/js/profile/index.200f4a1b.js",
   "build/js/student/attempts.js": "/build/js/student/attempts.9b90c632.js",
   "build/js/student/examples.js": "/build/js/student/examples.c146b74d.js",
   "build/js/student/index.js": "/build/js/student/index.d7e78106.js",
+  "build/js/task/edit.js": "/build/js/task/edit.5f199295.js",
   "build/js/task/index.js": "/build/js/task/index.ffc27eeb.js",
-  "build/js/task/new.js": "/build/js/task/new.944c98c9.js",
+  "build/js/task/new.js": "/build/js/task/new.94f666d2.js",
   "build/js/task/show.js": "/build/js/task/show.1d096b59.js",
   "build/js/teacher/index.js": "/build/js/teacher/index.18e73ef0.js"
 }

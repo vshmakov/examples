@@ -37,6 +37,7 @@ final class TaskVoter extends BaseVoter
     {
         return [
             self::SHOW,
+            self::EDIT,
             self::SOLVE,
         ];
     }

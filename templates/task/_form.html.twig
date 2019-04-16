@@ -11,7 +11,7 @@
 
     {% block right_table_body %}
     <td>
-        <input type="radio" name="task[profile]" value="{{  profile.id }}" {{ profileProvider.isCurrentProfile(profile) ? 'checked' : '' }}>
+        <input type="radio" name="task[profile]" value="{{  profile.id }}" {{ profile.isEqualTo(currentProfile) ? 'checked' : '' }}>
     </td>
     {% endblock %}
 {% endembed %}

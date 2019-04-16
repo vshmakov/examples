@@ -6,8 +6,8 @@ use App\Attempt\Profile\ProfileInitializerInterface;
 use App\Attempt\Profile\ProfileNormalizerInterface;
 use App\Attempt\Profile\ProfileProviderInterface;
 use App\DataFixtures\Attempt\ProfileFixtures;
-use App\Entity\BaseProfile;
 use App\Entity\Profile;
+use App\Entity\Settings;
 use App\Object\ObjectAccessor;
 use App\Security\User\CurrentUserProviderInterface;
 use App\Serializer\Group;
@@ -105,7 +105,7 @@ final class ProfileRepository extends ServiceEntityRepository implements Profile
     }
 
     /** @deprecated */
-    public function findOneByCurrentAuthorOrPublicAndSettingsData(BaseProfile $settings): ?Profile
+    public function getSettingsOrDefaultProfile(Settings $settings): Profile
     {
         $parameters = $this->normalizer->normalize($settings, null, ['groups' => Group::SETTINGS]);
 

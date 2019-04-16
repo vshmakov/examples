@@ -3,6 +3,7 @@
 namespace App\Attempt\Profile;
 
 use App\Entity\Profile;
+use App\Entity\Settings;
 
 interface ProfileProviderInterface
 {
@@ -13,4 +14,6 @@ interface ProfileProviderInterface
     public function getCurrentProfile(): Profile;
 
     public function isCurrentProfile(Profile $profile): bool;
+
+    public function getSettingsOrDefaultProfile(Settings $settings): Profile;
 }

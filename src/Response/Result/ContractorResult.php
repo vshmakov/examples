@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Response;
+namespace App\Response\Result;
 
 use App\Entity\Attempt;
 use App\Entity\Task;
 use App\Entity\User;
 
-final class ContractorResponse
+final class ContractorResult
 {
     /**
      * @var User

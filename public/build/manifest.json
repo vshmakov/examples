@@ -1,12 +1,13 @@
 {
   "build/css/app.css": "/build/css/app.dcc37950.css",
   "build/js/app.js": "/build/js/app.3e74b1c7.js",
-  "build/js/attempt/index.js": "/build/js/attempt/index.8cde306c.js",
+  "build/js/attempt/index.js": "/build/js/attempt/index.011c7d0e.js",
   "build/js/attempt/solve.js": "/build/js/attempt/solve.23a0c439.js",
   "build/js/homework.js": "/build/js/homework.945f38f6.js",
-  "build/js/profile/index.js": "/build/js/profile/index.6d4ab842.js",
-  "build/js/student/attempts.js": "/build/js/student/attempts.d686c8a3.js",
-  "build/js/student/examples.js": "/build/js/student/examples.665eb0d0.js",
-  "build/js/student/index.js": "/build/js/student/index.520d07a8.js",
-  "build/js/teacher/index.js": "/build/js/teacher/index.9672390b.js"
+  "build/js/profile/index.js": "/build/js/profile/index.532e52b4.js",
+  "build/js/student/attempts.js": "/build/js/student/attempts.9b90c632.js",
+  "build/js/student/examples.js": "/build/js/student/examples.c146b74d.js",
+  "build/js/student/index.js": "/build/js/student/index.678e85c1.js",
+  "build/js/task/index.js": "/build/js/task/index.ffc27eeb.js",
+  "build/js/teacher/index.js": "/build/js/teacher/index.18e73ef0.js"
 }

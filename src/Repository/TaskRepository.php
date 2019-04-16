@@ -4,14 +4,17 @@ namespace App\Repository;
 
 use App\Attempt\AttemptProviderInterface;
 use App\Entity\Task;
+use App\Object\ObjectAccessor;
+use App\Response\Result\TaskResult;
 use App\Security\User\CurrentUserProviderInterface;
 use App\Task\Contractor\ContractorProviderInterface;
 use App\Task\TaskProviderInterface;
+use App\Task\TaskResultFactoryInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Webmozart\Assert\Assert;
 
-final class TaskRepository extends ServiceEntityRepository implements TaskProviderInterface
+final class TaskRepository extends ServiceEntityRepository implements TaskProviderInterface, TaskResultFactoryInterface
 {
     /** @var CurrentUserProviderInterface */
     private $currentUserProvider;
@@ -53,5 +56,13 @@ final class TaskRepository extends ServiceEntityRepository implements TaskProvid
         return time() > $task->getAddTime()->getTimestamp()
             && time() < $task->getLimitTime()->getTimestamp()
             && $this->contractorProvider->getSolvedContractorsCount($task) < $task->getContractors()->count();
+    }
+
+    public function createTaskResult(Task $task): TaskResult
+    {
+        return ObjectAccessor::initialize(TaskResult::class, [
+            'task' => $task,
+            'doneContractorsCount' => $this->contractorProvider->getSolvedContractorsCount($task),
+        ]);
     }
 }

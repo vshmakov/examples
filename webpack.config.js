@@ -21,6 +21,8 @@ Encore
     .addEntry('js/student/attempts', './assets/js/student/attempts.ts')
     .addEntry('js/student/examples', './assets/js/student/examples.ts')
 
+    .addEntry('js/task/index', './assets/js/task/index.ts')
+
     .addStyleEntry('css/app', './assets/css/app.css')
 
     // will require an extra script tag for runtime.js

@@ -15,13 +15,14 @@ use App\Repository\ExampleRepository;
 use App\Repository\ProfileRepository;
 use App\Repository\SettingsRepository;
 use App\Repository\UserRepository;
-use App\Response\ContractorResponse;
+use App\Response\Result\ContractorResult;
 use App\Security\Annotation as AppSecurity;
 use App\Security\Voter\TaskVoter;
 use App\Service\UserLoader;
 use App\Task\Contractor\ContractorProviderInterface;
-use App\Task\Contractor\ContractorResponseFactoryInterface;
+use App\Task\Contractor\ContractorResultFactoryInterface;
 use App\Task\TaskProviderInterface;
+use App\Task\TaskResultFactoryInterface;
 use App\User\Teacher\Exception\RequiresTeacherAccessException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -41,11 +42,13 @@ final class TaskController extends Controller
     /**
      * @Route("/", name="task_index", methods="GET")
      */
-    public function index(TaskProviderInterface $taskProvider): Response
+    public function index(TaskProviderInterface $taskProvider, TaskResultFactoryInterface $taskResultFactory): Response
     {
+        $createTaskResult = [$taskResultFactory, 'createTaskResult'];
+
         return $this->render('task/index.html.twig', [
-            'actual' => $taskProvider->getActualTasksOfCurrentUser(),
-            'archive' => $taskProvider->getArchiveTasksOfCurrentUser(),
+            'actual' => array_map($createTaskResult, $taskProvider->getActualTasksOfCurrentUser()),
+            'archive' => array_map($createTaskResult, $taskProvider->getArchiveTasksOfCurrentUser()),
         ]);
     }
 
@@ -88,10 +91,10 @@ final class TaskController extends Controller
      * @Route("/{id}/", name="task_show", methods="GET")
      * @IsGranted(TaskVoter::SHOW, subject="task")
      */
-    public function show(Task $task, ContractorProviderInterface $contractorProvider, ContractorResponseFactoryInterface $contractorResponseProvider): Response
+    public function show(Task $task, ContractorProviderInterface $contractorProvider, ContractorResultFactoryInterface $contractorResponseProvider): Response
     {
-        $createContractorResponse = function (User $contractor) use ($task, $contractorResponseProvider): ContractorResponse {
-            return $contractorResponseProvider->createContractorResponse($contractor, $task);
+        $createContractorResponse = function (User $contractor) use ($task, $contractorResponseProvider): ContractorResult {
+            return $contractorResponseProvider->createContractorResult($contractor, $task);
         };
 
         return $this->render('task/show.html.twig', [

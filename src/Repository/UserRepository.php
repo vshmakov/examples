@@ -11,10 +11,10 @@ use App\Entity\Profile;
 use App\Entity\Task;
 use App\Entity\User;
 use App\Object\ObjectAccessor;
-use App\Response\ContractorResponse;
+use App\Response\Result\ContractorResult;
 use App\Security\User\CurrentUserProviderInterface;
 use App\Task\Contractor\ContractorProviderInterface;
-use App\Task\Contractor\ContractorResponseFactoryInterface;
+use App\Task\Contractor\ContractorResultFactoryInterface;
 use App\User\Teacher\TeacherProviderInterface;
 use App\User\UserEvaluatorInterface;
 use App\Utils\Cache\LocalCache;
@@ -23,7 +23,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Webmozart\Assert\Assert;
 
-final class UserRepository extends ServiceEntityRepository implements TeacherProviderInterface, ContractorProviderInterface, ContractorResponseFactoryInterface, UserEvaluatorInterface
+final class UserRepository extends ServiceEntityRepository implements TeacherProviderInterface, ContractorProviderInterface, ContractorResultFactoryInterface, UserEvaluatorInterface
 {
     private const  SOLVED_EXAMPLES_STANDARDS = [
         1 => [1 => 1, 2 => 5, 3 => 10, 4 => 25, 5 => 50],
@@ -337,9 +337,9 @@ where u = :u')
         return $this->isDoneByUser($task, $this->currentUserProvider->getCurrentUserOrGuest());
     }
 
-    public function createContractorResponse(User $contractor, Task $task): ContractorResponse
+    public function createContractorResult(User $contractor, Task $task): ContractorResult
     {
-        return ObjectAccessor::initialize(ContractorResponse::class, [
+        return ObjectAccessor::initialize(ContractorResult::class, [
             'contractor' => $contractor,
             'task' => $task,
             'lastAttempt' => $this->attemptProvider->getContractorLastAttempt($contractor, $task),

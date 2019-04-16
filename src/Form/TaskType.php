@@ -56,10 +56,11 @@ final class TaskType extends AbstractType
             'choice_translation_domain' => 'datetime',
             'date_format' => 'ddMMMy',
         ];
+
         $builder
             ->add('timesCount', NumberType::class)
-            ->add('addTime', DateTimeType::class)
-            ->add('limitTime', DateTimeType::class)
+            ->add('addTime', DateTimeType::class, $dateTimeOptions)
+            ->add('limitTime', DateTimeType::class, $dateTimeOptions)
             ->add('profile', ChoiceType::class, [
                 'choices' => $this->getAvailableProfilesIdList(),
                 'choice_label' => false,

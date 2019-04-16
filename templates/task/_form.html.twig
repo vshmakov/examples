@@ -3,6 +3,7 @@
 {{ form_row(form[field]) }}
 {%  endfor %}
 
+<h1>Какой профиль будет у домашнего задания?</h1>
 {% embed 'profile/list_table.html.twig' with {'title': 'Профили по умолчанию', 'profiles': publicProfiles} %}
     {% block right_table_headers %}
     <th>Выбрать</th>

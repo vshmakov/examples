@@ -22,6 +22,7 @@ Encore
     .addEntry('js/student/examples', './assets/js/student/examples.ts')
 
     .addEntry('js/task/index', './assets/js/task/index.ts')
+    .addEntry('js/task/new', './assets/js/task/new.ts')
 
     .addStyleEntry('css/app', './assets/css/app.css')
 

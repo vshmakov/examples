@@ -3,18 +3,20 @@
 namespace App\ApiPlatform\Filter\Validation;
 
 use ApiPlatform\Core\EventListener\EventPriorities;
+use App\ApiPlatform\Filter\SupportsTaskFilteringInterface;
 use App\Attempt\EventSubscriber\RouteTrait;
 use App\Entity\Task;
 use App\Security\Voter\TaskVoter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
+use Symfony\Component\HttpKernel\Event\KernelEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-final class FilterTaskValidationSubscriber implements EventSubscriberInterface
+final class FilterTaskValidationSubscriber implements EventSubscriberInterface, SupportsTaskFilteringInterface
 {
     use  RouteTrait;
 
@@ -33,15 +35,11 @@ final class FilterTaskValidationSubscriber implements EventSubscriberInterface
 
     public function onKernelView(GetResponseForControllerResultEvent $event): void
     {
-        if (!$this->inRoutes(FilterUserValidationSubscriber::SUPPORTED_ROUTES, $event)) {
+        if (!$this->isTaskFiltering($event)) {
             return;
         }
 
         $query = $event->getRequest()->query;
-
-        if (!$query->has(self::FIELD)) {
-            return;
-        }
 
         $task = $this->entityManager
             ->getRepository(Task::class)
@@ -61,5 +59,10 @@ final class FilterTaskValidationSubscriber implements EventSubscriberInterface
         return [
             KernelEvents::VIEW => ['onKernelView', EventPriorities::PRE_SERIALIZE],
         ];
+    }
+
+    public function isTaskFiltering(KernelEvent $event): bool
+    {
+        return $this->inRoutes(FilterUserValidationSubscriber::SUPPORTED_ROUTES, $event) && $event->getRequest()->query->has(self::FIELD);
     }
 }

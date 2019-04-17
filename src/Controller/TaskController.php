@@ -7,6 +7,7 @@ use App\ApiPlatform\Filter\Validation\FilterTaskValidationSubscriber;
 use App\ApiPlatform\Filter\Validation\FilterUserValidationSubscriber;
 use App\ApiPlatform\Format;
 use App\Attempt\EventSubscriber\ShowAttemptsCollectionSubscriber;
+use App\Attempt\Example\EventSubscriber\ShowExamplesCollectionSubscriber;
 use App\Attempt\Profile\ProfileProviderInterface;
 use App\Attempt\Settings\SettingsProviderInterface;
 use App\Controller\Traits\CurrentUserProviderTrait;
@@ -16,7 +17,6 @@ use App\Entity\User;
 use App\Entity\User\Role;
 use App\Form\TaskType;
 use App\Object\ObjectAccessor;
-use App\Repository\ExampleRepository;
 use App\Response\Result\ContractorResult;
 use App\Security\Annotation as AppSecurity;
 use App\Security\Voter\TaskVoter;
@@ -151,18 +151,20 @@ final class TaskController extends Controller
     }
 
     /**
-     * @Route("/{id}/contractor/{contractor_id}/examples", name="task_contractor_examples", methods="GET")
+     * @Route("/{id}/contractor/{contractor_id}/examples/", name="task_contractor_examples", methods="GET")
      * @Entity("user", expr="repository.find(contractor_id)")
+     * @IsGranted(TaskVoter::SHOW, subject="task")
+     * @IsGranted(UserVoter::SHOW_SOLVING_RESULTS, subject="user")
      */
-    public function contractorExamples(Task $task, User $user, ExampleRepository $exampleRepository): Response
+    public function contractorExamples(Task $task, User $user): Response
     {
-        $this->denyAccessUnlessGranted('SHOW', $task);
-        $this->denyAccessUnlessGranted('SHOW_EXAMPLES', $user);
+        $this->setJavascriptParameters([
+            'getExamplesUrl' => $this->generateUrl(ShowExamplesCollectionSubscriber::ROUTE, [FilterUserValidationSubscriber::FIELD => $user->getUsername(), FilterTaskValidationSubscriber::FIELD => $task->getId(), Attribute::FORMAT => Format::JSONDT]),
+        ]);
 
         return $this->render('task/contractor_examples.html.twig', [
             'task' => $task,
             'contractor' => $user,
-            'examples' => $exampleRepository->findByUserAndTask($user, $task),
         ]);
     }
 }

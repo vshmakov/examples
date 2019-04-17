@@ -122,3 +122,4 @@ services:
     App\Attempt\Example\EventSubscriber\ShowExamplesCollectionSubscriber:
         arguments:
             $userNumberProvider: '@App\Attempt\Example\Number\UserNumberProvider'
+            $taskNumberProvider: '@App\Attempt\Example\Number\TaskNumberProvider'

@@ -30,7 +30,7 @@ final class ShowAttemptsCollectionSubscriber implements EventSubscriberInterface
         }
 
         $event->setControllerResult(
-            array_reverse(Iterator::map($event->getControllerResult(), [$this->attemptResponseProvider, 'createAttemptResponse']))
+            Iterator::map($event->getControllerResult(), [$this->attemptResponseProvider, 'createAttemptResponse'])
         );
     }
 

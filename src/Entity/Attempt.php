@@ -18,6 +18,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * @ORM\Entity(repositoryClass="App\Repository\AttemptRepository")
  * @ApiResource(
+ *     order={"id": "DESC"},
  *     normalizationContext={"groups"={Group::ATTEMPT}},
  *     itemOperations={
  *     "get"={"access_control"="is_granted('VIEW', object)"},

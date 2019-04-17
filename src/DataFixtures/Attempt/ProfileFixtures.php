@@ -16,6 +16,8 @@ final class ProfileFixtures extends Fixture implements DependentFixtureInterface
     /** @var ProfileNormalizerInterface */
     private $normalizer;
 
+    public const  ADDITION_PROFILE_REFERENCE = 'Сложение в пределах 50';
+
     public const GUEST_PROFILE_DESCRIPTION = 'Тестовый профиль';
 
     public const GUEST_PROFILE = [
@@ -26,7 +28,7 @@ final class ProfileFixtures extends Fixture implements DependentFixtureInterface
 
     private const PUBLIC_PROFILES = [
         [
-            'description' => 'Сложение в пределах 50',
+            'description' => self::ADDITION_PROFILE_REFERENCE,
             'addFMin' => 10,
             'addFMax' => 40,
             'addSMin' => 10,
@@ -85,6 +87,7 @@ final class ProfileFixtures extends Fixture implements DependentFixtureInterface
     private function loadPublicProfiles(ObjectManager $manager): void
     {
         foreach (self::PUBLIC_PROFILES as $profileData) {
+            /** @var Profile $profile */
             $profile = ObjectAccessor::initialize(Profile::class, $profileData);
             ObjectAccessor::setValues($profile, [
                 'author' => $this->getReference(UserFixtures::ADMIN_USER_REFERENCE),
@@ -94,6 +97,10 @@ final class ProfileFixtures extends Fixture implements DependentFixtureInterface
 
             $this->normalizer->normalize($profile);
             $manager->persist($profile);
+
+            if (self::ADDITION_PROFILE_REFERENCE === $profile->getDescription()) {
+                $this->addReference(self::ADDITION_PROFILE_REFERENCE, $profile);
+            }
         }
     }
 

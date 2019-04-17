@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\ApiPlatform\Attribute;
-use App\ApiPlatform\Filter\FilterUserValidationSubscriber;
+use App\ApiPlatform\Filter\Validation\FilterUserValidationSubscriber;
 use App\ApiPlatform\Format;
 use App\Attempt\EventSubscriber\ShowAttemptsCollectionSubscriber;
 use App\Attempt\Example\EventSubscriber\ShowExamplesCollectionSubscriber;

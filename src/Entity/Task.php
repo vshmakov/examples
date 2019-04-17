@@ -7,6 +7,7 @@ use  App\Repository\TaskRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Webmozart\Assert\Assert;
 
 /**
  * @ORM\Entity(repositoryClass=TaskRepository::class)
@@ -63,6 +64,7 @@ class Task
         $this->contractors = new ArrayCollection();
         $this->attempts = new ArrayCollection();
         $this->addTime = new \DateTime();
+        $this->limitTime = (new \DateTime())->add(new \DateInterval('P7D'));
     }
 
     public function getId(): ?int
@@ -75,11 +77,11 @@ class Task
         return $this->author;
     }
 
-    public function setAuthor(? User $author): self
+    public function setAuthor(User $author): void
     {
+        Assert::true($author->isTeacher());
         $this->author = $author;
-
-        return $this;
+        $this->setContractors($author->getStudents());
     }
 
     /**
@@ -108,11 +110,9 @@ class Task
         return $this;
     }
 
-    public function setContractors(Collection $contractors): self
+    public function setContractors(Collection $contractors): void
     {
         $this->contractors = $contractors;
-
-        return $this;
     }
 
     /**

@@ -25,6 +25,7 @@ Encore
     .addEntry('js/task/new', './assets/js/task/new.ts')
     .addEntry('js/task/edit', './assets/js/task/edit.ts')
     .addEntry('js/task/show', './assets/js/task/show.ts')
+    .addEntry('js/task/contractor/attempts', './assets/js/task/contractor/attempts.ts')
 
     .addStyleEntry('css/app', './assets/css/app.css')
 

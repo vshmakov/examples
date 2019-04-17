@@ -4,9 +4,11 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
-use  App\ApiPlatform\Filter\AttemptUserFilter;
+use App\ApiPlatform\Filter\Attempt\TaskFilter;
+use  App\ApiPlatform\Filter\Attempt\UserFilter;
 use  App\DateTime\DateTime as DT;
 use App\Entity\Attempt\Result;
+use App\Object\ObjectAccessor;
 use App\Serializer\Group;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -25,7 +27,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * "get"
  *     }
  *     )
- * @ApiFilter(AttemptUserFilter::class)
+ * @ApiFilter(UserFilter::class)
+ * @ApiFilter(TaskFilter::class)
  */
 class Attempt
 {
@@ -64,6 +67,7 @@ class Attempt
     private $settings;
 
     /**
+     * @var Result
      * @ORM\OneToOne(targetEntity=Result::class, mappedBy="attempt", cascade={"persist", "remove"})
      */
     private $result;
@@ -164,11 +168,10 @@ class Attempt
         return $this->task;
     }
 
-    public function setTask(?Task $task): self
+    public function setTask(?Task $task): void
     {
         $this->task = $task;
-
-        return $this;
+        $this->setSettings($task->getSettings());
     }
 
     public function getSettings(): ?Settings
@@ -203,5 +206,10 @@ class Attempt
     public function isDone(): bool
     {
         return null !== $this->getResult() && 0 === $this->getResult()->getRemainedExamplesCount();
+    }
+
+    public function isFinished(): bool
+    {
+        return true === ObjectAccessor::getNullableTraversedValue($this, 'result.isFinished');
     }
 }

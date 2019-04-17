@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\ApiPlatform\Attribute;
-use App\ApiPlatform\Filter\FilterUserValidationSubscriber;
+use App\ApiPlatform\Filter\Validation\FilterUserValidationSubscriber;
 use App\ApiPlatform\Format;
 use App\Attempt\AttemptFactoryInterface;
 use App\Attempt\AttemptProviderInterface;
@@ -78,7 +78,7 @@ final class AttemptController extends Controller
         }
 
         return $this->redirectToRoute('attempt_solve', [
-            'id' => $creator->createAttempt()->getId(),
+            'id' => $creator->createCurrentUserAttempt()->getId(),
         ]);
     }
 

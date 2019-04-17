@@ -1,13 +1,12 @@
 <?php
 
-namespace App\ApiPlatform\Filter;
+namespace App\ApiPlatform\Filter\Validation;
 
 use ApiPlatform\Core\EventListener\EventPriorities;
 use App\Attempt\EventSubscriber\RouteTrait;
 use App\Attempt\EventSubscriber\ShowAttemptsCollectionSubscriber;
 use App\Attempt\Example\EventSubscriber\ShowExamplesCollectionSubscriber;
 use App\Entity\User;
-use App\Security\User\CurrentUserProviderInterface;
 use App\Security\Voter\UserVoter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -23,13 +22,10 @@ final class FilterUserValidationSubscriber implements EventSubscriberInterface
     use  RouteTrait;
 
     public const  FIELD = 'username';
-    private const SUPPORTED_ROUTES = [
+    public const SUPPORTED_ROUTES = [
         ShowAttemptsCollectionSubscriber::ROUTE,
         ShowExamplesCollectionSubscriber::ROUTE,
     ];
-
-    /** @var CurrentUserProviderInterface */
-    private $currentUserProvider;
 
     /** @var EntityManagerInterface */
     private $entityManager;
@@ -37,9 +33,8 @@ final class FilterUserValidationSubscriber implements EventSubscriberInterface
     /** @var AuthorizationCheckerInterface */
     private $authorizationChecker;
 
-    public function __construct(CurrentUserProviderInterface $currentUserProvider, EntityManagerInterface $entityManager, AuthorizationCheckerInterface $authorizationChecker)
+    public function __construct(EntityManagerInterface $entityManager, AuthorizationCheckerInterface $authorizationChecker)
     {
-        $this->currentUserProvider = $currentUserProvider;
         $this->entityManager = $entityManager;
         $this->authorizationChecker = $authorizationChecker;
     }

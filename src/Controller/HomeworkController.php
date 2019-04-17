@@ -44,7 +44,7 @@ final class HomeworkController extends Controller
         }
 
         return $this->redirectToRoute('attempt_solve', [
-            'id' => $attemptFactory->createTaskAttempt($task)->getId(),
+            'id' => $attemptFactory->createCurrentUserSolvesTaskAttempt($task)->getId(),
         ]);
     }
 }

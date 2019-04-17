@@ -248,7 +248,7 @@ where s.user = :user and a.task = :task')
 
     public function createSolvingExampleResponse(Attempt $attempt): ?ExampleResponse
     {
-        if (($attempt->getResult()->isFinished())) {
+        if (($attempt->isFinished())) {
             return null;
         }
 

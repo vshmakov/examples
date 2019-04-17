@@ -2,7 +2,7 @@
     'task/breadcrumbs/index.html.twig',
     {
         'breadcrumbs': [
-        {'title': 'Просмотреть домашнее задание'},
+            {'title': 'Просмотреть домашнее задание ('~task.settings.description~')', 'url': path('task_show', {'id': task.id})},
         ]|merge(breadcrumbs ?? [])
     }
 ) }}

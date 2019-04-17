@@ -4,10 +4,11 @@ namespace App\DataFixtures\Attempt;
 
 use App\Attempt\AttemptFactoryInterface;
 use App\Attempt\AttemptResultProviderInterface;
-use App\DataFixtures\PersistTrait;
+use App\DataFixtures\TaskFixtures;
 use App\DataFixtures\UserFixtures;
 use App\Entity\Attempt;
 use App\Entity\Example;
+use App\Entity\Task;
 use App\Object\ObjectAccessor;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -15,41 +16,55 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 final class AttemptFixtures extends Fixture implements DependentFixtureInterface
 {
-    use PersistTrait;
-
     /** @var AttemptFactoryInterface */
-    private $attemptCreator;
+    private $attemptFactory;
 
     /** @var AttemptResultProviderInterface */
     private $attemptResultProvider;
 
     public function __construct(AttemptFactoryInterface $attemptCreator, AttemptResultProviderInterface $attemptResultProvider)
     {
-        $this->attemptCreator = $attemptCreator;
+        $this->attemptFactory = $attemptCreator;
         $this->attemptResultProvider = $attemptResultProvider;
+    }
+
+    public function getDependencies(): array
+    {
+        return [
+            UserFixtures::class,
+            ProfileFixtures::class,
+            TaskFixtures::class,
+        ];
     }
 
     public function load(ObjectManager $manager)
     {
-        $this->manager = $manager;
-
-        for ($i = 1; $i <= 20; ++$i) {
-            $attempt = $this->attemptCreator->createAttempt();
-            $this->persist($attempt);
-
-            while ($attempt->getExamples()->count() < $attempt->getSettings()->getExamplesCount()) {
-                $isEvenExample = 0 === ($attempt->getExamples()->count() + 1) % 2;
-                $this->addExample($attempt, !$isEvenExample);
-            }
-
-            $manager->flush();
-            $this->attemptResultProvider->updateAttemptResult($attempt);
-        }
-
+        $this->loadGuestAttempts($manager);
+        $this->loadTaskAttempts($manager);
         $manager->flush();
     }
 
-    private function addExample(Attempt $attempt, bool $isRight): void
+    private function loadGuestAttempts(ObjectManager $manager): void
+    {
+        for ($i = 1; $i <= 10; ++$i) {
+            $attempt = $this->attemptFactory->createCurrentUserAttempt();
+            $this->solveAttempt($attempt, $manager);
+        }
+    }
+
+    private function solveAttempt(Attempt $attempt, ObjectManager $manager): void
+    {
+        $manager->persist($attempt);
+
+        while (!$attempt->isDone()) {
+            $isWrongExample = 1 === ($attempt->getExamples()->count() + 1) % 3;
+            $this->addExample($attempt, !$isWrongExample, $manager);
+            $manager->flush();
+            $this->attemptResultProvider->updateAttemptResult($attempt);
+        }
+    }
+
+    private function addExample(Attempt $attempt, bool $isRight, ObjectManager $manager): void
     {
         /** @var Example $example */
         $example = ObjectAccessor::initialize(Example::class, [
@@ -60,15 +75,18 @@ final class AttemptFixtures extends Fixture implements DependentFixtureInterface
             'isRight' => $isRight,
             'attempt' => $attempt,
         ]);
-        $this->persist($example);
+        $manager->persist($example);
         $attempt->addExample($example);
     }
 
-    public function getDependencies()
+    private function loadTaskAttempts(ObjectManager $manager): void
     {
-        return [
-            UserFixtures::class,
-            ProfileFixtures::class,
-        ];
+        /** @var Task $task */
+        $task = $this->getReference(TaskFixtures::TASK_REFERENCE);
+
+        for ($i = 1; $i < $task->getTimesCount(); ++$i) {
+            $attempt = $this->attemptFactory->createUserSolvesTaskAttempt($task, $this->getReference(UserFixtures::STUDENT_USER_REFERENCE));
+            $this->solveAttempt($attempt, $manager);
+        }
     }
 }

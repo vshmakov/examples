@@ -8,7 +8,6 @@ use App\Doctrine\QueryResult;
 use App\Entity\Profile;
 use App\Entity\Task;
 use App\Security\User\CurrentUserProviderInterface;
-use App\Security\Voter\ProfileVoter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -19,9 +18,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 final class TaskType extends AbstractType
 {
@@ -37,17 +34,16 @@ final class TaskType extends AbstractType
     /** @var EntityManagerInterface */
     private $entityManager;
 
-    /** @var AuthorizationCheckerInterface */
-    private $authorizationChecker;
-
-    //TODO refactor
-    public function __construct(CurrentUserProviderInterface $currentUserProvider, ProfileProviderInterface $profileProvider, SettingsProviderInterface $settingsProvider, EntityManagerInterface $entityManager, AuthorizationCheckerInterface $authorizationChecker)
-    {
+    public function __construct(
+        CurrentUserProviderInterface $currentUserProvider,
+        ProfileProviderInterface $profileProvider,
+        SettingsProviderInterface $settingsProvider,
+        EntityManagerInterface $entityManager
+    ) {
         $this->currentUserProvider = $currentUserProvider;
         $this->profileProvider = $profileProvider;
         $this->settingsProvider = $settingsProvider;
         $this->entityManager = $entityManager;
-        $this->authorizationChecker = $authorizationChecker;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -105,10 +101,6 @@ final class TaskType extends AbstractType
             $profileField->addError(new FormError('Необходимо выбрать профиль'));
 
             return;
-        }
-
-        if (!$this->authorizationChecker->isGranted(ProfileVoter::APPOINT, $profile)) {
-            throw new AccessDeniedHttpException();
         }
 
         $settings = $this->settingsProvider->getOrCreateSettingsByProfile($profile);

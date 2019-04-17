@@ -4,7 +4,7 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
-use App\ApiPlatform\Filter\ExampleUserFilter;
+use App\ApiPlatform\Filter\Example\UserFilter;
 use App\DateTime\DateTime as DT;
 use  App\Serializer\Group;
 use App\Service\ExampleManager;
@@ -12,12 +12,13 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ExampleRepository")
+ * @TODO deny item access
  * @ApiResource(
  *     normalizationContext={"groups"={Group::EXAMPLE}},
  *     itemOperations={"get"},
  *     collectionOperations={"get"}
  * )
- * @ApiFilter(ExampleUserFilter::class)
+ * @ApiFilter(  UserFilter::class)
  */
 class Example
 {

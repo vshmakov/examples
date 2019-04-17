@@ -2,19 +2,25 @@
 
 namespace App\Controller;
 
+use App\ApiPlatform\Attribute;
+use App\ApiPlatform\Filter\Validation\FilterTaskValidationSubscriber;
+use App\ApiPlatform\Filter\Validation\FilterUserValidationSubscriber;
+use App\ApiPlatform\Format;
+use App\Attempt\EventSubscriber\ShowAttemptsCollectionSubscriber;
 use App\Attempt\Profile\ProfileProviderInterface;
 use App\Attempt\Settings\SettingsProviderInterface;
 use App\Controller\Traits\CurrentUserProviderTrait;
+use App\Controller\Traits\JavascriptParametersTrait;
 use App\Entity\Task;
 use App\Entity\User;
 use App\Entity\User\Role;
 use App\Form\TaskType;
 use App\Object\ObjectAccessor;
-use App\Repository\AttemptRepository;
 use App\Repository\ExampleRepository;
 use App\Response\Result\ContractorResult;
 use App\Security\Annotation as AppSecurity;
 use App\Security\Voter\TaskVoter;
+use App\Security\Voter\UserVoter;
 use App\Task\Contractor\ContractorProviderInterface;
 use App\Task\Contractor\ContractorResultFactoryInterface;
 use App\Task\TaskProviderInterface;
@@ -33,7 +39,7 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 final class TaskController extends Controller
 {
-    use CurrentUserProviderTrait;
+    use CurrentUserProviderTrait, JavascriptParametersTrait;
 
     /**
      * @Route("/", name="task_index", methods="GET")
@@ -53,11 +59,9 @@ final class TaskController extends Controller
      */
     public function new(Request $request, SettingsProviderInterface $settingsProvider, ProfileProviderInterface $profileProvider): Response
     {
-        $currentUser = $this->getCurrentUserOrGuest();
+        /** @var Task $task */
         $task = ObjectAccessor::initialize(Task::class, [
-            'author' => $currentUser,
-            'contractors' => $currentUser->getStudents(),
-            'limitTime' => (new \DateTime())->add(new \DateInterval('P7D')),
+            'author' => $this->getCurrentUserOrGuest(),
         ]);
         $form = $this->createForm(TaskType::class, $task);
         $form->handleRequest($request);
@@ -116,6 +120,8 @@ final class TaskController extends Controller
             return $this->redirectToRoute('task_index');
         }
 
+        $form->remove('profile');
+
         return $this->render('task/edit.html.twig', [
             'task' => $task,
             'form' => $form->createView(),
@@ -127,18 +133,20 @@ final class TaskController extends Controller
     }
 
     /**
-     * @Route("/{id}/contractor/{contractor_id}/attempts", name="task_contractor_attempts", methods="GET")
+     * @Route("/{id}/contractor/{contractor_id}/attempts/", name="task_contractor_attempts", methods="GET")
      * @Entity("user", expr="repository.find(contractor_id)")
+     * @IsGranted(TaskVoter::SHOW, subject="task")
+     * @IsGranted(UserVoter::SHOW_SOLVING_RESULTS, subject="user")
      */
-    public function contractorAttempts(Task $task, User $user, AttemptRepository $attemptRepository): Response
+    public function contractorAttempts(Task $task, User $user): Response
     {
-        $this->denyAccessUnlessGranted('SHOW', $task);
-        $this->denyAccessUnlessGranted('SHOW_ATTEMPTS', $user);
+        $this->setJavascriptParameters([
+            'getAttemptsUrl' => $this->generateUrl(ShowAttemptsCollectionSubscriber::ROUTE, [FilterUserValidationSubscriber::FIELD => $user->getUsername(), FilterTaskValidationSubscriber::FIELD => $task->getId(), Attribute::FORMAT => Format::JSONDT]),
+        ]);
 
         return $this->render('task/contractor_attempts.html.twig', [
             'task' => $task,
             'contractor' => $user,
-            'attempts' => $attemptRepository->findByUserAndTask($user, $task),
         ]);
     }
 

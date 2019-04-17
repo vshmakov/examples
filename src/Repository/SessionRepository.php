@@ -83,9 +83,14 @@ where a.id is null and s.lastTime < :dt')
 
     public function getCurrentUserSession(): ?Session
     {
-        $where = ['user' => $this->currentUserProvider->getCurrentUserOrGuest()];
+        return $this->getUserSession($this->currentUserProvider->getCurrentUserOrGuest());
+    }
 
-        if ($this->currentUserProvider->isCurrentUserGuest()) {
+    private function getUserSession(User $user): ?Session
+    {
+        $where = ['user' => $user];
+
+        if ($this->currentUserProvider->isGuest($user)) {
             $where += ['sid' => $this->sessionMarker->getKey()];
         }
 
@@ -94,14 +99,19 @@ where a.id is null and s.lastTime < :dt')
 
     public function getCurrentUserSessionOrNew(): Session
     {
-        return $this->getCurrentUserSession() ?? $this->createSessionByCurrentUser();
+        return $this->getUserSessionOrNew($this->currentUserProvider->getCurrentUserOrGuest());
     }
 
-    private function createSessionByCurrentUser(): Session
+    public function getUserSessionOrNew(User $user): Session
+    {
+        return $this->getUserSession($user) ?? $this->createUserSession($user);
+    }
+
+    private function createUserSession(User $user): Session
     {
         return $this->getNewByUserAndSid(
-            $this->currentUserProvider->getCurrentUserOrGuest(),
-            $this->currentUserProvider->isCurrentUserGuest() ? $this->sessionMarker->getKey() : null
+            $user,
+            $this->currentUserProvider->isGuest($user) ? $this->sessionMarker->getKey() : null
         );
     }
 

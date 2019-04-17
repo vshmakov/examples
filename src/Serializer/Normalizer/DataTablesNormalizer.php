@@ -90,8 +90,8 @@ final class DataTablesNormalizer implements NormalizerInterface
         $operationName = $request->attributes->get('_api_collection_operation_name');
         $queryBuilder = $this->entityManager
             ->createQueryBuilder()
-            ->select('count(t)')
-            ->from($resourceClass, 't');
+            ->select('count(o)')
+            ->from($resourceClass, 'o');
 
         /** @var QueryCollectionExtensionInterface $extension */
         foreach ($this->collectionExtensions as $extension) {

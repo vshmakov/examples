@@ -104,11 +104,11 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
             ->select('count(a)')
             ->join('a.session', 's')
             ->where('s.user = :user')
-            ->andWhere('a.addTime <= :createdAt')
+            ->andWhere('a.id <= :attemptId')
             ->getQuery()
             ->setParameters([
                 'user' => $attempt->getSession()->getUser(),
-                'createdAt' => $attempt->getAddTime(),
+                'attemptId' => $attempt->getId(),
             ])
             ->getSingleScalarResult();
     }
@@ -172,7 +172,7 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
         return ExampleManager::rating($attempt->getExamplesCount(), $this->getWrongExamplesCount($attempt));
     }
 
-    public function createAttempt(): Attempt
+    public function createCurrentUserAttempt(): Attempt
     {
         $attempt = $this->createNewByCurrentUser();
         $attempt->setSettings($this->settingsProvider->getOrCreateSettingsByCurrentUserProfile());
@@ -185,12 +185,16 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
         return $attempt;
     }
 
-    public function createTaskAttempt(Task $task): Attempt
+    public function createCurrentUserSolvesTaskAttempt(Task $task): Attempt
     {
-        $attempt = $this->createNewByCurrentUser();
+        return $this->createUserSolvesTaskAttempt($task, $this->currentUserProvider->getCurrentUserOrGuest());
+    }
+
+    public function createUserSolvesTaskAttempt(Task $task, User $user): Attempt
+    {
+        $attempt = $this->createNewByUser($user);
         ObjectAccessor::setValues($attempt, [
             'task' => $task,
-            'settings' => $task->getSettings(),
         ]);
 
         $entityManager = $this->getEntityManager();
@@ -203,8 +207,13 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
 
     private function createNewByCurrentUser(): Attempt
     {
+        return $this->createNewByUser($this->currentUserProvider->getCurrentUserOrGuest());
+    }
+
+    private function createNewByUser(User $user): Attempt
+    {
         $attempt = ObjectAccessor::initialize(Attempt::class, [
-            'session' => $this->currentUserSessionProvider->getCurrentUserSessionOrNew(),
+            'session' => $this->currentUserSessionProvider->getUserSessionOrNew($user),
         ]);
 
         return $attempt;

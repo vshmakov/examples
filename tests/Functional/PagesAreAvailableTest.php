@@ -24,6 +24,8 @@ final class PagesAreAvailableTest extends BaseWebTestCase
 
     private const ADMIN_ENDPOINTS = [
         '/admin/',
+        //'/admin/user/',
+        //'/admin/session/',
     ];
 
     private const STUDENT_ENDPOINTS = [
@@ -32,8 +34,9 @@ final class PagesAreAvailableTest extends BaseWebTestCase
     ];
 
     private const TEACHER_ENDPOINTS = [
-        //'/student/',
+        '/student/',
         '/task/',
+        '/task/new/',
     ];
 
     /** @var Client */

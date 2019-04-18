@@ -164,7 +164,7 @@ class StudentManipulateProfilesTest extends BaseWebTestCase
     public function studentHasTestProfileByDefault(Crawler $profileIndexPageCrawler): Crawler
     {
         $firstPublicProfileCrawler = $this->getFirstPublicProfileCrawler($profileIndexPageCrawler);
-        $this->assertSame('Да', $firstPublicProfileCrawler->filter('.is-current-profile')->text());
+        $this->assertSame('Да', $this->getTrimmedText($firstPublicProfileCrawler->filter('.is-current-profile')));
         $descriptionCrawler = $firstPublicProfileCrawler->filter('.profile-description');
         $this->assertSame(ProfileFixtures::GUEST_PROFILE_DESCRIPTION, $this->getTrimmedText($descriptionCrawler));
 

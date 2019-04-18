@@ -4,8 +4,8 @@
     Домашнее задание
 {% endblock %}
 
-{%  block breadcrumbs %}
-    {{  include('task/breadcrumbs/index.html.twig') }}
+{% block breadcrumbs %}
+    {{ include('task/breadcrumbs/index.html.twig') }}
 {% endblock %}
 
 {% block main %}
@@ -15,8 +15,13 @@
         <li><a href="{{ path('task_new') }}" role="button" class="btn btn-success">Создать задание</a></li>
     </ul>
     {% from 'task/list_table.html.twig' import list_table %}
-    {{ list_table('Актуальные', actual, true) }}
-    {{ list_table('Архив', archive, false) }}
+    <div class="actual">
+        {{ list_table('Актуальные', actual, true) }}
+    </div>
+
+    <div class="archive">
+        {{ list_table('Архив', archive, false) }}
+    </div>
 {% endblock %}
 
 {% block javascripts %}

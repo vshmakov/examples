@@ -21,7 +21,7 @@ final class ShowExamplesCollectionSubscriber implements EventSubscriberInterface
     public const  ROUTE = 'api_examples_get_collection';
 
     /** @var ExampleResponseFactoryInterface */
-    private $exampleResponseProvider;
+    private $exampleResponseFactory;
 
     /** @var SupportsTaskFilteringInterface */
     private $supportsTaskFiltering;
@@ -33,12 +33,12 @@ final class ShowExamplesCollectionSubscriber implements EventSubscriberInterface
     private $taskNumberProvider;
 
     public function __construct(
-        ExampleResponseFactoryInterface $exampleResponseProvider,
+        ExampleResponseFactoryInterface $exampleResponseFactory,
         SupportsTaskFilteringInterface $supportsTaskFiltering,
         NumberProviderInterface $userNumberProvider,
         NumberProviderInterface  $taskNumberProvider
     ) {
-        $this->exampleResponseProvider = $exampleResponseProvider;
+        $this->exampleResponseFactory = $exampleResponseFactory;
         $this->supportsTaskFiltering = $supportsTaskFiltering;
         $this->userNumberProvider = $userNumberProvider;
         $this->taskNumberProvider = $taskNumberProvider;
@@ -58,7 +58,7 @@ final class ShowExamplesCollectionSubscriber implements EventSubscriberInterface
 
         $event->setControllerResult(
             Iterator::map($event->getControllerResult(), function (Example $example) use ($numberProvider): ExampleResponse {
-                return $this->exampleResponseProvider->createExampleResponse($example, $numberProvider);
+                return $this->exampleResponseFactory->createExampleResponse($example, $numberProvider);
             })
         );
     }

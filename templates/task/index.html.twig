@@ -15,8 +15,8 @@
         <li><a href="{{ path('task_new') }}" role="button" class="btn btn-success">Создать задание</a></li>
     </ul>
     {% from 'task/list_table.html.twig' import list_table %}
-    {{ list_table('Актуальные', actual) }}
-    {{ list_table('Архив', archive) }}
+    {{ list_table('Актуальные', actual, true) }}
+    {{ list_table('Архив', archive, false) }}
 {% endblock %}
 
 {% block javascripts %}

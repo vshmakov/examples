@@ -66,7 +66,23 @@ final class AppExtension extends AbstractExtension implements \Twig_Extension_Gl
     {
         return [
             new TwigFilter('toLabelString', [$this, 'toLabelStringFilter']),
+            new TwigFilter('toJavascriptString', [$this, 'toJavascriptStringFilter']),
         ];
+    }
+
+    public function toJavascriptStringFilter(string $string): string
+    {
+        $lines = [];
+
+        foreach (explode("\n", $string) as $line) {
+            $trimmedLine = trim($line);
+
+            if ('' !== $trimmedLine) {
+                $lines[] = $trimmedLine;
+            }
+        }
+
+        return implode('\n', $lines);
     }
 
     public function getFunctions()

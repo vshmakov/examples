@@ -1,4 +1,4 @@
-{% macro list_table(title, tasks) %}
+{% macro list_table(title, tasks, isActual) %}
     <h2>{{ title }}</h2>
 
     <table class="table table-info">
@@ -27,12 +27,25 @@
                 <td>
                     {{ taskResult.doneContractorsCount }} из {{ task.contractors.count }}
                 </td>
-                                <td>{{ task.timesCount }}</td>
+                <td>{{ task.timesCount }}</td>
                 <td>{{ task.totalExamplesCount }}</td>
                 <td>{{ task.addTime }}</td>
                 <td>{{ task.limitTime }}</td>
-                                <td>
+                <td>
                     <a href="{{ path('task_edit', {'id': task.id}) }}">Редактировать</a>
+
+                    {% if isActual %}
+                        {% set confirmMessage %}
+                            Вы действительно хотите архивировать домашнее задание ({{ task.settings.description }})?
+                            При архивации задания время его начала и окончания устанавливается в прошлое.
+                            Вы всегда сможете вернуть его в необходимое вам значение на странице редактирования задания.
+                        {% endset %}
+
+                        <a href="{{ path('task_archive', {'id': task.id}) }}" role="button" class="btn btn-danger"
+                           onclick="return confirm('{{ confirmMessage|toJavascriptString }}')">
+                            Архивировать
+                        </a>
+                    {% endif %}
                 </td>
             </tr>
         {% endfor %}

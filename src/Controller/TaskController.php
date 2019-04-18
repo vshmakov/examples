@@ -29,6 +29,7 @@ use App\User\Teacher\Exception\RequiresTeacherAccessException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -166,5 +167,19 @@ final class TaskController extends Controller
             'task' => $task,
             'contractor' => $user,
         ]);
+    }
+
+    /**
+     * @Route("/{id}/archive/", name="task_archive", methods={"GET"})
+     * @IsGranted(TaskVoter::EDIT, subject="task")
+     */
+    public function archive(Task $task): RedirectResponse
+    {
+        $lastTime = (new \DateTime())->sub(new \DateInterval('PT1M'));
+        $task->setAddTime($lastTime);
+        $task->setLimitTime($lastTime);
+        $this->getDoctrine()->getManager()->flush($task);
+
+        return $this->redirectToRoute('task_index');
     }
 }

@@ -16,11 +16,11 @@ final class ShowAttemptsCollectionSubscriber implements EventSubscriberInterface
     public const  ROUTE = 'api_attempts_get_collection';
 
     /** @var AttemptResponseFactoryInterface */
-    private $attemptResponseProvider;
+    private $attemptResponseFactory;
 
-    public function __construct(AttemptResponseFactoryInterface $attemptResponseProvider)
+    public function __construct(AttemptResponseFactoryInterface $attemptResponseFactory)
     {
-        $this->attemptResponseProvider = $attemptResponseProvider;
+        $this->attemptResponseFactory = $attemptResponseFactory;
     }
 
     public function onKernelView(GetResponseForControllerResultEvent $event): void
@@ -30,7 +30,7 @@ final class ShowAttemptsCollectionSubscriber implements EventSubscriberInterface
         }
 
         $event->setControllerResult(
-            Iterator::map($event->getControllerResult(), [$this->attemptResponseProvider, 'createAttemptResponse'])
+            Iterator::map($event->getControllerResult(), [$this->attemptResponseFactory, 'createAttemptResponse'])
         );
     }
 

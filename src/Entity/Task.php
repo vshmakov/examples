@@ -3,7 +3,8 @@
 namespace App\Entity;
 
 use App\DateTime\DateTime as DT;
-use  App\Repository\TaskRepository;
+use App\Repository\TaskRepository;
+use  App\Validator as AppAssert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -40,6 +41,7 @@ class Task
 
     /**
      * @ORM\Column(type="smallint")
+     * @AppAssert\NumberBetween(minimum=1, maximum=50)
      */
     private $timesCount = 5;
 

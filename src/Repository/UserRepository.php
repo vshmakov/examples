@@ -344,8 +344,21 @@ where u = :u')
             'task' => $task,
             'lastAttempt' => $this->attemptProvider->getContractorLastAttempt($contractor, $task),
             'rightExamplesCount' => $this->exampleProvider->getRightExamplesCount($contractor, $task),
+            'doneAttemptsCount' => $this->attemptProvider->getDoneAttemptsCount($task, $contractor),
             'rating' => $this->getTaskRating($contractor, $task),
         ]);
+    }
+
+    public function createCurrentContractorResult(Task $task): ContractorResult
+    {
+        return $this->createContractorResult($this->currentUserProvider->getCurrentUserOrGuest(), $task);
+    }
+
+    public function mapCreateCurrentContractorResult(array $tasks): array
+    {
+        return array_map(function (Task $task): ContractorResult {
+            return $this->createCurrentContractorResult($task);
+        }, $tasks);
     }
 
     /**

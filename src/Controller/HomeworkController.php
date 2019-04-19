@@ -7,6 +7,7 @@ use App\Entity\Task;
 use App\Security\Annotation as AppSecurity;
 use App\Security\Voter\TaskVoter;
 use App\Task\Contractor\ContractorProviderInterface;
+use App\Task\Contractor\ContractorResultFactoryInterface;
 use App\Task\Homework\HomeworkProviderInterface;
 use App\User\Student\Exception\RequiresStudentAccessException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -25,11 +26,11 @@ final class HomeworkController extends Controller
     /**
      * @Route("/", name="homework_index", methods={"GET"})
      */
-    public function index(HomeworkProviderInterface $homeworkProvider): Response
+    public function index(HomeworkProviderInterface $homeworkProvider, ContractorResultFactoryInterface $contractorResultFactory): Response
     {
         return $this->render('homework/index.html.twig', [
-            'actualHomework' => $homeworkProvider->getActualHomework(),
-            'archiveHomework' => $homeworkProvider->getArchiveHomework(),
+            'actualHomework' => $contractorResultFactory->mapCreateCurrentContractorResult($homeworkProvider->getActualHomework()),
+            'archiveHomework' => $contractorResultFactory->mapCreateCurrentContractorResult($homeworkProvider->getArchiveHomework()),
         ]);
     }
 

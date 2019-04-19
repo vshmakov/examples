@@ -18,6 +18,7 @@ use App\Entity\Profile;
 use App\Iterator;
 use App\Security\Voter\AttemptVoter;
 use App\Security\Voter\ProfileVoter;
+use App\Task\Contractor\ContractorResultFactoryInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -86,12 +87,22 @@ final class AttemptController extends Controller
      * @Route("/{id}/show/", name="attempt_show", methods={"GET"})
      * @IsGranted(AttemptVoter::VIEW, subject="attempt")
      */
-    public function show(Attempt $attempt, AttemptResponseFactoryInterface $attemptResponseProvider, ExampleResponseFactoryInterface $exampleResponseProvider): Response
+    public function show(Attempt $attempt, AttemptResponseFactoryInterface $attemptResponseFactory, ExampleResponseFactoryInterface $exampleResponseFactory, ContractorResultFactoryInterface $contractorResultFactory): Response
     {
+        $hasNextTaskAttempt = false;
+        $contractorResult = null;
+
+        if (null !== $attempt->getTask()) {
+            $contractorResult = $contractorResultFactory->createCurrentContractorResult($attempt->getTask());
+            $hasNextTaskAttempt = !$contractorResult->isDone();
+        }
+
         return $this->render('attempt/show.html.twig', [
             'attempt' => $attempt,
-            'attemptResponse' => $attemptResponseProvider->createAttemptResponse($attempt),
-            'exampleResponses' => Iterator::map($attempt->getExamples(), [$exampleResponseProvider, 'createExampleResponse']),
+            'hasNextTaskAttempt' => $hasNextTaskAttempt,
+            'contractorResult' => $contractorResult,
+            'attemptResponse' => $attemptResponseFactory->createAttemptResponse($attempt),
+            'exampleResponses' => Iterator::map($attempt->getExamples(), [$exampleResponseFactory, 'createExampleResponse']),
         ]);
     }
 

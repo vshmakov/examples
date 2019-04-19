@@ -32,6 +32,10 @@ final class ContractorResult
      * @var int|null
      */
     private $rating;
+    /**
+     * @var int
+     */
+    private $doneAttemptsCount;
 
     public function getContractor(): User
     {
@@ -81,5 +85,20 @@ final class ContractorResult
     public function setRating(?int $rating): void
     {
         $this->rating = $rating;
+    }
+
+    public function getDoneAttemptsCount(): int
+    {
+        return $this->doneAttemptsCount;
+    }
+
+    public function setDoneAttemptsCount(int $doneAttemptsCount): void
+    {
+        $this->doneAttemptsCount = $doneAttemptsCount;
+    }
+
+    public function isDone(): bool
+    {
+        return $this->getDoneAttemptsCount() === $this->getTask()->getTimesCount();
     }
 }

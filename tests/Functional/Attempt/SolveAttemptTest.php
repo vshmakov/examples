@@ -3,20 +3,12 @@
 namespace App\Tests\Functional\Attempt;
 
 use App\DataFixtures\Attempt\ProfileFixtures;
-use App\Tests\Functional\BaseWebTestCase;
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpKernel\Client;
 
-final class SolveAttemptTest extends BaseWebTestCase
+final class SolveAttemptTest extends AbstractSolveAttemptTest
 {
     /** @var Client */
     private static $unauthenticatedClient;
-
-    /** @var int */
-    private static $attemptId;
-
-    /** @var array */
-    private static $attemptData;
 
     public static function setupBeforeClass(): void
     {
@@ -26,118 +18,66 @@ final class SolveAttemptTest extends BaseWebTestCase
     /**
      * @test
      */
-    public function guestStartsNewAttempt(): void
+    public function guestStartsNewAttempt(): int
     {
         self::$unauthenticatedClient->request('GET', '/attempt/new/');
-        $response = self::$unauthenticatedClient->getResponse();
-        $this->assertTrue($response->isRedirection());
-        $this->assertTrue((bool) preg_match('#/attempt/(?<attemptId>\d+)/$#', $response->headers->get('location'), $matches));
-        self::$attemptId = $matches['attemptId'];
+
+        return $this->getAttemptId(self::$unauthenticatedClient);
     }
 
     /**
      * @test
      * @depends guestStartsNewAttempt
      */
-    public function guestGetsAttemptData(): void
+    public function guestGetsAttemptData(int $attemptId): array
     {
-        self::$attemptData = self::ajaxGet(self::$unauthenticatedClient, sprintf('/api/attempts/%s.json', self::$attemptId));
-        $this->assertTrue(self::$unauthenticatedClient->getResponse()->isSuccessful());
+        $attemptData = $this->getAttemptData($attemptId, self::$unauthenticatedClient);
 
-        $this->assertSame(ProfileFixtures::GUEST_PROFILE_DESCRIPTION, self::$attemptData['settings']['description']);
-        $this->assertSame(ProfileFixtures::GUEST_PROFILE['examplesCount'], self::$attemptData['result']['remainedExamplesCount']);
-        $this->assertContains('isFinished', self::$attemptData['result']);
+        $this->assertSame(ProfileFixtures::GUEST_PROFILE_DESCRIPTION, $attemptData['settings']['description']);
+        $this->assertSame(ProfileFixtures::GUEST_PROFILE['examplesCount'], $attemptData['result']['remainedExamplesCount']);
+        $this->assertContains('isFinished', $attemptData['result']);
+
+        return $attemptData;
     }
 
     /**
      * @testt
      * @depends guestGetsAttemptData
      */
-    public function guestSolvesAttempt(): void
+    public function guestSolvesAttempt(array $attemptData): void
     {
-        $attemptData = self::$attemptData;
-        $solvedExamplesCount = 0;
-
-        while (1 <= $attemptData['result']['remainedExamplesCount']) {
-            $this->assertLessThan(10, $solvedExamplesCount++);
-            $answerCallback = 1 !== $solvedExamplesCount ? 'rightAnswer' : 'wrongAnswer';
-            $answerAttemptData = \call_user_func([$this, $answerCallback], $attemptData['example']['string']);
-            $attemptData = $answerAttemptData['attempt'];
-            $isLastExample = 0 === $attemptData['result']['remainedExamplesCount'];
-
-            if (!$isLastExample) {
-                $this->assertFalse($attemptData['result']['isFinished']);
-            } else {
-                $this->assertTrue($attemptData['result']['isFinished']);
-                $this->assertNull($attemptData['example']);
-            }
-        }
+        $this->solveAttempt($attemptData, self::$unauthenticatedClient);
     }
 
     /**
      * @test
+     * @depends  guestStartsNewAttempt
      * @depends  guestSolvesAttempt
      */
-    public function guestRedirectsToAttemptResult(): void
+    public function guestRedirectsToAttemptResult(int $attemptId): void
     {
-        self::$unauthenticatedClient->request('GET', sprintf('/attempt/%s/', self::$attemptId));
+        self::$unauthenticatedClient->request('GET', sprintf('/attempt/%s/', $attemptId));
         $this->assertTrue(self::$unauthenticatedClient->getResponse()->isRedirection());
-        $this->assertTrue(self::$unauthenticatedClient->getResponse()->isRedirect(sprintf('/attempt/%s/show/', self::$attemptId)));
+        $this->assertTrue(self::$unauthenticatedClient->getResponse()->isRedirect(sprintf('/attempt/%s/show/', $attemptId)));
     }
 
     /**
      * @test
-     * @depends  guestSolvesAttempt
+     * @depends  guestStartsNewAttempt
      */
-    public function guestShowAttemptResult(): void
+    public function guestShowAttemptResult(int $attemptId): void
     {
-        self::$unauthenticatedClient->request('GET', sprintf('/attempt/%s/show/', self::$attemptId));
+        self::$unauthenticatedClient->request('GET', sprintf('/attempt/%s/show/', $attemptId));
         $this->assertTrue(self::$unauthenticatedClient->getResponse()->isSuccessful());
     }
 
     /**
      * @test
-     * @depends  guestSolvesAttempt
+     * @depends  guestStartsNewAttempt
      */
-    public function guestShowAttemptSettings(): void
+    public function guestShowAttemptSettings(int $attemptId): void
     {
-        self::$unauthenticatedClient->request('GET', sprintf('/attempt/%s/settings/', self::$attemptId));
+        self::$unauthenticatedClient->request('GET', sprintf('/attempt/%s/settings/', $attemptId));
         $this->assertTrue(self::$unauthenticatedClient->getResponse()->isSuccessful());
-    }
-
-    private function rightAnswer(string $example): array
-    {
-        $answerData = $this->answer($this->solve($example));
-        $this->assertTrue($answerData['isRight']);
-
-        return $answerData;
-    }
-
-    private function wrongAnswer(string $example): array
-    {
-        $answerData = $this->answer($this->solve($example) + 1);
-        $this->assertFalse($answerData['isRight']);
-
-        return $answerData;
-    }
-
-    private function answer(int $answer): array
-    {
-        $answerData = self::ajaxPut(
-            self::$unauthenticatedClient,
-            sprintf('/api/attempts/%s/answer.json', self::$attemptId),
-            ['answer' => $answer,
-            ]);
-        $this->assertTrue(self::$unauthenticatedClient->getResponse()->isSuccessful());
-
-        return $answerData;
-    }
-
-    private function solve(string $example): float
-    {
-        $expressionLanguage = new ExpressionLanguage();
-        $example = str_replace(':', '/', $example);
-
-        return $expressionLanguage->evaluate($example);
     }
 }

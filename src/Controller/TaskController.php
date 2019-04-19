@@ -36,6 +36,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/task")
+ * @IsGranted(Role::USER)
  * @AppSecurity\IsGranted(Role::TEACHER, exception=RequiresTeacherAccessException::class)
  */
 final class TaskController extends Controller

@@ -4,7 +4,9 @@ namespace App\Controller;
 
 use App\Attempt\AttemptFactoryInterface;
 use App\Entity\Task;
+use App\Entity\User\Role;
 use App\Security\Annotation as AppSecurity;
+use App\Security\Voter\CurrentUserVoter;
 use App\Security\Voter\TaskVoter;
 use App\Task\Contractor\ContractorProviderInterface;
 use App\Task\Contractor\ContractorResultFactoryInterface;
@@ -19,7 +21,9 @@ use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/homework")
+ * @IsGranted(Role::USER)
  * @AppSecurity\IsGranted("ROLE_STUDENT", exception=RequiresStudentAccessException::class)
+ * @IsGranted(CurrentUserVoter::SHOW_HOMEWORK, message="Необходимо выбрать учителя")
  */
 final class HomeworkController extends Controller
 {

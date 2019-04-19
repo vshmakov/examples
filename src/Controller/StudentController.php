@@ -22,6 +22,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/student")
+ * @IsGranted(Role::USER)
  * @AppSecurity\IsGranted(Role::TEACHER, exception=RequiresTeacherAccessException::class)
  */
 final class StudentController extends Controller

@@ -11,8 +11,13 @@
 {% block main %}
     <h1>Домашнее задание</h1>
 
-    {% include 'homework/tasks_table.html.twig' with {'title': 'Текущие задания', 'tasks': actualHomework} %}
-    {% include 'homework/tasks_table.html.twig' with {'title': 'Архив заданий', 'tasks': archiveHomework} %}
+    <div class="actual">
+        {% include 'homework/tasks_table.html.twig' with {'title': 'Текущие задания', 'tasks': actualHomework} %}
+    </div>
+
+    <div class="archive">
+        {% include 'homework/tasks_table.html.twig' with {'title': 'Архив заданий', 'tasks': archiveHomework} %}
+    </div>
 {% endblock %}
 
 {% block javascripts %}

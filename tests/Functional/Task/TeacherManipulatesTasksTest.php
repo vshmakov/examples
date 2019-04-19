@@ -34,15 +34,6 @@ final class TeacherManipulatesTasksTest extends BaseWebTestCase
      * @test
      * @depends  teacherEntersToTaskIndexPage
      */
-    public function teacherHasNoArchivedTasks(Crawler $taskIndexPageCrawler): void
-    {
-        $this->assertEmpty($taskIndexPageCrawler->filter('.archive tbody tr'));
-    }
-
-    /**
-     * @test
-     * @depends  teacherEntersToTaskIndexPage
-     */
     public function teacherHasTask(Crawler $taskIndexPageCrawler): Crawler
     {
         $firstActualTaskCrawler = $taskIndexPageCrawler->filter('.actual tbody tr:first-child');
@@ -75,7 +66,7 @@ final class TeacherManipulatesTasksTest extends BaseWebTestCase
     /**
      * @test
      * @depends  taskHasShowLink
-     * @depends defaultTaskHasAdditionSettings
+     * @depends  defaultTaskHasAdditionSettings
      */
     public function teacherEntersToTaskShowPage(Crawler $showTaskLinkCrawler): Crawler
     {
@@ -206,7 +197,6 @@ final class TeacherManipulatesTasksTest extends BaseWebTestCase
     /**
      * @test
      * @depends  taskHasDefaultSettingsDescription
-     * @depends  teacherHasNoArchivedTasks
      */
     public function teacherArchivesTask(Crawler $taskCrawler): Crawler
     {
@@ -216,15 +206,6 @@ final class TeacherManipulatesTasksTest extends BaseWebTestCase
         $this->assertTrue(self::$teacherClient->getResponse()->isRedirect('/task/'));
 
         return self::$teacherClient->followRedirect();
-    }
-
-    /**
-     * @test
-     * @depends  teacherArchivesTask
-     */
-    public function teacherHasOneArchivedTask(Crawler $taskIndexPageCrawler): void
-    {
-        $this->assertCount(1, $taskIndexPageCrawler->filter('.archive tbody tr'));
     }
 
     private function getTaskId(Crawler $showTaskLinkCrawler): int

@@ -32,14 +32,16 @@ final class TaskFixtures extends Fixture implements DependentFixtureInterface
 
     public function load(ObjectManager $manager): void
     {
-        /** @var Task $task */
-        $task = ObjectAccessor::initialize(Task::class, [
-            'author' => $this->getReference(UserFixtures::TEACHER_USER_REFERENCE),
-            'settings' => $this->settingsProvider->getOrCreateSettingsByProfile($this->getReference(ProfileFixtures::ADDITION_PROFILE_REFERENCE)),
-        ]);
+        for ($i = 1; $i <= 2; ++$i) {
+            /** @var Task $task */
+            $task = ObjectAccessor::initialize(Task::class, [
+                'author' => $this->getReference(UserFixtures::TEACHER_USER_REFERENCE),
+                'settings' => $this->settingsProvider->getOrCreateSettingsByProfile($this->getReference(ProfileFixtures::ADDITION_PROFILE_REFERENCE)),
+            ]);
 
-        $manager->persist($task);
-        $manager->flush();
+            $manager->persist($task);
+            $manager->flush();
+        }
 
         $this->addReference(self::TASK_REFERENCE, $task);
     }

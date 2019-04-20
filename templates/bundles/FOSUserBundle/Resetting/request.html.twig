@@ -1,7 +1,28 @@
 {% extends "@FOSUser/layout.html.twig" %}
+{% trans_default_domain 'FOSUserBundle' %}
 
-{%block title "Сброс пароля"%}
+{% block title %}
+    Сбросить пароль
+{% endblock %}
+
+{% block breadcrumbs %}
+    {{ include('@FOSUser/breadcrumbs/resetting.html.twig') }}
+{% endblock %}
 
 {% block fos_user_content %}
-{% include "@FOSUser/Resetting/request_content.html.twig" %}
+    <h1>{{ block('title') }}</h1>
+
+    <form action="{{ path('fos_user_resetting_send_email') }}" method="POST"
+          class="fos_user_resetting_request">
+        <div>
+            <label for="username">{{ 'resetting.request.username'|trans }}</label>
+            <input type="text" class="form-control" id="username" name="username" required="required"/>
+        </div>
+        <div>
+            <input
+                    type="submit"
+                    class="btn btn-danger"
+                    value="Сброс"/>
+        </div>
+    </form>
 {% endblock fos_user_content %}

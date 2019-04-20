@@ -3,7 +3,9 @@
 namespace App\Twig;
 
 use App\Object\ObjectAccessor;
+use App\Parameter\ChooseInterface;
 use App\Parameter\Container\ParametersContainerInterface;
+use App\Parameter\Environment\AppEnv;
 use App\Parameter\StringInterface;
 use App\Repository\AttemptRepository;
 use App\Repository\HomeworkRepository;
@@ -28,6 +30,9 @@ final class AppExtension extends AbstractExtension implements \Twig_Extension_Gl
     /** @var ParametersContainerInterface */
     private $javascriptParametersContainer;
 
+    /** @var ChooseInterface */
+    private $appEnv;
+
     public function __construct(
         CurrentUserProviderInterface $currentUserProvider,
         AttemptRepository $attemptRepository,
@@ -35,8 +40,10 @@ final class AppExtension extends AbstractExtension implements \Twig_Extension_Gl
         UserRepository $userRepository,
         EntityManagerInterface $entityManager,
         ParametersContainerInterface $javascriptParametersContainer,
-        StringInterface $appName
+        StringInterface $appName,
+        ChooseInterface $appEnv
     ) {
+        $this->appEnv = $appEnv;
         $this->entityManager = $entityManager;
         $this->taskRepository = $taskRepository;
         $this->userLoader = $currentUserProvider;
@@ -58,7 +65,9 @@ final class AppExtension extends AbstractExtension implements \Twig_Extension_Gl
     public function getGlobals()
     {
         return $this->globals + [
-                'javascriptParameters' => $this->javascriptParametersContainer->getParameters(),
+                'javascriptParameters' => $this->javascriptParametersContainer->getParameters() + [
+                        'isDevelopmentEnvironment' => $this->appEnv->is(AppEnv::DEV),
+                    ],
             ];
     }
 

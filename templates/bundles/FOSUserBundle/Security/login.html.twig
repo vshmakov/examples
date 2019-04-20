@@ -1,7 +1,107 @@
 {% extends "@FOSUser/layout.html.twig" %}
+{% trans_default_domain 'FOSUserBundle' %}
 
-{%block title "Вход"%}
+{% block title %}
+    Войти на сайт
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('build/js/security/login.css') }}">
+{% endblock %}
+
+{% block breadcrumbs %}
+    {{ include('@FOSUser/breadcrumbs/login.html.twig') }}
+{% endblock %}
 
 {% block fos_user_content %}
-    {{ include('@FOSUser/Security/login_content.html.twig') }}
+    <h1>{{ block('title') }}</h1>
+
+    <div id="accordion">
+        <h3>Мгновенный вход с помощью социальных сетей</h3>
+        <div>
+            {{ include("widget/social_networks_authorization.html.twig") }}
+        </div>
+
+        <h3>Войти с помощью электронной почты</h3>
+        <div>
+            {% if error %}
+                <div class="error">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            {% endif %}
+
+            <form action="{{ path("fos_user_security_check") }}" method="post">
+                {% if csrf_token %}
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token }}"/>
+                {% endif %}
+
+                <table class="table table-light">
+                    <tr>
+                        <th><label for="username">{{ 'resetting.request.username'|trans }}</label></th>
+                        <td>
+                            <input
+                                    type="text"
+                                    class="form-control"
+                                    id="username"
+                                    name="_username"
+                                    value="{{ last_username }}"
+                                    required="required"
+                                    autocomplete="username"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="password">{{ 'security.login.password'|trans }}</label></th>
+                        <td>
+                            <input
+                                    type="password"
+                                    id="password"
+                                    class="form-control"
+                                    name="_password"
+                                    required="required"
+
+                                    autocomplete="current-password"/>
+                        </td>
+                    </tr>
+                </table>
+
+                <input type="checkbox" id="remember_me" name="_remember_me" value="on" checked/>
+                <label class="login-rem" for="remember_me">{{ 'security.login.remember_me'|trans }}</label>
+
+                <input
+                        class="btn btn-success"
+                        type="submit"
+                        id="_submit"
+                        name="_submit"
+
+                        value="{{ 'security.login.submit'|trans }}"/>
+            </form>
+
+            <div>
+                <a href="{{ path("fos_user_resetting_request") }}">Забыли пароль?</a>
+                <a href="{{ path("fos_user_registration_register") }}">Регистрация</a>
+            </div>
+        </div>
+
+        <h3>Не можете войти на сайт?</h3>
+        <div>
+            <ol>
+                <li>Попробуйте воспользоваться сбросом пароля, перейдя по ссылке "Забыли пароль?"</li>
+                <li>
+                    Если вы не уверены, что ваша регистрация на сайте прошла успешно, попробуйте зарегистрироваться при
+                    помощи
+                    той
+                    же электронной почты еще раз.
+                </li>
+                <li>
+                    Если, при попытке войти, вы получаете сообщение "Электронная почта аккаунта не подтверждена.", то
+                    вам также
+                    потребуется воспользоваться сбросом пароля для потверждения своей электронной почты. <br>
+                    Дополнительные подробности вы сможете найти на странице регистрации.
+                </li>
+            </ol>
+        </div>
+    </div>
 {% endblock fos_user_content %}
+
+{% block javascripts %}
+    <script src="{{ asset('build/js/security/login.js') }}"></script>
+{% endblock %}

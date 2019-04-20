@@ -28,6 +28,9 @@ Encore
     .addEntry('js/task/contractor/attempts', './assets/js/task/contractor/attempts.ts')
     .addEntry('js/task/contractor/examples', './assets/js/task/contractor/examples.ts')
 
+    .addEntry('js/security/login', './assets/js/security/login.ts')
+    .addEntry('js/security/register', './assets/js/security/register.ts')
+
     .addStyleEntry('css/app', './assets/css/app.css')
 
     // will require an extra script tag for runtime.js

@@ -58,6 +58,7 @@ services:
         arguments:
             $javascriptParametersContainer: '@App\Parameter\Container\JavascriptParametersContainer'
             $appName: '@App\Parameter\Environment\AppName'
+            $appEnv: '@App\Parameter\Environment\AppEnv'
 
     App\Security\Annotation\IsGrantedListener:
         arguments:

@@ -1,7 +1,127 @@
 {% extends "@FOSUser/layout.html.twig" %}
+{% trans_default_domain 'FOSUserBundle' %}
 
-{%block title "Регистрация"%}
+{% block title %}
+    Зарегистрироваться
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('build/js/security/register.css') }}">
+{% endblock %}
+
+{% block breadcrumbs %}
+    {{ include('@FOSUser/breadcrumbs/register.html.twig') }}
+{% endblock %}
 
 {% block fos_user_content %}
-{% include "@FOSUser/Registration/register_content.html.twig" %}
+    <h1>{{ block('title') }}</h1>
+
+    <div id="accordion">
+        <h3>Мгновенная регистрация с помощью социальных сетей</h3>
+        <div>
+            {{ include("widget/social_networks_authorization.html.twig") }}
+        </div>
+
+        <h3>Зарегистрироваться с помощью электронной почты</h3>
+        <div>
+            {{ form_start(form, {'method': 'post', 'action': path('fos_user_registration_register'), 'attr': {'class':
+                'fos_user_registration_register'}}) }}
+            <table class="table table-light">
+                <tr>
+                    <th>Логин</th>
+                    <td>
+                        <div class="error">{{ form_errors(form.username) }}</div>
+                        {{ form_widget(form.username) }}
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        Электронная почта
+                    </th>
+                    <td>
+                        <div class="error">{{ form_errors(form.email) }}</div>
+                        {{ form_widget(form.email) }}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Пароль</th>
+                    <td>
+                        <div class="error">{{ form_errors(form.plainPassword.first) }}</div>
+                        {{ form_widget(form.plainPassword.first) }}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Повторите пароль</th>
+                    <td>
+                        <div class="error">{{ form_errors(form.plainPassword.second) }}</div>
+                        {{ form_widget(form.plainPassword.second) }}
+                    </td>
+                </tr>
+            </table>
+
+            {{ form_widget(form) }}
+
+            <div>
+                <input
+                        type="submit"
+                        class="btn btn-success"
+                        value="{{ 'registration.submit'|trans }}"/>
+            </div>
+            {{ form_end(form) }}
+        </div>
+
+        <h3>Как зарегистрироваться на нашем сервисе?</h3>
+        <div>
+            <p>
+                <b>
+                    Воспользуйтесь регистрацией при помощи широкого списка социальных сетей.
+                </b>
+            </p>
+
+            <p>Если вы хотите зарегистрироваться с помощью электронной почты, проделайте следующие действия.</p>
+            <ol>
+                <li>Введите придуманный вами логин, свою электронную почту и, дважды, пароль в форму регистрации.</li>
+                <li>Логин должен начинаться с буквы, заканчиваться буквой или цифрой и может содержать только строчные
+                    латинские
+                    символы, цифры, а также ._-
+                </li>
+                <li>После нажатия кнопки "Зарегистрироваться" вы должны оказаться на странице подтверждения регистрации,
+                    где
+                    будет указано, что на введенный вами адрес электронной почты было выслано регистрационное письмо.
+                </li>
+                <li>Войдите в ящик указанной вами электронной почты, откройте пришедшее письмо подтверждения регистрации
+                    и
+                    перейдите по соответствующей ссылке.
+                </li>
+                <li>Вы создали свой аккаунт на нашем сервисе. Приятного пользования!</li>
+            </ol>
+
+            <p>
+                Вы попали на страницу подтверждения регистрации, но письмо на указанную вами почту не пришло?
+            </p>
+            <ol>
+                <li>Подождите в течение 5 минут, а затем проверьте папку "Спам" вашего почтового ящика.</li>
+                <li>Воспользуйтесь <a href="{{ path("fos_user_resetting_request") }}">сбросом пароля</a> для
+                    подтверждения
+                    вашей
+                    почты.
+                </li>
+                {% set email=FEEDBACK_EMAIL %}
+                <li>
+                    {#TODO contact us#}
+                    <a href="">Напишите нам.</a>
+                    Мы активируем ваш аккаунт вручную в самое короткое время!
+                </li>
+            </ol>
+
+            <p>
+                <b>Спасибо, что выбрали наш сервис!</b>
+            </p>
+        </div>
+    </div>
 {% endblock fos_user_content %}
+
+{% block javascripts %}
+    <script src="{{ asset('build/js/security/register.js') }}"></script>
+{% endblock %}

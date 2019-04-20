@@ -11,8 +11,6 @@
     {% endif %}
 {% endblock %}
 
-{% block guest_auth %}{% endblock %}
-
 {% block main %}
     <content>
         <div>
@@ -76,9 +74,9 @@
             {{ include("index/using_steps.html.twig") }}
         </div>
 
-        {% if isGuest %}
-            {{ include("widget/auth.html.twig") }}
-        {% endif %}
+        {% block guest_authorization %}
+            {{ parent() }}
+        {% endblock %}
 
         <div>
             <h2>Расскажите о нас!</h2>

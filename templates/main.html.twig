@@ -153,8 +153,11 @@
             </main>
 
             {# TODO refactor#}
-            {% block guest_auth %}
-                {{ include("widget/guest_auth.html.twig", {"h": "h4"}) }}
+            {% block guest_authorization %}
+                {% if not is_granted('ROLE_USER') %}
+                    <h3>Мгновенный вход и регистрация с помощью социальных сетей</h3>
+                {{ include("widget/social_networks_authorization.html.twig") }}
+                {% endif %}
             {% endblock %}
         </div>
     {% endblock body %}

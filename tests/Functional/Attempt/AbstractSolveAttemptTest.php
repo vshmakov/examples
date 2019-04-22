@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Functional\Attempt;
 
 use App\Tests\Functional\BaseWebTestCase;
@@ -12,7 +14,7 @@ abstract class AbstractSolveAttemptTest extends BaseWebTestCase
     {
         $matches = $this->assertRedirectionLocationMatch('#/attempt/(?<attemptId>\d+)/$#', $client);
 
-        return $matches['attemptId'];
+        return (int) $matches['attemptId'];
     }
 
     protected function getAttemptData(int $attemptId, Client $client): array

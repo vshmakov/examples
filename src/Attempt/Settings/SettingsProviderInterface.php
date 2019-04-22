@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Attempt\Settings;
 
 use App\Entity\Profile;

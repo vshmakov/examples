@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\User\SocialAccount\SocialAccountProviderInterface;
@@ -33,7 +35,7 @@ final class SecurityController extends Controller
         }
 
         $user = $userProvider->getOrCreateUser($socialAccount);
-        $this->addFlash('login', $user->getId());
+        $this->addFlash('login', (string) $user->getId());
 
         return $this->redirectToRoute('security_login');
     }

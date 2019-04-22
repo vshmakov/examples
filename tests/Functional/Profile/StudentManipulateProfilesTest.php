@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Functional\Profile;
 
 use App\DataFixtures\Attempt\ProfileFixtures;
@@ -215,7 +217,7 @@ class StudentManipulateProfilesTest extends BaseWebTestCase
 
     private function getProfileIdFromRedirectingToEditPage(Client $client): int
     {
-        return $this->assertRedirectionLocationMatch('#/profile/(?<profileId>\d+)/edit/#', $client)['profileId'];
+        return (int) $this->assertRedirectionLocationMatch('#/profile/(?<profileId>\d+)/edit/#', $client)['profileId'];
     }
 
     private function assertAttemptProfileDescription(string $description, Crawler $solveAttemptPageCrawler): void

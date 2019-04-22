@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Functional\Task;
 
 use App\DataFixtures\Attempt\ProfileFixtures;
@@ -212,6 +214,6 @@ final class TeacherManipulatesTasksTest extends BaseWebTestCase
     {
         $this->assertTrue((bool) preg_match('#/task/(?<taskId>\d+)/$#', $showTaskLinkCrawler->attr('href'), $matches));
 
-        return $matches['taskId'];
+        return (int) $matches['taskId'];
     }
 }

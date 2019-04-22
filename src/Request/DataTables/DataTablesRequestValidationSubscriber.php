@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Request\DataTables;
 
 use ApiPlatform\Core\EventListener\EventPriorities;

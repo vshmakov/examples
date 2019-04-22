@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Request\Http;
 
 use ApiPlatform\Core\EventListener\EventPriorities;
@@ -15,7 +17,7 @@ final class RequestParserSubscriber implements EventSubscriberInterface
     {
         $request = $event->getRequest();
 
-        if (0 === mb_strpos($request->headers->get('CONTENT_TYPE'), 'application/json')
+        if (0 === mb_strpos($request->headers->get('CONTENT_TYPE', ''), 'application/json')
             && \in_array(mb_strtoupper($request->server->get('REQUEST_METHOD', 'GET')), ['PUT'], true)
         ) {
             $data = json_decode($request->getContent(), true);

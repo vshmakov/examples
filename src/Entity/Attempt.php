@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
@@ -79,9 +81,13 @@ class Attempt
         $this->addTime = new \DateTime();
     }
 
-    public function getId()
+    public function getId(): ?int
     {
-        return $this->id;
+        if (null === $this->id) {
+            return null;
+        }
+
+        return (int) $this->id;
     }
 
     /**

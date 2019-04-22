@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Functional\Security;
 
 use App\User\SocialAccount\Credentials\SocialAccountCredentialsProviderInterface;
@@ -10,7 +12,7 @@ final class SocialAccountCredentialsProvider implements SocialAccountCredentials
     {
         return [
             'network' => 'my_network',
-            'uid' => '123456',
+            'uid' => 123456,
         ];
     }
 }

@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 class ExampleManager
 {
-    public static function solve(float $first, float $second, int $sign): ? float
+    public static function solve(float $first, float $second, int $sign): ?float
     {
         switch ($sign) {
             case 1:
@@ -76,6 +78,9 @@ class ExampleManager
         $needUniqueAnswer = $this->getBooleanByPercentsProbability(80);
         $needMaxAmplitude = $this->getBooleanByPercentsProbability(70);
 
+        foreach ($settings as $key => $item) {
+            $settings[$key] = (int) $item;
+        }
         for ($i = 1; $i <= 20; ++$i) {
             extract($this->$actionName($settings));
             $qualityCoefficient = $this->getExampleQualityCoefficient($first, $second, $sign, $settings, $previousExamples, $needUniqueAnswer, $needMaxAmplitude);

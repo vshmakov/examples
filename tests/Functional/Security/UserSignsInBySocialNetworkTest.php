@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Functional\Security;
 
 use App\Tests\Functional\BaseWebTestCase;
@@ -23,7 +25,7 @@ final class UserSignsInBySocialNetworkTest extends BaseWebTestCase
      */
     public function userRegisters(): void
     {
-        self::$userClient->request(Request::METHOD_POST, '/security/ulogin/register/', ['token' => 123]);
+        self::$userClient->request(Request::METHOD_POST, '/security/ulogin/register/', ['token' => '123']);
         $this->assertTrue(self::$userClient->getResponse()->isRedirect('/security/login/'));
 
         self::$userClient->followRedirect();

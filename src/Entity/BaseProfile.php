@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\DateTime\DateTime as DT;
@@ -350,7 +352,7 @@ abstract class BaseProfile
 
     public function getExamplesCount(): ?int
     {
-        return $this->examplesCount;
+        return (int) $this->examplesCount;
     }
 
     public function setExamplesCount(int $examplesCount): self

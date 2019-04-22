@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Serializer\Normalizer;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
@@ -108,7 +110,7 @@ final class DataTablesNormalizer implements NormalizerInterface
             $filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operationName, ['filters' => $request->query->all()]);
         }
 
-        return $queryBuilder
+        return (int) $queryBuilder
             ->getQuery()
             ->getSingleScalarResult();
     }

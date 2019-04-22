@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Attempt\Example\Number;
 
 use App\Entity\Example;
@@ -20,7 +22,7 @@ final class TaskNumberProvider implements NumberProviderInterface
     {
         Assert::notNull($example->getAttempt()->getTask());
 
-        return $this->entityManager
+        return (int) $this->entityManager
             ->createQueryBuilder()
             ->select('count(e)')
             ->from(Example::class, 'e')

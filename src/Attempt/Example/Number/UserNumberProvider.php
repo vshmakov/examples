@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Attempt\Example\Number;
 
 use App\Entity\Example;
@@ -17,7 +19,7 @@ final class UserNumberProvider implements NumberProviderInterface
 
     public function getNumber(Example $example): int
     {
-        return $this->entityManager
+        return (int) $this->entityManager
             ->createQueryBuilder()
             ->select('count(e)')
             ->from(Example::class, 'e')

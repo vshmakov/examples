@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Attempt\AttemptProviderInterface;
@@ -75,7 +77,7 @@ final class ExampleRepository extends ServiceEntityRepository implements Example
             return null;
         }
 
-        return $this->createQueryBuilder('e')
+        return (int) $this->createQueryBuilder('e')
             ->select('count(e)')
             ->where('e.attempt = :attempt')
             ->andWhere('e.isRight = false')
@@ -260,7 +262,7 @@ where s.user = :user and a.task = :task')
 
     public function getRightExamplesCount(User $contractor, Task $task): int
     {
-        return $this->createQueryBuilder('e')
+        return (int) $this->createQueryBuilder('e')
             ->select('count(e)')
             ->join('e.attempt', 'a')
             ->join('a.session', 's')

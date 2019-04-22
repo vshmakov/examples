@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use  App\Attempt\AttemptFactoryInterface;
@@ -100,7 +102,7 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
 
     private function getNumber(Attempt $attempt): int
     {
-        return $this->createQueryBuilder('a')
+        return (int) $this->createQueryBuilder('a')
             ->select('count(a)')
             ->join('a.session', 's')
             ->where('s.user = :user')
@@ -135,7 +137,7 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
             return $this->getAnsweredExamplesCount($attempt);
         }
 
-        return $this->createQueryBuilder('a')
+        return (int) $this->createQueryBuilder('a')
             ->select('count(a)')
             ->join('a.examples', 'e')
             ->where('e.isRight = true')
@@ -147,7 +149,7 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
 
     private function getAnsweredExamplesCount(Attempt $attempt): int
     {
-        return $this->createQueryBuilder('a')
+        return (int) $this->createQueryBuilder('a')
             ->select('count(a)')
             ->join('a.examples', 'e')
             ->where('e.answer is not null')

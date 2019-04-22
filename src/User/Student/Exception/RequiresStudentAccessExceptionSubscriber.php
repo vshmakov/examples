@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\User\Student\Exception;
 
 use App\User\Teacher\Exception\RequiresTeacherAccessExceptionSubscriber;

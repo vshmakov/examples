@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Attempt\AttemptProviderInterface;
@@ -390,7 +392,7 @@ where u = :u')
             return null;
         }
 
-        return round(
+        return (int) round(
             array_reduce($attempts, function (float $rating, Attempt $attempt) use ($attempts): float {
                 return $rating + $attempt->getResult()->getRating() / \count($attempts);
             }, 0)

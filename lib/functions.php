@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 function arr(string $string): array
 {
     $array = explode(' ', $string);

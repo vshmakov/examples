@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Attempt\AttemptProviderInterface;
@@ -82,7 +84,7 @@ final class TaskRepository extends ServiceEntityRepository implements TaskProvid
     {
         $contractorsCount = $task->getContractors()->count();
 
-        return round(
+        return (int) round(
             array_reduce($task->getContractors()->toArray(), function (int $donePercent, User $contractor) use ($task, $contractorsCount): float {
                 if (0 === $contractorsCount) {
                     return 0;

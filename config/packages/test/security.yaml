@@ -10,5 +10,5 @@ security:
             guard:
                 provider: test
                 authenticators:
-                    - App\Security\TestAuthenticator
+                    - App\Security\Authentication\TestAuthenticator
             anonymous:    true

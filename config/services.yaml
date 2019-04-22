@@ -40,10 +40,6 @@ services:
         arguments:
             $appEnv: '%env(APP_ENV)%'
 
-    App\Security\TestAuthenticator:
-        arguments:
-            $appEnv: '@App\Parameter\Environment\AppEnv'
-
     App\Service\AuthChecker:
         arguments:
             $authorizationChecker: '@security.authorization_checker'

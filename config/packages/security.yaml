@@ -1,4 +1,3 @@
-
 security:
 
     encoders:
@@ -18,12 +17,12 @@ security:
 
     firewalls:
         login:
-            pattern: ^/api/login
+            pattern: ^/security/login/$
             context: main
             guard:
                 provider: login
                 authenticators:
-                    - App\Security\LoginAuthenticator
+                    - App\Security\Authentication\LoginAuthenticator
             logout:       true
             anonymous:    true
             remember_me:

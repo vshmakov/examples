@@ -10,6 +10,7 @@ use App\Entity\Attempt;
 use App\Entity\Profile;
 use App\Entity\Task;
 use App\Entity\User;
+use App\Entity\User\SocialAccount;
 use App\Object\ObjectAccessor;
 use App\Response\Result\ContractorResult;
 use App\Security\User\CurrentUserProviderInterface;
@@ -17,13 +18,14 @@ use App\Task\Contractor\ContractorProviderInterface;
 use App\Task\Contractor\ContractorResultFactoryInterface;
 use App\User\Teacher\TeacherProviderInterface;
 use App\User\UserEvaluatorInterface;
+use App\User\UserProviderInterface;
 use App\Utils\Cache\LocalCache;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Webmozart\Assert\Assert;
 
-final class UserRepository extends ServiceEntityRepository implements TeacherProviderInterface, ContractorProviderInterface, ContractorResultFactoryInterface, UserEvaluatorInterface
+final class UserRepository extends ServiceEntityRepository implements UserProviderInterface, TeacherProviderInterface, ContractorProviderInterface, ContractorResultFactoryInterface, UserEvaluatorInterface
 {
     private const  SOLVED_EXAMPLES_STANDARDS = [
         1 => [1 => 1, 2 => 5, 3 => 10, 4 => 25, 5 => 50],
@@ -53,7 +55,8 @@ final class UserRepository extends ServiceEntityRepository implements TeacherPro
         LocalCache $localCache,
         AttemptProviderInterface $attemptProvider,
         ExampleProviderInterface $exampleProvider
-    ) {
+    )
+    {
         parent::__construct($registry, User::class);
 
         $this->currentUserProvider = $currentUserProvider;
@@ -124,36 +127,49 @@ final class UserRepository extends ServiceEntityRepository implements TeacherPro
         ]);
     }
 
-    private function findOneByUloginCredentials($credentials): ?User
+    private function findOneBySocialAccount(SocialAccount $socialAccount): ?User
     {
-        extract($credentials);
-
-        return $this->findOneBy(['network' => $network, 'networkId' => $uid]);
+        return $this->createQueryBuilder('u')
+            ->select('u')
+            ->join('u.socialAccounts', 's')
+            ->where('s.networkId = :networkId and s.network = :network')
+            ->orWhere('u.networkId = :networkId and u.network = :network')
+            ->getQuery()
+            ->setParameters([
+                'network' => $socialAccount->getNetwork(),
+                'networkId' => $socialAccount->getNetworkId(),
+            ])
+            ->setMaxResults(1)
+            ->getOneOrNullResult();
     }
 
-    public function findOneByUloginCredentialsOrNew($credentials): User
+    private function getUniqueUsername(SocialAccount $socialAccount): string
     {
-        extract($credentials);
-
-        if ($user = $this->findOneByUloginCredentials($credentials)) {
-            return $user;
-        }
-
-        $uniqUsername = $username;
+        $uniqueUsername = $socialAccount->getUsername();
         $i = 1;
 
-        while ($this->countByUsername($uniqUsername)) {
-            $uniqUsername = sprintf('%s-%s', $uniqUsername, $i);
+        while ($this->countByUsername($uniqueUsername)) {
+            $uniqueUsername = sprintf('%s-%s', $uniqueUsername, $i);
             ++$i;
         }
 
-        $user = $this->getNew()
-            ->setUsername($uniqUsername)
-            ->setIsSocial(true)
-            ->setFirstName($first_name)
-            ->setLastName($last_name)
-            ->setNetwork($network)
-            ->setNetworkId($uid);
+        return $uniqueUsername;
+    }
+
+    public function getOrCreateUser(SocialAccount $socialAccount): User
+    {
+        $user = $this->findOneBySocialAccount($socialAccount);
+
+        if (null === $user) {
+            $user = $this->getNew();
+            ObjectAccessor::setValues($user, [
+                'username' => $this->getUniqueUsername($socialAccount),
+                'firstName' => $socialAccount->getFirstName(),
+                'lastName' => $socialAccount->getLastName(),
+            ]);
+        }
+
+        $user->addSocialAccount($socialAccount);
         $entityManager = $this->getEntityManager();
         $entityManager->persist($user);
         $entityManager->flush();
@@ -292,7 +308,7 @@ where u = :u')
             ->getQuery()
             ->getSingleScalarResult();
 
-        return (int) ($rightExamplesCount / $days);
+        return (int)($rightExamplesCount / $days);
     }
 
     private function putAssessment(int $result, array $standardList): int

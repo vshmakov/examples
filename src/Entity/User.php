@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\User\SocialAccount;
 use App\DataFixtures\UserFixtures;
 use App\DateTime\DateTime as DT;
 use App\Entity\Traits\BaseTrait;
@@ -93,6 +94,11 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
      * @ORM\Column(type="boolean", nullable=true)
      */
     private $isSocial = false;
+    /**
+     * @var Collection
+     * @ORM\OneToMany(targetEntity=SocialAccount::class, mappedBy="user", orphanRemoval=true)
+     */
+    private $socialAccounts;
 
     public function __construct()
     {
@@ -476,7 +482,7 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
         $fn = $this->getFirstName();
         $ln = $this->getLastName();
 
-        return $fn.$ln ? $fn.' '.$ln : null;
+        return $fn . $ln ? $fn . ' ' . $ln : null;
     }
 
     public function getFFName()
@@ -502,7 +508,7 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
 
     public function hasStudents(): bool
     {
-        return (bool) $this->getStudents()->count();
+        return (bool)$this->getStudents()->count();
     }
 
     public function existsName()
@@ -573,7 +579,7 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
 
     public function isTeacher(): bool
     {
-        return (bool) $this->isTeacher;
+        return (bool)$this->isTeacher;
     }
 
     public function isTeacherOf(self $student): bool
@@ -633,7 +639,7 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
 
     public function hasTeacher()
     {
-        return (bool) $this->teacher;
+        return (bool)$this->teacher;
     }
 
     public function isStudentOf(self $teacher): bool
@@ -643,7 +649,7 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
 
     public function fio()
     {
-        return $this->lastName.' '.$this->firstName.' '.$this->fatherName;
+        return $this->lastName . ' ' . $this->firstName . ' ' . $this->fatherName;
     }
 
     public function getAttempts()
@@ -758,7 +764,7 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
 
     public function hasParent(): bool
     {
-        return (bool) $this->parent;
+        return (bool)$this->parent;
     }
 
     /**
@@ -829,6 +835,15 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
         }
 
         return $session->getAttempts()->last() ?: null;
+    }
+
+    public function addSocialAccount(SocialAccount $socialAccount): void
+    {
+        if (!$this->socialAccounts->contains($socialAccount)) {
+            $this->socialAccounts[] = $socialAccount;
+        }
+
+        $socialAccount->setUser($this);
     }
 
     /**

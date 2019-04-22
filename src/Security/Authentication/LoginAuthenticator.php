@@ -1,10 +1,8 @@
 <?php
 
-namespace App\Security;
+namespace App\Security\Authentication;
 
-use App\Parameter\ChooseInterface;
-use App\Parameter\Environment\AppEnv;
-use App\Tests\Functional\BaseWebTestCase;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -12,32 +10,23 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 
-class TestAuthenticator extends AbstractGuardAuthenticator
+final class LoginAuthenticator extends AbstractGuardAuthenticator
 {
-    /** @var ChooseInterface */
-    private $appEnv;
-
-    public function __construct(ChooseInterface $appEnv)
-    {
-        $this->appEnv = $appEnv;
-    }
-
     public function supports(Request $request)
     {
-        return $this->appEnv->is(AppEnv::TEST)
-            && $request->server->has(BaseWebTestCase::TEST_AUTHENTICATION_HEADER_NAME);
+        return $request->hasSession() && $request->getSession()->getFlashBag()->has('login');
     }
 
     public function getCredentials(Request $request)
     {
         return [
-            'username' => $request->server->get(BaseWebTestCase::TEST_AUTHENTICATION_HEADER_NAME),
+            'userId' => $request->getSession()->getFlashBag()->get('login')[0] ?? null,
         ];
     }
 
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
-        return $userProvider->loadUserByUsername($credentials['username']);
+        return $userProvider->loadUserByUsername($credentials['userId']);
     }
 
     public function checkCredentials($credentials, UserInterface $user = null)
@@ -47,19 +36,20 @@ class TestAuthenticator extends AbstractGuardAuthenticator
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
-        throw new \LogicException('Test authentication das not work');
+        return new RedirectResponse('/login');
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
+        return new RedirectResponse('/');
     }
 
-    public function start(Request $request, AuthenticationException $authException = null)
+    public function start(Request $request, AuthenticationException $authenticationException = null)
     {
     }
 
     public function supportsRememberMe()
     {
-        return false;
+        return true;
     }
 }

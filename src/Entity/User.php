@@ -2,11 +2,11 @@
 
 namespace App\Entity;
 
-use App\Entity\User\SocialAccount;
 use App\DataFixtures\UserFixtures;
 use App\DateTime\DateTime as DT;
 use App\Entity\Traits\BaseTrait;
 use App\Entity\Traits\BaseUserTrait;
+use App\Entity\User\SocialAccount;
 use App\Object\ObjectAccessor;
 use App\Validator\Group as ValidationGroup;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -102,6 +102,7 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
 
     public function __construct()
     {
+        $this->socialAccounts = new ArrayCollection();
         $this->sessions = new ArrayCollection();
         $this->profiles = new ArrayCollection();
         $l = TEST_DAYS;
@@ -482,7 +483,7 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
         $fn = $this->getFirstName();
         $ln = $this->getLastName();
 
-        return $fn . $ln ? $fn . ' ' . $ln : null;
+        return $fn.$ln ? $fn.' '.$ln : null;
     }
 
     public function getFFName()
@@ -508,7 +509,7 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
 
     public function hasStudents(): bool
     {
-        return (bool)$this->getStudents()->count();
+        return (bool) $this->getStudents()->count();
     }
 
     public function existsName()
@@ -579,7 +580,7 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
 
     public function isTeacher(): bool
     {
-        return (bool)$this->isTeacher;
+        return (bool) $this->isTeacher;
     }
 
     public function isTeacherOf(self $student): bool
@@ -639,7 +640,7 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
 
     public function hasTeacher()
     {
-        return (bool)$this->teacher;
+        return (bool) $this->teacher;
     }
 
     public function isStudentOf(self $teacher): bool
@@ -649,7 +650,7 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
 
     public function fio()
     {
-        return $this->lastName . ' ' . $this->firstName . ' ' . $this->fatherName;
+        return $this->lastName.' '.$this->firstName.' '.$this->fatherName;
     }
 
     public function getAttempts()
@@ -764,7 +765,7 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
 
     public function hasParent(): bool
     {
-        return (bool)$this->parent;
+        return (bool) $this->parent;
     }
 
     /**

@@ -11,3 +11,6 @@ services:
             -
                 confirmation.template: '%fos_user.registration.confirmation.template%'
                 from_email: {confirmation: ''}
+
+    App\User\SocialAccount\Credentials\SocialAccountCredentialsProviderInterface:
+        class: 'App\Tests\Functional\Security\SocialAccountCredentialsProvider'

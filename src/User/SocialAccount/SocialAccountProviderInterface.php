@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Security\Ulogin;
+namespace App\User\SocialAccount;
 
 use App\Entity\User\SocialAccount;
 

@@ -55,8 +55,7 @@ final class UserRepository extends ServiceEntityRepository implements UserProvid
         LocalCache $localCache,
         AttemptProviderInterface $attemptProvider,
         ExampleProviderInterface $exampleProvider
-    )
-    {
+    ) {
         parent::__construct($registry, User::class);
 
         $this->currentUserProvider = $currentUserProvider;
@@ -308,7 +307,7 @@ where u = :u')
             ->getQuery()
             ->getSingleScalarResult();
 
-        return (int)($rightExamplesCount / $days);
+        return (int) ($rightExamplesCount / $days);
     }
 
     private function putAssessment(int $result, array $standardList): int

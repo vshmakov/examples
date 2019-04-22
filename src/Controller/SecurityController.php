@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Security\Ulogin\SocialAccountProviderInterface;
+use App\User\SocialAccount\SocialAccountProviderInterface;
 use App\User\UserProviderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;

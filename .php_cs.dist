@@ -2,9 +2,9 @@
 
 $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__)
-    ->exclude('config')
     ->exclude('node_modules')
     ->exclude('var')
+    ->exclude('vendor')
     ->exclude('public/bundles')
     ->exclude('public/build');
 

@@ -4,6 +4,7 @@
 /.env.*.local
 /var/
 /vendor/
+/public/bundles/
 ###< symfony/framework-bundle ###
 
 ###> symfony/webpack-encore-pack ###

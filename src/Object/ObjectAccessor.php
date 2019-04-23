@@ -6,6 +6,7 @@ use Doctrine\Instantiator\Instantiator;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Webmozart\Assert\Assert;
 
 abstract class ObjectAccessor
 {
@@ -75,5 +76,18 @@ abstract class ObjectAccessor
     {
         $propertyAccessor = self::createPropertyAccessor();
         $propertyAccessor->setValue($object, $key, $value);
+    }
+
+    public static function isSame($object1, $object2, array $properties): bool
+    {
+        Assert::notEmpty($properties);
+
+        foreach ($properties as $property) {
+            if (self::getValue($object1, $property) !== self::getValue($object2, $property)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

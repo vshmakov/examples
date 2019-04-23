@@ -7,6 +7,7 @@ use App\Attempt\AttemptProviderInterface;
 use App\Attempt\AttemptResponseFactoryInterface;
 use App\Attempt\AttemptResultProviderInterface;
 use App\Attempt\Example\ExampleResponseFactoryInterface;
+use App\Attempt\RatingGeneratorInterface;
 use App\Attempt\Settings\SettingsProviderInterface;
 use App\DateTime\DateTime as DT;
 use App\Doctrine\QueryResult;
@@ -19,7 +20,6 @@ use App\Object\ObjectAccessor;
 use App\Response\AttemptResponse;
 use App\Security\User\CurrentUserProviderInterface;
 use App\Security\User\CurrentUserSessionProviderInterface;
-use App\Service\ExampleManager;
 use App\Service\UserLoader;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
@@ -41,13 +41,17 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
     /** @var SettingsProviderInterface */
     private $settingsProvider;
 
+    /** @var RatingGeneratorInterface */
+    private $ratingGenerator;
+
     public function __construct(
         RegistryInterface $registry,
         UserLoader $userLoader,
         CurrentUserProviderInterface $currentUserProvider,
         CurrentUserSessionProviderInterface $currentUserSessionProvider,
         ExampleResponseFactoryInterface $exampleResponseProvider,
-        SettingsProviderInterface $settingsProvider
+        SettingsProviderInterface $settingsProvider,
+        RatingGeneratorInterface $ratingGenerator
     ) {
         parent::__construct($registry, Attempt::class);
 
@@ -56,6 +60,7 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
         $this->currentUserSessionProvider = $currentUserSessionProvider;
         $this->exampleResponseProvider = $exampleResponseProvider;
         $this->settingsProvider = $settingsProvider;
+        $this->ratingGenerator = $ratingGenerator;
     }
 
     public function getLastAttempt(): ?Attempt
@@ -165,11 +170,6 @@ final class AttemptRepository extends ServiceEntityRepository implements Attempt
                 'attempt' => $attempt,
                 'isRight' => false,
             ]);
-    }
-
-    private function getRating(Attempt $attempt): int
-    {
-        return ExampleManager::rating($attempt->getExamplesCount(), $this->getWrongExamplesCount($attempt));
     }
 
     public function createCurrentUserAttempt(): Attempt
@@ -316,7 +316,7 @@ where u = ?1')
     {
         $attemptsCount = \count($attempts);
         $ratingSumm = array_reduce($attempts, function (int $ratingSumm, Attempt $attempt): int {
-            return $ratingSumm + $this->getRating($attempt);
+            return $ratingSumm + $attempt->getResult()->getRating();
         }, 0);
 
         return $attemptsCount ? $ratingSumm / $attemptsCount : null;
@@ -405,10 +405,9 @@ where s.user = :user and a.task = :task')
 
     private function setRating(Attempt $attempt): void
     {
-        $result = $attempt
-            ->getResult();
+        $result = $attempt->getResult();
         $result->setRating(
-            ExampleManager::rating($result->getSolvedExamplesCount(), $result->getErrorsCount() + $result->getRemainedExamplesCount())
+            $this->ratingGenerator->generateRating($result->getErrorsCount() + $result->getRemainedExamplesCount(), $attempt->getSettings()->getExamplesCount())
         );
     }
 

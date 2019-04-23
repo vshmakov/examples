@@ -36,7 +36,7 @@ abstract class BaseProfile
      *
      * @ORM\Column(type="integer")
      * @AppAssert\NumberBetween(minimum=0, maximum=100000)
-     * @Groups({"settings"})
+     * @Groups({Group::SETTINGS, Group::MATHEMATICAL_SETTINGS})
      */
     protected $addFMin = 0;
 
@@ -45,7 +45,7 @@ abstract class BaseProfile
      *
      * @ORM\Column(type="integer")
      * @AppAssert\NumberBetween(minimum=0, maximum=100000)
-     * @Groups({Group::SETTINGS})
+     * @Groups({Group::SETTINGS, Group::MATHEMATICAL_SETTINGS})
      * @Assert\GreaterThanOrEqual(propertyPath="addFMin", message="Maximum value must be greater or equal to minimum value.")
      */
     protected $addFMax = 3;
@@ -55,7 +55,7 @@ abstract class BaseProfile
      *
      * @ORM\Column(type="integer")
      * @AppAssert\NumberBetween(minimum=0, maximum=100000)
-     * @Groups({Group::SETTINGS})
+     * @Groups({Group::SETTINGS, Group::MATHEMATICAL_SETTINGS})
      */
     protected $addSMin = 0;
 
@@ -65,7 +65,7 @@ abstract class BaseProfile
      * @ORM\Column(type="integer")
      * @AppAssert\NumberBetween(minimum=0, maximum=100000)
      * @Assert\GreaterThanOrEqual(propertyPath="addSMin", message="Maximum value must be greater or equal to minimum value.")
-     * @Groups({Group::SETTINGS})
+     * @Groups({Group::SETTINGS, Group::MATHEMATICAL_SETTINGS})
      */
     protected $addSMax = 3;
 
@@ -73,7 +73,7 @@ abstract class BaseProfile
      * @var int
      *
      * @ORM\Column(type="integer")
-     * @Groups({Group::SETTINGS})
+     * @Groups({Group::SETTINGS, Group::MATHEMATICAL_SETTINGS})
      */
     protected $addMin = 0;
 
@@ -81,7 +81,7 @@ abstract class BaseProfile
      * @var int
      *
      * @ORM\Column(type="integer")
-     * @Groups({Group::SETTINGS})
+     * @Groups({Group::SETTINGS, Group::MATHEMATICAL_SETTINGS})
      */
     protected $addMax = 100;
 
@@ -90,7 +90,7 @@ abstract class BaseProfile
      *
      * @ORM\Column(type="integer")
      * @AppAssert\NumberBetween(minimum=0, maximum=100000)
-     * @Groups({Group::SETTINGS})
+     * @Groups({Group::SETTINGS, Group::MATHEMATICAL_SETTINGS})
      */
     protected $subFMin = 0;
 
@@ -100,7 +100,7 @@ abstract class BaseProfile
      * @ORM\Column(type="integer")
      * @AppAssert\NumberBetween(minimum=0, maximum=100000)
      * @Assert\GreaterThanOrEqual(propertyPath="subFMin", message="Maximum value must be greater or equal to minimum value.")
-     * @Groups({Group::SETTINGS})
+     * @Groups({Group::SETTINGS, Group::MATHEMATICAL_SETTINGS})
      */
     protected $subFMax = 5;
 
@@ -109,7 +109,7 @@ abstract class BaseProfile
      *
      * @ORM\Column(type="integer")
      * @AppAssert\NumberBetween(minimum=0, maximum=100000)
-     * @Groups({Group::SETTINGS})
+     * @Groups({Group::SETTINGS, Group::MATHEMATICAL_SETTINGS})
      */
     protected $subSMin = 0;
 
@@ -119,7 +119,7 @@ abstract class BaseProfile
      * @ORM\Column(type="integer")
      * @AppAssert\NumberBetween(minimum=0, maximum=100000)
      * @Assert\GreaterThanOrEqual(propertyPath="subSMin", message="Maximum value must be greater or equal to minimum value.")
-     * @Groups({Group::SETTINGS})
+     * @Groups({Group::SETTINGS, Group::MATHEMATICAL_SETTINGS})
      */
     protected $subSMax = 5;
 
@@ -127,7 +127,7 @@ abstract class BaseProfile
      * @var int
      *
      * @ORM\Column(type="integer")
-     * @Groups({Group::SETTINGS})
+     * @Groups({Group::SETTINGS, Group::MATHEMATICAL_SETTINGS})
      */
     protected $subMin = 0;
 
@@ -135,7 +135,7 @@ abstract class BaseProfile
      * @var int
      *
      * @ORM\Column(type="integer")
-     * @Groups({Group::SETTINGS})
+     * @Groups({Group::SETTINGS, Group::MATHEMATICAL_SETTINGS})
      */
     protected $subMax = 100;
 
@@ -144,7 +144,7 @@ abstract class BaseProfile
      *
      * @ORM\Column(type="integer")
      * @AppAssert\NumberBetween(minimum=0, maximum=100000)
-     * @Groups({Group::SETTINGS})
+     * @Groups({Group::SETTINGS, Group::MATHEMATICAL_SETTINGS})
      */
     protected $multFMin = 0;
 
@@ -154,7 +154,7 @@ abstract class BaseProfile
      * @ORM\Column(type="integer")
      * @AppAssert\NumberBetween(minimum=0, maximum=100000)
      * @Assert\GreaterThanOrEqual(propertyPath="multFMin", message="Maximum value must be greater or equal to minimum value.")
-     * @Groups({Group::SETTINGS})
+     * @Groups({Group::SETTINGS, Group::MATHEMATICAL_SETTINGS})
      */
     protected $multFMax = 3;
 
@@ -163,7 +163,7 @@ abstract class BaseProfile
      *
      * @ORM\Column(type="integer")
      * @AppAssert\NumberBetween(minimum=0, maximum=100000)
-     * @Groups({Group::SETTINGS})
+     * @Groups({Group::SETTINGS, Group::MATHEMATICAL_SETTINGS})
      */
     protected $multSMin = 0;
 
@@ -173,7 +173,7 @@ abstract class BaseProfile
      * @ORM\Column(type="integer")
      * @AppAssert\NumberBetween(minimum=0, maximum=100000)
      * @Assert\GreaterThanOrEqual(propertyPath="multSMin", message="Maximum value must be greater or equal to minimum value.")
-     * @Groups({Group::SETTINGS})
+     * @Groups({Group::SETTINGS, Group::MATHEMATICAL_SETTINGS})
      */
     protected $multSMax = 3;
 
@@ -181,7 +181,7 @@ abstract class BaseProfile
      * @var int
      *
      * @ORM\Column(type="integer")
-     * @Groups({Group::SETTINGS})
+     * @Groups({Group::SETTINGS, Group::MATHEMATICAL_SETTINGS})
      */
     protected $multMin = 0;
 
@@ -189,7 +189,7 @@ abstract class BaseProfile
      * @var int
      *
      * @ORM\Column(type="integer")
-     * @Groups({Group::SETTINGS})
+     * @Groups({Group::SETTINGS, Group::MATHEMATICAL_SETTINGS})
      */
     protected $multMax = 100;
 
@@ -198,7 +198,7 @@ abstract class BaseProfile
      *
      * @ORM\Column(type="integer")
      * @AppAssert\NumberBetween(minimum=0, maximum=100000)
-     * @Groups({Group::SETTINGS})
+     * @Groups({Group::SETTINGS, Group::MATHEMATICAL_SETTINGS})
      */
     protected $divFMin = 0;
 
@@ -208,7 +208,7 @@ abstract class BaseProfile
      * @ORM\Column(type="integer")
      * @AppAssert\NumberBetween(minimum=0, maximum=100000)
      * @Assert\GreaterThanOrEqual(propertyPath="divFMin", message="Maximum value must be greater or equal to minimum value.")
-     * @Groups({Group::SETTINGS})
+     * @Groups({Group::SETTINGS, Group::MATHEMATICAL_SETTINGS})
      */
     protected $divFMax = 6;
 
@@ -217,7 +217,7 @@ abstract class BaseProfile
      *
      * @ORM\Column(type="integer")
      * @AppAssert\NumberBetween(minimum=1, maximum=100000)
-     * @Groups({Group::SETTINGS})
+     * @Groups({Group::SETTINGS, Group::MATHEMATICAL_SETTINGS})
      */
     protected $divSMin = 1;
 
@@ -227,7 +227,7 @@ abstract class BaseProfile
      * @ORM\Column(type="integer")
      * @AppAssert\NumberBetween(minimum=1, maximum=100000)
      * @Assert\GreaterThanOrEqual(propertyPath="divSMin", message="Maximum value must be greater or equal to minimum value.")
-     * @Groups({Group::SETTINGS})
+     * @Groups({Group::SETTINGS, Group::MATHEMATICAL_SETTINGS})
      */
     protected $divSMax = 6;
 
@@ -235,7 +235,7 @@ abstract class BaseProfile
      * @var int
      *
      * @ORM\Column(type="integer")
-     * @Groups({Group::SETTINGS})
+     * @Groups({Group::SETTINGS, Group::MATHEMATICAL_SETTINGS})
      */
     protected $divMin = 0;
 
@@ -243,7 +243,7 @@ abstract class BaseProfile
      * @var int
      *
      * @ORM\Column(type="integer")
-     * @Groups({Group::SETTINGS})
+     * @Groups({Group::SETTINGS, Group::MATHEMATICAL_SETTINGS})
      */
     protected $divMax = 100;
 
@@ -353,11 +353,9 @@ abstract class BaseProfile
         return (int) $this->examplesCount;
     }
 
-    public function setExamplesCount(int $examplesCount): self
+    public function setExamplesCount(int $examplesCount): void
     {
-        $this->examplesCount = btwVal(3, 150, $examplesCount);
-
-        return $this;
+        $this->examplesCount = $examplesCount;
     }
 
     public function getAddFMin(): int
@@ -696,32 +694,6 @@ abstract class BaseProfile
         return $this;
     }
 
-    public function getMinutes(): int
-    {
-        return $this->duration / MIN;
-    }
-
-    public function setMinutes(int $min)
-    {
-        $min = minVal(0, $min);
-        $this->setDuration($min * MIN + $this->getSeconds());
-
-        return $this;
-    }
-
-    public function getSeconds(): int
-    {
-        return $this->duration % MIN;
-    }
-
-    public function setSeconds(int $sec)
-    {
-        $sec = btwVal(0, 59, $sec);
-        $this->setDuration($this->getMinutes() * MIN + $sec);
-
-        return $this;
-    }
-
     public function getDescription(): ?string
     {
         return $this->description;
@@ -737,21 +709,6 @@ abstract class BaseProfile
     public function __toString()
     {
         return $this->getDescription();
-    }
-
-    public function getSettings()
-    {
-        $propertyAccessor = self::createPropertyAccessor();
-
-        return array_reduce(
-            self::getSettingsFields(),
-            function ($settings, $property) use ($propertyAccessor): array {
-                $settings[$property] = $propertyAccessor->getValue($this, $property);
-
-                return $settings;
-            },
-            []
-        );
     }
 
     public function isDemanding(): bool

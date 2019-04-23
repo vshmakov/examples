@@ -8,7 +8,6 @@ use App\ApiPlatform\Filter\Example\TaskFilter;
 use App\ApiPlatform\Filter\Example\UserFilter;
 use App\DateTime\DateTime as DT;
 use  App\Serializer\Group;
-use App\Service\ExampleManager;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -25,6 +24,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Example
 {
+    public const ACTION_NAMES = [1 => 'add', 'sub', 'mult', 'div'];
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -136,13 +137,10 @@ class Example
         return $this->answer;
     }
 
-    public function setAnswer(? float $answer): self
+    public function setAnswer(? float $answer): void
     {
         $this->answer = $answer;
-        $this->setIsRight(ExampleManager::isRight($this->first, $this->second, $this->sign, $answer));
         $this->setAnswerTime(new \DateTime());
-
-        return $this;
     }
 
     public function isRight(): ?bool

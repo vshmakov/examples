@@ -17,21 +17,6 @@ function maxVal(float $max, float $value): float
     return $value <= $max ? $value : $max;
 }
 
-function btwVal(float $min, float $max, float $value, ? bool $switch = null): float
-{
-    if (null === $switch) {
-        return maxVal($max, minVal($min, $value));
-    }
-
-    $out = (($value < $min) or ($value > $max));
-
-    if ($switch) {
-        return $out ? $max : $value;
-    }
-
-    return ($out) ? $min : $value;
-}
-
 function randStr(int $length = 32): string
 {
     $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPRQSTUVWXYZ0123456789';

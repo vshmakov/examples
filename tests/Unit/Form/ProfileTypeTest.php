@@ -5,22 +5,22 @@ namespace App\Tests\Unit\Form;
 use App\Entity\Profile;
 use App\Form\ProfileType;
 use App\Object\ObjectAccessor;
+use App\Tests\Unit\ServiceInitializerTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Serializer;
 
 final class ProfileTypeTest extends TestCase
 {
+    use ServiceInitializerTrait;
+
     /** @var ProfileType */
     private $profileType;
 
     public function setUp(): void
     {
-        $normalizer = new Serializer([new ObjectNormalizer()], []);
         $this->profileType = new ProfileType(
             $this->createMock(AuthorizationCheckerInterface::class),
-            $normalizer
+            $this->initializeNormalizer()
         );
     }
 

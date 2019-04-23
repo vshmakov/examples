@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\DataTables\Doctrine;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;

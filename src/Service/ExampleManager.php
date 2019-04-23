@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Service;
 
 class ExampleManager
@@ -79,7 +77,9 @@ class ExampleManager
         $needMaxAmplitude = $this->getBooleanByPercentsProbability(70);
 
         foreach ($settings as $key => $item) {
-            $settings[$key] = (int) $item;
+            if (\is_float($item)) {
+                $settings[$key] = (int) $item;
+            }
         }
         for ($i = 1; $i <= 20; ++$i) {
             extract($this->$actionName($settings));

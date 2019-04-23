@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Security\Annotation;
 
 use Sensio\Bundle\FrameworkExtraBundle\Request\ArgumentNameConverter;

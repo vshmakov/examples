@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Tests\Functional\Task;
 
 use App\DataFixtures\Attempt\ProfileFixtures;

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 $app = [
     'PRICE' => 49,
     'TEST_DAYS' => 3,

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Parameter\Environment;
 
 use App\Parameter\ChooseInterface;

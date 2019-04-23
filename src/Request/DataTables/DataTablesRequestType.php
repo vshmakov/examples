@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Request\DataTables;
 
 use Symfony\Component\Form\AbstractType;

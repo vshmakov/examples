@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Tests\Unit;
 
 use Doctrine\Common\Inflector\Inflector;

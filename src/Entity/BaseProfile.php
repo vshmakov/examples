@@ -83,7 +83,7 @@ abstract class BaseProfile
      * @ORM\Column(type="integer")
      * @Groups({Group::SETTINGS, Group::MATHEMATICAL_SETTINGS})
      */
-    protected $addMax = 100;
+    protected $addMax = 6;
 
     /**
      * @var int

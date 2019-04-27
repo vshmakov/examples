@@ -3,6 +3,7 @@
 namespace App\Attempt\Example;
 
 use App\Entity\Example;
+use App\Entity\Settings;
 use App\Object\ObjectAccessor;
 use Webmozart\Assert\Assert;
 
@@ -53,9 +54,9 @@ final class ExampleCoefficientGenerator implements CoefficientGeneratorInterface
         $amplitudeCoefficient = 0;
         $amplitudeCoefficient += $this->getPercentsAmplitude($example->getFirst(), $getPropertySettings(false, false), $getPropertySettings(false, true));
         $amplitudeCoefficient += $this->getPercentsAmplitude($example->getSecond(), $getPropertySettings(true, false), $getPropertySettings(true, true));
-        $amplitudeCoefficient /= 2;
+        $amplitudeCoefficient = 1 - ($amplitudeCoefficient / 2 / 100);
 
-        return $this->toIntegerValue($amplitudeCoefficient * 10 / 100);
+        return $this->toIntegerValue($amplitudeCoefficient * 20 / 100);
     }
 
     private function getPercentsAmplitude(float $number, float $min, float $max): float
@@ -70,6 +71,6 @@ final class ExampleCoefficientGenerator implements CoefficientGeneratorInterface
 
     private function toIntegerValue(float $coefficient): int
     {
-        return (int) round($coefficient * 10 ** 6);
+        return (int) round($coefficient * 10 ** 4);
     }
 }

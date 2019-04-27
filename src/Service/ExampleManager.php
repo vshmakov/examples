@@ -13,6 +13,8 @@ use Webmozart\Assert\Assert;
 
 final class ExampleManager implements ExampleGeneratorInterface
 {
+    private const  GENERATING_ATTEMPTS_COUNT = 10;
+
     /** @var NormalizerInterface */
     private $normalizer;
 
@@ -33,20 +35,21 @@ final class ExampleManager implements ExampleGeneratorInterface
         $sign = $this->generateRandomSign($settings);
         $maxQualityCoefficient = 0;
         $needUniqueAnswer = $this->getBooleanByPercentsProbability(80);
-        $needMaximumAmplitude = $this->getBooleanByPercentsProbability(70);
+        $needMaximumAmplitude = $this->getBooleanByPercentsProbability(50);
         $resultExample = null;
 
-        for ($i = 1; $i <= 20; ++$i) {
+        for ($i = 1; $i <= self::GENERATING_ATTEMPTS_COUNT; ++$i) {
             $example = $this->createRandomExample($sign, $settings);
-            $qualityCoefficient = 0;
+            $uniqueCoefficient = $amplitudeCoefficient = 0;
 
             if ($needUniqueAnswer) {
-                $qualityCoefficient += $this->coefficientGenerator->getUniqueCoefficient($example, $previousExamples);
+                $uniqueCoefficient = $this->coefficientGenerator->getUniqueCoefficient($example, $previousExamples);
             }
 
             if ($needMaximumAmplitude) {
-                $qualityCoefficient += $this->coefficientGenerator->getAmplitudeCoefficient($example, $settings);
+                $amplitudeCoefficient = $this->coefficientGenerator->getAmplitudeCoefficient($example, $settings);
             }
+            $qualityCoefficient = $uniqueCoefficient + $amplitudeCoefficient;
 
             if ($qualityCoefficient >= $maxQualityCoefficient) {
                 $maxQualityCoefficient = $qualityCoefficient;
@@ -64,7 +67,9 @@ final class ExampleManager implements ExampleGeneratorInterface
             $this->normalizer->normalize($settings, null, ['groups' => Group::MATHEMATICAL_SETTINGS])
         );
 
-        return ObjectAccessor::initialize(Example::class, $exampleData);
+        return ObjectAccessor::initialize(Example::class, $exampleData + [
+                'sign' => $sign,
+            ]);
     }
 
     private function generateRandomSign(Settings $settings): int
@@ -94,24 +99,19 @@ final class ExampleManager implements ExampleGeneratorInterface
     private function add(array $settings): array
     {
         extract($settings);
-        $switch = $this->getBooleanByPercentsProbability((50));
 
-        if ($switch) {
-            $firstMin = $this->getValueBetween($addMin - $addSMax, $addFMin, $addFMax);
-            $firstMax = $this->getValueBetween($addMax - $addSMin, $addFMin, $addFMax);
-            $first = mt_rand($firstMin, $firstMax);
+        $firstMin = $this->getValueBetween($addFMin, $addMin - $addSMax, $addFMax);
+        $firstMax = $this->getValueBetween($addFMax, $firstMin, $addMax - $addSMin);
+        $first = mt_rand($firstMin, $firstMax);
 
-            $secondMin = $this->getValueBetween($addSMin, $addSMax, $addMin - $first);
-            $secondMax = $this->getValueBetween($addSMin, $addSMax, $addMax - $first);
-            $second = mt_rand($secondMin, $secondMax);
-        } else {
-            $secondMin = $this->getValueBetween($addSMin, $addSMax, $addMin - $addFMax);
-            $secondMax = $this->getValueBetween($addSMin, $addSMax, $addMax - $addFMin);
-            $second = mt_rand($secondMin, $secondMax);
+        $secondMin = $this->getValueBetween($addSMin, $addMin - $first, $addSMax);
+        $secondMax = $this->getValueBetween($addSMax, $secondMin, $addMax - $first);
+        $second = mt_rand($secondMin, $secondMax);
 
-            $firstMin = $this->getValueBetween($addFMin, $addFMax, $addMin - $second);
-            $firstMax = $this->getValueBetween($addFMin, $addFMax, $addMax - $second);
-            $first = mt_rand($firstMin, $firstMax);
+        if ($this->getBooleanByPercentsProbability((40))) {
+            $var = $first;
+            $first = $second;
+            $second = $var;
         }
 
         return $this->createExampleData($first, $second);
@@ -135,27 +135,22 @@ final class ExampleManager implements ExampleGeneratorInterface
     private function mult(array $settings): array
     {
         extract($settings);
-        $switch = $this->getBooleanByPercentsProbability(50);
 
-        if ($switch) {
-            $firstMin = $this->getValueBetween($multFMin, $multFMax, $multMin / ($multSMax ?: 1));
-            $firstMax = $this->getValueBetween($multFMin, $multFMax, $multMax / ($multSMin ?: 1));
-            $first = mt_rand($firstMin, $firstMax);
+        $firstMin = $this->getValueBetween($multFMin, $multMin / ($multSMax ?: 1), $multFMax);
+        $firstMax = $this->getValueBetween($multFMax, $firstMin, $multMax / ($multSMin ?: 1));
+        $first = mt_rand($firstMin, $firstMax);
 
-            $secondMin = $this->getValueBetween($multSMin, $multSMax, $multMin / ($first ?: 1));
-            $secondMax = $this->getValueBetween($multSMin, $multSMax, $multMax / ($first ?: 1));
-            $second = mt_rand($secondMin, $secondMax);
-        } else {
-            $secondMin = $this->getValueBetween($multSMin, $multSMax, $multMin / ($multFMax ?: 1));
-            $secondMax = $this->getValueBetween($multSMin, $multSMax, $multMax / ($multFMin ?: 1));
-            $second = mt_rand($secondMin, $secondMax);
+        $secondMin = $this->getValueBetween($multSMin, $multMin / ($first ?: 1), $multSMax);
+        $secondMax = $this->getValueBetween($multSMax, $secondMin, $multMax / ($first ?: 1));
+        $second = mt_rand($secondMin, $secondMax);
 
-            $firstMin = $this->getValueBetween($multFMin, $multFMax, $multMin / ($second ?: 1));
-            $firstMax = $this->getValueBetween($multFMin, $multFMax, $multMax / ($second ?: 1));
-            $first = mt_rand($firstMin, $firstMax);
+        if ($this->getBooleanByPercentsProbability(40)) {
+            $var = $first;
+            $first = $second;
+            $second = $var;
         }
 
-        return $this->createExampleArray($first, $second);
+        return $this->createExampleData($first, $second);
     }
 
     private function div(array $settings): array
@@ -170,11 +165,13 @@ final class ExampleManager implements ExampleGeneratorInterface
             'multMax' => $divFMax,
         ]));
 
-        return $this->createExampleData($first * $second, $second);
+        return $this->createExampleData($first * $second, $second ?: 1);
     }
 
     private function getValueBetween(float $value, float $min, float $max): float
     {
+        Assert::greaterThanEq($max, $min);
+
         if ($value > $max) {
             return $max;
         }

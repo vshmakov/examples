@@ -3,12 +3,15 @@
 namespace App\Tests\Functional;
 
 use App\Request\Http\ContentType;
+use App\Tests\DataProviderTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\BrowserKit\Client;
 use Symfony\Component\DomCrawler\Crawler;
 
 abstract class BaseWebTestCase extends WebTestCase
 {
+    use DataProviderTrait;
+
     public const TEST_AUTHENTICATION_HEADER_NAME = 'test_authentication_header';
 
     protected static function createAuthenticatedClient(string $username): Client
@@ -18,16 +21,6 @@ abstract class BaseWebTestCase extends WebTestCase
         ]);
 
         return $client;
-    }
-
-    protected function wrapItemsInArray(array $items): array
-    {
-        return array_map(
-            function ($item): array {
-                return [$item];
-            },
-            $items
-        );
     }
 
     protected function getTrimmedText(Crawler $crawler): string

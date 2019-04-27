@@ -2,6 +2,8 @@
 
 namespace App\Attempt;
 
+use Webmozart\Assert\Assert;
+
 final class SolvedExamplesRatingGenerator implements RatingGeneratorInterface
 {
     private const COEFFICIENTS = [
@@ -14,9 +16,8 @@ final class SolvedExamplesRatingGenerator implements RatingGeneratorInterface
 
     public function generateRating(int $errorsCount, int $totalExamplesCount): int
     {
-        if ($errorsCount === $totalExamplesCount) {
-            return 0;
-        }
+        Assert::greaterThanEq($errorsCount, 0);
+        Assert::greaterThanEq($totalExamplesCount, 0);
 
         $rightExamplesCount = $totalExamplesCount - $errorsCount;
         $resultRating = 1;

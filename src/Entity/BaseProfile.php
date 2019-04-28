@@ -6,7 +6,6 @@ use App\DateTime\DateTime as DT;
 use App\Serializer\Group;
 use App\Validator as AppAssert;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -727,36 +726,5 @@ abstract class BaseProfile
     {
         $this->id = null;
         $this->addTime = new \DateTime();
-    }
-
-    public static function copySettings(self $source, self $target): self
-    {
-        $propertyAccessor = self::createPropertyAccessor();
-
-        return array_reduce(
-            self::getSettingsFields(),
-            function ($target, $property) use ($source, $propertyAccessor): self {
-                $propertyAccessor->setValue(
-                    $target,
-                    $property,
-                    $propertyAccessor->getValue($source, $property)
-                );
-
-                return $target;
-            },
-            $target
-        );
-    }
-
-    protected static function createPropertyAccessor()
-    {
-        return PropertyAccess::createPropertyAccessorBuilder()
-            ->enableExceptionOnInvalidIndex()
-            ->getPropertyAccessor();
-    }
-
-    public static function getSettingsFields(): array
-    {
-        return arr('duration examplesCount addFMin addFMax addSMin addSMax addMin addMax subFMin subFMax subSMin subSMax subMin subMax multFMin multFMax multSMin multSMax multMin multMax divFMin divFMax divSMin divSMax divMin divMax addPerc subPerc multPerc divPerc description');
     }
 }

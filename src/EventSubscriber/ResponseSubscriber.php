@@ -5,9 +5,9 @@ namespace App\EventSubscriber;
 use App\Entity\Session;
 use App\Entity\Visit;
 use App\Object\ObjectAccessor;
-use App\Repository\IpRepository;
 use App\Security\User\CurrentUserProviderInterface;
 use App\Security\User\CurrentUserSessionProviderInterface;
+use App\User\Visit\Ip\IpProviderInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,8 +31,8 @@ final class ResponseSubscriber implements EventSubscriberInterface
     /** @var SessionInterface */
     private $session;
 
-    /** @var IpRepository */
-    private $ipRepository;
+    /** @var IpProviderInterface */
+    private $ipProvider;
 
     /** @var EntityManagerInterface */
     private $entityManager;
@@ -44,14 +44,14 @@ final class ResponseSubscriber implements EventSubscriberInterface
         CurrentUserSessionProviderInterface $currentUserSessionProvider,
         RequestStack $requestStack,
         CurrentUserProviderInterface $currentUserProvider,
-        IpRepository $ipRepository,
+        IpProviderInterface $ipProvider,
         AuthorizationCheckerInterface $authorizationChecker,
         SessionInterface $session,
         EntityManagerInterface $entityManager
     ) {
         $this->session = $session;
         $this->currentUserSessionProvider = $currentUserSessionProvider;
-        $this->ipRepository = $ipRepository;
+        $this->ipProvider = $ipProvider;
         $this->request = $requestStack->getMasterRequest();
         $this->currentUserProvider = $currentUserProvider;
         $this->authorizationChecker = $authorizationChecker;
@@ -66,15 +66,9 @@ final class ResponseSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $clientIp = $this->request->getClientIp();
-
-        if (null === $clientIp) {
-            return;
-        }
-
         $this->updateSession($currentUserSession);
         $this->saveVisit($currentUserSession, $event->getResponse()->getStatusCode());
-        $this->saveIp($currentUserSession, $clientIp);
+        $this->saveIp($currentUserSession);
     }
 
     private function updateSession(Session $session): void
@@ -104,19 +98,21 @@ final class ResponseSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function saveIp(Session $session, string $clientIp): void
+    private function saveIp(Session $session): void
     {
         $user = $this->currentUserProvider->getCurrentUserOrGuest();
-        $ip = $this->ipRepository->findOneByIpOrNew($clientIp);
+        $ip = $this->ipProvider->getCurrentRequestIp();
 
-        if (null !== $ip) {
-            $session->setIp($ip);
-            $this->entityManager->flush($session);
+        if (null === $ip) {
+            return;
+        }
 
-            if (!$this->currentUserProvider->isCurrentUserGuest()) {
-                $user->addIp($ip);
-                $this->entityManager->flush($user);
-            }
+        $session->setIp($ip);
+        $this->entityManager->flush($session);
+
+        if (!$this->currentUserProvider->isCurrentUserGuest()) {
+            $user->addIp($ip);
+            $this->entityManager->flush($user);
         }
     }
 

@@ -4,40 +4,67 @@ namespace App\Repository;
 
 use App\Entity\Ip;
 use App\Object\ObjectAccessor;
-use App\Repository\Traits\BaseTrait;
+use App\Request\Ip\IpInfoRequestType;
 use App\Service\IpInformer;
+use App\User\Visit\Ip\IpProviderInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Webmozart\Assert\Assert;
 
-class IpRepository extends ServiceEntityRepository
+final class IpRepository extends ServiceEntityRepository implements IpProviderInterface
 {
-    use BaseTrait;
+    /** @var RequestStack */
+    private $requestStack;
 
-    public function __construct(RegistryInterface $registry)
+    /** @var FormFactoryInterface */
+    private $formFactory;
+
+    public function __construct(RegistryInterface $registry, RequestStack $requestStack, FormFactoryInterface $formFactory)
     {
         parent::__construct($registry, Ip::class);
+
+        $this->requestStack = $requestStack;
+        $this->formFactory = $formFactory;
     }
 
-    public function hasOrCreateByIp($ip): ?Ip
+    public function getCurrentRequestIp(): ?Ip
     {
-        if (!IpInformer::isIp($ip)) {
+        $request = $this->requestStack->getCurrentRequest();
+
+        if (null === $request) {
             return null;
         }
 
-        $entity = $this->findOneByIp($ip);
+        $clientIp = $request->getClientIp();
 
-        if (!$entity) {
-            $entity = ObjectAccessor::initialize(Ip::class, ['ip' => $ip]);
-            $entityManager = $this->getEntityManager();
-            $entityManager->persist($entity);
-            $entityManager->flush($entity);
+        if (null === $clientIp or !IpInformer::isIp($clientIp)) {
+            return null;
         }
 
-        return $entity;
+        if ($ip = $this->findOneByIp($clientIp)) {
+            return $ip;
+        }
+
+        $ip = ObjectAccessor::initialize(Ip::class, [
+            'ip' => $clientIp,
+        ]);
+        $this->fillIpInfo($ip);
+        $this->getEntityManager()->persist($ip);
+        $this->getEntityManager()->flush($ip);
+
+        return $ip;
     }
 
-    public function findOneByIpOrNew($ip)
+    private function fillIpInfo(Ip $ip): void
     {
-        return $this->hasOrCreateByIp($ip);
+        $ipInfo = json_decode(
+            file_get_contents(sprintf('http://api.db-ip.com/v2/free/%s', urlencode($ip->getIp()))),
+            true
+        );
+        $form = $this->formFactory->create(IpInfoRequestType::class, $ip);
+        Assert::isArray($ipInfo);
+        $form->submit($ipInfo);
     }
 }

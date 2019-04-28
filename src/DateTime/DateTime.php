@@ -7,6 +7,13 @@ use Exception;
 
 final class DateTime extends BaseDateTime
 {
+    private const  SECOND = 1;
+    private const  MINUTE = 60 * self::SECOND;
+    private const  HOUR = 60 * self::MINUTE;
+    private const  DAY = 24 * self::HOUR;
+    private const  MONGTH = 30 * self::DAY;
+    private const  YEAR = 365 * self::DAY;
+
     public static function createFromFormat($format, $string, $o = null)
     {
         $dt = \DateTime::createFromFormat($format, $string);
@@ -109,7 +116,7 @@ final class DateTime extends BaseDateTime
 
     public function getRoundDays()
     {
-        return round($this->getTimestamp() / DAY);
+        return round($this->getTimestamp() / self::DAY);
     }
 
     public function isPast(): bool
@@ -119,10 +126,10 @@ final class DateTime extends BaseDateTime
 
     public function getRoundUpDays()
     {
-        $t = $this->getTimestamp();
-        $d = (((int) ($t / DAY)));
+        $timestamp = $this->getTimestamp();
+        $days = (((int) ($timestamp / self::DAY)));
 
-        return 0 === $t % DAY ? $d : $d + 1;
+        return 0 === $timestamp % self::DAY ? $days : $days + 1;
     }
 
     public function minSecFormat()
@@ -142,12 +149,12 @@ final class DateTime extends BaseDateTime
 
     public function getMinutes()
     {
-        return (int) ($this->getTimestamp() % HOUR / MIN);
+        return (int) ($this->getTimestamp() % self::HOUR / self::MINUTE);
     }
 
     public function getSeconds()
     {
-        return $this->getTimeStamp() % MIN;
+        return $this->getTimeStamp() % self::MINUTE;
     }
 
     public function getRoundTimestamp()

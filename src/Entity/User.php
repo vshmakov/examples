@@ -69,7 +69,7 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
     private $addTime;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", nullable=true)
      */
     private $limitTime;
 
@@ -105,8 +105,6 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
         $this->socialAccounts = new ArrayCollection();
         $this->sessions = new ArrayCollection();
         $this->profiles = new ArrayCollection();
-        $l = TEST_DAYS;
-        $this->limitTime = (new \DateTime())->add(new \DateInterval("P{$l}D"));
         $this->addTime = new \DateTime();
         $this->codes = new ArrayCollection();
         $this->ips = new ArrayCollection();

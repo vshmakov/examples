@@ -54,7 +54,6 @@ final class AppExtension extends AbstractExtension implements \Twig_Extension_Gl
         $this->globals = [
             'user' => $user,
             'hasActualAttempt' => $hasActualAttempt,
-            'PRICE' => PRICE,
             'app_name' => $appName->toString(),
             'isGuest' => $currentUserProvider->isGuest($user),
             'FEEDBACK_EMAIL' => 'post@exmasters.ru',

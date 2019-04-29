@@ -2,29 +2,25 @@
 
 namespace App\Twig;
 
+use App\Attempt\AttemptProviderInterface;
 use App\Object\ObjectAccessor;
 use App\Parameter\ChooseInterface;
 use App\Parameter\Container\ParametersContainerInterface;
 use App\Parameter\Environment\AppEnv;
 use App\Parameter\StringInterface;
-use App\Repository\AttemptRepository;
-use App\Repository\HomeworkRepository;
-use App\Repository\UserRepository;
 use App\Security\User\CurrentUserProviderInterface;
 use Doctrine\Common\Inflector\Inflector;
-use Doctrine\ORM\EntityManagerInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
+use Twig\TwigFunction;
 
 final class AppExtension extends AbstractExtension implements \Twig_Extension_GlobalsInterface
 {
-    use BaseTrait;
-    private $userLoader;
-    private $globals;
-    private $entityManager;
-    private $attemptRepository;
-    private $taskRepository;
-    private $userRepository;
+    /** @var CurrentUserProviderInterface */
+    private $currentUserProvider;
+
+    /** @var AttemptProviderInterface */
+    private $attemptProvider;
 
     /** @var ParametersContainerInterface */
     private $javascriptParametersContainer;
@@ -32,41 +28,28 @@ final class AppExtension extends AbstractExtension implements \Twig_Extension_Gl
     /** @var ChooseInterface */
     private $appEnv;
 
-    public function __construct(
-        CurrentUserProviderInterface $currentUserProvider,
-        AttemptRepository $attemptRepository,
-        HomeworkRepository $taskRepository,
-        UserRepository $userRepository,
-        EntityManagerInterface $entityManager,
-        ParametersContainerInterface $javascriptParametersContainer,
-        StringInterface $appName,
-        ChooseInterface $appEnv
-    ) {
-        $this->appEnv = $appEnv;
-        $this->entityManager = $entityManager;
-        $this->taskRepository = $taskRepository;
-        $this->userLoader = $currentUserProvider;
-        $this->javascriptParametersContainer = $javascriptParametersContainer;
+    /** @var StringInterface */
+    private $appName;
 
-        $hasActualAttempt = (bool) $attemptRepository->getLastAttempt();
-        $user = $currentUserProvider->getCurrentUserOrGuest();
-        $user->setEntityRepository($userRepository);
-        $this->globals = [
-            'user' => $user,
-            'hasActualAttempt' => $hasActualAttempt,
-            'app_name' => $appName->toString(),
-            'isGuest' => $currentUserProvider->isGuest($user),
-            'FEEDBACK_EMAIL' => 'post@exmasters.ru',
-        ];
+    public function __construct(CurrentUserProviderInterface $currentUserProvider, AttemptProviderInterface $attemptProvider, ParametersContainerInterface $javascriptParametersContainer, ChooseInterface $appEnv, StringInterface $appName)
+    {
+        $this->currentUserProvider = $currentUserProvider;
+        $this->attemptProvider = $attemptProvider;
+        $this->javascriptParametersContainer = $javascriptParametersContainer;
+        $this->appEnv = $appEnv;
+        $this->appName = $appName;
     }
 
     public function getGlobals()
     {
-        return $this->globals + [
-                'javascriptParameters' => $this->javascriptParametersContainer->getParameters() + [
-                        'isDevelopmentEnvironment' => $this->appEnv->is(AppEnv::DEV),
-                    ],
-            ];
+        return [
+            'user' => $this->currentUserProvider->getCurrentUserOrGuest(),
+            'hasActualAttempt' => null !== $this->attemptProvider->getLastAttempt(),
+            'app_name' => $this->appName->toString(),
+            'javascriptParameters' => $this->javascriptParametersContainer->getParameters() + [
+                    'isDevelopmentEnvironment' => $this->appEnv->is(AppEnv::DEV),
+                ],
+        ];
     }
 
     public function getFilters()
@@ -94,17 +77,11 @@ final class AppExtension extends AbstractExtension implements \Twig_Extension_Gl
 
     public function getFunctions()
     {
-        return $this->prepareFunctions([
-            'getJavascriptParameters',
-            'dt',
-            'sortByCreationTime',
-            'sortByDateTime',
-        ]);
-    }
-
-    public function getJavascriptParameters(): array
-    {
-        return $this->javascriptParametersContainer->getParameters();
+        return [
+            new TwigFunction('dt', [$this, 'dt']),
+            new TwigFunction('sortByCreationTime', [$this, 'sortByCreationTime']),
+            new TwigFunction('sortByDateTime', [$this, 'sortByDateTime']),
+        ];
     }
 
     public function toLabelStringFilter(string $property): string

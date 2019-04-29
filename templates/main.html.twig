@@ -22,7 +22,7 @@
         <link rel="stylesheet" href=" {{ asset('build/css/app.css') }}">
     {% endblock %}
     <script>
-        var P ={{ (javascriptParameters + (jsParams ?? {}))|json_encode|raw }};
+        var P ={{ javascriptParameters|json_encode|raw }};
     </script>
 </head>
 

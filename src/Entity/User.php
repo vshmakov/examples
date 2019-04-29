@@ -752,6 +752,18 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
         return $session->getAttempts()->last() ?: null;
     }
 
+    public function getLastVisitedAt(): ?DT
+    {
+        /** @var Session|false $lastSession */
+        $lastSession = $this->sessions->last();
+
+        if (!$lastSession) {
+            return null;
+        }
+
+        return $lastSession->getLastTime();
+    }
+
     public function addSocialAccount(SocialAccount $socialAccount): void
     {
         if (!$this->socialAccounts->contains($socialAccount)) {
@@ -759,6 +771,13 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
         }
 
         $socialAccount->setUser($this);
+    }
+
+    public function getAttemptsCount(): int
+    {
+        return array_reduce($this->sessions->toArray(), function (int $attemptsCount, Session $session): int {
+            return $attemptsCount + $session->getAttempts()->count();
+        }, 0);
     }
 
     /**

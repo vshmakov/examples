@@ -19,12 +19,16 @@ final class UserAdmin extends AbstractAdmin
     protected function configureDatagridFilters(DatagridMapper $filter)
     {
         $filter
-            ->add('username');
+            ->add('username')
+        ->add('id');
     }
 
     protected function configureListFields(ListMapper $list)
     {
         $list
-            ->addIdentifier('username');
+            ->addIdentifier('id')
+            ->addIdentifier('username')
+            ->addIdentifier('lastVisitedAt')
+        ->addIdentifier('attemptsCount');
     }
 }

@@ -68,7 +68,7 @@ class Session
         return $this->id;
     }
 
-    public function getLastTime()
+    public function getLastTime(): DT
     {
         return DT::createFromDT($this->lastTime);
     }

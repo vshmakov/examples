@@ -26,4 +26,5 @@ return [
     Knp\Bundle\MenuBundle\KnpMenuBundle::class => ['all' => true],
     Sonata\AdminBundle\SonataAdminBundle::class => ['all' => true],
     Sonata\DoctrineORMAdminBundle\SonataDoctrineORMAdminBundle::class => ['all' => true],
+    KunicMarko\SonataAutoConfigureBundle\SonataAutoConfigureBundle::class => ['all' => true],
 ];

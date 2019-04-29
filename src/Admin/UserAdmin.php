@@ -2,13 +2,12 @@
 
 namespace App\Admin;
 
-use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
-final class UserAdmin extends AbstractAdmin
+final class UserAdmin extends BaseAdmin
 {
     protected function configureFormFields(FormMapper $form): void
     {

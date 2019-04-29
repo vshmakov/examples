@@ -25,8 +25,8 @@ final class PagesAreAvailableTest extends BaseWebTestCase
 
     private const ADMIN_ENDPOINTS = [
         '/admin/',
-        //'/admin/user/',
-        //'/admin/session/',
+        '/admin/dashboard',
+        '/admin/app/user/list',
     ];
 
     private const STUDENT_ENDPOINTS = [

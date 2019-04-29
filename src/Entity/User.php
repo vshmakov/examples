@@ -74,11 +74,6 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
     private $limitTime;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Code", mappedBy="user")
-     */
-    private $codes;
-
-    /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Ip", inversedBy="users")
      */
     private $ips;
@@ -106,7 +101,6 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
         $this->sessions = new ArrayCollection();
         $this->profiles = new ArrayCollection();
         $this->addTime = new \DateTime();
-        $this->codes = new ArrayCollection();
         $this->ips = new ArrayCollection();
         $this->transfers = new ArrayCollection();
         $this->students = new ArrayCollection();
@@ -242,44 +236,6 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
     public function setLimitTime(\DateTimeInterface $limitTime): self
     {
         $this->limitTime = $limitTime;
-
-        return $this;
-    }
-
-    public function getRemainedTime()
-    {
-        $d = $this->getLimitTime()->getTimestamp() - time();
-
-        return DT::createFromTimestamp($d > 0 ? $d : 0);
-    }
-
-    /**
-     * @return Collection|Code[]
-     */
-    public function getCodes(): Collection
-    {
-        return $this->codes;
-    }
-
-    public function addCode(Code $code): self
-    {
-        if (!$this->codes->contains($code)) {
-            $this->codes[] = $code;
-            $code->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCode(Code $code): self
-    {
-        if ($this->codes->contains($code)) {
-            $this->codes->removeElement($code);
-            // set the owning side to null (unless already changed)
-            if ($code->getUser() === $this) {
-                $code->setUser(null);
-            }
-        }
 
         return $this;
     }

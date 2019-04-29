@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use App\DataFixtures\UserFixtures;
 use App\DateTime\DateTime as DT;
-use App\Entity\Traits\BaseTrait;
 use App\Entity\Traits\BaseUserTrait;
 use App\Entity\User\SocialAccount;
 use App\Object\ObjectAccessor;
@@ -27,8 +26,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 class User implements UserInterface, GroupableInterface, EquatableInterface
 {
     use BaseUserTrait;
-    //TODO remove
-    use BaseTrait;
 
     /**
      * @ORM\Id()

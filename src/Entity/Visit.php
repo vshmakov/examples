@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use  App\DateTime\DateTime as DT;
-use App\Entity\Traits\BaseTrait;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -11,8 +10,6 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Visit
 {
-    use BaseTrait;
-
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()

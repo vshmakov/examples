@@ -120,3 +120,10 @@ services:
         arguments:
             $userNumberProvider: '@App\Attempt\Example\Number\UserNumberProvider'
             $taskNumberProvider: '@App\Attempt\Example\Number\TaskNumberProvider'
+
+    admin.user:
+        class: App\Admin\UserAdmin
+        arguments: [~, App\Entity\User, ~]
+        tags:
+            - { name: sonata.admin, manager_type: orm, label: User }
+

@@ -10,7 +10,6 @@ final class TaskVoter extends BaseVoter
 {
     public const  SHOW = 'SHOW';
     public const  EDIT = 'EDIT';
-    public const  DELETE = 'DELETE';
     public const  SOLVE = 'SOLVE';
 
     /** @var Task */
@@ -48,11 +47,6 @@ final class TaskVoter extends BaseVoter
     }
 
     protected function canEdit(): bool
-    {
-        return $this->canShow();
-    }
-
-    protected function canDelete(): bool
     {
         return $this->canShow();
     }

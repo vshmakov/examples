@@ -79,11 +79,6 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
     private $ips;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Transfer", mappedBy="user", orphanRemoval=true)
-     */
-    private $transfers;
-
-    /**
      * @var bool
      *
      * @ORM\Column(type="boolean", nullable=true)
@@ -102,7 +97,6 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
         $this->profiles = new ArrayCollection();
         $this->addTime = new \DateTime();
         $this->ips = new ArrayCollection();
-        $this->transfers = new ArrayCollection();
         $this->students = new ArrayCollection();
         $this->children = new ArrayCollection();
         $this->tasks = new ArrayCollection();
@@ -293,37 +287,6 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
     }
 
     /**
-     * @return Collection|Transfer[]
-     */
-    public function getTransfers(): Collection
-    {
-        return $this->transfers;
-    }
-
-    public function addTransfer(Transfer $transfer): self
-    {
-        if (!$this->transfers->contains($transfer)) {
-            $this->transfers[] = $transfer;
-            $transfer->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeTransfer(Transfer $transfer): self
-    {
-        if ($this->transfers->contains($transfer)) {
-            $this->transfers->removeElement($transfer);
-            // set the owning side to null (unless already changed)
-            if ($transfer->getUser() === $this) {
-                $transfer->setUser(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Assert\NotBlank(message="Имя не должно быть пустым", groups={ValidationGroup::ACCOUNT, ValidationGroup::STUDENT})
      * @Assert\Length(
@@ -473,7 +436,7 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
 
     public function isSocial(): bool
     {
-        return $this->isSocial ?? false;
+        return ($this->isSocial ?? false) or !$this->socialAccounts->isEmpty();
     }
 
     public function setIsSocial($s)

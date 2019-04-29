@@ -114,7 +114,6 @@
                                             <a class="dropdown-item" href="{{ path("session_index") }}">Сессии</a>
                                             <a class="dropdown-item" href="{{ path("ip_index") }}">Ip-адреса</a>
                                             <a class="dropdown-item" href="{{ path("visit_index") }}">Посещения</a>
-                                            <a class="dropdown-item" href="{{ path("transfer_index") }}">Платежи</a>
                                         </div>
                                     </li>
                                 {% endif %}
@@ -148,7 +147,7 @@
 
             <main>
                 {% block main %}
-                    <h1>{{  block('title') }}</h1>
+                    <h1>{{ block('title') }}</h1>
                 {% endblock %}
             </main>
 
@@ -156,7 +155,7 @@
             {% block guest_authorization %}
                 {% if not is_granted('ROLE_USER') %}
                     <h3>Мгновенный вход и регистрация с помощью социальных сетей</h3>
-                {{ include("widget/social_networks_authorization.html.twig") }}
+                    {{ include("widget/social_networks_authorization.html.twig") }}
                 {% endif %}
             {% endblock %}
         </div>

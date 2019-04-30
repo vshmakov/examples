@@ -1,0 +1,17 @@
+{% extends 'index/homepage/guest.html.twig' %}
+
+{% block title %}
+    Главная страница
+{% endblock %}
+
+{% block main %}
+    <h1>
+        Здравствуйте, {{ app.user.callName }}!<br>
+        {{ app_name }}<br>
+        Сервис по улучшению навыков счёта
+    </h1>
+{% endblock %}
+
+{% block javascripts %}
+
+{% endblock %}

@@ -15,19 +15,19 @@ final class UserAdmin extends BaseAdmin
             ->add('username', TextType::class);
     }
 
-    protected function configureDatagridFilters(DatagridMapper $filter)
+    protected function configureDatagridFilters(DatagridMapper $filter): void
     {
         $filter
             ->add('username')
-        ->add('id');
+            ->add('id');
     }
 
-    protected function configureListFields(ListMapper $list)
+    protected function configureListFields(ListMapper $list): void
     {
         $list
             ->addIdentifier('id')
             ->addIdentifier('username')
             ->addIdentifier('lastVisitedAt')
-        ->addIdentifier('attemptsCount');
+            ->addIdentifier('attemptsCount');
     }
 }

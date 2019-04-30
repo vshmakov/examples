@@ -12,7 +12,7 @@ $('.activity').each((number: number, element): void => {
     rating.html(styleRating(parseInt(rating.html())));
 });
 
-defaultDefinitions("table", {
+defaultDefinitions(".table-student", {
     searching: true,
     language: createLanguageSettings({from: "учеников"}),
     columns: createRenderList(6, {

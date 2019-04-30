@@ -32,6 +32,7 @@ Encore
     .addEntry('js/security/register', './assets/js/security/register.ts')
 
     .addEntry('js/homepage/student', './assets/js/homepage/student.ts')
+    .addEntry('js/homepage/teacher', './assets/js/homepage/teacher.ts')
 
     .addStyleEntry('css/app', './assets/css/app.css')
 

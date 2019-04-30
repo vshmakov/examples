@@ -46,11 +46,16 @@ final class TaskController extends Controller
     /**
      * @Route("/", name="task_index", methods="GET")
      */
-    public function index(TaskProviderInterface $taskProvider, TaskResultFactoryInterface $taskResultFactory): Response
+    public function index(): Response
+    {
+        return $this->render('task/index.html.twig');
+    }
+
+    public function tasks(TaskProviderInterface $taskProvider, TaskResultFactoryInterface $taskResultFactory): Response
     {
         $createTaskResult = [$taskResultFactory, 'createTaskResult'];
 
-        return $this->render('task/index.html.twig', [
+        return $this->render('task/tasks_widget.html.twig', [
             'actual' => array_map($createTaskResult, $taskProvider->getActualTasksOfCurrentUser()),
             'archive' => array_map($createTaskResult, $taskProvider->getArchiveTasksOfCurrentUser()),
         ]);

@@ -32,12 +32,17 @@ final class StudentController extends Controller
     /**
      * @Route("/", name="student_index", methods={"GET"})
      */
-    public function index(UserEvaluatorInterface $userEvaluator): Response
+    public function index(): Response
+    {
+        return $this->render('student/index.html.twig');
+    }
+
+    public function students(UserEvaluatorInterface $userEvaluator): Response
     {
         $students = $this->getCurrentUserOrGuest()->getRealStudents()->getValues();
         $this->sortStudents($students);
 
-        return $this->render('student/index.html.twig', [
+        return $this->render('student/students_widget.html.twig', [
             'students' => $students,
             'userEvaluator' => $userEvaluator,
         ]);

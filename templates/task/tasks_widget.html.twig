@@ -1,0 +1,11 @@
+<ul>
+    <li><a href="{{ path('task_new') }}" role="button" class="btn btn-success">Создать задание</a></li>
+</ul>
+{% from 'task/list_table.html.twig' import list_table %}
+<div class="actual">
+    {{ list_table('Актуальные', actual, true) }}
+</div>
+
+<div class="archive">
+    {{ list_table('Архив', archive, false) }}
+</div>

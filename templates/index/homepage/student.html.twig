@@ -11,29 +11,31 @@
         Сервис по улучшению навыков счёта
     </h1>
 
-    <div>
-        {% if not app.user.hasTeacher %}
-            <h1>Выберите учителя</h1>
+    {% block content %}
+        <div>
+            {% if not app.user.hasTeacher %}
+                <h1>Выберите учителя</h1>
 
-            {{ render(controller('App\\Controller\\TeacherController::teachers')) }}
-        {% else %}
-            <h1>Домашние задания</h1>
+                {{ render(controller('App\\Controller\\TeacherController::teachers')) }}
+            {% else %}
+                <h1>Домашние задания</h1>
 
-            {{ render(controller('App\\Controller\\HomeworkController::homework')) }}
-        {% endif %}
-    </div>
+                {{ render(controller('App\\Controller\\HomeworkController::homework')) }}
+            {% endif %}
+        </div>
 
-    <div>
-        <h1>Архив попыток</h1>
+        <div>
+            <h1>Архив попыток</h1>
 
-        {{ include("attempt/attempts_widget.html.twig") }}
-    </div>
+            {{ include("attempt/attempts_widget.html.twig") }}
+        </div>
 
-    <div>
-        <h1>Профили настроек</h1>
+        <div>
+            <h1>Профили настроек</h1>
 
-        {{ render(controller('App\\Controller\\ProfileController::profiles')) }}
-    </div>
+            {{ render(controller('App\\Controller\\ProfileController::profiles')) }}
+        </div>
+    {% endblock %}
 
     {% block share %}
         {{ parent() }}

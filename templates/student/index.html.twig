@@ -9,9 +9,9 @@
 {% endblock %}
 
 {% block main %}
-    {% from "student/list_table.html.twig" import list_table %}
+    <h1>Список учеников</h1>
 
-    {{ list_table ("Список учеников", students, userEvaluator) }}
+    {{ render(controller('App\\Controller\\StudentController::students')) }}
 {% endblock %}
 
 {% block javascripts %}

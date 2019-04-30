@@ -1,1 +1,20 @@
 {% extends 'index/homepage/student.html.twig' %}
+
+{% block content %}
+    <div>
+        <h1>Домашнее задание</h1>
+
+        {{ render(controller('App\\Controller\\TaskController::tasks')) }}
+    </div>
+
+    <div>
+        <h1>Ученики</h1>
+
+        {{ render(controller('App\\Controller\\StudentController::students')) }}
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('build/js/homepage/teacher.js') }}"></script>
+    {{ block('share_javascripts') }}
+{% endblock %}

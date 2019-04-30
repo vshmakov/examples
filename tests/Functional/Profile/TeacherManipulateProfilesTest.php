@@ -8,6 +8,6 @@ final class TeacherManipulateProfilesTest extends StudentManipulateProfilesTest
 {
     public static function setUpBeforeClass(): void
     {
-        self::$studentClient = self::createAuthenticatedClient(UserFixtures::TEACHER_USERNAME);
+        self::$studentClient = self::createAuthenticatedClient(UserFixtures::SECOND_TEACHER_USERNAME);
     }
 }

@@ -21,6 +21,7 @@ final class UserFixtures extends Fixture
     public const ADMIN_USERNAME = 'admin';
     public const STUDENT_USERNAME = 'student';
     public const TEACHER_USERNAME = 'teacher';
+    public const  SECOND_TEACHER_USERNAME = 'second_teacher';
     public const SIMPLE_USER_USERNAME = 'simple_user';
     public const SECOND_USER_USERNAME = 'second_user';
 
@@ -58,7 +59,7 @@ final class UserFixtures extends Fixture
     ];
 
     private const SECOND_TEACHER_USER = [
-        'username' => 'second_teacher',
+        'username' => self::SECOND_TEACHER_USERNAME,
         'firstName' => 'Петр',
         'fatherName' => 'Петрович',
         'lastName' => 'Петров',

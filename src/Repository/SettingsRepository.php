@@ -15,7 +15,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
-class SettingsRepository extends ServiceEntityRepository implements SettingsProviderInterface
+final class SettingsRepository extends ServiceEntityRepository implements SettingsProviderInterface
 {
     use BaseTrait;
     /** @var CurrentUserProviderInterface */

@@ -7,7 +7,7 @@ use App\Repository\Traits\BaseTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-class VisitRepository extends ServiceEntityRepository
+final class VisitRepository extends ServiceEntityRepository
 {
     use BaseTrait;
 

@@ -3,7 +3,7 @@
 <div>
     <h2>{{ title }}</h2>
 
-    <table class="table table-info">
+    <table class="table table-info table-profiles">
         <thead>
         <tr>
             <th>Номер</th>
@@ -30,8 +30,9 @@
                     {% block right_table_body %}
                         <td class="profile-actions">
                             {% set hasActions = false %}
+                            {% set canAppoint = is_granted('APPOINT', profile) %}
 
-                            {% if is_granted('APPOINT', profile) and not profileProvider.isCurrentProfile(profile) %}
+                            {% if canAppoint and not profileProvider.isCurrentProfile(profile) %}
                                 {% set hasActions = true %}
                                 <a href="{{ path('profile_appoint', {'id': profile.id}) }}">Выбрать</a>
                             {% endif %}
@@ -39,6 +40,14 @@
                             {% if is_granted('EDIT', profile) %}
                                 {% set hasActions = true %}
                                 <a href="{{ path('profile_edit', {'id': profile.id}) }}">Редактировать</a>
+                            {% endif %}
+
+                            {% if canAppoint %}
+                                {% set hasActions = true %}
+                                <a href="{{ path('attempt_new', {'profile_id': profile.id}) }}" role="button"
+                                   class="btn btn-success">
+                                    Начать новую попытку с этим профилем
+                                </a>
                             {% endif %}
 
                             {% if is_granted('DELETE', profile) %}
@@ -58,8 +67,6 @@
         {% for number, profile in profiles if not profileProvider.isCurrentProfile(profile) %}
             {{ block('row') }}
         {% endfor %}
-
-
         </tbody>
     </table>
 </div>

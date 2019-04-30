@@ -1,0 +1,7 @@
+<div class="actual">
+    {% include 'homework/tasks_table.html.twig' with {'title': 'Текущие задания', 'tasks': actualHomework} %}
+</div>
+
+<div class="archive">
+    {% include 'homework/tasks_table.html.twig' with {'title': 'Архив заданий', 'tasks': archiveHomework} %}
+</div>

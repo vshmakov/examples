@@ -32,12 +32,17 @@ final class TeacherController extends Controller
     /**
      * @Route("/", name="teacher_index", methods={"GET"})
      */
-    public function index(TeacherProviderInterface $teacherProvider): Response
+    public function index(): Response
+    {
+        return $this->render('teacher/index.html.twig');
+    }
+
+    public function teachers(TeacherProviderInterface $teacherProvider): Response
     {
         $teachers = $teacherProvider->getTeachers();
         $this->sortTeachers($teachers);
 
-        return $this->render('teacher/index.html.twig', [
+        return $this->render('teacher/list_table.html.twig', [
             'teachers' => $teachers,
         ]);
     }

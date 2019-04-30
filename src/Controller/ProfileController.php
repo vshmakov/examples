@@ -28,15 +28,17 @@ final class ProfileController extends Controller
     /**
      * @Route("/", name="profile_index", methods={"GET"})
      */
-    public function index(ProfileProviderInterface $profileProvider): Response
+    public function index(): Response
+    {
+        return $this->render('profile/index.html.twig');
+    }
+
+    public function profiles(ProfileProviderInterface $profileProvider): Response
     {
         $publicProfiles = $profileProvider->getPublicProfiles();
         $userProfiles = $profileProvider->getCurrentUserProfiles();
-        array_map(function (array &$profiles) use ($profileProvider): void {
-            $this->sortProfiles($profiles, $profileProvider);
-        }, [&$publicProfiles, &$userProfiles]);
 
-        return $this->render('profile/index.html.twig', [
+        return $this->render('profile/profiles_widget.html.twig', [
             'publicProfiles' => $publicProfiles,
             'userProfiles' => $userProfiles,
             'profileProvider' => $profileProvider,
@@ -147,21 +149,6 @@ final class ProfileController extends Controller
             ->flush($currentUser);
 
         return $this->redirectToRoute('profile_index');
-    }
-
-    private function sortProfiles(array &$profiles, ProfileProviderInterface $profileProvider): void
-    {
-        usort($profiles, function (Profile $profile1, Profile $profile2) use ($profileProvider): int {
-            if ($profileProvider->isCurrentProfile($profile1)) {
-                return -1;
-            }
-
-            if ($profileProvider->isCurrentProfile($profile2)) {
-                return 1;
-            }
-
-            return $profile1->getCreatedAt()->getTimestamp() <= $profile2->getCreatedAt()->getTimestamp() ? -1 : 1;
-        });
     }
 
     private function cloneProfile(Profile $sourceProfile): Profile

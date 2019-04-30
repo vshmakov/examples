@@ -31,6 +31,8 @@ Encore
     .addEntry('js/security/login', './assets/js/security/login.ts')
     .addEntry('js/security/register', './assets/js/security/register.ts')
 
+    .addEntry('js/homepage/student', './assets/js/homepage/student.ts')
+
     .addStyleEntry('css/app', './assets/css/app.css')
 
     // will require an extra script tag for runtime.js

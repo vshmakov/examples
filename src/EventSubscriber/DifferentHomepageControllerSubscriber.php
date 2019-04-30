@@ -2,15 +2,15 @@
 
 namespace App\EventSubscriber;
 
-use App\Entity\User\Role;
 use App\Attempt\EventSubscriber\RouteTrait;
+use App\Entity\User\Role;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Webmozart\Assert\Assert;
 
-final  class DifferentHomepageControllerSubscriber implements EventSubscriberInterface
+final class DifferentHomepageControllerSubscriber implements EventSubscriberInterface
 {
     use RouteTrait;
     private const  ROUTE = 'homepage';

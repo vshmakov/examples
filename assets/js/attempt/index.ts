@@ -13,7 +13,7 @@ function minutesSecondsDateFormatBySeconds(seconds: number): string {
     return `${dateParts.minute}:${dateParts.second}`;
 }
 
-defaultDefinitions('table', {
+defaultDefinitions('.table-attempts', {
     serverSide: true,
     ajax: PARAMETERS.getAttemptsUrl,
     language: createLanguageSettings({from: 'попыток'}),

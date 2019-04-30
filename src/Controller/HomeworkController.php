@@ -30,9 +30,14 @@ final class HomeworkController extends Controller
     /**
      * @Route("/", name="homework_index", methods={"GET"})
      */
-    public function index(HomeworkProviderInterface $homeworkProvider, ContractorResultFactoryInterface $contractorResultFactory): Response
+    public function index(): Response
     {
-        return $this->render('homework/index.html.twig', [
+        return $this->render('homework/index.html.twig');
+    }
+
+    public function homework(HomeworkProviderInterface $homeworkProvider, ContractorResultFactoryInterface $contractorResultFactory): Response
+    {
+        return $this->render('homework/homework.html.twig', [
             'actualHomework' => $contractorResultFactory->mapCreateCurrentContractorResult($homeworkProvider->getActualHomework()),
             'archiveHomework' => $contractorResultFactory->mapCreateCurrentContractorResult($homeworkProvider->getArchiveHomework()),
         ]);

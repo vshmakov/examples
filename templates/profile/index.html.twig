@@ -8,36 +8,8 @@
 
 {% block main %}
     <h1>Профили настроек</h1>
-    {% if not is_granted('ROLE_USER') %}
-        <div id="not-able-appoint-profiles-message" class="text-white bg-danger mb-3">
-            <div class="card-header">Внимание!</div>
-            <div class="card-body">
-                <h4 class="card-title">Вы не можете выбирать профили настроек!</h4>
-                <p class="card-text">
-                    Пожалуйста,
-                    <a href="{{ path("fos_user_security_login") }}">войдите</a>
-                    или
-                    <a href="{{ path("fos_user_registration_register") }}">зарегистрируйтесь</a>,
-                    чтобы иметь возможность изменить текущий профиль настроек или создать свой.
-                </p>
-            </div>
-        </div>
-    {% else %}
-        {# TODO move action buttons up #}
-        <ul>
-            <li><a class="profile-index-create-button btn btn-active" role="button" href="{{ path("profile_new") }}">
-                    Создать новый профиль
-                </a></li>
-        </ul>
-    {% endif %}
 
-    <div id="public-profiles">
-        {% embed 'profile/list_table.html.twig' with {'title': 'Профили по умолчанию', 'profiles': publicProfiles} %}{% endembed %}
-    </div>
-
-    <div id="user-profiles">
-        {% embed 'profile/list_table.html.twig' with {'title': 'Личные профили', 'profiles': userProfiles} %}{% endembed %}
-    </div>
+    {{ render(controller('App\\Controller\\ProfileController::profiles')) }}
 {% endblock %}
 
 {% block javascripts %}

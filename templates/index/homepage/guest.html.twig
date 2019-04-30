@@ -38,7 +38,7 @@
 
             <h2>Кому будет полезен наш сервис?</h2>
 
-                Детям с 6 до 12 лет. У нас ваш ребёнок сможет:
+            Детям с 6 до 12 лет. У нас ваш ребёнок сможет:
             <ol>
                 <li>Отработать навыки сложения, вычитания в пределах 10.</li>
                 <li>Научиться с уверенностью решать примеры с переходом через десятки.</li>
@@ -65,12 +65,23 @@
             {{ parent() }}
         {% endblock %}
 
-        <div>
-            <h2>Расскажите о нас!</h2>
-            <script src="//yastatic.net/es5-shims/0.0.2/es5-shims.min.js"></script>
-            <script src="//yastatic.net/share2/share.js"></script>
-            <div class="ya-share2"
-                 data-services="vkontakte,facebook,odnoklassniki,moimir,twitter,viber,whatsapp,skype"></div>
-        </div>
+        {% block share %}
+            <div>
+                <h2>Расскажите о нас!</h2>
+
+                <div class="ya-share2"
+                     data-services="vkontakte,facebook,odnoklassniki,moimir,twitter,viber,whatsapp,skype"></div>
+            </div>
+        {% endblock %}
     </content>
+{% endblock %}
+
+{% block share_javascripts %}
+    <script src="//yastatic.net/es5-shims/0.0.2/es5-shims.min.js"></script>
+    <script src="//yastatic.net/share2/share.js"></script>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ block('share_javascripts') }}
 {% endblock %}

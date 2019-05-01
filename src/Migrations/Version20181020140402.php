@@ -21,6 +21,7 @@ final class Version20181020140402 extends AbstractMigration
         $this->addSql('ALTER TABLE task ADD CONSTRAINT FK_527EDB2559949888 FOREIGN KEY (settings_id) REFERENCES settings (id)');
         $this->addSql('ALTER TABLE task_user ADD CONSTRAINT FK_FE2042328DB60186 FOREIGN KEY (task_id) REFERENCES task (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE task_user ADD CONSTRAINT FK_FE204232A76ED395 FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE attempt ADD settings_id INT DEFAULT NULL');
         $this->addSql('ALTER TABLE attempt ADD task_id INT DEFAULT NULL, CHANGE settings_id settings_id INT NOT NULL');
         $this->addSql('ALTER TABLE attempt ADD CONSTRAINT FK_18EC02668DB60186 FOREIGN KEY (task_id) REFERENCES task (id)');
         $this->addSql('CREATE INDEX IDX_18EC02668DB60186 ON attempt (task_id)');

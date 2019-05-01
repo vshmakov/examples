@@ -47,18 +47,17 @@ final class SolveAttemptTest extends AbstractSolveAttemptTest
     public function guestSolvesAttempt(array $attemptData): void
     {
         $this->solveAttempt($attemptData, self::$unauthenticatedClient);
+
+        //this test has long execution time
+        //and other tests are skipped
+        $this->guestRedirectsToAttemptResult($attemptData);
     }
 
-    /**
-     * @test
-     * @depends  guestStartsNewAttempt
-     * @depends  guestSolvesAttempt
-     */
-    public function guestRedirectsToAttemptResult(int $attemptId): void
+    public function guestRedirectsToAttemptResult(array $attemptData): void
     {
-        self::$unauthenticatedClient->request('GET', sprintf('/attempt/%s/', $attemptId));
+        self::$unauthenticatedClient->request('GET', sprintf('/attempt/%s/', $attemptData['id']));
         $this->assertTrue(self::$unauthenticatedClient->getResponse()->isRedirection());
-        $this->assertTrue(self::$unauthenticatedClient->getResponse()->isRedirect(sprintf('/attempt/%s/show/', $attemptId)));
+        $this->assertTrue(self::$unauthenticatedClient->getResponse()->isRedirect(sprintf('/attempt/%s/show/', $attemptData['id'])));
     }
 
     /**

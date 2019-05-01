@@ -5,6 +5,7 @@
 /var/
 /vendor/
 /public/bundles/
+/.phpunit.result.cache
 ###< symfony/framework-bundle ###
 
 ###> symfony/webpack-encore-pack ###

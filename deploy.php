@@ -48,6 +48,9 @@ after('deploy:failed', 'deploy:unlock');
 
 task('deploy:test', function (): void {
     run('{{symfony/console}} doctrine:migrations:migrate -n -e test');
+    run('{{symfony/console}} doctrine:schema:validate -e test');
+    run('{{symfony/console}} doctrine:fixtures:load -n -e test');
+    run('{{bin/php}} {{release_path}}/bin/phpunit');
 });
 
 task('pwd', function () {

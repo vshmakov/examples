@@ -18,7 +18,7 @@ final class ExampleGeneratorTest extends BaseTestCase
     /** @var ExampleGeneratorInterface */
     private $exampleGenerator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $exampleCoefficientGenerator = new ExampleCoefficientGenerator(new Solver());
 

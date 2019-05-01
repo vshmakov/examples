@@ -31,6 +31,7 @@
         "symfony/web-link": "^4.0"
     },
     "require-dev": {
+        "deployer/deployer": "^6.4",
         "doctrine/doctrine-fixtures-bundle": "^3.1",
         "easycorp/easy-deploy-bundle": "^1.0",
         "friendsofphp/php-cs-fixer": "^2.13",
@@ -71,7 +72,7 @@
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
             "assets:install --symlink --relative %PUBLIC_DIR%": "symfony-cmd",
-            "security-checker security:check": "script"
+            "security:check": "symfony-cmd"
         },
         "post-install-cmd": [
             "@auto-scripts"

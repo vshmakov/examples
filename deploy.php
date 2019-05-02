@@ -2,7 +2,16 @@
 
 namespace Deployer;
 
+use App\Deploy\AsyncProcess;
+use  Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
+
 require 'recipe/common.php';
+
+function toLinuxPath(string $path): string
+{
+    return str_replace('\\', '/', $path);
+}
 
 inventory('config/prod/hosts.yaml');
 
@@ -51,8 +60,8 @@ task('deploy:build', function (): void {
 desc('Deploy your project');
 task('deploy', [
     'deploy:info',
+    'deploy:build-assets',
     'deploy:prepare',
-    //'deploy:upload-assets',
     'deploy:lock',
     'deploy:release',
     'deploy:update_code',
@@ -62,12 +71,33 @@ task('deploy', [
     'deploy:test',
     'deploy:clear_paths',
     'deploy:build',
+    'deploy:upload-assets',
     'deploy:symlink',
     'deploy:unlock',
     'cleanup',
     'success',
 ]);
 
-task('deploy:upload-assets', function (): void {
-    upload('/C/OSPanel/domains/examples/composer.json', '~/abc.def');
+/** @var AsyncProcess $buildAssetsCommand */
+$buildAssetsCommand = null;
+
+task('deploy:build-assets', function () use (&$buildAssetsCommand): void {
+    $buildAssetsCommand = new AsyncProcess('npm run build');
+});
+
+task('deploy:upload-assets', function () use (&$buildAssetsCommand): void {
+    $buildAssetsCommand->wait();
+    set('build_assets_path', 'public/build');
+
+    $finder = Finder::create()
+        ->files()
+        ->in(sprintf('%s/%s', __DIR__, get('build_assets_path')));
+
+    /** @var SplFileInfo $file */
+    foreach ($finder as $file) {
+        set('asset_directory_path', toLinuxPath($file->getRelativePath()));
+        set('asset_path', toLinuxPath($file->getRelativePathname()));
+        run('mkdir {{release_path}}/{{build_assets_path}}/{{asset_directory_path}} -p');
+        runLocally('scp -P {{port}} {{build_assets_path}}/{{asset_path}} {{user}}@{{hostname}}:{{release_path}}/{{build_assets_path}}/{{asset_path}}');
+    }
 });

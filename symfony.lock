@@ -19,9 +19,6 @@
     "cocur/slugify": {
         "version": "v3.2"
     },
-    "easycorp/easy-deploy-bundle": {
-        "version": "v1.0.5"
-    },
     "knplabs/knp-menu": {
         "version": "2.3.0"
     },

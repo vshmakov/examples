@@ -23,8 +23,30 @@ set('shared_files', [
 set('clear_paths', ['.env.local.php']);
 
 set('env', [
-    'COMPOSER_MEMORY_LIMIT' => -1,
+    //'COMPOSER_MEMORY_LIMIT' => -1,
 ]);
+
+after('deploy:failed', 'deploy:unlock');
+
+task('deploy:test', function (): void {
+    cd('{{release_path}}');
+    run('{{symfony/console}} doctrine:migrations:migrate -n -e test');
+    run('{{symfony/console}} doctrine:schema:validate -e test');
+    run('{{symfony/console}} doctrine:fixtures:load -n -e test');
+    run('{{bin/php}} vendor/bin/phpunit');
+});
+
+after('deploy:vendors', 'deploy:post-install');
+task('deploy:post-install', function (): void {
+    cd('{{release_path}}');
+    run('{{bin/composer}} run-script auto-scripts');
+});
+
+task('deploy:build', function (): void {
+    cd('{{release_path}}');
+    run('{{bin/composer}} dump-env prod');
+    run('{{bin/composer}} dump-autoload --optimize --no-dev --classmap-authoritative');
+});
 
 desc('Deploy your project');
 task('deploy', [
@@ -46,25 +68,6 @@ task('deploy', [
     'success',
 ]);
 
-after('deploy:failed', 'deploy:unlock');
-set('release/composer', 'cd {{release_path}} && {{bin/composer}}');
-task('deploy:build', function (): void {
-    run('{{release/composer}} dump-env prod');
-    run('{{release/composer}} dump-autoload --optimize --no-dev --classmap-authoritative');
-});
-
 task('deploy:upload-assets', function (): void {
     upload('/C/OSPanel/domains/examples/composer.json', '~/abc.def');
-});
-
-task('deploy:test', function (): void {
-    run('{{symfony/console}} doctrine:migrations:migrate -n -e test');
-    run('{{symfony/console}} doctrine:schema:validate -e test');
-    run('{{symfony/console}} doctrine:fixtures:load -n -e test');
-    run('cd {{release_path}} && {{bin/php}} vendor/bin/phpunit');
-});
-
-after('deploy:vendors', 'deploy:post-install');
-task('deploy:post-install', function (): void {
-    run('cd {{release_path}} && {{bin/composer}} run-script auto-scripts');
 });

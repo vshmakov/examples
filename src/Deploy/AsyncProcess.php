@@ -11,7 +11,7 @@ use Symfony\Component\Process\Process;
  *
  * @see  https://github.com/deployphp/deployer/issues/1518
  */
-final class AsyncProcess
+final class AsyncProcess implements WaitableInterface
 {
     /** @var Process */
     private $process;

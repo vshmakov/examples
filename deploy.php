@@ -3,6 +3,7 @@
 namespace Deployer;
 
 use App\Deploy\AsyncProcess;
+use App\Deploy\AsyncProcessCollection;
 use  Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -95,8 +96,8 @@ task('deploy:upload-assets', function () use (&$buildAssetsCommand): void {
 desc('Deploy your project');
 task('deploy', function (): void {
     after('deploy:info', 'deploy:build-assets');
-    before('deploy:symlink', 'deploy:upload-assets');
     after('deploy:create-manifest', 'deploy:test');
+    before('deploy:symlink', 'deploy:upload-assets');
     invoke('quik-deploy');
 });
 

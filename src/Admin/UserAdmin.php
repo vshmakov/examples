@@ -25,9 +25,11 @@ final class UserAdmin extends BaseAdmin
     protected function configureListFields(ListMapper $list): void
     {
         $list
-            ->addIdentifier('id')
+            ->add('id')
             ->addIdentifier('username')
-            ->addIdentifier('lastVisitedAt')
-            ->addIdentifier('attemptsCount');
+            ->add('email')
+            ->add('lastVisitedAt')
+            ->add('attemptsCount')
+        ->add('isEnabled', static::TYPE_BOOLEAN);
     }
 }

@@ -8,6 +8,11 @@ use Symfony\Component\Finder\SplFileInfo;
 
 require 'recipe/common.php';
 
+function cdToReleasePath(): void
+{
+    cd('{{release_path}}');
+}
+
 function toLinuxPath(string $path): string
 {
     return str_replace('\\', '/', $path);
@@ -19,7 +24,7 @@ set('composer_options', '{{composer_action}} --no-scripts');
 set('ssh_multiplexing', false);
 set('symfony/console', '{{bin/php}} {{release_path}}/bin/console');
 
-const  LOGS_DIR = 'var/logs';
+const  LOGS_DIR = 'var/log';
 const  CACHE_DIR = 'var/cache';
 
 set('shared_dirs', [LOGS_DIR]);
@@ -34,11 +39,18 @@ set('clear_paths', ['.env.local.php']);
 set('env', [
     //'COMPOSER_MEMORY_LIMIT' => -1,
 ]);
+set('build_assets_path', 'public/build');
 
 after('deploy:failed', 'deploy:unlock');
 
+task('deploy:create-manifest', function (): void {
+    cdToReleasePath();
+    run('mkdir {{build_assets_path}} -p');
+    run('echo "{}" > {{build_assets_path}}/manifest.json');
+});
+
 task('deploy:test', function (): void {
-    cd('{{release_path}}');
+    cdToReleasePath();
     run('{{symfony/console}} doctrine:migrations:migrate -n -e test');
     run('{{symfony/console}} doctrine:schema:validate -e test');
     run('{{symfony/console}} doctrine:fixtures:load -n -e test');
@@ -57,27 +69,6 @@ task('deploy:build', function (): void {
     run('{{bin/composer}} dump-autoload --optimize --no-dev --classmap-authoritative');
 });
 
-desc('Deploy your project');
-task('deploy', [
-    'deploy:info',
-    'deploy:build-assets',
-    'deploy:prepare',
-    'deploy:lock',
-    'deploy:release',
-    'deploy:update_code',
-    'deploy:shared',
-    'deploy:writable',
-    'deploy:vendors',
-    'deploy:test',
-    'deploy:clear_paths',
-    'deploy:build',
-    'deploy:upload-assets',
-    'deploy:symlink',
-    'deploy:unlock',
-    'cleanup',
-    'success',
-]);
-
 /** @var AsyncProcess $buildAssetsCommand */
 $buildAssetsCommand = null;
 
@@ -87,7 +78,6 @@ task('deploy:build-assets', function () use (&$buildAssetsCommand): void {
 
 task('deploy:upload-assets', function () use (&$buildAssetsCommand): void {
     $buildAssetsCommand->wait();
-    set('build_assets_path', 'public/build');
 
     $finder = Finder::create()
         ->files()
@@ -101,3 +91,29 @@ task('deploy:upload-assets', function () use (&$buildAssetsCommand): void {
         runLocally('scp -P {{port}} {{build_assets_path}}/{{asset_path}} {{user}}@{{hostname}}:{{release_path}}/{{build_assets_path}}/{{asset_path}}');
     }
 });
+
+desc('Deploy your project');
+task('deploy', function (): void {
+    after('deploy:info', 'deploy:build-assets');
+    before('deploy:symlink', 'deploy:upload-assets');
+    after('deploy:create-manifest', 'deploy:test');
+    invoke('quik-deploy');
+});
+
+task('quik-deploy', [
+    'deploy:info',
+    'deploy:prepare',
+    'deploy:lock',
+    'deploy:release',
+    'deploy:update_code',
+    'deploy:shared',
+    'deploy:writable',
+    'deploy:vendors',
+    'deploy:create-manifest',
+    'deploy:clear_paths',
+    'deploy:build',
+    'deploy:symlink',
+    'deploy:unlock',
+    'cleanup',
+    'success',
+]);

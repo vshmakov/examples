@@ -3,7 +3,6 @@
 namespace Deployer;
 
 use App\Deploy\AsyncProcess;
-use App\Deploy\AsyncProcessCollection;
 use  Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -56,6 +55,12 @@ task('deploy:test', function (): void {
     run('{{symfony/console}} doctrine:schema:validate -e test');
     run('{{symfony/console}} doctrine:fixtures:load -n -e test');
     run('{{bin/php}} vendor/bin/phpunit');
+});
+
+task('deploy:migrate', function (): void {
+    cdToReleasePath();
+    run('{{symfony/console}} doctrine:migrations:migrate -n');
+    run('{{symfony/console}} doctrine:schema:validate');
 });
 
 after('deploy:vendors', 'deploy:post-install');
@@ -112,6 +117,7 @@ task('quik-deploy', [
     'deploy:vendors',
     'deploy:create-manifest',
     'deploy:clear_paths',
+    'deploy:migrate',
     'deploy:build',
     'deploy:symlink',
     'deploy:unlock',

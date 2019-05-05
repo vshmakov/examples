@@ -13,11 +13,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\KernelEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-final class ResponseSubscriber implements EventSubscriberInterface
+final class LogSubscriber implements EventSubscriberInterface
 {
     /** @var Request|null */
     private $request;
@@ -58,8 +58,14 @@ final class ResponseSubscriber implements EventSubscriberInterface
         $this->entityManager = $entityManager;
     }
 
-    public function onKernelResponse(FilterResponseEvent $event): void
+    public function onKernelTerminate(KernelEvent $event): void
     {
+        $isGetRequest = $event->getRequest()->isMethod(Request::METHOD_GET);
+
+        if ($isGetRequest) {
+            $this->updateCurrentUser();
+        }
+
         $currentUserSession = $this->currentUserSessionProvider->getCurrentUserSession();
 
         if (!$this->request or null === $currentUserSession) {
@@ -68,7 +74,10 @@ final class ResponseSubscriber implements EventSubscriberInterface
 
         $this->updateSession($currentUserSession);
         $this->saveVisit($currentUserSession, $event->getResponse()->getStatusCode());
-        $this->saveIp($currentUserSession);
+
+        if ($isGetRequest) {
+            $this->saveIp($currentUserSession);
+        }
     }
 
     private function updateSession(Session $session): void
@@ -83,19 +92,18 @@ final class ResponseSubscriber implements EventSubscriberInterface
         $uri = $request->getRequestUri();
         $routeName = $request->attributes->get('_route', $uri);
 
-        if ('_wdt' !== $routeName &&
-            !$this->authorizationChecker->isGranted('ROLE_ADMIN')) {
-            $visit = ObjectAccessor::initialize(Visit::class, [
-                'uri' => $uri,
-                'routeName' => $routeName,
-                'method' => $request->getMethod(),
-                'statusCode' => $statusCode,
-                'session' => $session,
-            ]);
-
-            $this->entityManager->persist($visit);
-            $this->entityManager->flush($visit);
+        if ('_wdt' === $routeName or $this->authorizationChecker->isGranted('ROLE_ADMIN')) {
+            return;
         }
+
+        $visit = ObjectAccessor::initialize(Visit::class, ['uri' => $uri,
+            'routeName' => $routeName,
+            'method' => $request->getMethod(),
+            'statusCode' => $statusCode,
+            'session' => $session, ]);
+
+        $this->entityManager->persist($visit);
+        $this->entityManager->flush($visit);
     }
 
     private function saveIp(Session $session): void
@@ -116,10 +124,17 @@ final class ResponseSubscriber implements EventSubscriberInterface
         }
     }
 
+    private function updateCurrentUser(): void
+    {
+        $currentUser = $this->currentUserProvider->getCurrentUserOrGuest();
+        $currentUser->setLastVisitedAt(new \DateTime());
+        $this->entityManager->flush($currentUser);
+    }
+
     public static function getSubscribedEvents(): array
     {
         return [
-            KernelEvents::RESPONSE => 'onKernelResponse',
+            KernelEvents::TERMINATE => 'onKernelTerminate',
         ];
     }
 }

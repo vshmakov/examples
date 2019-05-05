@@ -87,6 +87,12 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
      */
     private $socialAccounts;
 
+    /**
+     * @var \DateTimeInterface|null
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $lastVisitedAt;
+
     public function __construct()
     {
         $this->socialAccounts = new ArrayCollection();
@@ -752,16 +758,14 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
         return $session->getAttempts()->last() ?: null;
     }
 
-    public function getLastVisitedAt(): ?DT
+    public function getLastVisitedAt(): ?\DateTimeInterface
     {
-        /** @var Session|false $lastSession */
-        $lastSession = $this->sessions->last();
+        return $this->lastVisitedAt;
+    }
 
-        if (!$lastSession) {
-            return null;
-        }
-
-        return $lastSession->getLastTime();
+    public function setLastVisitedAt(\DateTimeInterface $lastVisitedAt): void
+    {
+        $this->lastVisitedAt = $lastVisitedAt;
     }
 
     public function addSocialAccount(SocialAccount $socialAccount): void

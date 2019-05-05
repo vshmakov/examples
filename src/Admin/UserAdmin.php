@@ -9,6 +9,15 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 final class UserAdmin extends BaseAdmin
 {
+    public function __construct($code, $class, $baseControllerName)
+    {
+        parent::__construct($code, $class, $baseControllerName);
+
+        $this->datagridValues = [
+                '_sort_by' => 'lastVisitedAt',
+            ] + $this->datagridValues;
+    }
+
     protected function configureFormFields(FormMapper $form): void
     {
         $form
@@ -28,8 +37,10 @@ final class UserAdmin extends BaseAdmin
             ->add('id')
             ->addIdentifier('username')
             ->add('email')
-            ->add('lastVisitedAt')
+            ->add('network')
+            ->add('networkId')
+            ->add('lastVisitedAt', static::TYPE_DATETIME)
             ->add('attemptsCount')
-        ->add('isEnabled', static::TYPE_BOOLEAN);
+            ->add('isEnabled', static::TYPE_BOOLEAN);
     }
 }

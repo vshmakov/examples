@@ -114,3 +114,7 @@ services:
         arguments:
             $userNumberProvider: '@App\Attempt\Example\Number\UserNumberProvider'
             $taskNumberProvider: '@App\Attempt\Example\Number\TaskNumberProvider'
+
+
+    session.flashbag:
+        class: Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag

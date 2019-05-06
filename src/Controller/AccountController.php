@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Controller\Traits\CurrentUserProviderTrait;
 use App\Entity\User\Role;
 use App\Form\AccountType;
-use App\Security\Authentication\AuthenticatorInterface;
+use App\Security\Authentication\Guard\LoginAuthenticator;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,7 +32,7 @@ final class AccountController extends Controller
     /**
      * @Route("/edit/", name="account_edit", methods={"GET", "POST"})
      */
-    public function edit(Request $request, SessionInterface $session, AuthenticatorInterface $authenticator): Response
+    public function edit(Request $request, SessionInterface $session): Response
     {
         $currentUser = $this->getCurrentUserOrGuest();
         $currentUser->cleanSocialUsername();
@@ -44,9 +44,9 @@ final class AccountController extends Controller
                 ->getManager()
                 ->flush($currentUser);
 
-            $authenticator->authenticate($currentUser);
+            $this->addFlash(LoginAuthenticator::LOGIN_AS_USER, $currentUser->getId());
 
-            return $this->redirectToRoute('account_index');
+            return $this->redirectToRoute('security_login', [LoginAuthenticator::REDIRECT_AFTER_LOGIN => $this->generateUrl('account_index')]);
         }
 
         return $this->render('account/edit.html.twig', [

@@ -12,15 +12,17 @@ use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 
 final class LoginAuthenticator extends AbstractGuardAuthenticator
 {
+    public const  LOGIN_AS_USER = 'login_as_user';
+
     public function supports(Request $request)
     {
-        return $request->hasSession() && $request->getSession()->getFlashBag()->has('login');
+        return $request->hasSession() && $request->getSession()->getFlashBag()->has(self::LOGIN_AS_USER);
     }
 
     public function getCredentials(Request $request)
     {
         return [
-            'userId' => $request->getSession()->getFlashBag()->get('login')[0] ?? null,
+            'userId' => $request->getSession()->getFlashBag()->get(self::LOGIN_AS_USER)[0] ?? null,
         ];
     }
 

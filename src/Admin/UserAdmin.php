@@ -5,6 +5,7 @@ namespace App\Admin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
+use Sonata\AdminBundle\Route\RouteCollection;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 final class UserAdmin extends BaseAdmin
@@ -16,6 +17,12 @@ final class UserAdmin extends BaseAdmin
         $this->datagridValues = [
                 '_sort_by' => 'lastVisitedAt',
             ] + $this->datagridValues;
+    }
+
+    protected function configureRoutes(RouteCollection $collection)
+    {
+        $collection
+            ->add('loginAs', $this->getRouterIdParameter().'/login-as');
     }
 
     protected function configureFormFields(FormMapper $form): void
@@ -52,6 +59,7 @@ final class UserAdmin extends BaseAdmin
             ])
             ->add('_action', null, [
                 'actions' => [
+                    'loginAs' => [],
                     'delete' => [],
                 ],
             ]);

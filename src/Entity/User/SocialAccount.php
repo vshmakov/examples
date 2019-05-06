@@ -146,4 +146,9 @@ class SocialAccount
     {
         $this->profile = $profile;
     }
+
+    public function __toString(): string
+    {
+        return sprintf('%s %s', $this->network, $this->networkId);
+    }
 }

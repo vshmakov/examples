@@ -29,8 +29,8 @@ final class UserAdmin extends BaseAdmin
         $filter
             ->add('username')
             ->add('id')
-        ->add('firstName')
-        ->add('lastName');
+            ->add('firstName')
+            ->add('lastName');
     }
 
     protected function configureListFields(ListMapper $list): void
@@ -41,10 +41,19 @@ final class UserAdmin extends BaseAdmin
             ->add('firstName')
             ->add('lastName')
             ->add('email')
+            ->add('socialAccounts')
             ->add('network')
             ->add('networkId')
             ->add('lastVisitedAt', static::TYPE_DATETIME)
             ->add('attemptsCount')
-            ->add('isEnabled', static::TYPE_BOOLEAN);
+            ->add('isEnabled', static::TYPE_BOOLEAN)
+            ->add('rolesString', null, [
+                'label' => 'Roles',
+            ])
+            ->add('_action', null, [
+                'actions' => [
+                    'delete' => [],
+                ],
+            ]);
     }
 }

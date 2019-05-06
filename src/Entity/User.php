@@ -768,6 +768,11 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
         $this->lastVisitedAt = $lastVisitedAt;
     }
 
+    public function getSocialAccounts(): Collection
+    {
+        return $this->socialAccounts;
+    }
+
     public function addSocialAccount(SocialAccount $socialAccount): void
     {
         if (!$this->socialAccounts->contains($socialAccount)) {
@@ -804,8 +809,13 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
         return true;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return sprintf('%s %s (%s)', $this->getFirstName(), $this->getLastName(), $this->getUsername());
+    }
+
+    public function getRolesString(): string
+    {
+        return implode(', ', $this->getRoles());
     }
 }

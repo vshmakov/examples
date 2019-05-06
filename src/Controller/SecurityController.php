@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Security\Authentication\LoginAuthenticator;
+use App\Security\Authentication\Guard\LoginAuthenticator;
 use App\User\SocialAccount\SocialAccountProviderInterface;
 use App\User\UserProviderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;

@@ -794,19 +794,9 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
      */
     public function isEqualTo(SymfonyUserInterface $user)
     {
-        foreach (['id', 'username', 'roles'] as $field) {
-            if (null === $this->roles && 'roles' === $field) {
-                //this user created from serialization and has no roles
-                //We don't compare roles field
-                continue;
-            }
+        $compareFields = ['id', 'username', 'isTeacher'];
 
-            if (ObjectAccessor::getValue($this, $field) !== ObjectAccessor::getValue($user, $field)) {
-                return false;
-            }
-        }
-
-        return true;
+        return ObjectAccessor::isSame($this, $user, $compareFields);
     }
 
     public function __toString(): string

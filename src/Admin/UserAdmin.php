@@ -49,8 +49,6 @@ final class UserAdmin extends BaseAdmin
             ->add('lastName')
             ->add('email')
             ->add('socialAccounts')
-            ->add('network')
-            ->add('networkId')
             ->add('lastVisitedAt', static::TYPE_DATETIME)
             ->add('attemptsCount')
             ->add('isEnabled', static::TYPE_BOOLEAN)
@@ -60,7 +58,6 @@ final class UserAdmin extends BaseAdmin
             ->add('_action', null, [
                 'actions' => [
                     'loginAs' => [],
-                    'delete' => [],
                 ],
             ]);
     }

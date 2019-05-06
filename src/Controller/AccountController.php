@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Controller\Traits\CurrentUserProviderTrait;
 use App\Entity\User\Role;
 use App\Form\AccountType;
+use App\Security\Authentication\AuthenticatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,7 +32,7 @@ final class AccountController extends Controller
     /**
      * @Route("/edit/", name="account_edit", methods={"GET", "POST"})
      */
-    public function edit(Request $request, SessionInterface $session): Response
+    public function edit(Request $request, SessionInterface $session, AuthenticatorInterface $authenticator): Response
     {
         $currentUser = $this->getCurrentUserOrGuest();
         $currentUser->cleanSocialUsername();
@@ -42,6 +43,8 @@ final class AccountController extends Controller
             $this->getDoctrine()
                 ->getManager()
                 ->flush($currentUser);
+
+            $authenticator->authenticate($currentUser);
 
             return $this->redirectToRoute('account_index');
         }

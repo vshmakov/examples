@@ -134,7 +134,7 @@ final class LogSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            KernelEvents::TERMINATE => 'onKernelTerminate',
+            KernelEvents::RESPONSE => 'onKernelTerminate',
         ];
     }
 }

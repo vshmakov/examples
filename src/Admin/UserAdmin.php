@@ -28,7 +28,9 @@ final class UserAdmin extends BaseAdmin
     {
         $filter
             ->add('username')
-            ->add('id');
+            ->add('id')
+        ->add('firstName')
+        ->add('lastName');
     }
 
     protected function configureListFields(ListMapper $list): void

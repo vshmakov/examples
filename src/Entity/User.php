@@ -803,4 +803,9 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
 
         return true;
     }
+
+    public function __toString()
+    {
+        return sprintf('%s %s (%s)', $this->getFirstName(), $this->getLastName(), $this->getUsername());
+    }
 }

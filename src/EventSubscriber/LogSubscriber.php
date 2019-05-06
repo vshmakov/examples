@@ -58,7 +58,7 @@ final class LogSubscriber implements EventSubscriberInterface
         $this->entityManager = $entityManager;
     }
 
-    public function onKernelTerminate(KernelEvent $event): void
+    public function saveLogs(KernelEvent $event): void
     {
         $isGetRequest = $event->getRequest()->isMethod(Request::METHOD_GET);
 
@@ -134,7 +134,7 @@ final class LogSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            KernelEvents::RESPONSE => 'onKernelTerminate',
+            KernelEvents::RESPONSE => 'saveLogs',
         ];
     }
 }

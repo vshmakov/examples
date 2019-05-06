@@ -36,6 +36,8 @@ final class UserAdmin extends BaseAdmin
         $list
             ->add('id')
             ->addIdentifier('username')
+            ->add('firstName')
+            ->add('lastName')
             ->add('email')
             ->add('network')
             ->add('networkId')

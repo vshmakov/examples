@@ -9,6 +9,10 @@
     <div id="contacts"></div>
 {% endblock %}
 
+{%  block breadcrumbs %}
+    {{  include('index/breadcrumbs/contacts.html.twig') }}
+{% endblock %}
+
 {% block javascripts %}
     <script src="{{ asset('build/js/contacts.js') }}"></script>
 {% endblock %}

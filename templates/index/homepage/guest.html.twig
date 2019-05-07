@@ -1,19 +1,17 @@
 {% extends 'main.html.twig' %}
 
-
 {% block title %}
     3000+ примеров по математике
 {% endblock %}
 
 {% block main %}
-    <content>
+    <div>
         <div>
             <h1>Добро пожаловать!</h1>
             <h2>
                 {{ app_name }}<br>
                 3000+ примеров по математике с автоматической проверкой, лимитом по времени и полной историей
-                решения!<br>
-                Совершенно бесплатно!
+                решения!
             </h2>
 
 
@@ -58,10 +56,13 @@
             </p>
 
             <h2>Как пользоваться сервисом?</h2>
-            {{ include("index/using_steps.html.twig") }}
+            <div>
+                Узнайте о возможностях, предоставляемых нашим сервисом, и том, как ими воспользоваться
+                <a href="{{  path('help') }}">здесь.</a>
+            </div>
         </div>
 
-        {% block guest_authorization %}
+        {% block guest_authorization_widget %}
             {{ parent() }}
         {% endblock %}
 
@@ -73,8 +74,10 @@
                      data-services="vkontakte,facebook,odnoklassniki,moimir,twitter,viber,whatsapp,skype"></div>
             </div>
         {% endblock %}
-    </content>
+    </div>
 {% endblock %}
+
+{% block guest_authorization %}{% endblock %}
 
 {% block share_javascripts %}
     <script src="//yastatic.net/es5-shims/0.0.2/es5-shims.min.js"></script>

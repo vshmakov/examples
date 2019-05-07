@@ -19,10 +19,12 @@ System requirements
 Installation
 ----------------
 
-git clone https://github.com/shm-vadim/examples
+- git clone https://github.com/shm-vadim/examples
 - cd examples
 - composer install --no-scripts
 - Create .env.local and set there your own DATABASE_URL 
 - bin/console doctrine:database:create && bin/console doctrine:migrations:migrate -n && bin/console doctrine:fixtures:load -n
 - bin/console server:run
 - Open http://localhost:8000 in yor browser.
+
+Profit!

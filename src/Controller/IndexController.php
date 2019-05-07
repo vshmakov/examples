@@ -42,4 +42,20 @@ final class IndexController extends Controller
 
         return 'index/homepage/guest.html.twig';
     }
+
+    /**
+     * @Route("/help/", name="help", methods={"GET"})
+     */
+    public function help(): Response
+    {
+        return $this->render('index/help.html.twig');
+    }
+
+    /**
+     * @Route("/contacts/", name="contacts", methods={"GET"})
+     */
+    public function contacts(): Response
+    {
+        return $this->render('index/contacts.html.twig');
+    }
 }

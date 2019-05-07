@@ -1,0 +1,14 @@
+{% extends 'main.html.twig' %}
+{% block title %}
+    Свяжитесь с нами
+{% endblock %}
+
+{% block main %}
+    {{ parent() }}
+
+    <div id="contacts"></div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('build/js/contacts.js') }}"></script>
+{% endblock %}

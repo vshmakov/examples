@@ -12,6 +12,8 @@ final class PagesAreAvailableTest extends BaseWebTestCase
         '/',
         '/attempt/',
         '/profile/',
+        '/help/',
+        '/contacts/',
         '/login',
         '/resetting/request',
         '/register/',

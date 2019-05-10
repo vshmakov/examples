@@ -3,14 +3,36 @@
     Свяжитесь с нами
 {% endblock %}
 
-{% block main %}
-    {{ parent() }}
-
-    <div id="contacts"></div>
+{% block breadcrumbs %}
+    {{ include('index/breadcrumbs/contacts.html.twig') }}
 {% endblock %}
 
-{%  block breadcrumbs %}
-    {{  include('index/breadcrumbs/contacts.html.twig') }}
+{% block main %}
+    {{ parent() }}
+    <div>
+        Отправьте сообщение на нашу
+        <a href="#" id="sendEmailLink">
+            электронную почту
+        </a>
+        мы ответим вам в самое короткое время!
+    </div>
+
+    <div>
+        <div>
+            Также вы можете написать в нашу группу ВКонтакте.
+        </div>
+
+        <script type="text/javascript" src="https://vk.com/js/api/openapi.js?160"></script>
+
+        <!-- VK Widget -->
+        <div id="vk_community_messages"></div>
+        <script type="text/javascript">
+            VK.Widgets.CommunityMessages("vk_community_messages", 177660826, {
+                expanded: "1",
+                tooltipButtonText: "Есть вопрос?"
+            });
+        </script>
+    </div>
 {% endblock %}
 
 {% block javascripts %}

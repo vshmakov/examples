@@ -422,17 +422,17 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
         return $a ? trim(sprintf(...array_merge([$f], $a))) : null;
     }
 
-    public function getCallName()
+    public function getCallName(): string
     {
         return ($this->isTeacher() or $this->hasStudents()) ? $this->getFFName() : $this->existsName();
     }
 
     public function hasStudents(): bool
     {
-        return (bool) $this->getStudents()->count();
+        return !$this->getStudents()->isEmpty();
     }
 
-    public function existsName()
+    public function existsName(): string
     {
         return $this->firstName ?: $this->username;
     }

@@ -12,6 +12,8 @@ final class PagesAreAvailableTest extends BaseWebTestCase
         '/',
         '/attempt/',
         '/profile/',
+        '/help/',
+        '/contacts/',
         '/login',
         '/resetting/request',
         '/register/',
@@ -27,6 +29,8 @@ final class PagesAreAvailableTest extends BaseWebTestCase
         '/admin/',
         '/admin/dashboard',
         '/admin/app/user/list',
+        '/admin/app/visit/list',
+        '/admin/app/ip/list',
     ];
 
     private const STUDENT_ENDPOINTS = [

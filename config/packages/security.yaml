@@ -22,7 +22,7 @@ security:
             guard:
                 provider: login
                 authenticators:
-                    - App\Security\Authentication\LoginAuthenticator
+                    - App\Security\Authentication\Guard\LoginAuthenticator
             logout:       true
             anonymous:    true
             remember_me:

@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Controller\Traits\CurrentUserProviderTrait;
 use App\Entity\User\Role;
 use App\Form\AccountType;
+use App\Security\Authentication\Guard\LoginAuthenticator;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -43,7 +44,9 @@ final class AccountController extends Controller
                 ->getManager()
                 ->flush($currentUser);
 
-            return $this->redirectToRoute('account_index');
+            $this->addFlash(LoginAuthenticator::LOGIN_AS_USER, $currentUser->getId());
+
+            return $this->redirectToRoute('security_login', [LoginAuthenticator::REDIRECT_AFTER_LOGIN => $this->generateUrl('account_index')]);
         }
 
         return $this->render('account/edit.html.twig', [

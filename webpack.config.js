@@ -9,6 +9,7 @@ Encore
     //.setManifestKeyPrefix('build/')
 
     .addEntry('js/app', './assets/js/app.js')
+    .addEntry('js/contacts', './assets/js/contacts.js')
 
     .addEntry('js/attempt/index', './assets/js/attempt/index.ts')
     .addEntry('js/attempt/solve', './assets/js/attempt/solve.ts')

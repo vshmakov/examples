@@ -1,179 +1,205 @@
-<!DOCTYPE html>
+{% block layout %}
+    <!DOCTYPE html>
 
-<html lang="ru">
-<head>
-    {% block meta %}
-        <meta name="description" content="3000 примеров по математике">
-        <meta name="description" content="решение примеров">
-        <meta name="description" content="примеры по математике">
-        <meta name="description" content="решение онлайн">
-        <meta name="description" content="примеры онлайн">
-    {% endblock %}
-
-    <meta charset="UTF-8">
-    <meta name="yandex-verification" content="aab601ee6924bd0d"/>
-    <meta name='wmail-verification' content='a9e3c6258270a271647eefa4e21bc4fb'/>
-    <title>
-        {% block base_title %}
-            {% block title %}Welcome!{% endblock %} || {{ app_name }} || Решение примеров online
+    <html lang="ru">
+    <head>
+        {% block meta %}
+            <meta name="description" content="3000 примеров по математике">
+            <meta name="description" content="решение примеров">
+            <meta name="description" content="примеры по математике">
+            <meta name="description" content="решение онлайн">
+            <meta name="description" content="примеры онлайн">
         {% endblock %}
-    </title>
-    {% block stylesheets %}
-        <link rel="stylesheet" href=" {{ asset('build/css/app.css') }}">
-    {% endblock %}
-    <script>
-        var P ={{ javascriptParameters|json_encode|raw }};
-    </script>
-</head>
 
-<body>
-{% block page %}
-    {% block body %}
-        <div class="container">
-            {% block nav %}
-                <nav class="navbar navbar-expand-lg main-menu">
-                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01"
-                            aria-controls="navbarColor01"
-                            aria-expanded="false" aria-label="Открыть меню">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
+        <meta charset="UTF-8">
+        <meta name="yandex-verification" content="aab601ee6924bd0d"/>
+        <meta name='wmail-verification' content='a9e3c6258270a271647eefa4e21bc4fb'/>
+        <title>
+            {% block base_title %}
+                {% block title %}Welcome!{% endblock %} || {{ app_name }} || Решение примеров online
+            {% endblock %}
+        </title>
+        {% block stylesheets %}
+            <link rel="stylesheet" href=" {{ asset('build/css/app.css') }}">
+        {% endblock %}
+        <script>
+            var P ={{ javascriptParameters|json_encode|raw }};
+        </script>
+    </head>
 
-                    <div class="collapse navbar-collapse" id="navbarColor01">
-                        <ul class="navbar-nav mr-auto">
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ path('homepage') }}">
-                                    На главную
-                                </a>
-                            </li>
+    <body>
+    {% block page %}
+        {% block body %}
+            <div class="container">
+                {% block nav %}
+                    <nav class="navbar navbar-expand-lg main-menu">
+                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01"
+                                aria-controls="navbarColor01"
+                                aria-expanded="false" aria-label="Открыть меню">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
 
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ path('attempt_index') }}">
-                                    Архив попыток
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ path('profile_index') }}">
-                                    Профили настроек
-                                </a>
-                            </li>
-
-                            {% if hasActualAttempt %}
+                        <div class="collapse navbar-collapse" id="navbarColor01">
+                            <ul class="navbar-nav mr-auto">
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ path('attempt_last') }}">
-                                        Вернуться к последней попытке
+                                    <a class="nav-link" href="{{ path('homepage') }}">
+                                        На главную
                                     </a>
                                 </li>
-                            {% endif %}
 
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ path('attempt_new') }}">
-                                    Начать новую попытку
-                                </a>
-                            </li>
-
-                            {% if is_granted('ROLE_USER') %}
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle account-button" data-toggle="dropdown" href="#"
-                                       role="button"
-                                       aria-haspopup="true" aria-expanded="false">Аккаунт</a>
-
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="{{ path("account_index") }}">Просмотреть
-                                            профиль</a>
-
-                                        {% if is_granted('ROLE_TEACHER') %}
-                                            <a class="dropdown-item" href="{{ path("student_index") }}">Список
-                                                учеников</a>
-                                            <a class="dropdown-item" href="{{ path("task_index") }}">Домашнее
-                                                задание</a>
-                                        {% endif %}
-
-                                        {% if is_granted('SHOW_HOMEWORK') %}
-                                            <a class="dropdown-item" href="{{ path("homework_index") }}">
-                                                Домашнее задание
-                                            </a>
-                                        {% endif %}
-
-                                        {% if is_granted('ROLE_STUDENT') %}
-                                            <a class="dropdown-item" href="{{ path("teacher_index") }}">Выбрать
-                                                учителя</a>
-                                        {% endif %}
-                                    </div>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ path('attempt_index') }}">
+                                        Архив попыток
+                                    </a>
                                 </li>
 
-                                {% if is_granted("ROLE_ADMIN") %}
-                                    <li class="nav-item dropdown">
-                                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#"
-                                           role="button"
-                                           aria-haspopup="true"
-                                           aria-expanded="false">Панель управления</a>
-                                        <div class="dropdown-menu">
-                                            <a class="dropdown-item" href="{{ path("admin_index") }}">
-                                                Статистика
-                                            </a>
-                                            <a class="dropdown-item" href="{{ path("sonata_admin_dashboard") }}">
-                                                Панель управления
-                                            </a>
-                                        </div>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ path('profile_index') }}">
+                                        Профили настроек
+                                    </a>
+                                </li>
+
+                                {% if hasActualAttempt %}
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{{ path('attempt_last') }}">
+                                            Вернуться к последней попытке
+                                        </a>
                                     </li>
                                 {% endif %}
 
                                 <li class="nav-item">
-                                    <a onclick="return confirm('Вы действительно хотите выйти?')" class="nav-link"
-                                       href="{{ path("fos_user_security_logout") }}">
-                                        Выйти
+                                    <a class="nav-link" href="{{ path('attempt_new') }}">
+                                        Начать новую попытку
                                     </a>
                                 </li>
-                            {% else %}
+
+                                {% set isUser = is_granted('ROLE_USER') %}
+                                {% if isUser %}
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle account-button" data-toggle="dropdown"
+                                           href="#"
+                                           role="button"
+                                           aria-haspopup="true" aria-expanded="false">Аккаунт</a>
+
+                                        <div class="dropdown-menu">
+                                            <a class="dropdown-item" href="{{ path("account_index") }}">Просмотреть
+                                                профиль</a>
+
+                                            {% if is_granted('ROLE_TEACHER') %}
+                                                <a class="dropdown-item" href="{{ path("student_index") }}">Список
+                                                    учеников</a>
+                                                <a class="dropdown-item" href="{{ path("task_index") }}">Домашнее
+                                                    задание</a>
+                                            {% endif %}
+
+                                            {% if is_granted('SHOW_HOMEWORK') %}
+                                                <a class="dropdown-item" href="{{ path("homework_index") }}">
+                                                    Домашнее задание
+                                                </a>
+                                            {% endif %}
+
+                                            {% if is_granted('ROLE_STUDENT') %}
+                                                <a class="dropdown-item" href="{{ path("teacher_index") }}">Выбрать
+                                                    учителя</a>
+                                            {% endif %}
+                                        </div>
+                                    </li>
+
+                                    {% if is_granted("ROLE_ADMIN") %}
+                                        <li class="nav-item dropdown">
+                                            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#"
+                                               role="button"
+                                               aria-haspopup="true"
+                                               aria-expanded="false">Панель управления</a>
+
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" href="{{ path("admin_index") }}">
+                                                    Статистика
+                                                </a>
+                                                <a class="dropdown-item" href="{{ path("admin_app_user_list") }}">
+                                                    Пользователи
+                                                </a>
+                                                <a class="dropdown-item" href="{{ path("admin_app_visit_list") }}">
+                                                    Посещения
+                                                </a>
+                                                <a class="dropdown-item" href="{{ path("admin_app_ip_list") }}">
+                                                    Ip адреса
+                                                </a>
+                                            </div>
+                                        </li>
+                                    {% endif %}
+                                {% endif %}
+
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ path('fos_user_security_login') }}">
-                                        Войти
+                                    <a class="nav-link" href="{{ path('help') }}">
+                                        Как пользоваться сервисом?
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ path('fos_user_registration_register') }}">
-                                        Зарегистрироваться
+                                    <a class="nav-link" href="{{ path('contacts') }}">
+                                        Свяжитесь с нами
                                     </a>
                                 </li>
-                            {% endif %}
-                        </ul>
-                    </div>
+
+                                {% if isUser %}
+                                    <li class="nav-item">
+                                        <a onclick="return confirm('Вы действительно хотите выйти?')" class="nav-link"
+                                           href="{{ path("fos_user_security_logout") }}">
+                                            Выйти
+                                        </a>
+                                    </li>
+                                {% else %}
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{{ path('fos_user_security_login') }}">
+                                            Войти
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{{ path('fos_user_registration_register') }}">
+                                            Зарегистрироваться
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </nav>
+                {% endblock nav %}
+
+                <nav>
+                    {% block breadcrumbs %}{% endblock %}
                 </nav>
-            {% endblock nav %}
 
-            <nav>
-                {% block breadcrumbs %}{% endblock %}
-            </nav>
+                <main>
+                    {% block main %}
+                        <h1>{{ block('title') }}</h1>
+                    {% endblock %}
+                </main>
 
-            <main>
-                {% block main %}
-                    <h1>{{ block('title') }}</h1>
+                {# TODO refactor#}
+                {% block guest_authorization %}
+                    {% block guest_authorization_widget %}
+                        {% if not is_granted('ROLE_USER') %}
+                            <h3>Мгновенный вход и регистрация с помощью социальных сетей</h3>
+                            {{ include("widget/social_networks_authorization.html.twig") }}
+                        {% endif %}
+                    {% endblock %}
                 {% endblock %}
-            </main>
+            </div>
+        {% endblock body %}
 
-            {# TODO refactor#}
-            {% block guest_authorization %}
-                {% if not is_granted('ROLE_USER') %}
-                    <h3>Мгновенный вход и регистрация с помощью социальных сетей</h3>
-                    {{ include("widget/social_networks_authorization.html.twig") }}
-                {% endif %}
-            {% endblock %}
-        </div>
-    {% endblock body %}
+        <footer class="{#navbar-fixed-bottom#}">
+            <div>
+                {% set y=date()|date("Y") %}
+                <em>
+                    © {{ y != 2018 ? "2018 - " : "" }} {{ y }}, VSH-Studio
+                </em>
+            </div>
+        </footer>
+    {% endblock page %}
 
-    <footer class="{#navbar-fixed-bottom#}">
-        <div>
-            {% set y=date()|date("Y") %}
-            <em>
-                © {{ y != 2018 ? "2018 - " : "" }} {{ y }}, VSH-Studio
-            </em>
-        </div>
-    </footer>
-{% endblock page %}
-
-{% block javascripts %}
-    <script src="{{ asset('build/js/app.js') }}"></script>
+    {% block javascripts %}
+        <script src="{{ asset('build/js/app.js') }}"></script>
+    {% endblock %}
+    </body>
+    </html>
 {% endblock %}
-</body>
-</html>

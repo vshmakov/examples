@@ -87,6 +87,12 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
      */
     private $socialAccounts;
 
+    /**
+     * @var \DateTimeInterface|null
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $lastVisitedAt;
+
     public function __construct()
     {
         $this->socialAccounts = new ArrayCollection();
@@ -416,17 +422,17 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
         return $a ? trim(sprintf(...array_merge([$f], $a))) : null;
     }
 
-    public function getCallName()
+    public function getCallName(): string
     {
         return ($this->isTeacher() or $this->hasStudents()) ? $this->getFFName() : $this->existsName();
     }
 
     public function hasStudents(): bool
     {
-        return (bool) $this->getStudents()->count();
+        return !$this->getStudents()->isEmpty();
     }
 
-    public function existsName()
+    public function existsName(): string
     {
         return $this->firstName ?: $this->username;
     }
@@ -752,16 +758,19 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
         return $session->getAttempts()->last() ?: null;
     }
 
-    public function getLastVisitedAt(): ?DT
+    public function getLastVisitedAt(): ?\DateTimeInterface
     {
-        /** @var Session|false $lastSession */
-        $lastSession = $this->sessions->last();
+        return $this->lastVisitedAt;
+    }
 
-        if (!$lastSession) {
-            return null;
-        }
+    public function setLastVisitedAt(\DateTimeInterface $lastVisitedAt): void
+    {
+        $this->lastVisitedAt = $lastVisitedAt;
+    }
 
-        return $lastSession->getLastTime();
+    public function getSocialAccounts(): Collection
+    {
+        return $this->socialAccounts;
     }
 
     public function addSocialAccount(SocialAccount $socialAccount): void
@@ -785,18 +794,18 @@ class User implements UserInterface, GroupableInterface, EquatableInterface
      */
     public function isEqualTo(SymfonyUserInterface $user)
     {
-        foreach (['id', 'username', 'roles'] as $field) {
-            if (null === $this->roles && 'roles' === $field) {
-                //this user created from serialization and has no roles
-                //We don't compare roles field
-                continue;
-            }
+        $compareFields = ['id', 'username', 'isTeacher'];
 
-            if (ObjectAccessor::getValue($this, $field) !== ObjectAccessor::getValue($user, $field)) {
-                return false;
-            }
-        }
+        return ObjectAccessor::isSame($this, $user, $compareFields);
+    }
 
-        return true;
+    public function __toString(): string
+    {
+        return sprintf('%s %s (%s)', $this->getFirstName(), $this->getLastName(), $this->getUsername());
+    }
+
+    public function getRolesString(): string
+    {
+        return implode(', ', $this->getRoles());
     }
 }

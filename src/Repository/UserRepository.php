@@ -128,18 +128,21 @@ final class UserRepository extends ServiceEntityRepository implements UserProvid
 
     private function findOneBySocialAccount(SocialAccount $socialAccount): ?User
     {
-        return $this->createQueryBuilder('u')
+        $criteria = [
+            'network' => $socialAccount->getNetwork(),
+            'networkId' => $socialAccount->getNetworkId(),
+        ];
+
+        $user = $this->createQueryBuilder('u')
             ->select('u')
             ->join('u.socialAccounts', 's')
             ->where('s.networkId = :networkId and s.network = :network')
-            ->orWhere('u.networkId = :networkId and u.network = :network')
             ->getQuery()
-            ->setParameters([
-                'network' => $socialAccount->getNetwork(),
-                'networkId' => $socialAccount->getNetworkId(),
-            ])
+            ->setParameters($criteria)
             ->setMaxResults(1)
             ->getOneOrNullResult();
+
+        return $user ?? $this->findOneBy($criteria);
     }
 
     private function getUniqueUsername(SocialAccount $socialAccount): string

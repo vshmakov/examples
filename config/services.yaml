@@ -97,12 +97,6 @@ services:
         arguments:
             $apiRequestHandler: '@App\Request\ApiRequestHandler'
 
-    App\Security\User\CurrentUserUpdatesUsernameSubscriber:
-        factory: 'App\Security\User\CurrentUserUpdatesUsernameSubscriber::factory'
-        tags:
-            - { name: doctrine.event_subscriber, connection: default }
-
-
     App\Serializer\Encoder\JsonDatatablesEncoder:
         arguments:
             $applicationEnvironment: '@App\Parameter\Environment\AppEnv'
@@ -120,3 +114,7 @@ services:
         arguments:
             $userNumberProvider: '@App\Attempt\Example\Number\UserNumberProvider'
             $taskNumberProvider: '@App\Attempt\Example\Number\TaskNumberProvider'
+
+
+    session.flashbag:
+        class: Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag

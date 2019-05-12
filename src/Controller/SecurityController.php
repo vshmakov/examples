@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Security\Authentication\Guard\LoginAuthenticator;
 use App\User\SocialAccount\SocialAccountProviderInterface;
 use App\User\UserProviderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -33,7 +34,7 @@ final class SecurityController extends Controller
         }
 
         $user = $userProvider->getOrCreateUser($socialAccount);
-        $this->addFlash('login', (string) $user->getId());
+        $this->addFlash(LoginAuthenticator::LOGIN_AS_USER, (string) $user->getId());
 
         return $this->redirectToRoute('security_login');
     }

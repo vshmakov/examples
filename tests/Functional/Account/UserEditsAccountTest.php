@@ -73,6 +73,7 @@ final class UserEditsAccountTest extends BaseWebTestCase
         self::$userClient->submit($editAccountForm, [
             'account[username]' => self::TEMPORARY_USERNAME,
         ]);
+
         $this->assertRedirectionToAccountIndexPage(self::$userClient);
     }
 
@@ -88,6 +89,7 @@ final class UserEditsAccountTest extends BaseWebTestCase
         $newUsernameClient->submit($editAccountForm, [
             'account[username]' => UserFixtures::SIMPLE_USER_USERNAME,
         ]);
+
         $this->assertRedirectionToAccountIndexPage($newUsernameClient);
         $this->userEntersToAccountIndexPage();
     }
@@ -99,6 +101,9 @@ final class UserEditsAccountTest extends BaseWebTestCase
 
     private function assertRedirectionToAccountIndexPage(Client $client): void
     {
+        $this->assertRedirectionLocationMatch('#^/security/login/#', $client);
+        $client->followRedirect();
+
         $this->assertTrue($client->getResponse()->isRedirect('/account/'));
     }
 }

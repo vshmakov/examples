@@ -2,17 +2,37 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Annotation\ApiResource;
+use App\ApiPlatform\Filter\Attempt\TaskFilter;
+use  App\ApiPlatform\Filter\Attempt\UserFilter;
+use  App\DateTime\DateTime as DT;
+use App\Entity\Attempt\Result;
+use App\Object\ObjectAccessor;
+use App\Serializer\Group;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\AttemptRepository")
+ * @ApiResource(
+ *     order={"id": "DESC"},
+ *     normalizationContext={"groups"={Group::ATTEMPT}},
+ *     itemOperations={
+ *     "get"={"access_control"="is_granted('VIEW', object)"},
+ *   "answer"={"access_control"="is_granted('SOLVE', object)", "path"="/attempts/{id}/answer.{_format}", "controller"="App\Controller\Api\AttemptController::answer", "method"="PUT"}
+ *     },
+ *     collectionOperations={
+ * "get"
+ *     }
+ *     )
+ * @ApiFilter(UserFilter::class)
+ * @ApiFilter(TaskFilter::class)
  */
 class Attempt
 {
-    use BaseTrait;
-
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -47,15 +67,25 @@ class Attempt
      */
     private $settings;
 
+    /**
+     * @var Result
+     * @ORM\OneToOne(targetEntity=Result::class, mappedBy="attempt", cascade={"persist", "remove"})
+     */
+    private $result;
+
     public function __construct()
     {
         $this->examples = new ArrayCollection();
         $this->addTime = new \DateTime();
     }
 
-    public function getId()
+    public function getId(): ?int
     {
-        return $this->id;
+        if (null === $this->id) {
+            return null;
+        }
+
+        return (int) $this->id;
     }
 
     /**
@@ -89,9 +119,19 @@ class Attempt
         return $this;
     }
 
-    public function getAddTime(): ? \DateTimeInterface
+    public function getCreatedAt(): \DateTimeInterface
     {
-        return $this->dt($this->addTime);
+        return $this->getAddTime();
+    }
+
+    public function getAddTime(): ?DT
+    {
+        return DT::createFromDT($this->addTime);
+    }
+
+    public function getStartedAt(): DT
+    {
+        return $this->getAddTime();
     }
 
     public function setAddTime(\DateTimeInterface $addTime): self
@@ -101,7 +141,7 @@ class Attempt
         return $this;
     }
 
-    public function getSession(): ? Session
+    public function getSession(): ?Session
     {
         return $this->session;
     }
@@ -118,17 +158,12 @@ class Attempt
         return $this->getSettings()->getExamplesCount();
     }
 
-    public function getLimitTime()
+    public function getLimitTime(): \DateTimeInterface
     {
-        return $this->dts($this->getAddTime()->getTimestamp() + $this->getSettings()->getDuration());
+        return DT::createFromTimestamp($this->getAddTime()->getTimestamp() + $this->getSettings()->getDuration()->getTimestamp());
     }
 
-    public function getMaxTime()
-    {
-        return $this->dts($this->getSettings()->getDuration());
-    }
-
-    public function getUser()
+    public function getUser(): ?User
     {
         return $this->getSession()->getUser();
     }
@@ -138,11 +173,10 @@ class Attempt
         return $this->task;
     }
 
-    public function setTask(?Task $task): self
+    public function setTask(?Task $task): void
     {
         $this->task = $task;
-
-        return $this;
+        $this->setSettings($task->getSettings());
     }
 
     public function getSettings(): ?Settings
@@ -155,5 +189,32 @@ class Attempt
         $this->settings = $settings;
 
         return $this;
+    }
+
+    public function getResult(): ?Result
+    {
+        return $this->result;
+    }
+
+    public function setResult(Result $result): self
+    {
+        $this->result = $result;
+
+        // set the owning side of the relation if necessary
+        if ($this !== $result->getAttempt()) {
+            $result->setAttempt($this);
+        }
+
+        return $this;
+    }
+
+    public function isDone(): bool
+    {
+        return null !== $this->getResult() && 0 === $this->getResult()->getRemainedExamplesCount();
+    }
+
+    public function isFinished(): bool
+    {
+        return true === ObjectAccessor::getNullableTraversedValue($this, 'result.isFinished');
     }
 }

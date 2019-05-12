@@ -2,12 +2,20 @@
 
 namespace App\Entity;
 
+use App\DataFixtures\UserFixtures;
+use App\DateTime\DateTime as DT;
+use App\Entity\Traits\BaseUserTrait;
+use App\Entity\User\SocialAccount;
+use App\Object\ObjectAccessor;
+use App\Validator\Group as ValidationGroup;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\GroupableInterface;
 use FOS\UserBundle\Model\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\EquatableInterface;
+use Symfony\Component\Security\Core\User\UserInterface as SymfonyUserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -15,9 +23,9 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @UniqueEntity(fields="username", message="Логин занят")
  * @UniqueEntity(fields="email", message="Данный адрес электронной почты уже зарегистрирован")
  */
-class User implements UserInterface, GroupableInterface
+class User implements UserInterface, GroupableInterface, EquatableInterface
 {
-    use BaseTrait, BaseUserTrait;
+    use BaseUserTrait;
 
     /**
      * @ORM\Id()
@@ -38,6 +46,7 @@ class User implements UserInterface, GroupableInterface
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Profile", inversedBy="users")
+     * @ORM\JoinColumn(onDelete="set null")
      */
     private $profile;
 
@@ -57,14 +66,9 @@ class User implements UserInterface, GroupableInterface
     private $addTime;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", nullable=true)
      */
     private $limitTime;
-
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Code", mappedBy="user")
-     */
-    private $codes;
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Ip", inversedBy="users")
@@ -72,120 +76,35 @@ class User implements UserInterface, GroupableInterface
     private $ips;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Transfer", mappedBy="user", orphanRemoval=true)
-     */
-    private $transfers;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="username", type="string", length=180, nullable=true)
-     * @Assert\NotBlank(message="Имя не должно быть пустым")
-     * @Assert\Regex(
-     *     pattern="/^[a-z][a-z0-9\._\-]+[a-z0-9]$/",
-     *     message="Логин должен начинаться с буквы, заканчиваться буквой или цифрой  и может содержать только строчные латинские символы, цифры, а также ._-"
-     * )
-     */
-    private $username;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="username_canonical", type="string", length=180, unique=true, nullable=true)
-     */
-    private $usernameCanonical;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="email", type="string", length=180, nullable=true)
-     */
-    private $email;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="email_canonical", type="string", length=180, unique=true, nullable=true)
-     */
-    private $emailCanonical;
-
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="enabled", type="boolean", nullable=false)
-     */
-    private $enabled;
-
-    /**
      * @var bool
      *
      * @ORM\Column(type="boolean", nullable=true)
      */
     private $isSocial = false;
+    /**
+     * @var Collection
+     * @ORM\OneToMany(targetEntity=SocialAccount::class, mappedBy="user", orphanRemoval=true)
+     */
+    private $socialAccounts;
 
     /**
-     * @var string|null
-     *
-     * @ORM\Column(name="salt", type="string", length=255, nullable=true)
+     * @var \DateTimeInterface|null
+     * @ORM\Column(type="datetime", nullable=true)
      */
-    private $salt;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="password", type="string", length=255, nullable=true)
-     * @Assert\Length(
-     * min = 3,
-     * minMessage = "Ваш пароль должен содержать как минимум {{ limit }} символовlong",
-     * )
-     */
-    private $password;
-
-    /**
-     * @var \DateTime|null
-     *
-     * @ORM\Column(name="last_login", type="datetime", nullable=true)
-     */
-    private $lastLogin;
-
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="confirmation_token", type="string", length=180, unique=true, nullable=true)
-     */
-    private $confirmationToken;
-
-    /**
-     * @var \DateTime|null
-     *
-     * @ORM\Column(name="password_requested_at", type="datetime", nullable=true)
-     */
-    private $passwordRequestedAt;
-
-    /**
-     * @var array
-     *
-     * @ORM\Column(name="roles", type="array", length=0, nullable=false)
-     */
-    private $roles;
+    private $lastVisitedAt;
 
     public function __construct()
     {
-        $this->enabled = false;
-        $this->roles = [];
+        $this->socialAccounts = new ArrayCollection();
         $this->sessions = new ArrayCollection();
         $this->profiles = new ArrayCollection();
-        $l = TEST_DAYS;
-        $this->limitTime = (new \DateTime())->add(new \DateInterval("P{$l}D"));
         $this->addTime = new \DateTime();
-        $this->codes = new ArrayCollection();
-        $this->money = DEFAULT_MONEY;
         $this->ips = new ArrayCollection();
-        $this->transfers = new ArrayCollection();
         $this->students = new ArrayCollection();
         $this->children = new ArrayCollection();
         $this->tasks = new ArrayCollection();
         $this->homework = new ArrayCollection();
+        $this->roles = [];
     }
 
     public function getId()
@@ -193,9 +112,14 @@ class User implements UserInterface, GroupableInterface
         return $this->id;
     }
 
-    public function getAddTime(): ? \DateTimeInterface
+    public function getAddTime(): ?DT
     {
-        return $this->dt($this->addTime);
+        return DT::createFromDT($this->addTime);
+    }
+
+    public function getRegisteredAt(): DT
+    {
+        return $this->getAddTime();
     }
 
     public function setAddTime(\DateTimeInterface $addTime): self
@@ -203,6 +127,11 @@ class User implements UserInterface, GroupableInterface
         $this->addTime = $addTime;
 
         return $this;
+    }
+
+    public function setRegistrationTime(\DateTimeInterface $registrationTime): void
+    {
+        $this->setAddTime($registrationTime);
     }
 
     /**
@@ -267,7 +196,7 @@ class User implements UserInterface, GroupableInterface
         return $this;
     }
 
-    public function getProfile(): ? Profile
+    public function getProfile(): ?Profile
     {
         return $this->profile;
     }
@@ -279,12 +208,12 @@ class User implements UserInterface, GroupableInterface
         return $this;
     }
 
-    public function getAllMoney(): ? int
+    public function getAllMoney(): ?int
     {
         return $this->allMoney;
     }
 
-    public function getMoney(): ? int
+    public function getMoney(): ?int
     {
         return $this->money;
     }
@@ -296,52 +225,14 @@ class User implements UserInterface, GroupableInterface
         return $this;
     }
 
-    public function getLimitTime(): ? \DateTimeInterface
+    public function getLimitTime(): ?\DateTimeInterface
     {
-        return $this->dt($this->limitTime);
+        return DT::createFromDT($this->limitTime);
     }
 
     public function setLimitTime(\DateTimeInterface $limitTime): self
     {
         $this->limitTime = $limitTime;
-
-        return $this;
-    }
-
-    public function getRemainedTime()
-    {
-        $d = $this->getLimitTime()->getTimestamp() - time();
-
-        return $this->dts($d > 0 ? $d : 0);
-    }
-
-    /**
-     * @return Collection|Code[]
-     */
-    public function getCodes(): Collection
-    {
-        return $this->codes;
-    }
-
-    public function addCode(Code $code): self
-    {
-        if (!$this->codes->contains($code)) {
-            $this->codes[] = $code;
-            $code->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCode(Code $code): self
-    {
-        if ($this->codes->contains($code)) {
-            $this->codes->removeElement($code);
-            // set the owning side to null (unless already changed)
-            if ($code->getUser() === $this) {
-                $code->setUser(null);
-            }
-        }
 
         return $this;
     }
@@ -399,54 +290,23 @@ class User implements UserInterface, GroupableInterface
     }
 
     /**
-     * @return Collection|Transfer[]
-     */
-    public function getTransfers(): Collection
-    {
-        return $this->transfers;
-    }
-
-    public function addTransfer(Transfer $transfer): self
-    {
-        if (!$this->transfers->contains($transfer)) {
-            $this->transfers[] = $transfer;
-            $transfer->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeTransfer(Transfer $transfer): self
-    {
-        if ($this->transfers->contains($transfer)) {
-            $this->transfers->removeElement($transfer);
-            // set the owning side to null (unless already changed)
-            if ($transfer->getUser() === $this) {
-                $transfer->setUser(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Assert\NotBlank(message="Имя не должно быть пустым", groups={"account", "child"})
+     * @Assert\NotBlank(message="Имя не должно быть пустым", groups={ValidationGroup::ACCOUNT, ValidationGroup::STUDENT})
      * @Assert\Length(
      * min = 2,
      * minMessage = "Ваше имя должно содержать как минимум {{ limit }} символа",
-     *groups={"account", "child"}
+     *groups={ValidationGroup::ACCOUNT, ValidationGroup::STUDENT}
      * )
      */
     private $firstName;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Assert\NotBlank(message="Фамилия не должна быть пустой", groups={"account", "child"})
+     * @Assert\NotBlank(message="Фамилия не должна быть пустой", groups={ValidationGroup::ACCOUNT, ValidationGroup::STUDENT})
      * @Assert\Length(
      * min = 2,
      * minMessage = "Ваша фамилия должна содержать как минимум {{ limit }} символа",
-     * groups={"account", "child"}
+     * groups={ValidationGroup::ACCOUNT, ValidationGroup::STUDENT}
      * )
      */
     private $lastName;
@@ -463,11 +323,11 @@ class User implements UserInterface, GroupableInterface
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Assert\NotBlank(message="Отчество не должно быть пустым", groups={"account"})
+     * @Assert\NotBlank(message="Отчество не должно быть пустым", groups={ValidationGroup::ACCOUNT, ValidationGroup::STUDENT})
      * @Assert\Length(
      * min = 4,
      * minMessage = "Ваше отчество должно содержать как минимум {{ limit }} символа",
-     * groups={"account"}
+     * groups={ValidationGroup::ACCOUNT, ValidationGroup::STUDENT}
      * )
      */
     private $fatherName;
@@ -475,7 +335,7 @@ class User implements UserInterface, GroupableInterface
     /**
      * @ORM\Column(type="boolean", nullable=true)
      */
-    private $isTeacher;
+    private $isTeacher = false;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\User", mappedBy="teacher")
@@ -483,7 +343,9 @@ class User implements UserInterface, GroupableInterface
     private $students;
 
     /**
+     * @var User|null
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="students")
+     * @ORM\JoinColumn(onDelete="set null")
      */
     private $teacher;
 
@@ -507,7 +369,7 @@ class User implements UserInterface, GroupableInterface
      */
     private $homework;
 
-    public function getFirstName(): ? string
+    public function getFirstName(): ?string
     {
         return $this->firstName;
     }
@@ -519,7 +381,7 @@ class User implements UserInterface, GroupableInterface
         return $this;
     }
 
-    public function getLastName(): ? string
+    public function getLastName(): ?string
     {
         return $this->lastName;
     }
@@ -560,24 +422,24 @@ class User implements UserInterface, GroupableInterface
         return $a ? trim(sprintf(...array_merge([$f], $a))) : null;
     }
 
-    public function getCallName()
+    public function getCallName(): string
     {
         return ($this->isTeacher() or $this->hasStudents()) ? $this->getFFName() : $this->existsName();
     }
 
     public function hasStudents(): bool
     {
-        return (bool) $this->getStudents()->count();
+        return !$this->getStudents()->isEmpty();
     }
 
-    public function existsName()
+    public function existsName(): string
     {
         return $this->firstName ?: $this->username;
     }
 
     public function isSocial(): bool
     {
-        return $this->isSocial ?? false;
+        return ($this->isSocial ?? false) or !$this->socialAccounts->isEmpty();
     }
 
     public function setIsSocial($s)
@@ -600,7 +462,7 @@ class User implements UserInterface, GroupableInterface
         return $this->setUsernameCanonical($u);
     }
 
-    public function getNetwork(): ? string
+    public function getNetwork(): ?string
     {
         return $this->network;
     }
@@ -612,7 +474,7 @@ class User implements UserInterface, GroupableInterface
         return $this;
     }
 
-    public function getNetworkId(): ? string
+    public function getNetworkId(): ?string
     {
         return $this->networkId;
     }
@@ -624,7 +486,7 @@ class User implements UserInterface, GroupableInterface
         return $this;
     }
 
-    public function getFatherName(): ? string
+    public function getFatherName(): ?string
     {
         return $this->fatherName;
     }
@@ -636,9 +498,14 @@ class User implements UserInterface, GroupableInterface
         return $this;
     }
 
-    public function isTeacher(): ? bool
+    public function isTeacher(): bool
     {
         return (bool) $this->isTeacher;
+    }
+
+    public function isTeacherOf(self $student): bool
+    {
+        return $this->students->contains($student);
     }
 
     public function setIsTeacher(? bool $isTeacher): self
@@ -696,9 +563,9 @@ class User implements UserInterface, GroupableInterface
         return (bool) $this->teacher;
     }
 
-    public function isUserTeacher(self $teacher)
+    public function isStudentOf(self $teacher): bool
     {
-        return $this->teacher === $teacher;
+        return $this->hasTeacher() && $this->teacher->isEqualTo($teacher);
     }
 
     public function fio()
@@ -801,7 +668,7 @@ class User implements UserInterface, GroupableInterface
         return $this->parent === $parent;
     }
 
-    public function getRealStudents()
+    public function getRealStudents(): Collection
     {
         return array_reduce(
             $this->getStudents()->getValues(),
@@ -860,14 +727,12 @@ class User implements UserInterface, GroupableInterface
         return $this->homework;
     }
 
-    public function addHomework(Task $homework): self
+    public function addHomework(Task $homework): void
     {
         if (!$this->homework->contains($homework)) {
             $this->homework[] = $homework;
             $homework->addContractor($this);
         }
-
-        return $this;
     }
 
     public function removeHomework(Task $homework): self
@@ -878,5 +743,69 @@ class User implements UserInterface, GroupableInterface
         }
 
         return $this;
+    }
+
+    public function getLastAttempt(): ?Attempt
+    {
+        \Webmozart\Assert\Assert::notSame(UserFixtures::GUEST_USERNAME, $this->getUsername());
+        /** @var Session|null $session */
+        $session = $this->getSessions()->first();
+
+        if (!$session) {
+            return null;
+        }
+
+        return $session->getAttempts()->last() ?: null;
+    }
+
+    public function getLastVisitedAt(): ?\DateTimeInterface
+    {
+        return $this->lastVisitedAt;
+    }
+
+    public function setLastVisitedAt(\DateTimeInterface $lastVisitedAt): void
+    {
+        $this->lastVisitedAt = $lastVisitedAt;
+    }
+
+    public function getSocialAccounts(): Collection
+    {
+        return $this->socialAccounts;
+    }
+
+    public function addSocialAccount(SocialAccount $socialAccount): void
+    {
+        if (!$this->socialAccounts->contains($socialAccount)) {
+            $this->socialAccounts[] = $socialAccount;
+        }
+
+        $socialAccount->setUser($this);
+    }
+
+    public function getAttemptsCount(): int
+    {
+        return array_reduce($this->sessions->toArray(), function (int $attemptsCount, Session $session): int {
+            return $attemptsCount + $session->getAttempts()->count();
+        }, 0);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEqualTo(SymfonyUserInterface $user)
+    {
+        $compareFields = ['id', 'username', 'isTeacher'];
+
+        return ObjectAccessor::isSame($this, $user, $compareFields);
+    }
+
+    public function __toString(): string
+    {
+        return sprintf('%s %s (%s)', $this->getFirstName(), $this->getLastName(), $this->getUsername());
+    }
+
+    public function getRolesString(): string
+    {
+        return implode(', ', $this->getRoles());
     }
 }

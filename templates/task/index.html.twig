@@ -1,25 +1,19 @@
 {% extends 'main.html.twig' %}
 
-{% block title %}Задания{% endblock %}
-
-{% block main %}
-<h1>Задания</h1>
-{% from 'task/tasks_table.html.twig' import tasks_table as table %}
-{{ table('Актуальные', actualTasks, taskRepository) }}
-{{ table('Архив', archiveTasks, taskRepository) }}
-
-<a href="{{ path('task_new') }}" role="button" class="btn">Создать задание</a>
+{% block title %}
+    Домашнее задание
 {% endblock %}
 
-{%block javascripts%}
-{{parent()}}
-<script src="/js/jquery.datatables.min.js"></script>
-<script>
-    $("table").DataTable({
-        pageLength: 50,
-        //order: [1, "asc"],
-        lengthMenu: [25, 50, 100, 250],
-        language: {{ include("task/language.json.twig") }}
-    });
-</script>
-{%endblock%}
+{% block breadcrumbs %}
+    {{ include('task/breadcrumbs/index.html.twig') }}
+{% endblock %}
+
+{% block main %}
+    <h1>Домашнее задание</h1>
+
+    {{ render(controller('App\\Controller\\TaskController::tasks')) }}
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('build/js/task/index.js') }}"></script>
+{% endblock %}

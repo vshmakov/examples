@@ -1,0 +1,8 @@
+{{ include(
+    'index/breadcrumbs/index.html.twig',
+    {
+        'breadcrumbs': [
+            {'title': 'Войти на сайт', 'url': path('fos_user_security_login')},
+        ]|merge(breadcrumbs ?? [])
+    }
+) }}

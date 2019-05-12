@@ -1,26 +1,19 @@
-{% extends 'task/base.html.twig' %}
+{% extends 'main.html.twig' %}
 
-{% block title %}Создать задание{% endblock %}
-
-{% block main %}
-<h1>Создать задание</h1>
-
-{{ include('task/_form.html.twig') }}
+{% block title %}
+    Создать домашнее задание
 {% endblock %}
 
+{%  block breadcrumbs %}
+    {{  include('task/breadcrumbs/new.html.twig') }}
+{% endblock %}
 
-{%block javascripts%}
-{{parent()}}
-<script>
-var r=$("[type=radio]");
-r.filter("[value="+P.current+"]").attr("checked", true);
-</script>
-<script src="/js/jquery.datatables.min.js"></script>
-<script>
-$("table").DataTable({
-pageLength: 25,
-//order: [1, "asc"],
-language: {%include("profile/language.json.twig")%}
-});
-</script>
-{%endblock%}
+{% block main %}
+    <h1>{{  block('title') }}</h1>
+
+    {{ include('task/_form.html.twig') }}
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{  asset('build/js/task/new.js') }}"></script>
+{% endblock %}

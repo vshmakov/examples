@@ -1,28 +1,19 @@
-{% extends "task/base.html.twig" %}
+{% extends 'main.html.twig' %}
 
-{%block title "Архив попыток ("~contractor.FLName~")"%}
+{% block title %}
+    Архив попыток ({{ contractor.LFName }})
+{% endblock %}
+
+{%  block breadcrumbs %}
+    {{  include('task/breadcrumbs/contractor/attempts.html.twig') }}
+{% endblock %}
 
 {% block main %}
-<h1>Архив попыток</h1>
-{{ include("attempt/index_table.html.twig") }}
+    <h1>Архив попыток</h1>
+
+    {{ include("attempt/list_table.html.twig") }}
 {% endblock %}
 
-{% block bottom_links %}
-<a href="{{ path('task_show', {'id': task.id}) }}">Назад к просмотру задания</a>
-{{ parent() }}
-
-{% endblock %}
 {% block javascripts %}
-{{parent()}}
-<script src="/js/jquery.datatables.min.js"></script>
-<script>
-$("table").DataTable({
-searching: false,
-sorting: false,
-data: {{processAttempts(attempts)|reverse|json_encode|raw}},
-deferRender: true,
-pageLength: 50,
-language: {{include("attempt/language.json.twig")}}
-});
-</script>
+    <script src="{{  asset('build/js/task/contractor/attempts.js') }}"></script>
 {% endblock %}

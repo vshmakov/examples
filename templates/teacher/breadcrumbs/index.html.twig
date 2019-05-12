@@ -1,0 +1,8 @@
+{{ include(
+    'index/breadcrumbs/index.html.twig',
+    {
+        'breadcrumbs': [
+        {'title': 'Список учителей', 'url': path('teacher_index')},
+        ]|merge(breadcrumbs ?? [])
+    }
+) }}

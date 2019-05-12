@@ -1,0 +1,47 @@
+{% extends 'main.html.twig' %}
+{% use 'profile/_view_widget.html.twig' %}
+
+{% set currentProfileMessage = isCurrentProfile ?? false ? '(Текущий)' : '' %}
+{% block title %}
+    {{ profile.description }} {{ currentProfileMessage }}
+{% endblock %}
+
+{% block breadcrumbs %}
+    {{ include('profile/breadcrumbs/show.html.twig') }}
+{% endblock %}
+
+{% set block_template = 'profile/_settings_group_view_widget.html.twig' %}
+
+{% block before_view %}
+    <div id="show-profile-actions">
+        <h2>Действия</h2>
+        <ul>
+            {% if is_granted('APPOINT', profile) %}
+                <li>
+                    <a href="{{ path('attempt_new', {'profile_id': profile.id}) }}" role="button"
+                       class="btn btn-success">
+                        Начать новую попытку с этим профилем
+                    </a>
+                </li>
+            {% endif %}
+
+            {% if is_granted('EDIT', profile) %}
+                <li>
+                    <a href="{{ path('profile_edit', {'id': profile.id}) }}" role="button" class="btn btn-warning">
+                        Редактировать
+                    </a>
+                </li>
+            {% endif %}
+
+            {% if is_granted('COPY', profile) %}
+                <li>
+                    <a href="{{ path('profile_copy', {'id': profile.id}) }}" role="button" class="btn btn-primary">
+                        Копировать в личные профили
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <h1>Профиль настроек {{ currentProfileMessage }}</h1>
+{% endblock %}

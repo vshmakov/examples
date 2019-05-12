@@ -1,0 +1,23 @@
+<div>
+    <h2>{{ title }}</h2>
+    <table>
+        <tbody>
+        {% for field in fields %}
+            <tr>
+                <th>{{ field|toLabelString|trans }}</th>
+                <td>
+                    {% if field == 'durationInterval' %}
+                        {{ profile.durationInterval.format('%I:%S') }}
+                    {% elseif field == 'isDemanding' %}
+                        {{ profile.isDemanding ? 'Да' : 'Нет' }}
+                        {%  elseif field in ['addPerc', 'subPerc', 'multPerc', 'divPerc'] %}
+                            {{  attribute(profile, field) }}%
+                    {% else %}
+                        {{ attribute(profile, field) }}
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

@@ -2,19 +2,33 @@
 
 namespace App\Controller;
 
+use App\ApiPlatform\Attribute;
+use App\ApiPlatform\Filter\Validation\FilterTaskValidationSubscriber;
+use App\ApiPlatform\Filter\Validation\FilterUserValidationSubscriber;
+use App\ApiPlatform\Format;
+use App\Attempt\EventSubscriber\ShowAttemptsCollectionSubscriber;
+use App\Attempt\Example\EventSubscriber\ShowExamplesCollectionSubscriber;
+use App\Attempt\Profile\ProfileProviderInterface;
+use App\Attempt\Settings\SettingsProviderInterface;
+use App\Controller\Traits\CurrentUserProviderTrait;
+use App\Controller\Traits\JavascriptParametersTrait;
 use App\Entity\Task;
 use App\Entity\User;
+use App\Entity\User\Role;
 use App\Form\TaskType;
-use App\Repository\AttemptRepository;
-use App\Repository\ExampleRepository;
-use App\Repository\ProfileRepository;
-use App\Repository\SettingsRepository;
-use App\Repository\TaskRepository;
-use App\Repository\UserRepository;
-use App\Service\UserLoader;
+use App\Object\ObjectAccessor;
+use App\Response\Result\ContractorResult;
+use App\Security\Annotation as AppSecurity;
+use App\Security\Voter\TaskVoter;
+use App\Security\Voter\UserVoter;
+use App\Task\Contractor\ContractorProviderInterface;
+use App\Task\Contractor\ContractorResultFactoryInterface;
+use App\Task\TaskProviderInterface;
+use App\Task\TaskResultFactoryInterface;
+use App\User\Teacher\Exception\RequiresTeacherAccessException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\Form;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,172 +36,156 @@ use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/task")
+ * @IsGranted(Role::USER)
+ * @AppSecurity\IsGranted(Role::TEACHER, exception=RequiresTeacherAccessException::class)
  */
-class TaskController extends AbstractController
+final class TaskController extends Controller
 {
+    use CurrentUserProviderTrait, JavascriptParametersTrait;
+
     /**
      * @Route("/", name="task_index", methods="GET")
      */
-    public function index(TaskRepository $taskRepository): Response
+    public function index(): Response
     {
-        $this->denyAccessUnlessGranted('SHOW_TASKS');
+        return $this->render('task/index.html.twig');
+    }
 
-        $tasks = array_reduce(
-            $taskRepository->findByCurrentAuthor(),
-            function (array $data, Task $task) use ($taskRepository): array {
-                $group = $taskRepository->isActual($task) ? 'actualTasks' : 'archiveTasks';
-                $data[$group][] = $task;
+    public function tasks(TaskProviderInterface $taskProvider, TaskResultFactoryInterface $taskResultFactory): Response
+    {
+        $createTaskResult = [$taskResultFactory, 'createTaskResult'];
 
-                return $data;
-            },
-            ['actualTasks' => [], 'archiveTasks' => []]
-        );
-
-        return $this->render('task/index.html.twig', [
-            'taskRepository' => $taskRepository,
-        ]
-            + $tasks);
+        return $this->render('task/tasks_widget.html.twig', [
+            'actual' => array_map($createTaskResult, $taskProvider->getActualTasksOfCurrentUser()),
+            'archive' => array_map($createTaskResult, $taskProvider->getArchiveTasksOfCurrentUser()),
+        ]);
     }
 
     /**
-     * @Route("/new", name="task_new", methods="GET|POST")
+     * @Route("/new/", name="task_new", methods={"GET", "POST"})
      */
-    public function new(Request $request, UserLoader $userLoader, ProfileRepository $profileRepository, UserRepository $userRepository, SettingsRepository $settingsRepository): Response
+    public function new(Request $request, SettingsProviderInterface $settingsProvider, ProfileProviderInterface $profileProvider): Response
     {
-        $this->denyAccessUnlessGranted('CREATE_TASKS');
-
-        $currentUser = $userLoader->getUser()
-            ->setEntityRepository($userRepository);
-        $task = (new Task())
-            ->setAuthor($currentUser)
-            ->setContractors($currentUser->getStudents())
-            ->setLimitTime((new \DT())->add(new \DateInterval('P7D')));
+        /** @var Task $task */
+        $task = ObjectAccessor::initialize(Task::class, [
+            'author' => $this->getCurrentUserOrGuest(),
+        ]);
         $form = $this->createForm(TaskType::class, $task);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $redirectResponse = $this->processForm($form, $request, $profileRepository, $settingsRepository)) {
-            return $redirectResponse;
-        }
-
-        return $this->render('task/new.html.twig', [
-            'jsParams' => [
-                'current' => $currentUser->getCurrentProfile()->getId(),
-            ],
-            'task' => $task,
-            'form' => $form->createView(),
-            'publicProfiles' => $profileRepository->findByIsPublic(true),
-            'profiles' => $profileRepository->findByAuthor($currentUser),
-            'profileRepository' => $profileRepository,
-        ]);
-    }
-
-    /**
-     * @Route("/{id}", name="task_show", methods="GET")
-     */
-    public function show(Task $task, UserRepository $userRepository, TaskRepository $taskRepository, AttemptRepository $attemptRepository): Response
-    {
-        $this->denyAccessUnlessGranted('SHOW', $task);
-
-        $contractors = $userRepository->findByHomework($task);
-        $finishedTaskContractors = $notFinishedTaskContractors = [];
-
-        foreach ($contractors as $contractor) {
-            $group = $taskRepository->isDoneByUser($task, $contractor) ? 'finishedTaskContractors' : 'notFinishedTaskContractors';
-            ($$group)[] = $contractor;
-        }
-
-        return $this->render('task/show.html.twig', [
-            'task' => $task,
-            'finishedTaskContractors' => $finishedTaskContractors,
-            'notFinishedTaskContractors' => $notFinishedTaskContractors,
-            'attemptRepository' => $attemptRepository,
-        ]);
-    }
-
-    private function processForm(Form $form, Request $request, ProfileRepository $profileRepository, SettingsRepository $settingsRepository): ? RedirectResponse
-    {
-        $task = $form->getData();
-        $profile = $profileRepository->find($request->request->get('profile_id', ''));
-
-        if (!$profile) {
-            throw $this->createNotFoundException();
-        }
-
-        if (!$this->isGranted('USE', $profile)) {
-            throw $this->createAccessDeniedException();
-        }
-
-        if ($form->isValid()) {
-            $settings = $settingsRepository->findBySettingsDataOrNew($profile);
-            $task->setSettings($settings);
-
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($task);
-            $em->flush();
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($task);
+            $entityManager->flush($task);
 
             return $this->redirectToRoute('task_index');
         }
 
-        return null;
-    }
+        $form->remove('profile');
 
-    /**
-     * @Route("/{id}/edit", name="task_edit", methods="GET|POST")
-     */
-    public function edit(Request $request, Task $task, ProfileRepository $profileRepository, UserRepository $userRepository, UserLoader $userLoader, SettingsRepository $settingsRepository): Response
-    {
-        $this->denyAccessUnlessGranted('EDIT', $task);
-
-        $currentUser = $userLoader->getUser()
-            ->setEntityRepository($userRepository);
-        $form = $this->createForm(TaskType::class, $task);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $redirectResponse = $this->processForm($form, $request, $profileRepository, $settingsRepository)) {
-            return $redirectResponse;
-        }
-
-        return $this->render('task/edit.html.twig', [
-            'jsParams' => [
-                'current' => ($profileRepository->findOneByCurrentAuthorOrPublicAndSettingsData($task->getSettings()) ?? $currentUser->getCurrentProfile())->getId(),
-            ],
+        return $this->render('task/new.html.twig', [
             'task' => $task,
             'form' => $form->createView(),
-            'publicProfiles' => $profileRepository->findByIsPublic(true),
-            'profiles' => $profileRepository->findByAuthor($currentUser),
-            'profileRepository' => $profileRepository,
+            'profileProvider' => $profileProvider,
+            'currentProfile' => $profileProvider->getCurrentProfile(),
+            'publicProfiles' => $profileProvider->getPublicProfiles(),
+            'userProfiles' => $profileProvider->getCurrentUserProfiles(),
         ]);
     }
 
     /**
-     * @Route("/{id}/contractor/{contractor_id}/attempts", name="task_contractor_attempts", methods="GET")
-     * @Entity("user", expr="repository.find(contractor_id)")
+     * @Route("/{id}/", name="task_show", methods="GET")
+     * @IsGranted(TaskVoter::SHOW, subject="task")
      */
-    public function contractorAttempts(Task $task, User $user, AttemptRepository $attemptRepository): Response
+    public function show(Task $task, ContractorProviderInterface $contractorProvider, ContractorResultFactoryInterface $contractorResultFactory, TaskResultFactoryInterface $taskResultFactory): Response
     {
-        $this->denyAccessUnlessGranted('SHOW', $task);
-        $this->denyAccessUnlessGranted('SHOW_ATTEMPTS', $user);
+        $createContractorResult = function (User $contractor) use ($task, $contractorResultFactory): ContractorResult {
+            return $contractorResultFactory->createContractorResult($contractor, $task);
+        };
+
+        return $this->render('task/show.html.twig', [
+            'taskResult' => $taskResultFactory->createTaskResult($task),
+            'solvedTaskContractors' => array_map($createContractorResult, $contractorProvider->getSolvedTaskContractors($task)),
+            'notSolvedTaskContractors' => array_map($createContractorResult, $contractorProvider->getNotSolvedTaskContractors($task)),
+        ]);
+    }
+
+    /**
+     * @Route("/{id}/edit/", name="task_edit", methods={"GET", "POST"})
+     * @IsGranted(TaskVoter::EDIT, subject="task")
+     */
+    public function edit(Request $request, Task $task, ProfileProviderInterface $profileProvider): Response
+    {
+        $form = $this->createForm(TaskType::class, $task);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->getDoctrine()
+                ->getManager()
+                ->flush($task);
+
+            return $this->redirectToRoute('task_index');
+        }
+
+        $form->remove('profile');
+
+        return $this->render('task/edit.html.twig', [
+            'task' => $task,
+            'form' => $form->createView(),
+            'profileProvider' => $profileProvider,
+            'currentProfile' => $profileProvider->getSettingsOrDefaultProfile($task->getSettings()),
+            'publicProfiles' => $profileProvider->getPublicProfiles(),
+            'userProfiles' => $profileProvider->getCurrentUserProfiles(),
+        ]);
+    }
+
+    /**
+     * @Route("/{id}/contractor/{contractor_id}/attempts/", name="task_contractor_attempts", methods="GET")
+     * @Entity("user", expr="repository.find(contractor_id)")
+     * @IsGranted(TaskVoter::SHOW, subject="task")
+     * @IsGranted(UserVoter::SHOW_SOLVING_RESULTS, subject="user")
+     */
+    public function contractorAttempts(Task $task, User $user): Response
+    {
+        $this->setJavascriptParameters([
+            'getAttemptsUrl' => $this->generateUrl(ShowAttemptsCollectionSubscriber::ROUTE, [FilterUserValidationSubscriber::FIELD => $user->getUsername(), FilterTaskValidationSubscriber::FIELD => $task->getId(), Attribute::FORMAT => Format::JSONDT]),
+        ]);
 
         return $this->render('task/contractor_attempts.html.twig', [
             'task' => $task,
             'contractor' => $user,
-            'attempts' => $attemptRepository->findByUserAndTask($user, $task),
         ]);
     }
 
     /**
-     * @Route("/{id}/contractor/{contractor_id}/examples", name="task_contractor_examples", methods="GET")
+     * @Route("/{id}/contractor/{contractor_id}/examples/", name="task_contractor_examples", methods="GET")
      * @Entity("user", expr="repository.find(contractor_id)")
+     * @IsGranted(TaskVoter::SHOW, subject="task")
+     * @IsGranted(UserVoter::SHOW_SOLVING_RESULTS, subject="user")
      */
-    public function contractorExamples(Task $task, User $user, ExampleRepository $exampleRepository): Response
+    public function contractorExamples(Task $task, User $user): Response
     {
-        $this->denyAccessUnlessGranted('SHOW', $task);
-        $this->denyAccessUnlessGranted('SHOW_EXAMPLES', $user);
+        $this->setJavascriptParameters([
+            'getExamplesUrl' => $this->generateUrl(ShowExamplesCollectionSubscriber::ROUTE, [FilterUserValidationSubscriber::FIELD => $user->getUsername(), FilterTaskValidationSubscriber::FIELD => $task->getId(), Attribute::FORMAT => Format::JSONDT]),
+        ]);
 
         return $this->render('task/contractor_examples.html.twig', [
             'task' => $task,
             'contractor' => $user,
-            'examples' => $exampleRepository->findByUserAndTask($user, $task),
         ]);
+    }
+
+    /**
+     * @Route("/{id}/archive/", name="task_archive", methods={"GET"})
+     * @IsGranted(TaskVoter::EDIT, subject="task")
+     */
+    public function archive(Task $task): RedirectResponse
+    {
+        $lastTime = (new \DateTime())->sub(new \DateInterval('PT1M'));
+        $task->setAddTime($lastTime);
+        $task->setLimitTime($lastTime);
+        $this->getDoctrine()->getManager()->flush($task);
+
+        return $this->redirectToRoute('task_index');
     }
 }

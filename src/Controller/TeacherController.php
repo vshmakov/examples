@@ -2,12 +2,17 @@
 
 namespace App\Controller;
 
+use App\Controller\Traits\CurrentUserProviderTrait;
 use App\Entity\User;
-use App\Form\ChildType;
-use App\Repository\TaskRepository;
-use App\Repository\UserRepository;
-use App\Service\UserLoader;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use  App\Entity\User\Role;
+use App\Form\StudentType;
+use App\Security\Annotation as AppSecurity;
+use App\Security\Voter\UserVoter;
+use App\Task\Homework\HomeworkProviderInterface;
+use App\User\Student\Exception\RequiresStudentAccessException;
+use App\User\Teacher\TeacherProviderInterface;
+use App\Validator\Group;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,70 +22,71 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @Route("/teacher")
- * @Security("is_granted('SHOW_TEACHERS')")
+ * @IsGranted(Role::USER)
+ * @AppSecurity\IsGranted("ROLE_STUDENT", exception=RequiresStudentAccessException::class)
  */
-class TeacherController extends Controller
+final class TeacherController extends Controller
 {
-    use BaseTrait;
-    private $currentUser;
-
-    public function __construct(UserRepository $userRepository, UserLoader $userLoader)
-    {
-        $this->currentUser = $userLoader->getUser()
-            ->setEntityRepository($userRepository);
-    }
+    use  CurrentUserProviderTrait;
 
     /**
-     *@Route("/", name="teacher_index")
+     * @Route("/", name="teacher_index", methods={"GET"})
      */
-    public function index(UserRepository $userRepository): Response
+    public function index(): Response
     {
-        return $this->render('teacher/index.html.twig', [
-            'teachers' => $userRepository->findByIsTeacher(true),
+        return $this->render('teacher/index.html.twig');
+    }
+
+    public function teachers(TeacherProviderInterface $teacherProvider): Response
+    {
+        $teachers = $teacherProvider->getTeachers();
+        $this->sortTeachers($teachers);
+
+        return $this->render('teacher/list_table.html.twig', [
+            'teachers' => $teachers,
         ]);
     }
 
     /**
-     *@Route("/{id}/appoint", name="teacher_appoint")
+     * @Route("/{id}/appoint/", name="teacher_appoint", methods={"GET", "POST"})
+     * @IsGranted(UserVoter::APPOINT_TEACHER, subject="teacher")
      */
-    public function appoint(User $teacher, ValidatorInterface $validator, Request $request, TaskRepository $taskRepository): Response
+    public function appoint(User $teacher, Request $request, ValidatorInterface $validator, HomeworkProviderInterface $homeworkProvider): Response
     {
-        $this->denyAccessUnlessGranted('APPOINT', $teacher);
-        $currentUser = $this->currentUser;
+        $currentUser = $this->getCurrentUserOrGuest();
         $currentUser->cleanSocialUsername();
-        $errors = $validator->validate($currentUser, null, ['child']);
+        $errors = $validator->validate($currentUser, null, Group::STUDENT);
 
         if (!\count($errors)) {
             $currentUser->setTeacher($teacher);
 
-            foreach ($taskRepository->findActualByAuthor($teacher) as $homework) {
-                $currentUser->addHomework($homework);
+            foreach ($homeworkProvider->getActualHomework() as $task) {
+                $currentUser->addHomework($task);
             }
 
-            $this->getEntityManager()->flush();
+            $this->getDoctrine()
+                ->getManager()
+                ->flush($currentUser);
 
             return $this->redirectToRoute('account_index');
         }
 
-        $form = $this->createForm(ChildType::class, $currentUser);
-        $form->remove('isTeacher');
+        $form = $this->createForm(StudentType::class, $currentUser);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->getEntityManager()->flush();
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $this->getDoctrine()
+                    ->getManager()
+                    ->flush($currentUser);
 
-            return $this->redirectToRoute('teacher_appoint', [
-                'id' => $teacher->getId(),
-            ]);
-        }
-
-        if (!$form->isSubmitted()) {
+                return $this->redirectToRoute('teacher_appoint', ['id' => $teacher->getId()]);
+            }
+        } else {
             foreach ($errors as $error) {
                 $form->addError(new FormError($error->getMessage()));
             }
         }
-
-        $this->missResponseEvent();
 
         return $this->render('teacher/edit.html.twig', [
             'form' => $form->createView(),
@@ -88,14 +94,40 @@ class TeacherController extends Controller
     }
 
     /**
-     *@Route("/disappoint", name="teacher_disappoint")
+     * @Route("/disappoint/", name="teacher_disappoint", methods={"GET"})
      */
     public function disappoint(): Response
     {
-        $this->denyAccessUnlessGranted('DISAPPOINT_TEACHERS');
-        $this->currentUser->setTeacher(null);
-        $this->getEntityManager()->flush();
+        $currentUser = $this->getCurrentUserOrGuest();
+        $currentUser->setTeacher(null);
+        $this->getDoctrine()
+            ->getManager()
+            ->flush($currentUser);
 
         return $this->redirectToRoute('account_index');
+    }
+
+    private function sortTeachers(array &$teachers): void
+    {
+        $currentUser = $this->getCurrentUserOrGuest();
+
+        usort($teachers, function (User $teacher1, User $teacher2) use ($currentUser): int {
+            if ($currentUser->isStudentOf($teacher1)) {
+                return -1;
+            }
+
+            if (($currentUser->isStudentOf($teacher2))) {
+                return 1;
+            }
+
+            $studentsCount1 = $teacher1->getStudents()->count();
+            $studentsCount2 = $teacher2->getStudents()->count();
+
+            if ($studentsCount1 !== $studentsCount2) {
+                return $studentsCount1 > $studentsCount2 ? -1 : 1;
+            }
+
+            return $teacher1->getRegisteredAt()->getTimestamp() <= $teacher2->getRegisteredAt()->getTimestamp() ? -1 : 1;
+        });
     }
 }

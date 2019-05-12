@@ -1,70 +1,17 @@
-{%extends 'main.html.twig'%}
+{% extends 'main.html.twig' %}
 
-{%block title "Профили настроек"%}
+{% block title %}Профили настроек{% endblock %}
 
-{%block main%}
-{%from "profile/list_table.html.twig" import list_table as  t%}
-<div class="profile-index">
-{%if not canAppoint%}
-<div class="row">
-              <div class="text-white bg-danger mb-3 profile-index-card">
-                <div class="card-header">Внимание!</div>
-                <div class="card-body">
-                  <h4 class="card-title">Вы не можете выбирать профили настроек!</h4>
-                  <p class="card-text">
-{%if isGuest%}
-Пожалуйста, <a href="{{path("fos_user_security_login")}}">войдите</a> или <a href="{{path("fos_user_registration_register")}}">зарегистрируйтесь</a>, чтобы иметь возможность выбирать текущие профили настроек.
-{%else%}
-Пожалуйста, <a href="{{path("account_pay")}}">оплатите сервис</a>, чтобы иметь возможность выбирать текущие профили настроек.
-{%endif%}
-</p>
-                </div>
-              </div>
-</div>
-{%endif%}
+{% block breadcrumbs %}
+    {{ include('profile/breadcrumbs/index.html.twig') }}
+{% endblock %}
 
-{{t("Профили по умолчанию", public, pR)}}
-{%if user.hasTeacher%}
-{{t("Профили учителя", teacherProfiles, pR)}}
-{%endif%}
-{{t("Личные профили", profiles, pR)}}
+{% block main %}
+    <h1>Профили настроек</h1>
 
-{%if is_granted("CREATE_PROFILE")%}
-<div class="row profile-index-create-div">
-<a class="profile-index-create-button btn btn-active" role="button" href="{{path("profile_new")}}">Создать новый профиль</a>
-</div>
-{%endif%}
-</div>
-{%endblock%}
+    {{ render(controller('App\\Controller\\ProfileController::profiles')) }}
+{% endblock %}
 
-{%block javascripts%}
-{{parent()}}
-<script>
-var r=$("[type=radio]");
-r.click(function (e) {
-r.attr("disabled", true);
-e.stopPropagation();
-location.href=$(e.target).data("href");
-});
-
-$("table .actions").click(function (e) {
-e.stopPropagation();
-});
-
-$("tr").click(function () {
-var r=$(this).find("[type=radio]");
-if (!r.attr("disabled")) r.click();
-});
-
-r.filter("[value="+P.current+"]").attr("checked", true);
-if (!P.canAppoint) r.attr("disabled", true);
-</script>
-<script src="/js/jquery.datatables.min.js"></script>
-<script>
-$("table").DataTable({
-pageLength: 25,
-//order: [1, "asc"],
-language: {{include("profile/language.json.twig")}}
-});
-</script>
-{%endblock%}
+{% block javascripts %}
+    <script src="{{ asset('build/js/profile/index.js') }}"></script>
+{% endblock %}

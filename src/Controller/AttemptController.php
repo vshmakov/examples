@@ -2,81 +2,56 @@
 
 namespace App\Controller;
 
+use App\ApiPlatform\Attribute;
+use App\ApiPlatform\Filter\Validation\FilterUserValidationSubscriber;
+use App\ApiPlatform\Format;
+use App\Attempt\AttemptFactoryInterface;
+use App\Attempt\AttemptProviderInterface;
+use App\Attempt\AttemptResponseFactoryInterface;
+use App\Attempt\EventSubscriber\ShowAttemptsCollectionSubscriber;
+use App\Attempt\Example\ExampleResponseFactoryInterface;
+use App\Controller\Traits\CurrentUserProviderTrait;
+use App\Controller\Traits\JavascriptParametersTrait;
+use App\Controller\Traits\ProfileTrait;
 use App\Entity\Attempt;
-use App\Form\SettingsType;
-use App\Repository\AttemptRepository;
-use App\Repository\ExampleRepository;
-use App\Repository\ProfileRepository;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\Profile;
+use App\Iterator;
+use App\Security\Voter\AttemptVoter;
+use App\Security\Voter\ProfileVoter;
+use App\Task\Contractor\ContractorResultFactoryInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/attempt")
  */
-class AttemptController extends Controller
+final class AttemptController extends Controller
 {
-    use BaseTrait;
+    use CurrentUserProviderTrait, JavascriptParametersTrait, ProfileTrait;
 
     /**
-     * @Route("/", name="attempt_index")
+     * @Route("/", name="attempt_index", methods={"GET"})
      */
-    public function index(AttemptRepository $attemptRepository): Response
+    public function index(): Response
     {
-        return $this->render('attempt/index.html.twig', [
-            'attempts' => $attemptRepository->findAllByCurrentUser(),
+        $this->setJavascriptParameters([
+            'getAttemptsUrl' => $this->generateUrl(ShowAttemptsCollectionSubscriber::ROUTE, [FilterUserValidationSubscriber::FIELD => $this->getCurrentUserOrGuest()->getUsername(), Attribute::FORMAT => Format::JSONDT]),
         ]);
+
+        return $this->render('attempt/index.html.twig');
     }
 
     /**
-     *@Route("/{id}/show", name="attempt_show", requirements={"id": "\d+"})
+     * @Route("/last/", name="attempt_last", methods={"GET"})
      */
-    public function show(Attempt $attempt, ExampleRepository $exampleRepository, AttemptRepository $attemptRepository): Response
+    public function last(AttemptProviderInterface $attemptProvider): RedirectResponse
     {
-        $this->denyAccessUnlessGranted('VIEW', $attempt);
-
-        return $this->render('attempt/show.html.twig', [
-            'attemptRepository' => $attemptRepository,
-            'att' => $attempt->setEntityRepository($attemptRepository),
-            'examples' => $exampleRepository->findByAttempt($attempt),
-            'exR' => $exampleRepository,
-        ]);
-    }
-
-    /**
-     *@Route("/{id}", name="attempt_solve", requirements={"id": "\d+"})
-     */
-    public function solve(Attempt $attempt, ExampleRepository $exampleRepository, AttemptRepository $attemptRepository): Response
-    {
-        if (!$this->isGranted('SOLVE', $attempt)) {
-            if ($this->isGranted('VIEW', $attempt)) {
-                return $this->redirectToRoute('attempt_show', ['id' => $attempt->getId()]);
-            }
-            throw $this->createAccessDeniedException();
-        }
-
-        $exampleRepository->findLastUnansweredByAttemptOrGetNew($attempt);
-
-        return $this->render('attempt/solve.html.twig', [
-            'jsParams' => [
-                'attData' => $attempt->setEntityRepository($attemptRepository)->getData(),
-                'attempt_answer' => $this->generateUrl('attempt_answer', ['id' => $attempt->getId()]),
-                'showAttemptUrl' => $this->generateUrl('attempt_show', ['id' => $attempt->getId()]),
-            ],
-            'att' => $attempt,
-        ]);
-    }
-
-    /**
-     *@Route("/last", name="attempt_last")
-     */
-    public function last(AttemptRepository $attemptRepository): Response
-    {
-        if ($attempt = $attemptRepository->findLastActualByCurrentUser()) {
+        if ($attempt = $attemptProvider->getLastAttempt()) {
             return $this->redirectToRoute('attempt_solve', ['id' => $attempt->getId()]);
         }
 
@@ -84,57 +59,85 @@ class AttemptController extends Controller
     }
 
     /**
-     *@Route("/new", name="attempt_new")
+     * @Route("/new/", name="attempt_new", methods={"GET"})
      */
-    public function new(AttemptRepository $attemptRepository): RedirectResponse
+    public function new(Request $request, AttemptFactoryInterface $creator): RedirectResponse
     {
+        $profileParameter = 'profile_id';
+
+        if ($request->query->has($profileParameter)) {
+            $profile = $this->getDoctrine()
+                ->getRepository(Profile::class)
+                ->find($request->query->get($profileParameter));
+
+            if (null === $profile) {
+                throw new NotFoundHttpException();
+            }
+
+            $this->denyAccessUnlessGranted(ProfileVoter::APPOINT, $profile);
+            $this->saveAndAppointProfile($profile);
+        }
+
         return $this->redirectToRoute('attempt_solve', [
-            'id' => $attemptRepository->getNewByCurrentUser()->getId(),
+            'id' => $creator->createCurrentUserAttempt()->getId(),
         ]);
     }
 
     /**
-     *@Route("/{id}/answer", name="attempt_answer", methods="POST")
+     * @Route("/{id}/show/", name="attempt_show", methods={"GET"})
+     * @IsGranted(AttemptVoter::VIEW, subject="attempt")
      */
-    public function answer(Attempt $attempt, Request $request, ExampleRepository $exampleRepository, EntityManagerInterface $entityManager, AttemptRepository $attemptRepository): JsonResponse
+    public function show(Attempt $attempt, AttemptResponseFactoryInterface $attemptResponseFactory, ExampleResponseFactoryInterface $exampleResponseFactory, ContractorResultFactoryInterface $contractorResultFactory): Response
     {
-        if (!$this->isGranted('ANSWER', $attempt)) {
-            return $this->json(['finish' => true]);
+        $hasNextTaskAttempt = false;
+        $contractorResult = null;
+
+        if (null !== $attempt->getTask()) {
+            $contractorResult = $contractorResultFactory->createCurrentContractorResult($attempt->getTask());
+            $hasNextTaskAttempt = !$contractorResult->isDone();
         }
 
-        $example = $exampleRepository->findLastUnansweredByAttempt($attempt);
-        $answer = (float) $request->request->get('answer');
-        $example->setAnswer($answer);
-        $entityManager->flush();
-
-        $finish = !$this->isGranted('SOLVE', $attempt);
-
-        if (!$finish) {
-            $exampleRepository->getNew($attempt);
-        }
-
-        return $this->json([
-            'isRight' => $example->isRight(),
-            'finish' => $finish,
-            'attData' => $attempt->setEntityRepository($attemptRepository)->getData(),
+        return $this->render('attempt/show.html.twig', [
+            'attempt' => $attempt,
+            'hasNextTaskAttempt' => $hasNextTaskAttempt,
+            'contractorResult' => $contractorResult,
+            'attemptResponse' => $attemptResponseFactory->createAttemptResponse($attempt),
+            'exampleResponses' => Iterator::map($attempt->getExamples(), [$exampleResponseFactory, 'createExampleResponse']),
         ]);
     }
 
     /**
-     *@Route("/{id}/profile", name="attempt_profile")
+     * @Route("/{id}/", name="attempt_solve", methods={"GET"})
+     * @IsGranted(AttemptVoter::SOLVE, subject="attempt")
      */
-    public function profile(Attempt $attempt, ProfileRepository $profileRepository, AttemptRepository $attemptRepository): Response
+    public function solve(Attempt $attempt, AttemptResponseFactoryInterface $attemptResponseProvider): Response
     {
-        $this->denyAccessUnlessGranted('VIEW', $attempt);
-        $profile = $attempt->getSettings()->setEntityRepository($profileRepository);
+        if ($attempt->getResult()->isFinished()) {
+            return $this->redirectToRoute('attempt_show', ['id' => $attempt->getId()]);
+        }
 
-        return $this->render('attempt/profile.html.twig', [
-            'jsParams' => [
-                'canEdit' => false,
-            ],
-            'profile' => $profile,
-            'form' => $this->createForm(SettingsType::class, $profile)->createView(),
-            'att' => $attempt->setEntityRepository($attemptRepository),
+        $this->setJavascriptParameters([
+            'solveAttemptDataUrl' => $this->generateUrl('api_attempts_get_item', ['id' => $attempt->getId(), Attribute::FORMAT => Format::JSON]),
+            'answerAttemptUrl' => $this->generateUrl('api_attempts_answer_item', ['id' => $attempt->getId(), Attribute::FORMAT => Format::JSON]),
+            'showAttemptUrl' => $this->generateUrl('attempt_show', ['id' => $attempt->getId()]),
+        ]);
+
+        return $this->render('attempt/solve.html.twig', [
+            'attempt' => $attempt,
+            'attemptResponse' => $attemptResponseProvider->createAttemptResponse($attempt),
+        ]);
+    }
+
+    /**
+     * @Route("/{id}/settings/", name="attempt_settings", methods={"GET"})
+     * @IsGranted(AttemptVoter::VIEW, subject="attempt")
+     */
+    public function settings(Attempt $attempt, AttemptResponseFactoryInterface $attemptResponseProvider): Response
+    {
+        return $this->render('attempt/settings.html.twig', [
+            'attempt' => $attempt,
+            'settings' => $attempt->getSettings(),
+            'attemptResponse' => $attemptResponseProvider->createAttemptResponse($attempt),
         ]);
     }
 }

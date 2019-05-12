@@ -3,86 +3,78 @@
 namespace App\Security\Voter;
 
 use App\Entity\Profile;
-use App\Service\AuthChecker;
-use App\Service\UserLoader;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+use App\Security\User\CurrentUserProviderInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class ProfileVoter extends Voter
+final class ProfileVoter extends BaseVoter
 {
-    use BaseTrait;
-    private $userLoader;
-    private $authChecker;
+    public const  VIEW = 'VIEW';
+    public const  EDIT = 'EDIT';
+    public const  DELETE = 'DELETE';
+    public const  APPOINT = 'APPOINT';
+    public const  COPY = 'COPY';
 
-    public function __construct(UserLoader $userLoader, AuthChecker $authChecker)
+    /** @var Profile */
+    protected $subject;
+
+    /** @var CurrentUserProviderInterface */
+    private $currentUserProvider;
+
+    /** @var AuthorizationCheckerInterface */
+    private $authorizationChecker;
+
+    public function __construct(CurrentUserProviderInterface $currentUserProvider, AuthorizationCheckerInterface $authorizationChecker)
     {
-        $this->userLoader = $userLoader;
-        $this->authChecker = $authChecker;
+        $this->currentUserProvider = $currentUserProvider;
+        $this->authorizationChecker = $authorizationChecker;
     }
 
-    protected function supports($attribute, $subject)
+    protected function supports($attribute, $subject): bool
     {
-        return !\is_array($subject) ? ($subject instanceof Profile or null === $subject && $this->hasHandler($attribute)) : $this->supportsArr($attribute, $subject);
+        return $subject instanceof Profile;
     }
 
-    protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
+    protected static function getSupportedAttributes(): array
     {
-        if (\is_array($subject)) {
-            return $this->voteOnArr($attribute, $subject, $token);
-        }
-
-        if ($this->authChecker->isGranted('ROLE_SUPER_ADMIN')) {
-            return true;
-        }
-
-        return $this->checkRight($attribute, $subject, $token);
+        return [
+            self::VIEW,
+            self::EDIT,
+            self::DELETE,
+            self::APPOINT,
+            self::COPY,
+        ];
     }
 
-    private function canCreateProfile(): bool
+    protected function canView(): bool
     {
-        return $this->canCreate();
+        $author = $this->subject->getAuthor();
+
+        return $this->subject->isPublic()
+            or $this->currentUserProvider->getCurrentUserOrGuest()->isEqualTo($author);
     }
 
-    private function canCreate(): bool
-    {
-        return !$this->userLoader->isGuest();
-    }
-
-    private function canView(): bool
-    {
-        $profile = $this->subject;
-        $user = $this->userLoader->getUser();
-        $author = $profile->getAuthor();
-
-        return $profile->isPublic() or $user === $author or $user->isUserTeacher($author);
-    }
-
-    private function canEdit(): bool
+    protected function canEdit(): bool
     {
         $profile = $this->subject;
 
-        return $this->canCreate() && $this->userLoader->getUser() === $profile->getAuthor() && !$profile->isPublic();
+        return $this->authorizationChecker->isGranted(CurrentUserVoter::CREATE_PROFILES)
+            && $this->currentUserProvider->getCurrentUserOrGuest()->isEqualTo($profile->getAuthor())
+            && !$profile->isPublic();
     }
 
-    private function canDelete(): bool
+    protected function canDelete(): bool
     {
         return $this->canEdit();
     }
 
-    private function canAppoint(): bool
+    protected function canAppoint(): bool
     {
-        return $this->canUse()
-            && $this->userLoader->getUser()->getCurrentProfile() !== $this->subject;
+        return $this->authorizationChecker->isGranted(CurrentUserVoter::CREATE_PROFILES) && $this->canView();
     }
 
-    private function canUse(): bool
+    protected function canCopy(): bool
     {
-        return $this->authChecker->isGranted('IS_ACCOUNT_PAID')
-            && $this->canCreate() && $this->canView();
-    }
-
-    private function canCopy(): bool
-    {
-        return $this->canCreate() && $this->canView();
+        return $this->authorizationChecker->isGranted(CurrentUserVoter::CREATE_PROFILES)
+            && $this->canView();
     }
 }

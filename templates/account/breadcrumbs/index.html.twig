@@ -1,0 +1,8 @@
+{{ include(
+    'index/breadcrumbs/index.html.twig',
+    {
+        'breadcrumbs': [
+        {'title': 'Мой профиль', 'url': path('account_index')},
+        ]|merge(breadcrumbs ?? [])
+    }
+) }}

@@ -1,12 +1,19 @@
-{% extends 'task/base.html.twig' %}
+{% extends 'main.html.twig' %}
 
-{% block title %}Задание ({{ task.settings.description }}){% endblock %}
+{% set task = taskResult.task %}
+{% block title %}
+    Домашнее задание ({{ task.settings.description }})
+{% endblock %}
+
+{% block breadcrumbs %}
+    {{ include('task/breadcrumbs/show.html.twig') }}
+{% endblock %}
 
 {% block main %}
-<h1>Задание</h1>
+    {{ parent() }}
 
-<table class="table">
-    <tbody>
+    <table class="table table-light">
+        <tbody>
         <tr>
             <th>Настройки</th>
             <td><a href="{{ path('settings_show', {'id': task.settings.id}) }}">{{ task.settings.description }}</a></td>
@@ -23,28 +30,21 @@
             <th>Время окончания</th>
             <td>{{ task.limitTime }}</td>
         </tr>
-    </tbody>
-</table>
+        <tr>
+            <th>Процент выполнения</th>
+            <td>{{ taskResult.donePercent }}%</td>
+        </tr>
+        </tbody>
+    </table>
 
-{% from 'task/contractors_table.html.twig' import contractors_table as contractors %}
-<h1>Ученики</h1>
-{{ contractors('Выполнившие задания', task, finishedTaskContractors, attemptRepository) }}
-{{ contractors('Не выполнившие задания', task, notFinishedTaskContractors, attemptRepository) }}
+    <h1>Ученики</h1>
+    <div id="active-contractors">
+        {% include 'task/contractors_table.html.twig' with {'title': 'Не закончившие выполнение', 'contractors': notSolvedTaskContractors} %}
+    </div>
+
+    {% include 'task/contractors_table.html.twig' with {'title': 'Закончившие выполнение', 'contractors': solvedTaskContractors} %}
 {% endblock %}
 
-{% block bottom_links %}
-<a href="{{ path('task_edit', {'id': task.id}) }}">Редактировать задание</a>
-{{ parent() }}
+{% block javascripts %}
+    <script src="{{ asset('build/js/task/show.js') }}"></script>
 {% endblock %}
-
-{%block javascripts%}
-{{parent()}}
-<script src="/js/jquery.datatables.min.js"></script>
-<script>
-    $("table.contractors").DataTable({
-        pageLength: 25,
-                lengthMenu: [25, 50, 100, 250],
-        language: {{ include("student/language.json.twig") }}
-    });
-</script>
-{%endblock%}

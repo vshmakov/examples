@@ -1,0 +1,14 @@
+{% macro breadcrumbs(breadcrumbs) %}
+    <h4>Вы здесь</h4>
+
+    <ol class="breadcrumb">
+    {% for  breadcrumb in breadcrumbs %}
+        {% if breadcrumb.url is defined and not loop.last %}
+            <li class="breadcrumb-item">
+                <a href="{{ breadcrumb.url }}">{{ breadcrumb.title }}</a>
+            </li>
+        {% else %}
+            <li class="breadcrumb-item active">{{ breadcrumb.title }}</li>
+        {% endif %}
+    {% endfor %}
+{% endmacro %}

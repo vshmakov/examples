@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use  App\DateTime\DateTime as DT;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -9,8 +10,6 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Visit
 {
-    use BaseTrait;
-
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -61,7 +60,7 @@ class Visit
 
     public function getAddTime(): ?\DateTimeInterface
     {
-        return $this->dt($this->addTime);
+        return DT::createFromDT($this->addTime);
     }
 
     public function setAddTime(\DateTimeInterface $addTime): self

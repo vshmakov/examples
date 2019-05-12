@@ -14,29 +14,25 @@ security:
                 property: id
         fos_userbundle:
             id: fos_user.user_provider.username_email
-        in_memory: { memory: ~ }
 
     firewalls:
         login:
-            pattern: ^/api/login
+            pattern: ^/security/login/$
             context: main
             guard:
                 provider: login
                 authenticators:
-                    - App\Security\LoginAuthenticator
+                    - App\Security\Authentication\Guard\LoginAuthenticator
             logout:       true
             anonymous:    true
             remember_me:
                 secret:   '%kernel.secret%'
-                lifetime: 604800 # 1 week in seconds
                 path:     /
                 always_remember_me: true
                 user_provider: login
 
         main:
             pattern: ^/
-            #stateless: true
-            #context: main
             form_login:
                 always_use_default_target_path: true
                 provider: fos_userbundle
@@ -45,18 +41,15 @@ security:
             anonymous:    true
             remember_me:
                 secret:   '%kernel.secret%'
-                lifetime: 604800 # 1 week in seconds
                 path:     /
                 user_provider: fos_userbundle
 
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
-            #context: main
             security: false
 
     access_control:
         - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/admin(/|$), role: ROLE_ADMIN }
-        - { path: ^/(account|teacher|student|child|task|settings|homework)/, role: IS_AUTHENTICATED_REMEMBERED}
+        - { path: ^/admin/, role: ROLE_ADMIN }

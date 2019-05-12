@@ -1,0 +1,8 @@
+{{ include(
+    'task/breadcrumbs/index.html.twig',
+    {
+        'breadcrumbs': [
+            {'title': 'Редактировать домашнее задание'},
+        ]|merge(breadcrumbs ?? [])
+    }
+) }}

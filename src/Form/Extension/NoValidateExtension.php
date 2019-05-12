@@ -9,15 +9,15 @@ use Symfony\Component\Form\FormView;
 
 class NoValidateExtension extends AbstractTypeExtension
 {
+    public static function getExtendedTypes(): iterable
+    {
+        return [FormType::class];
+    }
+
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['attr'] = array_merge($view->vars['attr'], [
             'novalidate' => 'novalidate',
         ]);
-    }
-
-    public function getExtendedType()
-    {
-        return FormType::class;
     }
 }

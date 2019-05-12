@@ -2,78 +2,59 @@
 
 namespace App\Controller;
 
+use App\Attempt\AttemptFactoryInterface;
 use App\Entity\Task;
-use App\Repository\AttemptRepository;
-use App\Repository\ExampleRepository;
-use App\Repository\TaskRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Entity\User\Role;
+use App\Security\Annotation as AppSecurity;
+use App\Security\Voter\CurrentUserVoter;
+use App\Security\Voter\TaskVoter;
+use App\Task\Contractor\ContractorProviderInterface;
+use App\Task\Contractor\ContractorResultFactoryInterface;
+use App\Task\Homework\HomeworkProviderInterface;
+use App\User\Student\Exception\RequiresStudentAccessException;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/homework")
+ * @IsGranted(Role::USER)
+ * @AppSecurity\IsGranted("ROLE_STUDENT", exception=RequiresStudentAccessException::class)
+ * @IsGranted(CurrentUserVoter::SHOW_HOMEWORK, message="Необходимо выбрать учителя")
  */
-class HomeworkController extends AbstractController
+final class HomeworkController extends Controller
 {
-    use BaseTrait;
+    /**
+     * @Route("/", name="homework_index", methods={"GET"})
+     */
+    public function index(): Response
+    {
+        return $this->render('homework/index.html.twig');
+    }
+
+    public function homework(HomeworkProviderInterface $homeworkProvider, ContractorResultFactoryInterface $contractorResultFactory): Response
+    {
+        return $this->render('homework/homework.html.twig', [
+            'actualHomework' => $contractorResultFactory->mapCreateCurrentContractorResult($homeworkProvider->getActualHomework()),
+            'archiveHomework' => $contractorResultFactory->mapCreateCurrentContractorResult($homeworkProvider->getArchiveHomework()),
+        ]);
+    }
 
     /**
-     * @Route("/", name="homework_index")
+     * @Route("{id}/solve/", name="homework_solve", methods={"GET"})
+     * @IsGranted(TaskVoter::SOLVE, subject="task")
      */
-    public function index(TaskRepository $taskRepository, AttemptRepository $attemptRepository): Response
+    public function solve(Task $task, AttemptFactoryInterface $attemptFactory, ContractorProviderInterface $contractorProvider): RedirectResponse
     {
-        $this->denyAccessUnlessGranted('SHOW_HOMEWORKS');
-
-        $tasks = $taskRepository->findHomeworkByCurrentUser();
-        $activeTasks = $archiveTasks = [];
-
-        foreach ($tasks as $task) {
-            $group = $this->isGranted('SOLVE', $task) ? 'activeTasks' : 'archiveTasks';
-            ($$group)[] = $task;
+        if ($contractorProvider->isDoneByCurrentContractor($task)) {
+            throw new BadRequestHttpException();
         }
 
-        return $this->render('homework/index.html.twig', [
-            'activeTasks' => $activeTasks,
-            'archiveTasks' => $archiveTasks,
-            'attemptRepository' => $attemptRepository,
-        ]);
-    }
-
-    /**
-     * @Route("{id}/solve", name="homework_solve")
-     */
-    public function solve(Task $task, AttemptRepository $attemptRepository): Response
-    {
-        $this->denyAccessUnlessGranted('SOLVE', $task);
-
         return $this->redirectToRoute('attempt_solve', [
-            'id' => $attemptRepository->getNewByCurrentUserAndTask($task)->getId(),
-        ]);
-    }
-
-    /**
-     * @Route("{id}/examples", name="homework_examples")
-     */
-    public function examples(Task $task, ExampleRepository $exampleRepository): Response
-    {
-        $this->denyAccessUnlessGranted('SHOW_EXAMPLES', $task);
-
-        return $this->render('homework/examples.html.twig', [
-            'task' => $task,
-            'examples' => $exampleRepository->findByCurrentUserAndHomework($task),
-        ]);
-    }
-
-    /**
-     * @Route("{id}/attempts", name="homework_attempts")
-     */
-    public function attempts(Task $task, AttemptRepository $attemptRepository): Response
-    {
-        $this->denyAccessUnlessGranted('SHOW_ATTEMPTS', $task);
-
-        return $this->render('homework/attempts.html.twig', [
-            'task' => $task,
-            'attempts' => $attemptRepository->findByCurrentUserAndHomework($task),
+            'id' => $attemptFactory->createCurrentUserSolvesTaskAttempt($task)->getId(),
         ]);
     }
 }

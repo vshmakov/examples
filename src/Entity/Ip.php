@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use  App\DateTime\DateTime as DT;
 use App\Service\IpInformer as IpInfo;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -12,8 +13,6 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Ip
 {
-    use BaseTrait;
-
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -77,23 +76,14 @@ class Ip
         return $this->ip;
     }
 
-    public function isValid()
+    public function isValid(): bool
     {
         return IpInfo::isIp($this->ip);
     }
 
-    public function setIp(string $ip): self
+    public function setIp(string $ip): void
     {
-        if (IpInfo::isIp($ip)) {
-            $this->ip = $ip;
-            $info = IpInfo::getInfoByIp($ip);
-            $this->continent = $info['continentName'];
-            $this->country = $info['countryName'];
-            $this->region = $info['stateProv'];
-            $this->city = $info['city'];
-        }
-
-        return $this;
+        $this->ip = $ip;
     }
 
     public function getCountry(): ?string
@@ -134,7 +124,7 @@ class Ip
 
     public function getAddTime(): ?\DateTimeInterface
     {
-        return $this->dt($this->addTime);
+        return DT::createFromDT($this->addTime);
     }
 
     public function setAddTime(\DateTimeInterface $addTime): self

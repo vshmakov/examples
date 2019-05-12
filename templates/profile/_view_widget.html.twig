@@ -1,0 +1,13 @@
+{% block main %}
+    <div>
+        {% block before_view %}{% endblock %}
+
+        {{ include(block_template, {title: 'Параметры профиля', fields:['description', 'examplesCount', 'duration', 'isDemanding']}) }}
+        {{ include(block_template, {title: 'Сложение', fields:['addFMin', 'addFMax', 'addSMin', 'addSMax', 'addMin', 'addMax', 'addPerc']}) }}
+        {{ include(block_template, {title: 'Вычитание', fields:['subFMin', 'subFMax', 'subSMin', 'subSMax', 'subMin', 'subMax', 'subPerc']}) }}
+        {{ include(block_template, {title: 'Умножение', fields:['multFMin', 'multFMax', 'multSMin', 'multSMax', 'multMin', 'multMax', 'multPerc']}) }}
+        {{ include(block_template, {title: 'Деление', fields:['divFMin', 'divFMax', 'divSMin', 'divSMax', 'divMin', 'divMax', 'divPerc']}) }}
+
+        {% block after_view %}{% endblock %}
+    </div>
+{% endblock %}

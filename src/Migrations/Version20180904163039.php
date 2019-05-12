@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace DoctrineMigrations;
 
 use Doctrine\DBAL\Schema\Schema;
@@ -24,30 +22,6 @@ final class Version20180904163039 extends AbstractMigration implements Container
     public function up(Schema $schema): void
     {
         $this->abortIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), 'Migration can only be executed safely on \'mysql\'.');
-
-        $em = $this->container
-->get('doctrine.orm.default_entity_manager')
-;
-
-        $users = $em->createQuery('select u from App:User u')
-->getResult()
-;
-
-        foreach ($users as $u) {
-            if ($u->isSocial()) {
-                $reg = preg_match('#^([a-z]+)\-(\d+)$#', $u->getUsername(), $arr);
-                $u->setUsername(
-'^'.$u->getUsername()
-);
-
-                if ($reg) {
-                    $u->setNetwork($arr[1])
-->setNetworkId($arr[2]);
-                }
-            }
-        }
-
-        $em->flush();
     }
 
     public function down(Schema $schema): void

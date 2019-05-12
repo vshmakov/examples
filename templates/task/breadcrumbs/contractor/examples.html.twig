@@ -1,0 +1,8 @@
+{{ include(
+    'task/breadcrumbs/show.html.twig',
+    {
+        'breadcrumbs': [
+            {'title': 'Примеры ученика'},
+    ]|merge(breadcrumbs ?? [])
+    }
+) }}

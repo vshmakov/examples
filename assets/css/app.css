@@ -1,0 +1,190 @@
+@import "~datatables.net-bs/css/dataTables.bootstrap.css";
+@import "cerulean.bootstrap.css";
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    margin-bottom: 10vh;
+    background-color: #caffca;
+    font-size: 16px;
+}
+
+footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 10vh; /*������ ������ ����� �������� �� ������ ������*/
+    font-size: 80%;
+}
+
+footer .row {
+    background-color: #193441;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.main-menu {
+    border-bottom: 1px solid black;
+    background-color: #193441;
+    font-size: 19px;
+}
+
+.main-menu a {
+    color: white;
+}
+
+main {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    padding: 40px;
+    border: 1px solid black;
+}
+
+footer {
+    border: 1px solid black;
+}
+
+.ya-share2 {
+    margin-left: 100px;
+    margin-top: 10px;
+}
+
+table {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.profile-index table {
+    margin-left: 0px;
+}
+
+.profile-index input[type=radio] {
+    /*display: block;
+    height:100%;
+    width: 100%;
+    */
+    padding: 5px;
+}
+
+.profile-index-card {
+    margin-bottom: 20px;
+}
+
+.profile-index-create-div {
+    margin: 0 auto;
+}
+
+.profile-edit .set-group {
+    float: left;
+}
+
+.profile-edit button {
+    margin-top: 10px;
+}
+
+.profile-back-link a {
+    color: green;
+    font-size: 200%;
+}
+
+.profile-back-link a:hover {
+    color: blue;
+}
+
+.email-link {
+    color: green;
+}
+
+.example-area, .example-area input {
+    font-size: 35px;
+}
+
+.attempt-solve-statistic {
+    float: right;
+    margin-left: 100px;
+}
+
+.attempt-solve ul {
+    font-size: 150%;
+}
+
+.attempt-solve form {
+    float: left;
+}
+
+.attempt-show-extbl .error, .attempt-show-extbl h6 {
+}
+
+.attempt-show-extbl td {
+    border-collapse: collapse;
+    border: 1px solid black;
+}
+
+.attempt-show-extbl {
+    float: right;
+    margin-left: 200px;
+}
+
+.attempt-show-statistic {
+    float: left;
+}
+
+.attempt-show-statistic ul {
+    margin-top: -5px;
+}
+
+.login-error {
+    color: red;
+    font-size: 200%;
+}
+
+.auth-links a {
+    color: green;
+    font-size: 200%;
+}
+
+.auth-links a:hover {
+    color: blue;
+}
+
+.auth-form .btn {
+    font-size: 200%;
+}
+
+#remember_me {
+}
+
+.login-rem {
+}
+
+.register-form .btn {
+    background-color: yellow;
+    border: 2px solid black;
+}
+
+.register-form .btn:hover {
+    background-color: green;
+}
+
+.resetting-email {
+    font-size: 200%;
+}
+
+.error {
+    color: #f55;
+}
+
+.card-header {
+    font-size: 130%;
+    font-weight: bold;
+}
+
+.tbl-bordered td, .tbl-bordered th, .tbl-bordered thead {
+    border-collapse: collapse;
+    border: 1px solid black;
+}

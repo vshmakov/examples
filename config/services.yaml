@@ -1,10 +1,7 @@
-# Put parameters here that don't need to change on each machine where the app is deployed
-# https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     locale: 'en'
 
 services:
-    # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
@@ -38,3 +35,86 @@ services:
         class: App\Form\Extension\NoValidateExtension
         tags:
             - {name: form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType}
+
+    App\Parameter\Environment\AppEnv:
+        arguments:
+            $appEnv: '%env(APP_ENV)%'
+
+    App\Service\AuthChecker:
+        arguments:
+            $authorizationChecker: '@security.authorization_checker'
+
+    Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface: '@App\Service\AuthChecker'
+
+    App\Parameter\Environment\AppName:
+        arguments:
+            $appName: '%env(APP_NAME)%'
+
+    App\Twig\AppExtension:
+        arguments:
+            $javascriptParametersContainer: '@App\Parameter\Container\JavascriptParametersContainer'
+            $appName: '@App\Parameter\Environment\AppName'
+            $appEnv: '@App\Parameter\Environment\AppEnv'
+
+    App\Security\Annotation\IsGrantedListener:
+        arguments:
+            $argumentNameConverter: '@framework_extra_bundle.argument_name_convertor'
+
+    Monolog\Formatter\JsonFormatter: ~
+
+    App\Utils\PerformanceMeter:
+        arguments:
+            $appEnv: '@App\Parameter\Environment\AppEnv'
+
+    App\Attempt\Profile\ProfileNormalizerInterface: '@App\Form\ProfileType'
+
+    App\Security\User\CurrentUserProviderInterface:
+        class: App\Service\UserLoader
+        public: true
+
+    App\Parameter\Container\ParametersContainerInterface:
+        class: 'App\Parameter\Container\JavascriptParametersContainer'
+        public: true
+
+    App\Attempt\Doctrine\UserAttemptsExtension:
+        tags:
+            - { name: api_platform.doctrine.orm.query_extension.collection, priority: 9 }
+
+    App\Serializer\Normalizer\DataTablesNormalizer:
+        arguments:
+            $collectionExtensions: !tagged api_platform.doctrine.orm.query_extension.collection
+            $collectionFilters: !tagged api_platform.filter
+
+    App\DataTables\Doctrine\PaginationExtension:
+        tags:
+            - { name: api_platform.doctrine.orm.query_extension.collection, priority: 9 }
+
+    App\Request\Pagination\PaginationRequestType:
+        arguments:
+            $apiRequestHandler: '@App\Request\ApiRequestHandler'
+
+    App\Request\DataTables\DataTablesRequestType:
+        arguments:
+            $apiRequestHandler: '@App\Request\ApiRequestHandler'
+
+    App\Serializer\Encoder\JsonDatatablesEncoder:
+        arguments:
+            $applicationEnvironment: '@App\Parameter\Environment\AppEnv'
+
+
+    App\Attempt\AttemptResponseFactoryInterface:
+        class: 'App\Repository\AttemptRepository'
+        public: true
+
+    App\Attempt\AttemptProviderInterface:
+        class: 'App\Repository\AttemptRepository'
+        public: true
+
+    App\Attempt\Example\EventSubscriber\ShowExamplesCollectionSubscriber:
+        arguments:
+            $userNumberProvider: '@App\Attempt\Example\Number\UserNumberProvider'
+            $taskNumberProvider: '@App\Attempt\Example\Number\TaskNumberProvider'
+
+
+    session.flashbag:
+        class: Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag

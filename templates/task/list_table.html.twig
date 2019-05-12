@@ -1,0 +1,54 @@
+{% macro list_table(title, tasks, isActual) %}
+    <h2>{{ title }}</h2>
+
+    <table class="table table-info table-task">
+        <thead>
+        <tr>
+            <th>№</th>
+            <th>Задание</th>
+            <th>Насколько задание выполнено учениками?</th>
+            <th>Сколько учеников выполнило задание?</th>
+            <th>Сколько нужно выполнить попыток?</th>
+            <th>Сколько нужно решить примеров?</th>
+            <th>Когда начинается задание?</th>
+            <th>Когда заканчивается задание?</th>
+            <th>Действия</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for number, taskResult in sortByDateTime(tasks, 'task.limitTime')|reverse %}
+            {% set task = taskResult.task %}
+            <tr>
+                <td>{{ number+1 }}</td>
+                <td>
+                    <a href="{{ path('task_show', {'id': task.id}) }}">{{ task.settings.description }}</a>
+                </td>
+                <td>{{ taskResult.donePercent }}%</td>
+                <td>
+                    {{ taskResult.doneContractorsCount }} из {{ task.contractors.count }}
+                </td>
+                <td>{{ task.timesCount }}</td>
+                <td>{{ task.totalExamplesCount }}</td>
+                <td>{{ task.addTime }}</td>
+                <td>{{ task.limitTime }}</td>
+                <td>
+                    <a href="{{ path('task_edit', {'id': task.id}) }}">Редактировать</a>
+
+                    {% if isActual %}
+                        {% set confirmMessage %}
+                            Вы действительно хотите архивировать домашнее задание ({{ task.settings.description }})?
+                            При архивации задания время его начала и окончания устанавливается в прошлое.
+                            Вы всегда сможете вернуть его в необходимое вам значение на странице редактирования задания.
+                        {% endset %}
+
+                        <a href="{{ path('task_archive', {'id': task.id}) }}" role="button" class="btn btn-danger"
+                           onclick="return confirm('{{ confirmMessage|toJavascriptString }}')">
+                            Архивировать
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endmacro %}

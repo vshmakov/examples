@@ -7,20 +7,19 @@
 
     <table class="table">
         <thead>
-            <tr>
-                <th>Id</th>
-                <th>Ip</th>
-                <th>Country</th>
-                <th>Region</th>
-                <th>City</th>
-                <th>Continent</th>
-                <th>AddTime</th>
-                <th>actions</th>
-            </tr>
+        <tr>
+            <th>Id</th>
+            <th>Ip</th>
+            <th>Country</th>
+            <th>Region</th>
+            <th>City</th>
+            <th>Continent</th>
+            <th>AddTime</th>
+            <th>actions</th>
+        </tr>
         </thead>
         <tbody>
         {% for ip in ips %}
-{{fillIp(ip)}}
         {% endfor %}
         </tbody>
     </table>
@@ -28,16 +27,6 @@
     <a href="{{ path('ip_new') }}">Create new</a>
 {% endblock %}
 
-{%block javascripts%}
-{{parent()}}
-<script src="/js/jquery.datatables.min.js"></script>
-<script>
-$("table").DataTable({
-pageLength: 50,
-order: [0, "desc"],
-lengthMenu: [25, 50, 100, 250],
-data: {{processIps(ips)|reverse|json_encode|raw}},
-deferRender: true,
-});
-</script>
-{%endblock%}
+{% block javascripts %}
+    <script src="{{  asset('build/js/admin/ip/index.js') }}"></script>
+{% endblock %}

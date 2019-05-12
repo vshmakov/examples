@@ -1,0 +1,11 @@
+sonata_auto_configure:
+    admin:
+        suffix: Admin
+        manager_type: orm
+    entity:
+        namespaces:
+            - { namespace: App\Entity, manager_type: orm }
+    controller:
+        suffix: Controller
+        namespaces:
+            - App\Controller\Admin

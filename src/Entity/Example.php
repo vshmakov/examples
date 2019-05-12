@@ -2,15 +2,29 @@
 
 namespace App\Entity;
 
-use App\Service\ExampleManager;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Annotation\ApiResource;
+use App\ApiPlatform\Filter\Example\TaskFilter;
+use App\ApiPlatform\Filter\Example\UserFilter;
+use App\DateTime\DateTime as DT;
+use  App\Serializer\Group;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ExampleRepository")
+ * @TODO deny item access
+ * @ApiResource(
+ *     order={"id": "DESC"},
+ *     normalizationContext={"groups"={Group::EXAMPLE}},
+ *     itemOperations={"get"},
+ *     collectionOperations={"get"}
+ * )
+ * @ApiFilter(  UserFilter::class)
+ * @ApiFilter(TaskFilter::class)
  */
 class Example
 {
-    use BaseTrait;
+    public const ACTION_NAMES = [1 => 'add', 'sub', 'mult', 'div'];
 
     /**
      * @ORM\Id()
@@ -70,7 +84,7 @@ class Example
         return $this->id;
     }
 
-    public function getAttempt(): ? Attempt
+    public function getAttempt(): ?Attempt
     {
         return $this->attempt;
     }
@@ -82,7 +96,7 @@ class Example
         return $this;
     }
 
-    public function getFirst(): ? float
+    public function getFirst(): ?float
     {
         return $this->first;
     }
@@ -94,7 +108,7 @@ class Example
         return $this;
     }
 
-    public function getSign(): ? int
+    public function getSign(): ?int
     {
         return $this->sign;
     }
@@ -106,7 +120,7 @@ class Example
         return $this;
     }
 
-    public function getSecond(): ? float
+    public function getSecond(): ?float
     {
         return $this->second;
     }
@@ -118,21 +132,18 @@ class Example
         return $this;
     }
 
-    public function getAnswer(): ? float
+    public function getAnswer(): ?float
     {
         return $this->answer;
     }
 
-    public function setAnswer(? float $answer): self
+    public function setAnswer(? float $answer): void
     {
         $this->answer = $answer;
-        $this->setIsRight(ExampleManager::isRight($this->first, $this->second, $this->sign, $answer));
         $this->setAnswerTime(new \DateTime());
-
-        return $this;
     }
 
-    public function isRight(): ? bool
+    public function isRight(): ?bool
     {
         return $this->isRight;
     }
@@ -144,9 +155,14 @@ class Example
         return $this;
     }
 
-    public function getAddTime(): ? \DateTimeInterface
+    public function getAddTime(): ?\DateTimeInterface
     {
-        return $this->dt($this->addTime);
+        return DT::createFromDT($this->addTime);
+    }
+
+    public function getCreatedAt(): \DateTimeInterface
+    {
+        return $this->getAddTime();
     }
 
     public function setAddTime(\DateTimeInterface $addTime): self
@@ -156,9 +172,9 @@ class Example
         return $this;
     }
 
-    public function getAnswerTime(): ? \DateTimeInterface
+    public function getAnswerTime(): ?\DateTimeInterface
     {
-        return $this->dt($this->answerTime);
+        return null !== $this->answerTime ? DT::createFromDT($this->answerTime) : null;
     }
 
     public function setAnswerTime(\DateTimeInterface $answerTime): self

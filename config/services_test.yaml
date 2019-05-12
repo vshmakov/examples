@@ -2,8 +2,15 @@ services:
     _defaults:
         public: true
 
-    # If you need to access services in a test, create an alias
-    # and then fetch that alias from the container. As a convention,
-    # aliases are prefixed with test. For example:
-    #
-    # test.App\Service\MyService: '@App\Service\MyService'
+    fos_user.mailer:
+        class: 'App\Tests\Functional\Security\Mailer'
+        arguments:
+            - '@mailer'
+            - '@router'
+            - '@templating'
+            -
+                confirmation.template: '%fos_user.registration.confirmation.template%'
+                from_email: {confirmation: ''}
+
+    App\User\SocialAccount\Credentials\SocialAccountCredentialsProviderInterface:
+        class: 'App\Tests\Functional\Security\SocialAccountCredentialsProvider'

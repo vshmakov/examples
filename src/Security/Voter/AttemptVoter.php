@@ -3,81 +3,79 @@
 namespace App\Security\Voter;
 
 use App\Entity\Attempt;
-use App\Repository\AttemptRepository;
-use App\Repository\ExampleRepository;
-use App\Repository\SessionRepository;
-use App\Service\AuthChecker;
-use App\Service\UserLoader;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+use App\Entity\User\Role;
+use App\Security\User\CurrentUserProviderInterface;
+use App\Security\User\CurrentUserSessionProviderInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Webmozart\Assert\Assert;
 
-class AttemptVoter extends Voter
+final class AttemptVoter extends BaseVoter
 {
-    use BaseTrait;
-    private $userLoader;
-    private $sessionRepository;
-    private $attemptRepository;
-    private $exampleRepository;
-    private $authChecker;
+    public const VIEW = 'VIEW';
+    public const SOLVE = 'SOLVE';
 
-    public function __construct(UserLoader $userLoader, SessionRepository $sessionRepository, AttemptRepository $attemptRepository, ExampleRepository $exampleRepository, AuthChecker $authChecker)
-    {
-        $this->userLoader = $userLoader;
-        $this->sessionRepository = $sessionRepository;
-        $this->attemptRepository = $attemptRepository;
-        $this->exampleRepository = $exampleRepository;
-        $this->authChecker = $authChecker;
+    /** @var Attempt */
+    protected $subject;
+
+    /** @var AuthorizationCheckerInterface */
+    private $authorizationChecker;
+
+    /** @var CurrentUserProviderInterface */
+    private $currentUserProvider;
+
+    /** @var CurrentUserSessionProviderInterface */
+    private $currentUserSessionProvider;
+
+    public function __construct(
+        AuthorizationCheckerInterface $authorizationChecker,
+        CurrentUserProviderInterface $currentUserProvider,
+        CurrentUserSessionProviderInterface $currentUserSessionProvider
+    ) {
+        $this->authorizationChecker = $authorizationChecker;
+        $this->currentUserProvider = $currentUserProvider;
+        $this->currentUserSessionProvider = $currentUserSessionProvider;
     }
 
-    protected function supports($attribute, $subject)
+    protected static function getSupportedAttributes(): array
+    {
+        return [
+            self::VIEW,
+            self::SOLVE,
+        ];
+    }
+
+    protected function supports($attribute, $subject): bool
     {
         return $subject instanceof Attempt;
     }
 
-    protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
+    protected function canView(): bool
     {
-        return $this->checkRight($attribute, $subject->setEntityRepository($this->attemptRepository), $token);
-    }
-
-    private function canSolve()
-    {
-        $attempt = $this->subject;
-
-        if (!$this->canView()) {
-            return false;
-        }
-
-        $userLoader = $this->userLoader;
-        $user = $userLoader->getUser();
-
-        if (($userLoader->isGuest() && $attempt->getSession() !== $this->sessionRepository->findOneByCurrentUser())
-            or (0 === $attempt->getRemainedExamplesCount())
-            or (0 === $attempt->getRemainedTime()->getTimestamp())) {
-            return false;
-        }
-
-        return true;
-    }
-
-    private function canAnswer()
-    {
-        $attempt = $this->subject;
-        $example = $this->exampleRepository->findLastUnansweredByAttempt($attempt);
-
-        return $this->canSolve() && $example;
-    }
-
-    private function canView()
-    {
-        if ($this->authChecker->isGranted('ROLE_ADMIN')) {
+        if ($this->authorizationChecker->isGranted(Role::ADMIN)) {
             return true;
         }
 
-        $attempt = $this->subject;
-        $userLoader = $this->userLoader;
-        $user = $userLoader->getUser();
-        $author = $attempt->getSession()->getUser();
+        $currentUser = $this->currentUserProvider->getCurrentUserOrGuest();
+        $author = $this->subject->getSession()->getUser();
 
-        return $user === $author or $author->isUserTeacher($user);
+        return $currentUser->isEqualTo($author) or $currentUser->isTeacherOf($author);
+    }
+
+    protected function canSolve(): bool
+    {
+        return $this->canView()
+            && $this->createdByCurrentSessionUser($this->subject);
+    }
+
+    private function createdByCurrentSessionUser(Attempt $attempt): bool
+    {
+        if (!$this->currentUserProvider->isCurrentUserGuest()) {
+            return true;
+        }
+
+        $session = $attempt->getSession();
+        Assert::notNull($session);
+
+        return $this->currentUserSessionProvider->isCurrentUserSession($session);
     }
 }

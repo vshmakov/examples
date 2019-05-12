@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use  App\DateTime\DateTime as DT;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -11,8 +12,6 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Session
 {
-    use BaseTrait;
-
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -31,7 +30,7 @@ class Session
     private $lastTime;
 
     /**
-     * @ORM\Column(type="string", length=32)
+     * @ORM\Column(type="string", length=32, nullable=true)
      */
     private $sid;
 
@@ -69,9 +68,9 @@ class Session
         return $this->id;
     }
 
-    public function getLastTime()
+    public function getLastTime(): DT
     {
-        return $this->dt($this->lastTime);
+        return DT::createFromDT($this->lastTime);
     }
 
     public function setLastTime($dt)
@@ -83,7 +82,7 @@ class Session
 
     public function getAddTime(): ?\DateTimeInterface
     {
-        return $this->dt($this->addTime);
+        return DT::createFromDT($this->addTime);
     }
 
     public function setAddTime(\DateTimeInterface $addTime): self
@@ -98,7 +97,7 @@ class Session
         return $this->sid;
     }
 
-    public function setSid(string $sid): self
+    public function setSid(?string $sid): self
     {
         $this->sid = $sid;
 

@@ -2,175 +2,160 @@
 
 namespace App\Controller;
 
+use App\Attempt\Profile\ProfileInitializerInterface;
+use App\Attempt\Profile\ProfileProviderInterface;
+use App\Controller\Traits\CurrentUserProviderTrait;
+use App\Controller\Traits\ProfileTrait;
 use App\Entity\Profile;
 use App\Form\ProfileType;
-use App\Repository\ProfileRepository;
-use App\Repository\UserRepository;
-use App\Service\UserLoader;
+use App\Security\Voter\CurrentUserVoter;
+use App\Security\Voter\ProfileVoter;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use  Symfony\Component\HttpFoundation\Request;
+use  Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/profile")
  */
-class ProfileController extends Controller
+final class ProfileController extends Controller
 {
-    use BaseTrait;
+    use CurrentUserProviderTrait, ProfileTrait;
 
     /**
-     * @Route("/", name="profile_index", methods="GET")
+     * @Route("/", name="profile_index", methods={"GET"})
      */
-    public function index(ProfileRepository $profileRepository, UserLoader $userLoader, UserRepository $userRepository): Response
+    public function index(): Response
     {
-        $publicProfiles = $profileRepository->findByIsPublic(true);
-        $userProfiles = $profileRepository->findByCurrentAuthor();
-        $teacherProfiles = $profileRepository->findByCurrentUserTeacher();
+        return $this->render('profile/index.html.twig');
+    }
 
-        return $this->render('profile/index.html.twig', [
-            'public' => $publicProfiles,
-            'teacherProfiles' => $teacherProfiles,
-            'profiles' => $userProfiles,
-            'canAppoint' => $can = $this->isGranted('PRIV_APPOINT_PROFILES'),
-            'pR' => $profileRepository,
-            'jsParams' => [
-                'current' => $userRepository->getCurrentProfile($userLoader->getUser())->getId(),
-                'canAppoint' => $can,
-            ],
+    public function profiles(ProfileProviderInterface $profileProvider): Response
+    {
+        $publicProfiles = $profileProvider->getPublicProfiles();
+        $userProfiles = $profileProvider->getCurrentUserProfiles();
+
+        return $this->render('profile/profiles_widget.html.twig', [
+            'publicProfiles' => $publicProfiles,
+            'userProfiles' => $userProfiles,
+            'profileProvider' => $profileProvider,
         ]);
     }
 
     /**
-     * @Route("/new", name="profile_new", methods="GET|POST")
+     * @Route("/new/", name="profile_new", methods="GET|POST")
+     * @IsGranted(CurrentUserVoter::CREATE_PROFILES)
      */
-    public function new(Request $request, ProfileRepository $profileRepository, UserLoader $userLoader): Response
+    public function new(Request $request, ProfileInitializerInterface $profileInitializer): Response
     {
-        $profile = new Profile();
-        $profile->SetDescription($profileRepository->getTitle($profile))
-            ->setAuthor($userLoader->getUser());
-        $form = $this->buildForm($profile);
+        $profile = $profileInitializer->initializeNewProfile();
+        $form = $this->createForm(ProfileType::class, $profile);
         $form->handleRequest($request);
-        $canCreate = $this->isGranted('CREATE', $profile);
 
-        if ($form->isSubmitted() && $form->isValid() && $canCreate) {
-            return $this->saveAndRedirect($profile, $form, $userLoader);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->saveAndAppointProfile($profile);
+
+            return $this->redirectToRoute('profile_edit', ['id' => $profile->getId()]);
         }
 
         return $this->render('profile/new.html.twig', [
-            'jsParams' => [
-                'canEdit' => $canCreate,
-            ],
-            'profile' => $profile->setEntityRepository($profileRepository),
+            'profile' => $profile,
             'form' => $form->createView(),
         ]);
     }
 
     /**
-     * @Route("/{id}/edit", name="profile_edit", methods="GET|POST")
+     * @Route("/{id}/edit/", name="profile_edit", methods="GET|POST")
+     * @IsGranted(ProfileVoter::EDIT, subject="profile")
      */
-    public function edit(Request $request, Profile $profile, ProfileRepository $profileRepository, UserLoader $userLoader): Response
+    public function edit(Profile $profile, Request $request, ProfileProviderInterface $profileProvider): Response
     {
-        $this->denyAccessUnlessGranted('VIEW', $profile);
-        $profile->SetDescription($profileRepository->getTitle($profile));
-        $canEdit = $this->isGranted('EDIT', $profile);
-        $canCopy = $this->isGranted('COPY', $profile);
-        $copying = $request->request->has('copy') && $canCopy;
+        $profileTitle = $profile->getDescription();
+        $form = $this->createForm(ProfileType::class, $profile)
+            ->add('copy', SubmitType::class);
+        $form->handleRequest($request);
 
-        if ($copying) {
-            ($profile = clone $profile);
-            $profile->setAuthor($userLoader->getUser());
-        }
+        if ($form->isSubmitted() && $form->isValid()) {
+            $redirectAction = 'profile_show';
 
-        $form = $this->buildForm($profile, $copying);
-
-        if ($request->isMethod('POST')) {
-            $inputs = $request->request->get($form->getName());
-
-            if ($copying) {
-                foreach (arr('isPublic author addTime') as $fieldName) {
-                    if (isset($inputs[$fieldName])) {
-                        unset($inputs[$fieldName]);
-                    }
-                }
+            if ($form->get('copy')->isClicked()) {
+                $profile = $this->cloneProfile($form->getData());
+                $redirectAction = 'profile_edit';
             }
 
-            $form->submit($inputs);
-        }
+            $this->saveAndAppointProfile($profile);
 
-        if (($form->isSubmitted()) && ($form->isValid()) && ($canEdit or $copying)) {
-            return $this->saveAndRedirect($profile, $form, $userLoader);
+            return $this->redirectToRoute($redirectAction, ['id' => $profile->getId()]);
         }
 
         return $this->render('profile/edit.html.twig', [
-            'jsParams' => [
-                'canEdit' => $canEdit or $canCopy,
-            ],
-            'profile' => $profile->setEntityRepository($profileRepository),
+            'profile' => $profile,
+            'profileTitle' => $profileTitle,
+            'isCurrentProfile' => $profileProvider->isCurrentProfile($profile),
             'form' => $form->createView(),
         ]);
     }
 
     /**
-     * @Route("/{id}/delete", name="profile_delete", methods="DELETE")
+     * @Route("/{id}/", name="profile_show", methods={"GET"})
+     * @IsGranted(ProfileVoter::VIEW, subject="profile")
      */
-    public function delete(Request $request, Profile $profile, UserRepository $userRepository): Response
+    public function show(Profile $profile, ProfileProviderInterface $profileProvider): Response
     {
-        $this->denyAccessUnlessGranted('DELETE', $profile);
+        return $this->render('profile/show.html.twig', [
+            'profile' => $profile,
+            'isCurrentProfile' => $profileProvider->isCurrentProfile($profile),
+        ]);
+    }
 
-        foreach ($userRepository->findByProfile($profile) as $user) {
-            $user->setProfile(null);
-        }
+    /**
+     * @Route("/{id}/copy/", name="profile_copy", methods={"GET"})
+     * @IsGranted(ProfileVoter::COPY, subject="profile")
+     */
+    public function copy(Profile $profile): RedirectResponse
+    {
+        $targetProfile = $this->cloneProfile($profile);
+        $this->saveAndAppointProfile($targetProfile);
 
+        return $this->redirectToRoute('profile_edit', ['id' => $targetProfile->getId()]);
+    }
+
+    /**
+     * @Route("/{id}/delete/", name="profile_delete", methods={"DELETE"})
+     * @IsGranted(ProfileVoter::DELETE, subject="profile")
+     */
+    public function delete(Request $request, Profile $profile): RedirectResponse
+    {
         $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->flush();
         $entityManager->remove($profile);
-        $entityManager->flush();
+        $entityManager->flush($profile);
 
         return $this->redirectToRoute('profile_index');
     }
 
     /**
-     * @Route("/{id}/appoint", name="profile_appoint", methods="GET")
+     * @Route("/{id}/appoint/", name="profile_appoint", methods={"GET"})
+     * @IsGranted(ProfileVoter::APPOINT, subject="profile")
      */
-    public function appoint(Profile $profile, UserLoader $userLoader)
+    public function appoint(Profile $profile): RedirectResponse
     {
-        if ($this->isGranted('APPOINT', $profile)) {
-            $user = $userLoader->getUser();
-            $user->setProfile($profile);
-            $this->getEntityManager()->flush();
-        }
+        $currentUser = $this->getCurrentUserOrGuest();
+        $currentUser->setProfile($profile);
+        $this->getDoctrine()
+            ->getManager()
+            ->flush($currentUser);
 
         return $this->redirectToRoute('profile_index');
     }
 
-    private function buildForm(Profile $profile, bool $copying = false)
+    private function cloneProfile(Profile $sourceProfile): Profile
     {
-        $form = $this->createForm(ProfileType::class, $profile);
+        $targetProfile = clone $sourceProfile;
+        $targetProfile->setAuthor($this->getCurrentUserOrGuest());
 
-        if ($this->isGranted('ROLE_ADMIN') && !$copying) {
-            $form->add('isPublic')
-                ->add('author')
-                ->add('addTime');
-        }
-
-        return $form;
-    }
-
-    private function saveAndRedirect(Profile $profile, $form, UserLoader $userLoader)
-    {
-        $profile->normalize();
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->persist($profile);
-        $entityManager->flush();
-
-        if ($this->isGranted('APPOINT', $profile)) {
-            $userLoader->getUser()->setProfile($profile);
-            $entityManager->flush();
-        }
-
-        return $this->redirectToRoute('profile_edit', [
-            'id' => $profile->getId(),
-        ]);
+        return $targetProfile;
     }
 }

@@ -1,26 +1,19 @@
-{% extends 'homework/base.html.twig' %}
+{% extends 'main.html.twig' %}
 
-{% block title %}Домашнее задание{% endblock %}
-
-{% block main %}
-<h1>Домашнее задание</h1>
-
-{% from 'homework/tasks_table.html.twig' import tasks_table as tasks %}
-{{ tasks("Активные задания", activeTasks, attemptRepository) }}
-{{ tasks("Архив заданий", archiveTasks, attemptRepository) }}
+{% block title %}
+    Домашнее задание
 {% endblock %}
 
-{%block javascripts%}
-{{parent()}}
-<script src="/js/jquery.datatables.min.js"></script>
-<script>
-    hideHomeworksBlock();
-    
-    $("table").DataTable({
-        pageLength: 25,
-        //order: [1, "asc"],
-        lengthMenu: [25, 50, 100, 250],
-        language: {{ include("task/language.json.twig") }}
-    });
-</script>
-{%endblock%}
+{% block breadcrumbs %}
+    {{ include('homework/breadcrumbs/index.html.twig') }}
+{% endblock %}
+
+{% block main %}
+    <h1>Домашнее задание</h1>
+
+    {{ render(controller('App\\Controller\\HomeworkController::homework')) }}
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('build/js/homework/index.js') }}"></script>
+{% endblock %}

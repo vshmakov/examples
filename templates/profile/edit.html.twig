@@ -1,132 +1,33 @@
 {% extends 'main.html.twig' %}
+{% use 'profile/_view_widget.html.twig' %}
 
-{%set cur=user.currentProfile is same as(profile) ? " (текущий)" : ""%}
-{% block title %}{{profile.title~cur}}{% endblock %}
-
-{%macro list(f, t, inps)%}
-<div class="">
-<h2>{{t}}</h2>
-<table class="prf-stg-grp">
-{%for d, k in inps%}
-{%set i=f[k]%}
-<tr>
-<td>{{d}}</td> 
-<td>{{form_widget(i)}}</td>
-</tr>
-{%endfor%}
-</table>
-</div>
-{%endmacro%}
-
-{% block main%}
-<div class="profile-edit">
-{{ form_start(form) }}
-{{form_errors(form)}}
-{%from _self import list as list%}
-
-   <h1>{%block main_heading%}Редактировать профиль <em>{{cur}}</em>{%endblock%}</h1>
-<div class="row">
-<table class="prf-stg-grp">
-<tr>
-<td>Описание профиля</td>
-<td>{{form_widget(form.description)}}</td>
-</tr>
-</table>
-</div>
-
-<div class="row">
-<h2>Параметры попытки</h2>
-<table class="prf-stg-grp">
-<tr>
-<td>Количество примеров в попытке</td>
-<td>{{form_widget(form.examplesCount)}}</td>
-</tr>
-<tr>
-<td>Длительность попытки (мин:сек)</td>
-{%set msi={"attr":{"size": 2}}%}
-<td>{{form_widget(form.minutes, msi)}}:{{form_widget(form.seconds, msi)}}</td>
-</tr>
-<tr>
-<td>Повторять пример до получения правильного ответа</td>
-<td>{{form_widget(form.isDemanding)}}</td>
-</tr>
-</table>
-</div>
-
-<div>
-<div class="set-group">
-{{list(form, "Сложение", {
- "Минимальное первое слагаемое": "addFMin", "Максимальное первое слагаемое": "addFMax",
- "Минимальное второе слагаемое": "addSMin", "Максимальное второе слагаемое": "addSMax",
- "Минимальная сумма": "addMin", "Максимальная сумма": "addMax",
-"Процент примеров на сложение": "addPerc"})}}
-
-{{list(form, "Вычитание", {
-"Минимальное уменьшаемое": "subFMin", "Максимальное уменьшаемое": "subFMax", 
-"Минимальное вычитаемое": "subSMin", "Максимальное вычитаемое": "subSMax", 
-"Минимальная разность": "subMin", "Максимальная разность": "subMax", 
-"Процент примеров на вычитание": "subPerc"})}}
-</div>
-
-<div class="set-group">
-{{list(form, "Умножение", {
-"Минимальный первый множитель": "multFMin",  "Максимальный первый множитель": "multFMax", 
-"Минимальный второй множитель": "multSMin",  "Максимальный второй множитель": "multSMax", 
-"Минимальное произведение": "multMin", "Максимальное произведение": "multMax",
-"Процент примеров на умножение": "multPerc"})}}
-
-{{list(form, "Деление", {
-"Минимальное делимое": "divFMin", "Максимальное делимое": "divFMax", 
-"Минимальный делитель": "divSMin", "Максимальный делитель": "divSMax", 
-"Минимальная частное": "divMin", "Максимальное частное": "divMax", 
-"Процент примеров на деление": "divPerc"})}}
-</div>
-</div>
-
-{%block advanced_parameters%}
-{%if is_granted("ROLE_ADMIN")%}
-<h2>Параметры для администратора</h2>
-<ul>
-<li>{{form_label(form.isPublic, "Общий профиль")}}{{form_widget(form.isPublic)}}</li>
-<li>{{form_label(form.author, "Создатель профиля")}}{{form_widget(form.author)}}</li>
-<li>{{form_label(form.addTime, "Время создания профиля")}}{{form_widget(form.addTime)}}</li>
-</ul>
-{%endif%}
-{%endblock%}
-
-{%block save_button%}
-{%if is_granted(canEdit ?? "EDIT", profile)%}
-    <button class="btn btn-success">Сохранить</button>
-{%endif%}
-
-{%if is_granted("COPY", profile)%}
-<button type="submit" name="copy" value="1" class="btn btn-info">Скопировать</button>
-{%endif%}
-{%endblock%}
-{{ form_end(form) }}
-
-{%block delete_button%}
-{%if is_granted("DELETE", profile)%}
-{{include("profile/_delete_form.html.twig")}}
-{%endif%}
-{%endblock%}
-
-{% block bottom_links %}
-<div class="profile-back-link">
-{%block back_link%}
-<a href="{{path("profile_index")}}">Вернуться к списку профилей</a>
-{%endblock%}
-</div>
-{% endblock bottom_links %}
-
-</div>
+{% set currentProfileMessage = isCurrentProfile ?? false ? '(Текущий)' : '' %}
+{% block title %}
+    {{ profileTitle }} {{ currentProfileMessage }}
 {% endblock %}
 
-{%block javascripts%}
-{{parent()}}
-<script>
-if (!P.canEdit) {
-$(".main").find("input, select").attr("disabled", true);
-}
-</script>
-{%endblock%}
+{% block breadcrumbs %}
+    {{ include('profile/breadcrumbs/edit.html.twig') }}
+{% endblock %}
+
+{% block _profile_duration_widget %}
+    <div id="{{ form.vars.id }}">
+        {{ form_widget(form.minute) }}:{{ form_widget(form.second) }}
+    </div>
+{% endblock %}
+
+{% set block_template = 'profile/_settings_group_edit_widget.html.twig' %}
+
+{% block before_view %}
+    <h1>Редактировать профиль {{ currentProfileMessage }}</h1>
+
+    {{ form_start(form) }}
+    <div>{{ form_errors(form) }}</div>
+
+    {% form_theme form _self %}
+{% endblock %}
+
+{% block after_view %}
+    {{ form_rest(form) }}
+    {{ form_end(form) }}
+{% endblock %}

@@ -2,44 +2,58 @@
 
 namespace App\Repository;
 
-use App\Entity\BaseProfile;
+use App\Attempt\Profile\ProfileProviderInterface;
+use  App\Attempt\Settings\SettingsProviderInterface;
+use App\DateTime\DateTime as DT;
+use App\Entity\Profile;
 use App\Entity\Settings;
-use App\Entity\User;
-use App\Service\UserLoader;
+use App\Object\ObjectAccessor;
+use App\Repository\Traits\BaseTrait;
+use App\Security\User\CurrentUserProviderInterface;
+use App\Serializer\Group;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
-class SettingsRepository extends ServiceEntityRepository
+final class SettingsRepository extends ServiceEntityRepository implements SettingsProviderInterface
 {
     use BaseTrait;
-    private $userLoader;
+    /** @var CurrentUserProviderInterface */
+    private $currentUserProvider;
 
-    public function __construct(RegistryInterface $registry, UserLoader $userLoader)
+    /** @var ObjectNormalizer */
+    private $normalizer;
+
+    /** @var ProfileProviderInterface */
+    private $profileProvider;
+
+    public function __construct(RegistryInterface $registry, CurrentUserProviderInterface $currentUserProvider, ObjectNormalizer $normalizer, ProfileProviderInterface $profileProvider)
     {
         parent::__construct($registry, Settings::class);
-        $this->userLoader = $userLoader;
+
+        $this->currentUserProvider = $currentUserProvider;
+        $this->normalizer = $normalizer;
+        $this->profileProvider = $profileProvider;
     }
 
-    public function getNewByCurrentUser(): Settings
+    public function getOrCreateSettingsByCurrentUserProfile(): Settings
     {
-        $currentUser = $this->userLoader->getUser()
-            ->setEntityRepository($this->getEntityRepository(User::class));
-        $profile = $currentUser->getCurrentProfile();
-
-        return $this->findBySettingsDataOrNew($profile);
+        return $this->getOrCreateSettingsByProfile($this->profileProvider->getCurrentProfile());
     }
 
-    public function findBySettingsDataOrNew(BaseProfile $profile): Settings
+    public function getOrCreateSettingsByProfile(Profile $profile): Settings
     {
-        if ($settings = $this->findOneBy($profile->getSettings())) {
+        $settingsData = $this->normalizer->normalize($profile, null, ['groups' => Group::SETTINGS]);
+
+        if ($settings = $this->findOneBy($settingsData)) {
             return $settings;
         }
 
-        $settings = new Settings();
-        Settings::copySettings($profile, $settings);
+        $settingsData['duration'] = DT::createFromTimestamp($settingsData['duration']);
+        $settings = ObjectAccessor::initialize(Settings::class, $settingsData);
         $entityManager = $this->getEntityManager();
         $entityManager->persist($settings);
-        $entityManager->flush();
+        $entityManager->flush($settings);
 
         return $settings;
     }

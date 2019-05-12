@@ -2,114 +2,114 @@
 
 namespace App\Repository;
 
-use App\Entity\BaseProfile;
+use App\Attempt\Profile\ProfileInitializerInterface;
+use App\Attempt\Profile\ProfileNormalizerInterface;
+use App\Attempt\Profile\ProfileProviderInterface;
+use App\DataFixtures\Attempt\ProfileFixtures;
 use App\Entity\Profile;
-use App\Entity\User;
-use App\Service\UserLoader;
+use App\Entity\Settings;
+use App\Object\ObjectAccessor;
+use App\Security\User\CurrentUserProviderInterface;
+use App\Serializer\Group;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-class ProfileRepository extends ServiceEntityRepository
+final class ProfileRepository extends ServiceEntityRepository implements ProfileInitializerInterface, ProfileProviderInterface
 {
-    use BaseTrait;
-    private $userLoader;
+    /** @var CurrentUserProviderInterface */
+    private $currentUserProvider;
 
-    public function __construct(RegistryInterface $registry, UserLoader $userLoader)
+    /** @var NormalizerInterface */
+    private $normalizer;
+
+    /** @var ProfileNormalizerInterface */
+    private $profileNormalizer;
+
+    public function __construct(RegistryInterface $registry, CurrentUserProviderInterface $currentUserProvider, NormalizerInterface $normalizer, ProfileNormalizerInterface $profileNormalizer)
     {
         parent::__construct($registry, Profile::class);
-        $this->userLoader = $userLoader;
+
+        $this->currentUserProvider = $currentUserProvider;
+        $this->normalizer = $normalizer;
+        $this->profileNormalizer = $profileNormalizer;
     }
 
-    public function findOneByAuthor(User $user)
+    public function getCurrentProfile(): Profile
     {
-        return $this->getValue(
-            $this->createQuery('select p from App:Profile p
-where p.author = :u')
-                ->setParameter('u', $user)
-        );
+        $currentUser = $this->currentUserProvider->getCurrentUserOrGuest();
+
+        if (null === $currentUser->getProfile()) {
+            $currentUser->setProfile(
+                $this->findOneBy(['isPublic' => true, 'description' => ProfileFixtures::GUEST_PROFILE])
+            );
+            $this->getEntityManager()->flush($currentUser);
+        }
+
+        return $currentUser->getProfile();
     }
 
-    public function findOneByUser(User $user)
+    public function isCurrentProfile(Profile $profile): bool
     {
-        return $this->getValue(
-            $this->createQuery('select p from App:Profile p
-join p.users u
-where u = :u
-')->setParameter('u', $user)
-        );
+        return $profile->isEqualTo($this->getCurrentProfile());
     }
 
-    public function findOnePublic()
+    public function getCurrentUserProfiles(): array
     {
-        return $this->getValue(
-            $this->createQuery('select p from App:Profile p
-where p.isPublic = true
-')
-        );
+        return $this->findByAuthor($this->currentUserProvider->getCurrentUserOrGuest());
     }
 
-    public function findByCurrentAuthor()
+    public function getPublicProfiles(): array
     {
-        return $this->findByAuthor($this->userLoader->getUser());
+        return $this->findBy(['isPublic' => true]);
     }
 
-    public function getTitle(Profile $profile)
+    public function initializeNewProfile(): Profile
+    {
+        /** @var Profile $profile */
+        $profile = ObjectAccessor::initialize(Profile::class, [
+            'author' => $this->currentUserProvider->getCurrentUserOrGuest(),
+        ]);
+        $profile->setDescription($this->getTitle($profile));
+        $this->profileNormalizer->normalize($profile);
+
+        return $profile;
+    }
+
+    private function getTitle(Profile $profile): string
     {
         return $profile->getDescription() ?: 'Профиль №'.$this->getNumber($profile);
     }
 
-    public function countByCurrentAuthor()
+    private function getNumber(Profile $profile): int
     {
-        return $this->count(['author' => $this->userLoader->getUser()]);
-    }
-
-    public function getNumber(Profile $profile)
-    {
-        return ($profile->getId()) ? $this->getValue(
-            $this->createQuery('select count(p) from App:Profile p
-where p.author =:a and p.id <= :id')
-                ->setParameters([
-                    'a' => $profile->getAuthor(),
-                    'id' => $p->getId(),
-                ])
-        ) : $this->countByCurrentAuthor() + 1;
-    }
-
-    public function getNewByCurrentUser()
-    {
-        $profile = (new Profile());
-
-        return $profile->SetDescription($this->getTitle($profile))
-            ->setAuthor($this->userLoader->getUser());
-    }
-
-    public function findByCurrentUserTeacher()
-    {
-        $user = $this->userLoader->getUser();
-
-        if (!$user->hasTeacher()) {
-            return [];
+        if (null === $profile->getId()) {
+            return $this->countByCurrentAuthor() + 1;
         }
 
-        return $this->findByAuthor($user->getTeacher());
+        return $this->createQueryBuilder('p')
+            ->select('count(p)')
+            ->where('p.author = :author')
+            ->andWhere('p.id <= :profileId')
+            ->getQuery()
+            ->setParameters([
+                'author' => $profile->getAuthor(),
+                'profileId' => $profile->getId(),
+            ])
+            ->getSingleScalarResult();
     }
 
-    public function findOneByCurrentAuthorOrPublicAndSettingsData(BaseProfile $settings): ? Profile
+    private function countByCurrentAuthor(): int
     {
-        $where = array_reduce(Profile::getSettingsFields(), function (string $where, string $property): string {
-            if ($where) {
-                $where .= ' and ';
-            }
+        return $this->count(['author' => $this->currentUserProvider->getCurrentUserOrGuest()]);
+    }
 
-            return $where."p.$property = :$property";
-        }, '');
+    /** @deprecated */
+    public function getSettingsOrDefaultProfile(Settings $settings): Profile
+    {
+        $parameters = $this->normalizer->normalize($settings, null, ['groups' => Group::SETTINGS]);
 
-        $profile = $this->getValue(
-            $this->createQuery("select p from App:Profile p
-where p.author = :user and $where")
-                ->setParameters(['user' => $this->userLoader->getUser()] + $settings->getSettings())
-        );
-
-        return $profile ?? $this->findOneBy(['isPublic' => true] + $settings->getSettings());
+        return $this->findOneBy(['author' => $this->currentUserProvider->getCurrentUserOrGuest()] + $parameters)
+            ?? $this->findOneBy(['isPublic' => true] + $parameters);
     }
 }

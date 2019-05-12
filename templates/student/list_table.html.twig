@@ -1,0 +1,33 @@
+{% macro list_table(students, userEvaluator) %}
+    <table class="table table-info table-student">
+        <thead>
+        <tr>
+            <th>№</th>
+            <th>Фамилия / Имя</th>
+            <th>Логин</th>
+            <th>Время последней попытки</th>
+            <th>Коэффициент активности (0-5)</th>
+            <th>Действия</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for number, student in students %}
+            <tr>
+                <td>{{ number+1 }}</td>
+                <td>
+                    {{ student.lastName }}
+                    {{ student.firstName }}
+                </td>
+                <td class="username">{{ student.username }}</td>
+                {% set attempt = student.attempts.last %}
+                <td>{{ attempt ? attempt.startedAt.timeStamp : "-" }}</td>
+                <td class="activity">{{ userEvaluator.getActivityCoefficient(student) }}</td>
+                <td>
+                    <a href="{{ path("student_attempts", {"id": student.id}) }}">Посмотреть список попыток</a>
+                    <a href="{{ path("student_examples", {"id": student.id}) }}">Посмотреть список примеров</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endmacro %}

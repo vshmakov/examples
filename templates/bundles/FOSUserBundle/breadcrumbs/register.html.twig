@@ -1,0 +1,8 @@
+{{ include(
+    '@FOSUser/breadcrumbs/login.html.twig',
+    {
+        'breadcrumbs': [
+            {'title': 'Зарегистрироваться'},
+        ]|merge(breadcrumbs ?? [])
+    }
+) }}

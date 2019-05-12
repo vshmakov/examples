@@ -1,0 +1,8 @@
+{{ include(
+    'index/breadcrumbs/index.html.twig',
+    {
+        'breadcrumbs': [
+            {'title': 'Архив попыток', 'url': path('attempt_index')},
+    ]|merge(breadcrumbs ?? [])
+    }
+) }}

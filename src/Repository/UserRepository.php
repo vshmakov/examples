@@ -2,96 +2,114 @@
 
 namespace App\Repository;
 
+use App\Attempt\AttemptProviderInterface;
+use App\Attempt\Example\ExampleProviderInterface;
+use App\DataFixtures\UserFixtures;
+use App\DateTime\DateTime as DT;
 use App\Entity\Attempt;
 use App\Entity\Profile;
 use App\Entity\Task;
 use App\Entity\User;
-use App\Service\AuthChecker;
+use App\Entity\User\SocialAccount;
+use App\Object\ObjectAccessor;
+use App\Response\Result\ContractorResult;
+use App\Security\User\CurrentUserProviderInterface;
+use App\Task\Contractor\ContractorProviderInterface;
+use App\Task\Contractor\ContractorResultFactoryInterface;
+use App\User\Teacher\TeacherProviderInterface;
+use App\User\UserEvaluatorInterface;
+use App\User\UserProviderInterface;
 use App\Utils\Cache\LocalCache;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Webmozart\Assert\Assert;
 
-class UserRepository extends ServiceEntityRepository
+final class UserRepository extends ServiceEntityRepository implements UserProviderInterface, TeacherProviderInterface, ContractorProviderInterface, ContractorResultFactoryInterface, UserEvaluatorInterface
 {
-    use BaseTrait;
-    const GUEST_LOGIN = '__guest';
-    private $authChecker;
+    private const  SOLVED_EXAMPLES_STANDARDS = [
+        1 => [1 => 1, 2 => 5, 3 => 10, 4 => 25, 5 => 50],
+        3 => [1 => 1, 2 => 3, 3 => 5, 4 => 15, 5 => 30],
+        7 => [1 => 1, 2 => 3, 3 => 5, 4 => 10, 5 => 20],
+        90 => [1 => 1, 2 => 3, 3 => 5, 4 => 10, 5 => 15],
+    ];
+
+    /** @var CurrentUserProviderInterface */
+    private $currentUserProvider;
+
+    /** @var AuthorizationCheckerInterface */
+    private $authorizationChecker;
+
     private $localCache;
 
-    public function __construct(RegistryInterface $registry, AuthChecker $authChecker, LocalCache $localCache)
-    {
+    /** @var AttemptProviderInterface */
+    private $attemptProvider;
+
+    /** @var ExampleProviderInterface */
+    private $exampleProvider;
+
+    public function __construct(
+        RegistryInterface $registry,
+        CurrentUserProviderInterface $currentUserProvider,
+        AuthorizationCheckerInterface $authorizationChecker,
+        LocalCache $localCache,
+        AttemptProviderInterface $attemptProvider,
+        ExampleProviderInterface $exampleProvider
+    ) {
         parent::__construct($registry, User::class);
-        $this->authChecker = $authChecker;
+
+        $this->currentUserProvider = $currentUserProvider;
+        $this->authorizationChecker = $authorizationChecker;
         $this->localCache = $localCache;
+        $this->attemptProvider = $attemptProvider;
+        $this->exampleProvider = $exampleProvider;
     }
 
-    public function getCurrentProfile(User $user)
+    private function getAttemptsCount(User $user)
     {
-        $profileRepository = $this->getEntityRepository(Profile::class);
-        $profile = $user->getProfile() ?? $profileRepository->findOneByAuthor($user) ?? $profileRepository->findOnePublic();
-        $testProfileDescription = 'Тестовый профиль';
-
-        if (!$profile) {
-            $profile = $profileRepository->getNewByCurrentUser()
-                ->setDescription($testProfileDescription)
-                ->setIsPublic(true)
-                ->setAuthor($this->getGuest());
-
-            $entityManager = $this->getEntityManager();
-            $entityManager->persist($profile);
-            $entityManager->flush();
-        }
-
-        return $this->authChecker->isGranted('PRIV_APPOINT_PROFILES', $user) ? $profile
-            : $profileRepository->findOneBy(['description' => $testProfileDescription, 'isPublic' => true]);
+        return $this->createQueryBuilder('u')
+            ->select('count(a)')
+            ->join('u.sessions', 's')
+            ->join('s.attempts', 'a')
+            ->where('u = :user')
+            ->getQuery()
+            ->setParameter('user', $user)
+            ->getSingleScalarResult();
     }
 
-    public function getAttemptsCount(User $user)
+    private function getExamplesCount(User $user)
     {
-        return $this->getValue(
-            $this->createQuery('select count(a) from App:User u
-join u.sessions s
-join s.attempts a
-where u = :u')
-                ->setParameter('u', $user)
-        );
+        return $this->createQueryBuilder('u')
+            ->select('count(e)')
+            ->join('u.sessions', 's')
+            ->join('s.attempts', 'a')
+            ->join('a.examples', 'e')
+            ->where('u = :user')
+            ->getQuery()
+            ->setParameter('user', $user)
+            ->getSingleScalarResult();
     }
 
-    public function getExamplesCount(User $user)
+    private function getProfilesCount(User $user): int
     {
-        return $this->getValue(
-            $this->createQuery('select count(e) from App:User u
-join u.sessions s
-join s.attempts a
-join a.examples e
-where u = :u')
-                ->setParameter('u', $user)
-        );
+        return $this->getEntityManager()
+            ->getRepository(Profile::class)
+            ->countByAuthor($user);
     }
 
-    public function getProfilesCount(User $user)
-    {
-        return $this->getValue(
-            $this->createQuery('select count(p) from App:User u
-join u.profiles p
-where u = :u')
-                ->setParameter('u', $user)
-        );
-    }
-
-    public function getGuest()
+    public function getGuest(): User
     {
         static $user = false;
-        $guestLogin = self::GUEST_LOGIN;
+        $guestUsername = UserFixtures::GUEST_USERNAME;
 
         if (false === $user) {
-            $user = $this->findOneByUsername($guestLogin);
+            $user = $this->findOneByUsername($guestUsername);
         }
 
         if (!$user) {
             $user = $this->getNew()
-                ->setUsername($guestLogin)
-                ->setUsernameCanonical($guestLogin);
+                ->setUsername($guestUsername)
+                ->setUsernameCanonical($guestUsername);
 
             $entityManager = $this->getEntityManager();
             $entityManager->persist($user);
@@ -101,42 +119,59 @@ where u = :u')
         return $user;
     }
 
-    public function getNew()
+    private function getNew(): User
     {
-        return (new User())
-            ->setEnabled(true);
+        return ObjectAccessor::initialize(User::class, [
+            'enabled' => true,
+        ]);
     }
 
-    public function findOneByUloginCredentials($credentials)
+    private function findOneBySocialAccount(SocialAccount $socialAccount): ?User
     {
-        extract($credentials);
+        $criteria = [
+            'network' => $socialAccount->getNetwork(),
+            'networkId' => $socialAccount->getNetworkId(),
+        ];
 
-        return $this->findOneBy(['network' => $network, 'networkId' => $uid]);
+        $user = $this->createQueryBuilder('u')
+            ->select('u')
+            ->join('u.socialAccounts', 's')
+            ->where('s.networkId = :networkId and s.network = :network')
+            ->getQuery()
+            ->setParameters($criteria)
+            ->setMaxResults(1)
+            ->getOneOrNullResult();
+
+        return $user ?? $this->findOneBy($criteria);
     }
 
-    public function findOneByUloginCredentialsOrNew($credentials)
+    private function getUniqueUsername(SocialAccount $socialAccount): string
     {
-        extract($credentials);
-
-        if ($user = $this->findOneByUloginCredentials($credentials)) {
-            return $user;
-        }
-
-        $uniqUsername = $username;
+        $uniqueUsername = $socialAccount->getUsername();
         $i = 1;
 
-        while ($this->countByUsername($uniqUsername)) {
-            $uniqUsername = sprintf('%s-%s', $uniqUsername, $i);
+        while ($this->countByUsername($uniqueUsername)) {
+            $uniqueUsername = sprintf('%s-%s', $uniqueUsername, $i);
             ++$i;
         }
 
-        $user = $this->getNew()
-            ->setUsername($uniqUsername)
-            ->setIsSocial(true)
-            ->setFirstName($first_name)
-            ->setLastName($last_name)
-            ->setNetwork($network)
-            ->setNetworkId($uid);
+        return $uniqueUsername;
+    }
+
+    public function getOrCreateUser(SocialAccount $socialAccount): User
+    {
+        $user = $this->findOneBySocialAccount($socialAccount);
+
+        if (null === $user) {
+            $user = $this->getNew();
+            ObjectAccessor::setValues($user, [
+                'username' => $this->getUniqueUsername($socialAccount),
+                'firstName' => $socialAccount->getFirstName(),
+                'lastName' => $socialAccount->getLastName(),
+            ]);
+        }
+
+        $user->addSocialAccount($socialAccount);
         $entityManager = $this->getEntityManager();
         $entityManager->persist($user);
         $entityManager->flush();
@@ -178,32 +213,34 @@ where u = :u')
         return $count;
     }
 
-    public function getSolvedExamplesCount(User $user, \DateTimeInterface $dt = null): int
+    public function getSolvedExamplesCount(User $user, \DateTimeInterface $exampleCreatedAt = null): int
     {
-        $andWhere = '';
-        $parameters = ['u' => $user];
+        $queryBuilder = $this->createQueryBuilder('u')
+            ->select('count(e)')
+            ->join('u.sessions', 's')
+            ->join('s.attempts', 'a')
+            ->join('a.examples', 'e')
+            ->where('u = :user')
+            ->andWhere('e.isRight = true');
+        $parameters = ['user' => $user];
 
-        if ($dt) {
-            $andWhere = ' and e.addTime > :dt';
-            $parameters += ['dt' => $dt];
+        if (null !== $exampleCreatedAt) {
+            $queryBuilder->andWhere('e.addTime > :createdAt');
+            $parameters += ['createdAt' => $exampleCreatedAt];
         }
 
-        return $this->getValue(
-            $this->createQuery("select count(e) from App:Example e
-join e.attempt a
-join a.session s
-join s.user u
-where u = :u and e.isRight = true $andWhere")
-                ->setParameters($parameters)
-        );
+        return $queryBuilder
+            ->getQuery()
+            ->setParameters($parameters)
+            ->getSingleScalarResult();
     }
 
-    public function clearNotEnabledUsers(\DateTimeInterface $dt)
+    public function clearNotEnabledUsers(\DateTimeInterface $dt): int
     {
         $entityManager = $this->getEntityManager();
         $users = $entityManager->createQuery('select u from App:User u
         where u.enabled = false and u.addTime < :dt')
-            ->setParameter('dt', \DT::createBySubDays(10))
+            ->setParameter('dt', \App\DateTime\DateTime::createBySubDays(10))
             ->getResult();
 
         foreach ($users as $user) {
@@ -217,14 +254,15 @@ where u = :u and e.isRight = true $andWhere")
     public function hasExamples(User $user): bool
     {
         return $this->localCache->get(['users[%s].hasExamples', $user], function () use ($user): bool {
-            return $this->getValue(
-                $this->createQuery('select count(e) from App:Example e
-join e.attempt a
-join a.session s
-join s.user u
-where u = :user')
-                    ->setParameters(['user' => $user])
-            );
+            return $this->createQueryBuilder('u')
+                ->select('count(e)')
+                ->join('u.sessions', 's')
+                ->join('s.attempts', 'a')
+                ->join('a.examples', 'e')
+                ->where('u = :user')
+                ->getQuery()
+                ->setParameter('user', $user)
+                ->getSingleScalarResult();
         });
     }
 
@@ -237,17 +275,128 @@ where u = :user')
             ->getResult();
     }
 
-    public function getFinishedCountByTask(Task $task): int
+    public function getTeachers(): array
     {
-        $finishedUsersCount = 0;
-        $taskRepository = $this->getEntityRepository(Task::class);
+        return $this->findByIsTeacher(true);
+    }
 
-        foreach ($task->getContractors()->toArray() as $user) {
-            if ($taskRepository->isDoneByUser($task, $user)) {
-                ++$finishedUsersCount;
+    public function getActivityCoefficient(User $user): int
+    {
+        $assessments = [];
+
+        foreach (self::SOLVED_EXAMPLES_STANDARDS as $lastDays => $standardList) {
+            $examplesCount = $this->getAverageRightExamplesCount($lastDays, $user);
+            $assessments[] = $this->putAssessment($examplesCount, $standardList);
+        }
+
+        return max($assessments);
+    }
+
+    private function getAverageRightExamplesCount(int $days, User $user): int
+    {
+        Assert::greaterThan($days, 0);
+        $rightExamplesCount = $this->createQueryBuilder('u')
+            ->select('count(e)')
+            ->join('u.sessions', 's')
+            ->join('s.attempts', 'a')
+            ->join('a.examples', 'e')
+            ->where('u = :user')
+            ->andWhere('e.isRight = true')
+            ->andWhere('e.addTime >= :solvedAt')
+            ->setParameters([
+                'user' => $user,
+                'solvedAt' => DT::createBySubDays($days),
+            ])
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return (int) ($rightExamplesCount / $days);
+    }
+
+    private function putAssessment(int $result, array $standardList): int
+    {
+        $assessment = 0;
+
+        foreach ($standardList as $key => $standard) {
+            if ($result >= $standard) {
+                $assessment = $key;
             }
         }
 
-        return $finishedUsersCount;
+        return $assessment;
+    }
+
+    public function getSolvedTaskContractors(Task $task): array
+    {
+        return array_filter($task->getContractors()->toArray(), function (User $contractor) use ($task): bool {
+            return $this->isDoneByUser($task, $contractor);
+        });
+    }
+
+    public function getNotSolvedTaskContractors(Task $task): array
+    {
+        return array_filter($task->getContractors()->toArray(), function (User $contractor) use ($task): bool {
+            return !$this->isDoneByUser($task, $contractor);
+        });
+    }
+
+    public function getSolvedContractorsCount(Task $task): int
+    {
+        return \count($this->getSolvedTaskContractors($task));
+    }
+
+    private function isDoneByUser(Task $task, User $user): bool
+    {
+        return $task->getTimesCount() === $this->attemptProvider->getDoneAttemptsCount($task, $user);
+    }
+
+    public function isDoneByCurrentContractor(Task $task): bool
+    {
+        return $this->isDoneByUser($task, $this->currentUserProvider->getCurrentUserOrGuest());
+    }
+
+    public function createContractorResult(User $contractor, Task $task): ContractorResult
+    {
+        return ObjectAccessor::initialize(ContractorResult::class, [
+            'contractor' => $contractor,
+            'task' => $task,
+            'lastAttempt' => $this->attemptProvider->getContractorLastAttempt($contractor, $task),
+            'rightExamplesCount' => $this->exampleProvider->getRightExamplesCount($contractor, $task),
+            'doneAttemptsCount' => $this->attemptProvider->getDoneAttemptsCount($task, $contractor),
+            'rating' => $this->getTaskRating($contractor, $task),
+        ]);
+    }
+
+    public function createCurrentContractorResult(Task $task): ContractorResult
+    {
+        return $this->createContractorResult($this->currentUserProvider->getCurrentUserOrGuest(), $task);
+    }
+
+    public function mapCreateCurrentContractorResult(array $tasks): array
+    {
+        return array_map(function (Task $task): ContractorResult {
+            return $this->createCurrentContractorResult($task);
+        }, $tasks);
+    }
+
+    /**
+     * @param User $user
+     * @param Task $task
+     *
+     * @return int
+     */
+    public function getTaskRating(User $user, Task $task): ?int
+    {
+        $attempts = $this->attemptProvider->getContractorDoneAttempts($user, $task);
+
+        if (empty($attempts)) {
+            return null;
+        }
+
+        return (int) round(
+            array_reduce($attempts, function (float $rating, Attempt $attempt) use ($attempts): float {
+                return $rating + $attempt->getResult()->getRating() / \count($attempts);
+            }, 0)
+        );
     }
 }

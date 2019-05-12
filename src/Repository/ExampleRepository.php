@@ -2,76 +2,113 @@
 
 namespace App\Repository;
 
+use App\Attempt\AttemptProviderInterface;
+use App\Attempt\AttemptResponseFactoryInterface;
+use App\Attempt\Example\ExampleGeneratorInterface;
+use App\Attempt\Example\ExampleProviderInterface;
+use App\Attempt\Example\ExampleResponseFactoryInterface;
+use App\Attempt\Example\Number\NumberProviderInterface;
+use  App\DateTime\DateTime as DT;
 use App\Entity\Attempt;
 use App\Entity\Example;
 use App\Entity\Task;
 use App\Entity\User;
-use App\Service\ExampleManager;
+use App\Object\ObjectAccessor;
+use App\Response\ExampleResponse;
 use App\Service\UserLoader;
 use App\Utils\Cache\GlobalCache;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Psr\Container\ContainerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-class ExampleRepository extends ServiceEntityRepository
+final class ExampleRepository extends ServiceEntityRepository implements ExampleProviderInterface, ExampleResponseFactoryInterface, NumberProviderInterface
 {
-    use BaseTrait;
-    private $exampleManager;
+    /** @var ExampleGeneratorInterface */
+    private $exampleGenerator;
+
     private $userLoader;
     private $globalCache;
 
-    public function __construct(RegistryInterface $registry, ExampleManager $exampleManager, UserLoader $userLoader, GlobalCache $globalCache)
-    {
+    /** @var ContainerInterface */
+    private $container;
+
+    public function __construct(
+        RegistryInterface $registry,
+        ExampleGeneratorInterface $exampleGenerator,
+        UserLoader $userLoader,
+        GlobalCache $globalCache,
+        ContainerInterface $container
+    ) {
         parent::__construct($registry, Example::class);
-        $this->exampleManager = $exampleManager;
+        $this->exampleGenerator = $exampleGenerator;
         $this->userLoader = $userLoader;
         $this->globalCache = $globalCache;
+        $this->container = $container;
     }
 
-    public function findLastUnansweredByAttempt(Attempt $attempt): ? Example
+    public function findLastUnansweredByAttempt(Attempt $attempt): ?Example
     {
-        return $this->getValue(
-            $this->createQuery('select e from App:Example e
-where e.attempt = :a and e.answer is null
-order by e.addTime desc')
-                ->setParameter('a', $attempt)
-        );
+        return $this->createQueryBuilder('e')
+            ->select('e')
+            ->where('e.attempt = :attempt')
+            ->andWhere('e.answer is null')
+            ->orderBy('e.addTime', 'desc')
+            ->getQuery()
+            ->setParameter('attempt', $attempt)
+            ->setMaxResults(1)
+            ->getOneOrNullResult();
     }
 
-    public function findLastByAttempt(Attempt $attempt): ? Example
+    public function findLastByAttempt(Attempt $attempt): ?Example
     {
-        return $this->getValue(
-            $this->createQuery('select e from App:Example e
-where e.attempt = :a 
-order by e.addTime desc')
-                ->setParameter('a', $attempt)
-        );
+        return $this->createQueryBuilder('e')
+            ->select('e')
+            ->where('e.attempt = :attempt')
+            ->orderBy('e.addTime', 'desc')
+            ->getQuery()
+            ->setParameter('attempt', $attempt)
+            ->setMaxResults(1)
+            ->getOneOrNullResult();
     }
 
-    public function getErrorNum(Example $example): ? int
+    private function getErrorNumber(Example $example): ?int
     {
         if (false !== $example->isRight()) {
             return null;
         }
 
-        return $this->getValue(
-            $this->createQuery('select count(e) from App:Example e
-where e.attempt = :a and e.isRight = false and e.addTime <= :dt')
-                ->setParameters(['a' => $example->getAttempt(), 'dt' => $example->getAddTime()])
-        );
+        return (int) $this->createQueryBuilder('e')
+            ->select('count(e)')
+            ->where('e.attempt = :attempt')
+            ->andWhere('e.isRight = false')
+            ->andWhere('e.addTime <= :createdAt')
+            ->getQuery()
+            ->setParameters([
+                'attempt' => $example->getAttempt(),
+                'createdAt' => $example->getAddTime(),
+            ])
+            ->getSingleScalarResult();
     }
 
     public function getNumber(Example $example): int
     {
-        $where = $example->getAttempt()->getSettings()->isDemanding() ? ' and e.isRight != false' : '';
+        $queryBuilder = $this->createQueryBuilder('e')
+            ->select('count(e)')
+            ->where('e.attempt = :attempt')
+            ->andWhere('e.id < :exampleId');
 
-        return $this->getValue(
-            $this->createQuery("select count(e) from App:Example e
-where e.attempt = :a and e.addTime < :dt $where")
+        if ($example->getAttempt()->getSettings()->isDemanding()) {
+            $queryBuilder->andWhere('e.isRight != false');
+        }
+
+        return $queryBuilder
+                ->getQuery()
                 ->setParameters([
-                    'a' => $example->getAttempt(),
-                    'dt' => $example->getAddTime(),
+                    'attempt' => $example->getAttempt(),
+                    'exampleId' => $example->getId(),
                 ])
-        ) + 1;
+                ->getSingleScalarResult()
+            + 1;
     }
 
     public function findLastUnansweredByAttemptOrGetNew(Attempt $attempt): Example
@@ -79,97 +116,112 @@ where e.attempt = :a and e.addTime < :dt $where")
         return $this->findLastUnansweredByAttempt($attempt) ?? $this->getNew($attempt);
     }
 
-    public function getNew(Attempt $attempt): Example
+    private function getNew(Attempt $attempt): Example
     {
-        $example = (new Example())
-            ->setAttempt($attempt);
-
         $lastExample = $this->findLastByAttempt($attempt);
 
-        if ($attempt->getSettings()->isDemanding() && $lastExample && !$lastExample->isRight()) {
-            $example->setFirst($lastExample->getFirst())
-                ->setSecond($lastExample->getSecond())
-                ->setSign($lastExample->getSign());
+        if ($attempt->getSettings()->isDemanding() && null !== $lastExample && !$lastExample->isRight()) {
+            $example = ObjectAccessor::initialize(Example::class, [
+                'first' => $lastExample->getFirst(),
+                'second' => $lastExample->getSecond(),
+                'sign' => $lastExample->getSign(),
+            ]);
         } else {
-            ($settings = $attempt->getSettings()->getSettings());
-            $exampleManager = $this->exampleManager;
-            $sign = $exampleManager->getRandomSign($settings);
-            $previousExamples = $this->createQuery('select e from App:Example e
-join e.attempt a
-join a.session s
-join s.user u
-where u = :u and a.addTime > :dt')
-                ->setParameters([
-                    'u' => $this->userLoader->getUser(),
-                    'dt' => (new \DateTime())->sub(new \DateInterval('P3D')),
-                ])
-                ->getResult();
-
-            $exampleData = (object) $exampleManager->getRandomExample($sign, $settings, $previousExamples);
-            $example->setFirst($exampleData->first)
-                ->setSecond($exampleData->second)
-                ->setSign($exampleData->sign);
+            $example = $this->generateExample($attempt);
         }
 
-        $entityManager = $this->getEntityManager();
-        $entityManager->persist($example);
-        $entityManager->flush();
+        $example->setAttempt($attempt);
+
+        $this->getEntityManager()->persist($example);
+        $this->getEntityManager()->flush($example);
 
         return $example;
     }
 
-    public function getSolvingTime(Example $example): \DateTimeInterface
+    private function generateExample(Attempt $attempt): Example
+    {
+        $previousExamples = $this->getPreviousExamples((new \DateTime())->sub(new \DateInterval('P3D')));
+
+        return $this->exampleGenerator->generate($attempt->getSettings(), $previousExamples);
+    }
+
+    /**
+     * @return Example[]
+     */
+    private function getPreviousExamples(\DateTimeInterface $solvedAt): array
+    {
+        return $this->createQueryBuilder('e')
+            ->select('e')
+            ->join('e.attempt', 'a')
+            ->join('a.session', 's')
+            ->where('s.user = :user')
+            ->andWhere('e.addTime >= :solvedAt')
+            ->getQuery()
+            ->setParameters([
+                'user' => $this->userLoader->getUser(),
+                'solvedAt' => $solvedAt,
+            ])
+            ->getResult();
+    }
+
+    public function getSolvingTime(Example $example): ?\DateTimeInterface
     {
         $solvingTime = !$example->isAnswered() ? null
             : $this->globalCache->get(['examples[%s].solvingTime', $example], function () use ($example) {
-                $previousExample = $this->getValue(
-                $this->createQuery('select e from App:Example e
-where e.attempt = :att and e.addTime < :dt
-order by e.addTime desc')
+                $previousExample = $this->createQueryBuilder('e')
+                    ->select('e')
+                    ->where('e . attempt = :attempt')
+                    ->andWhere('e . addTime < :createdAt')
+                    ->orderBy('e . addTime', 'desc')
+                    ->getQuery()
                     ->setParameters([
-                        'dt' => $example->getAddTime(),
-                        'att' => $example->getAttempt(),
+                        'attempt' => $example->getAttempt(),
+                        'createdAt' => $example->getAddTime(),
                     ])
-            );
+                    ->setMaxResults(1)
+                    ->getOneOrNullResult();
                 $previousTime = $previousExample ? $previousExample->getAnswerTime() : $example->getAttempt()->getAddTime();
 
-                return $example->getAnswerTime()->getTimestamp() - $previousTime->getTimestamp();
+                return null !== $example->getAnswerTime() ? $example->getAnswerTime()->getTimestamp() - $previousTime->getTimestamp() : null;
             });
 
-        return $this->dts($solvingTime);
+        return null !== $solvingTime ? DT::createFromTimestamp($solvingTime) : null;
     }
 
     public function findByUser(User $user): array
     {
         return $this->createQuery('select e from App:Example e
-join e.attempt a
-join a.session s
-where s.user = :u')
+join e . attempt a
+join a . session s
+where s . user = :u')
             ->setParameter('u', $user)
             ->getResult();
     }
 
     public function getUserNumber(Example $example): int
     {
-        return $this->getValue(
-            $this->createQuery('select count(e) from App:Example e
-join e.attempt a
-join a.session s
-join s.user u
-where u = :u and e.addTime < :dt and (e.isRight != false or e.isRight is null)')
+        return $this->createQueryBuilder('e')
+                ->select('count(e)')
+                ->join('e . attempt', 'a')
+                ->join('a . session', 's')
+                ->where('s . user = :user')
+                ->andWhere('e . addTime < :createdAt')
+                ->andWhere('(e . isRight != false or e . isRight is null)')
+                ->getQuery()
                 ->setParameters([
-                    'u' => $example->getAttempt()->getSession()->getUser(),
-                    'dt' => $example->getAddTime(),
+                    'user' => $example->getAttempt()->getSession()->getUser(),
+                    'createdAt' => $example->getAddTime(),
                 ])
-        ) + 1;
+                ->getSingleScalarResult()
+            + 1;
     }
 
     public function findByCurrentUserAndHomework(Task $task): array
     {
         return $this->createQuery('select e from App:Example e
-join e.attempt a
-join a.session s
-where s.user = :user and a.task = :task')
+join e . attempt a
+join a . session s
+where s . user = :user and a . task = :task')
             ->setParameters(['user' => $this->userLoader->getUser(), 'task' => $task])
             ->getResult();
     }
@@ -177,10 +229,60 @@ where s.user = :user and a.task = :task')
     public function findByUserAndTask(User $user, Task $task): array
     {
         return $this->createQuery('select e from App:Example e
-join e.attempt a
-join a.session s
-where s.user = :user and a.task = :task')
-->setParameters(['user' => $user, 'task' => $task])
-->getResult();
+join e . attempt a
+join a . session s
+where s . user = :user and a . task = :task')
+            ->setParameters(['user' => $user, 'task' => $task])
+            ->getResult();
+    }
+
+    public function createExampleResponse(Example $example, NumberProviderInterface $numberProvider = null): ExampleResponse
+    {
+        return new ExampleResponse(
+            null !== $numberProvider ? $numberProvider->getNumber($example) : $this->getNumber($example),
+            $this->getSolvingTime($example),
+            $this->getErrorNumber($example),
+            $example,
+            [$this->getAttemptResponseFactory(), 'createAttemptResponse']
+        );
+    }
+
+    private function getAttemptResponseFactory(): AttemptResponseFactoryInterface
+    {
+        return $this->container->get(AttemptResponseFactoryInterface::class);
+    }
+
+    private function getAttemptProvider(): AttemptProviderInterface
+    {
+        return $this->container->get(AttemptProviderInterface::class);
+    }
+
+    public function createSolvingExampleResponse(Attempt $attempt): ?ExampleResponse
+    {
+        if (($attempt->isFinished())) {
+            return null;
+        }
+
+        return $this->createExampleResponse(
+        //TODO
+            $this->findLastUnansweredByAttemptOrGetNew($attempt)
+        );
+    }
+
+    public function getRightExamplesCount(User $contractor, Task $task): int
+    {
+        return (int) $this->createQueryBuilder('e')
+            ->select('count(e)')
+            ->join('e . attempt', 'a')
+            ->join('a . session', 's')
+            ->where('s . user = :user')
+            ->andWhere('a in(:attempts)')
+            ->andWhere('e . isRight = true')
+            ->getQuery()
+            ->setParameters([
+                'user' => $contractor,
+                'attempts' => $this->getAttemptProvider()->getContractorDoneAttempts($contractor, $task),
+            ])
+            ->getSingleScalarResult();
     }
 }

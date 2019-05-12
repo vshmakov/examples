@@ -2,17 +2,19 @@
 
 namespace App\Entity;
 
+use App\DateTime\DateTime as DT;
+use App\Repository\TaskRepository;
+use  App\Validator as AppAssert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Webmozart\Assert\Assert;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\TaskRepository")
+ * @ORM\Entity(repositoryClass=TaskRepository::class)
  */
 class Task
 {
-    use BaseTrait;
-
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -21,6 +23,7 @@ class Task
     private $id;
 
     /**
+     * @var User
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="tasks")
      * @ORM\JoinColumn(nullable=false)
      */
@@ -38,6 +41,7 @@ class Task
 
     /**
      * @ORM\Column(type="smallint")
+     * @AppAssert\NumberBetween(minimum=1, maximum=50)
      */
     private $timesCount = 5;
 
@@ -62,23 +66,24 @@ class Task
         $this->contractors = new ArrayCollection();
         $this->attempts = new ArrayCollection();
         $this->addTime = new \DateTime();
+        $this->limitTime = (new \DateTime())->add(new \DateInterval('P7D'));
     }
 
-    public function getId(): ? int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getAuthor(): ? User
+    public function getAuthor(): ?User
     {
         return $this->author;
     }
 
-    public function setAuthor(? User $author): self
+    public function setAuthor(User $author): void
     {
+        Assert::true($author->isTeacher());
         $this->author = $author;
-
-        return $this;
+        $this->setContractors($author->getStudents());
     }
 
     /**
@@ -107,11 +112,9 @@ class Task
         return $this;
     }
 
-    public function setContractors(Collection $contractors): self
+    public function setContractors(Collection $contractors): void
     {
         $this->contractors = $contractors;
-
-        return $this;
     }
 
     /**
@@ -145,7 +148,7 @@ class Task
         return $this;
     }
 
-    public function getTimesCount(): ? int
+    public function getTimesCount(): ?int
     {
         return $this->timesCount;
     }
@@ -157,9 +160,9 @@ class Task
         return $this;
     }
 
-    public function getAddTime(): ? \DateTimeInterface
+    public function getAddTime(): ?\DateTimeInterface
     {
-        return $this->dt($this->addTime);
+        return DT::createFromDT($this->addTime);
     }
 
     public function setAddTime(\DateTimeInterface $addTime): self
@@ -169,9 +172,9 @@ class Task
         return $this;
     }
 
-    public function getLimitTime(): ? \DateTimeInterface
+    public function getLimitTime(): ?\DateTimeInterface
     {
-        return $this->dt($this->limitTime);
+        return DT::createFromDT($this->limitTime);
     }
 
     public function setLimitTime(\DateTimeInterface $limitTime): self
@@ -181,9 +184,9 @@ class Task
         return $this;
     }
 
-    public function isAuthor(User $author): bool
+    public function isCreatedBy(User $author): bool
     {
-        return $this->author === $author;
+        return $this->author->isEqualTo($author);
     }
 
     public function getSettings(): ?Settings
@@ -196,5 +199,10 @@ class Task
         $this->settings = $settings;
 
         return $this;
+    }
+
+    public function getTotalExamplesCount(): int
+    {
+        return $this->getSettings()->getExamplesCount() * $this->getTimesCount();
     }
 }

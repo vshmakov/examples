@@ -1,33 +1,40 @@
-{% macro contractors_table(title,task, contractors, attemptRepository) %}
 <h2>{{ title }}</h2>
 
-<table class="table contractors">
+<table class="table table-info">
     <thead>
+    <tr>
         <th>№</th>
         <th>Ученик</th>
-        <th>Время последней попытки</th>
-        <th>Попытки (Выполненные / Начатые)</th>
-        <th>Средняя оценка (Выполненные / Начатые)</th>
+        <th>Когда была начата последняя попытка?</th>
+        <th>Сколько решено примеров?</th>
+        <th>Оценка</th>
         <th>Действия</th>
+    </tr>
     </thead>
     <tbody>
-        {% for number, contractor in sortContractors(contractors) %}
+    {% for number, contractorResponse in sortByDateTime(contractors, 'lastAttempt.startedAt')|reverse %}
+        {% set contractor = contractorResponse.contractor %}
         <tr>
             <td>{{ number+1 }}</td>
-            <td>{{ contractor.lastName }} {{ contractor.firstName }}</td>
-            <td>{{ attemptRepository.findLastOneByTaskAndUser(task, contractor)|property('addTime') }}</td>
-            <td>{{attemptRepository.findDoneByUserAndTask(contractor, task)|length }} / {{
-                attemptRepository.countByUserAndTask(contractor, task) }}</td>
-            <td>{{ attemptRepository.getDoneAverageRatingByUserAndTask(contractor, task) ?? '-'}} / {{
-                attemptRepository.getAverageRatingByUserAndTask(contractor, task) ?? '-'}}</td>
             <td>
-                <a href="{{ path('task_contractor_attempts', {'id': task.id, 'contractor_id': contractor.id}) }}">Просмотреть
-                    попытки</a>
-                <a href="{{ path('task_contractor_examples', {'id': task.id, 'contractor_id': contractor.id}) }}">Просмотреть
-                    примеры</a>
+                {{ contractor.lastName }} {{ contractor.firstName }}
+            </td>
+            <td>
+                {{ contractorResponse.lastAttempt is not null ? contractorResponse.lastAttempt.startedAt.timestamp : '-' }}
+            </td>
+            <td>
+                {{ contractorResponse.rightExamplesCount }} из {{ contractorResponse.task.totalExamplesCount }}
+            </td>
+            <td>{{ contractorResponse.rating ?? '-' }}</td>
+            <td>
+                <a href="{{ path('task_contractor_attempts', {'id': task.id, 'contractor_id': contractor.id}) }}">
+                    Просмотреть попытки
+                </a>
+                <a href="{{ path('task_contractor_examples', {'id': task.id, 'contractor_id': contractor.id}) }}">
+                    Просмотреть примеры
+                </a>
             </td>
         </tr>
-        {% endfor %}
+    {% endfor %}
     </tbody>
 </table>
-{% endmacro %}

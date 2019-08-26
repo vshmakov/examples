@@ -1,2 +1,2 @@
 language: php
-install: ./.tr/install.sh
+install: ./tr/install.sh

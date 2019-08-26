@@ -41,7 +41,8 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 final class TaskController extends Controller
 {
-    use CurrentUserProviderTrait, JavascriptParametersTrait;
+    use CurrentUserProviderTrait;
+    use JavascriptParametersTrait;
 
     /**
      * @Route("/", name="task_index", methods="GET")

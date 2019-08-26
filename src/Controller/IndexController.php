@@ -16,7 +16,8 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 final class IndexController extends Controller
 {
-    use CurrentUserProviderTrait, JavascriptParametersTrait;
+    use CurrentUserProviderTrait;
+    use JavascriptParametersTrait;
 
     /**
      * @Route("/", name="homepage", methods={"GET"})

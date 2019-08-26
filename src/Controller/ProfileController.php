@@ -23,7 +23,8 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 final class ProfileController extends Controller
 {
-    use CurrentUserProviderTrait, ProfileTrait;
+    use CurrentUserProviderTrait;
+    use ProfileTrait;
 
     /**
      * @Route("/", name="profile_index", methods={"GET"})

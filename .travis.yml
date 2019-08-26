@@ -1,10 +1,6 @@
 language: php
-install: composer install
+php: 7.2
+install: ./te/install.sh
 
 services:
     - mysql
-
-post_install:
-    - php bin/console d:d:c -e test
-    - php bin/console d:m:m -n -e test
-    - php bin/console d:f:l -n -e test

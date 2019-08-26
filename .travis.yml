@@ -1,6 +1,6 @@
 language: php
 php: 7.2
-install: ./te/install.sh
+install: ./tr/install.sh
 
 services:
     - mysql

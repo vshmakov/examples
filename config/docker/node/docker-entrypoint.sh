@@ -1,3 +1,4 @@
 #!/bin/sh
 npm install
-npm start
+npm run dev
+echo  'Node is ready'

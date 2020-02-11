@@ -5,8 +5,12 @@ RUN apt-get update
 
 #install zip
 RUN apt-get install -y \
-        libzip-dev \
-        zip
+    libzip-dev \
+    zip
+
+#install bash
+RUN apt-get install -y \
+    bash
 
 #install php extensions
 RUN docker-php-ext-install \

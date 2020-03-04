@@ -32,7 +32,9 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 final class AttemptController extends Controller
 {
-    use CurrentUserProviderTrait, JavascriptParametersTrait, ProfileTrait;
+    use CurrentUserProviderTrait;
+    use JavascriptParametersTrait;
+    use ProfileTrait;
 
     /**
      * @Route("/", name="attempt_index", methods={"GET"})

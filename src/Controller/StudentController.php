@@ -27,7 +27,8 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 final class StudentController extends Controller
 {
-    use  CurrentUserProviderTrait, JavascriptParametersTrait;
+    use  CurrentUserProviderTrait;
+    use JavascriptParametersTrait;
 
     /**
      * @Route("/", name="student_index", methods={"GET"})

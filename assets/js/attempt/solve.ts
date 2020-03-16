@@ -196,7 +196,7 @@ class App {
     }
 
     private _enableForm(): void {
-        $(this._input).add(this._submitButton).attr('disabled', '');
+        $(this._input).add(this._submitButton).attr('disabled', null);
         this._submitButton.html('Ответить');
         this._input.focus().click().select();
     }

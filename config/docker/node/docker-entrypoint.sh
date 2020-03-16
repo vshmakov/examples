@@ -1,4 +1,4 @@
 #!/bin/sh
-npm install
-npm run dev
+yarn install
+yarn run dev --watch
 echo  'Node is ready'

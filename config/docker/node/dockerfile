@@ -9,10 +9,9 @@ RUN apt-get update
 RUN apt-get install -y \
     bash
 
-
 RUN mkdir -p ${APP_DIR}
 WORKDIR ${APP_DIR}
 
-#COPY ./docker-entrypoint.sh /
-#RUN chmod +x /docker-entrypoint.sh
-#ENTRYPOINT ["/docker-entrypoint.sh"]
+COPY ./docker-entrypoint.sh /
+RUN chmod +x /docker-entrypoint.sh
+ENTRYPOINT ["/docker-entrypoint.sh"]

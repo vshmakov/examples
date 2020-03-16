@@ -1,0 +1,33 @@
+FROM php:7.2-fpm
+
+#update utilities
+RUN apt-get update
+
+#install zip
+RUN apt-get install -y \
+    libzip-dev \
+    zip
+
+#install bash
+RUN apt-get install -y \
+    bash
+
+#install php extensions
+RUN docker-php-ext-install \
+    pdo_mysql
+
+#install composer
+RUN curl --insecure https://getcomposer.org/composer.phar -o /usr/bin/composer && chmod +x /usr/bin/composer \
+    && composer self-update
+
+#clean cache
+RUN apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+ADD php.ini /usr/local/etc/php/conf.d/
+
+workdir /var/www
+
+COPY ./docker-entrypoint.sh /
+RUN chmod +x /docker-entrypoint.sh
+ENTRYPOINT ["/docker-entrypoint.sh"]

@@ -1,0 +1,17 @@
+from node:8
+
+ARG APP_DIR=/var/www
+
+#update utilities
+RUN apt-get update
+
+#install bash
+RUN apt-get install -y \
+    bash
+
+RUN mkdir -p ${APP_DIR}
+WORKDIR ${APP_DIR}
+
+COPY ./docker-entrypoint.sh /
+RUN chmod +x /docker-entrypoint.sh
+ENTRYPOINT ["/docker-entrypoint.sh"]

@@ -3,7 +3,7 @@ import "../app";
 import Timeout = NodeJS.Timeout;
 import {PARAMETERS} from '../constants';
 import getTwoNumberDateParts from '../datetime/getTwoNumberDateParts';
-import  EmptyCallback from '../Callable/EmptyCallback';
+import EmptyCallback from '../Callable/EmptyCallback';
 
 interface AttemptDataCallback {
     (data: AttemptData): void;
@@ -146,7 +146,7 @@ class App {
 
     private _answer(event): void {
         event.preventDefault();
-        let answer = this._input.val();
+        let answer = +this._input.val();
         this._refresh((setDataCallback: AttemptDataCallback): void => {
             Api.answer(answer, (data: AttemptData): void => setDataCallback(data));
         });
@@ -191,12 +191,12 @@ class App {
     }
 
     private _disableForm(): void {
-        $(this._input).add(this._submitButton).attr('disabled', true);
+        $(this._input).add(this._submitButton).attr('disabled', 'disabled');
         this._submitButton.html('Пожалуйста, подождите...');
     }
 
     private _enableForm(): void {
-        $(this._input).add(this._submitButton).attr('disabled', false);
+        $(this._input).add(this._submitButton).attr('disabled', null);
         this._submitButton.html('Ответить');
         this._input.focus().click().select();
     }

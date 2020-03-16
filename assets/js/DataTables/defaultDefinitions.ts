@@ -1,5 +1,5 @@
 import * as $ from 'jquery';
-import  DEFAULT_PARAMETERS from './defaultParameters';
+import DEFAULT_PARAMETERS from './defaultParameters';
 
 
 export default function defaultDefinitions(selector, customParameters) {

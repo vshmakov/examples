@@ -12,24 +12,15 @@ This web application created to study children to solve arithmetic examples.
 System requirements
 ----------------
 
-- PHP 7.2
-- Composer
-- node.js
-- npm
-- MySQL
+- docker
+- docker compose
 
 Installation
 ----------------
 
-- git clone https://github.com/shm-vadim/examples
+- git clone https://github.com/vshmakov/examples
 - cd examples
-- composer install --no-scripts
-- Create .env.local and set there your own DATABASE_URL like in .env
-- bin/console doctrine:database:create && bin/console doctrine:migrations:migrate -n && bin/console doctrine:fixtures:load -n
-- composer run-script auto-scripts
-- npm install
-- npm run dev
-- bin/console server:run
+- docker-compose up -d
 - Open http://localhost:8000 in yor browser.
 
 Enjoy!

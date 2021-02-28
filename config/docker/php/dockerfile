@@ -8,9 +8,10 @@ RUN apt-get install -y \
     libzip-dev \
     zip
 
-#install bash
+#install aditional instruments
 RUN apt-get install -y \
-    bash
+    bash \
+    git
 
 #install php extensions
 RUN docker-php-ext-install \

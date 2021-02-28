@@ -31,6 +31,8 @@ final class IpRepository extends ServiceEntityRepository implements IpProviderIn
 
     public function getCurrentRequestIp(): ?Ip
     {
+        return null;
+
         $request = $this->requestStack->getCurrentRequest();
 
         if (null === $request) {
